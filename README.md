@@ -1,16 +1,76 @@
-# React + Vite
+# DuckLoad Web Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+PUP Student Guidance System Capstone - React + Vite Frontend
 
-Currently, two official plugins are available:
+## Setup Instructions
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+### Prerequisites
+- Node.js v22+ installed
+- npm v10+
 
-## React Compiler
+### Installation
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+```bash
+# From the web/ directory
+npm install
+```
 
-## Expanding the ESLint configuration
+### Running Development Server
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```bash
+# Start the React dev server (runs on http://localhost:5173)
+npm run dev
+```
+
+### Building for Production
+
+```bash
+npm run build
+```
+
+### Running Linter
+
+```bash
+npm run lint
+```
+
+## Project Structure
+
+```
+src/
+├── components/        # Reusable UI components (shadcn/ui)
+├── features/         # Feature modules (pds, appointments, etc.)
+├── pages/            # Page components (Login, StudentForm, etc.)
+├── routes/           # Route definitions
+├── context/          # React Context (AuthContext)
+├── hooks/            # Custom React hooks
+├── services/         # API services
+├── config/           # Configuration files
+├── assets/           # Images and icons
+├── lib/              # Utilities and helpers
+├── App.jsx           # Main app component
+└── main.jsx          # Entry point
+```
+
+## Tech Stack
+
+- **React** 18.2.0 - UI library
+- **Vite** ^5.0.0 - Build tool
+- **React Router** 6.18.0 - Routing
+- **Tailwind CSS** 3.3.0 - Styling
+- **shadcn/ui** - Component library
+- **Axios** - HTTP client
+
+## Environment Variables
+
+Create a `.env` file in the web directory:
+
+```env
+VITE_API_BASE_URL=http://localhost:8000/api/v1
+```
+
+## Notes
+
+- Backend API runs on port 8000 (see `/api` directory)
+- Mock authentication uses localStorage for testing
+- Default test credentials: email: `student`, password: `password`

@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { useAuth } from "@/context";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import PUPLogo from "@/assets/images/PUPLogo.png";
 import { AlertCircle, CheckCircle } from "lucide-react";
 
 export default function Register() {
@@ -85,9 +86,9 @@ export default function Register() {
           <div className="bg-gradient-to-r from-primary to-primary-dark px-6 py-8 text-primary-foreground">
             <div className="flex items-center justify-center mb-4">
               <img
-                src="/assets/images/PUPLogo.png"
+                src={PUPLogo}
                 alt="PUPT Logo"
-                className="h-12 w-12 object-contain"
+                className="h-16 w-16 object-contain"
               />
             </div>
             <h1 className="text-2xl font-bold text-center">PUPT OGOS</h1>
