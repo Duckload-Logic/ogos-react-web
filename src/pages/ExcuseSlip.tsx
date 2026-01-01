@@ -106,7 +106,7 @@ export default function ExcuseSlip() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-b from-primary to-primary-dark text-primary-foreground py-8 md:py-12">
+      <div className="bg-primary text-primary-foreground py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <h1 className="text-3xl md:text-4xl font-bold">
             Excuse Slip Management
@@ -236,7 +236,7 @@ export default function ExcuseSlip() {
                   key={slip.id}
                   className="border-0 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b pb-3">
+                  <CardHeader className="bg-gray-50 border-b pb-3">
                     <div className="flex items-start justify-between">
                       <CardTitle className="text-base">{slip.reason}</CardTitle>
                       {getStatusBadge(slip.status)}

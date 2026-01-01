@@ -42,7 +42,7 @@ export default function ScheduleAppointment() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-b from-primary to-primary-dark text-primary-foreground py-8 md:py-12">
+      <div className="bg-primary text-primary-foreground py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <h1 className="text-3xl md:text-4xl font-bold">
             Schedule an Appointment

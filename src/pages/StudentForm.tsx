@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Check, AlertCircle, Save } from "lucide-react";
+import { Check, AlertCircle, Save, AlertTriangle } from "lucide-react";
 import { useAddressForm } from "@/hooks/useAddressForm";
 import { PersonalInformation } from "@/features/pds/components/PersonalInformation";
 import { EducationalBackground } from "@/features/pds/components/EducationalBackground";
@@ -697,7 +697,7 @@ export default function StudentForm() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-b from-primary to-primary-dark text-primary-foreground py-8 md:py-12">
+      <div className="bg-primary text-primary-foreground py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <h1 className="text-3xl md:text-4xl font-bold">
             Individual Inventory Record Form
@@ -710,6 +710,21 @@ export default function StudentForm() {
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-12">
+        {/* URGENT: PDS Completion Alert Banner */}
+        <div className="mb-8 bg-yellow-100 border-l-4 border-yellow-500 p-4 sm:p-6 rounded-lg shadow-md">
+          <div className="flex items-start gap-3">
+            <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
+            <div className="flex-1">
+              <h3 className="font-bold text-lg text-yellow-800 mb-1">
+                Important: Complete Your Personal Data Sheet
+              </h3>
+              <p className="text-yellow-700 text-sm sm:text-base">
+                You must complete this form to access all guidance services. Your information helps us provide better support and counseling.
+              </p>
+            </div>
+          </div>
+        </div>
+
         {/* Progress Bar */}
         <Card className="border-0 shadow-sm mb-6 sm:mb-8 bg-white">
           <CardContent className="pt-6">
@@ -847,7 +862,7 @@ export default function StudentForm() {
 
             {/* Form Content Card */}
             <Card className="border-0 shadow-sm">
-              <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b p-4 sm:p-6">
+              <CardHeader className="bg-gray-50 border-b p-4 sm:p-6">
                 <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
                   <CardTitle className="text-base sm:text-lg md:text-xl">
                     {sections[currentSection].title}

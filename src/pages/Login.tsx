@@ -14,14 +14,59 @@ export default function Login() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  // Validation functions
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validateUsername = (username: string): boolean => {
+    return username.length >= 3 && username.length <= 50;
+  };
+
+  const validatePassword = (password: string): boolean => {
+    return password.length >= 6;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
     setIsLoading(true);
 
-    // Validation
+    // Strict Validation
     if (!username || !password) {
-      setError("Please enter both username and password");
+      setError("Please enter both email/username and password");
+      setIsLoading(false);
+      return;
+    }
+
+    // Validate username/email format
+    const isEmail = username.includes("@");
+    
+    if (isEmail) {
+      if (!validateEmail(username)) {
+        setError("Please enter a valid email address (e.g., user@domain.com)");
+        setIsLoading(false);
+        return;
+      }
+    } else {
+      if (!validateUsername(username)) {
+        setError("Username must be between 3 and 50 characters");
+        setIsLoading(false);
+        return;
+      }
+    }
+
+    // Validate password
+    if (!validatePassword(password)) {
+      setError("Password must be at least 6 characters long");
+      setIsLoading(false);
+      return;
+    }
+
+    // Check for empty spaces
+    if (username.includes(" ") || password.includes(" ")) {
+      setError("Username and password cannot contain spaces");
       setIsLoading(false);
       return;
     }
@@ -34,34 +79,34 @@ export default function Login() {
     if (success) {
       navigate("/");
     } else {
-      setError("Invalid email or password");
+      setError("Invalid email/username or password. Please try again");
     }
 
     setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4 py-8">
+    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-3 sm:px-4 py-6 sm:py-8">
       <div className="w-full max-w-md">
         {/* Card Container */}
         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
           {/* Header */}
-          <div className="bg-gradient-to-r from-primary to-primary-dark px-6 py-8 text-primary-foreground">
-            <div className="flex items-center justify-center mb-4">
+          <div className="bg-primary px-4 sm:px-6 py-6 sm:py-8 text-primary-foreground">
+            <div className="flex items-center justify-center mb-3 sm:mb-4">
               <img
                 src={PUPLogo}
                 alt="PUPT Logo"
-                className="h-16 w-16 object-contain"
+                className="h-14 sm:h-16 w-14 sm:w-16 object-contain"
               />
             </div>
-            <h1 className="text-2xl font-bold text-center">PUPT OGOS</h1>
-            <p className="text-center text-sm opacity-90 mt-2">
+            <h1 className="text-xl sm:text-2xl font-bold text-center">PUPT OGOS</h1>
+            <p className="text-center text-xs sm:text-sm opacity-90 mt-2">
               Login to Your Account
             </p>
           </div>
 
           {/* Form Content */}
-          <div className="px-6 py-8">
+          <div className="px-4 sm:px-6 py-6 sm:py-8">
             {/* Error Alert */}
             {error && (
               <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg flex gap-3">
@@ -116,14 +161,14 @@ export default function Login() {
               <Button
                 type="submit"
                 disabled={isLoading}
-                className="w-full h-10 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold"
+                className="w-full h-10 sm:h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold text-sm sm:text-base"
               >
                 {isLoading ? "Logging in..." : "Login"}
               </Button>
             </form>
 
             {/* Footer */}
-            <p className="text-center text-sm text-muted-foreground mt-6">
+            <p className="text-center text-xs sm:text-sm text-muted-foreground mt-6">
               Don't have an account?{" "}
               <Link
                 to="/register"
@@ -136,7 +181,7 @@ export default function Login() {
         </div>
 
         {/* Support Text */}
-        <p className="text-center text-sm text-muted-foreground mt-6">
+        <p className="text-center text-xs sm:text-sm text-muted-foreground mt-6">
           Need help? Contact the guidance office
         </p>
       </div>

@@ -13,6 +13,7 @@ import ScheduleAppointment from "@/pages/ScheduleAppointment";
 import StudentForm from "@/pages/StudentForm";
 import ExcuseSlip from "@/pages/ExcuseSlip";
 import ViewSchedules from "@/pages/ViewSchedules";
+import Profile from "@/pages/Profile";
 import NotFound from "@/pages/NotFound";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 
@@ -76,6 +77,14 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute>
         <ViewSchedules />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/profile",
+    element: (
+      <ProtectedRoute>
+        <Profile />
       </ProtectedRoute>
     ),
   },

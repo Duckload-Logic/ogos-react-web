@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
+import { AlertTriangle } from "lucide-react";
 
 const PROGRAMS = [
   { title: "Counseling" },
@@ -23,7 +24,7 @@ export default function GuidanceServices() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-b from-primary to-primary-dark text-primary-foreground py-8 md:py-12">
+      <div className="bg-primary text-primary-foreground py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <h1 className="text-3xl md:text-4xl font-bold">Guidance Services</h1>
           <p className="text-base md:text-lg mt-2 opacity-90">
@@ -33,14 +34,25 @@ export default function GuidanceServices() {
       </div>
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-12">
-        {/* Personal Data Sheet Form Button */}
+        {/* URGENT: PDS Completion Alert Banner */}
         {showForm && (
-          <div className="mb-8">
-            <Link to="/form">
-              <Button className="w-full bg-primary hover:bg-primary-dark text-primary-foreground font-semibold">
-                Fill Out Personal Data Sheet
-              </Button>
-            </Link>
+          <div className="mb-8 bg-yellow-100 border-l-4 border-yellow-500 p-4 sm:p-6 rounded-lg shadow-md">
+            <div className="flex items-start gap-3">
+              <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h3 className="font-bold text-lg text-yellow-800 mb-2">
+                  Important: Complete Your Personal Data Sheet
+                </h3>
+                <p className="text-yellow-700 text-sm sm:text-base mb-4">
+                  You must complete this form to access all guidance services. Your information helps us provide better support and counseling.
+                </p>
+                <Link to="/form">
+                  <Button className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold">
+                    Complete Form Now
+                  </Button>
+                </Link>
+              </div>
+            </div>
           </div>
         )}
 

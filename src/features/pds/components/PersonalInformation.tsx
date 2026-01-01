@@ -1,4 +1,5 @@
 import { FormData } from "@/features/pds/types";
+import { Upload } from "lucide-react";
 
 interface PersonalInformationProps {
   formData: FormData;
@@ -311,6 +312,27 @@ export function PersonalInformation({
         {!formData.mobileNo && (
           <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
         )}
+      </div>
+
+      {/* File Upload Section for Supporting Documents */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Upload className="w-5 h-5 text-blue-600" />
+          <h3 className="font-semibold text-blue-900">Supporting Documents</h3>
+        </div>
+        <p className="text-sm text-blue-700 mb-4">
+          Upload scans of your birth certificate, ID, or other relevant documents
+        </p>
+        <div className="flex flex-col gap-3">
+          <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:bg-blue-100 transition">
+            <div className="text-center">
+              <Upload className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+              <p className="text-sm font-medium text-blue-900">Click to upload files</p>
+              <p className="text-xs text-blue-700">PNG, JPG, PDF up to 5MB</p>
+            </div>
+            <input type="file" className="hidden" multiple accept="image/*,.pdf" />
+          </label>
+        </div>
       </div>
     </div>
   );

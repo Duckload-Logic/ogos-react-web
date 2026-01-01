@@ -51,7 +51,7 @@ export default function ViewSchedules() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <div className="bg-gradient-to-b from-primary to-primary-dark text-primary-foreground py-8 md:py-12">
+      <div className="bg-primary text-primary-foreground py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
           <h1 className="text-3xl md:text-4xl font-bold">My Schedules</h1>
           <p className="text-base md:text-lg mt-2 opacity-90">
@@ -90,7 +90,7 @@ export default function ViewSchedules() {
                   key={appointment.id}
                   className="border-0 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <CardHeader className="bg-gradient-to-r from-blue-50 to-blue-100 border-b pb-3">
+                  <CardHeader className="bg-blue-50 border-b pb-3">
                     <CardTitle className="text-lg text-gray-900">
                       {appointment.reason}
                     </CardTitle>
@@ -143,7 +143,7 @@ export default function ViewSchedules() {
                     <div className="pt-4 flex gap-3">
                       <Button
                         variant="outline"
-                        className="flex-1 border-gray-300 hover:bg-gray-100 text-gray-900"
+                        className="flex-1 border-blue-500 text-blue-600 hover:bg-blue-50 bg-blue-50"
                       >
                         Reschedule
                       </Button>
@@ -194,7 +194,7 @@ export default function ViewSchedules() {
                   key={slip.id}
                   className="border-0 shadow-sm hover:shadow-md transition-shadow"
                 >
-                  <CardHeader className="bg-gradient-to-r from-purple-50 to-purple-100 border-b pb-3">
+                  <CardHeader className="bg-purple-50 border-b pb-3">
                     <div className="flex items-start justify-between">
                       <CardTitle className="text-lg text-gray-900">
                         {slip.reason}
@@ -240,7 +240,7 @@ export default function ViewSchedules() {
 
         {/* Quick Actions */}
         <Card className="border-0 shadow-sm mt-12">
-          <CardHeader className="bg-gradient-to-r from-amber-50 to-amber-100 border-b">
+          <CardHeader className="bg-amber-50 border-b">
             <CardTitle className="text-lg">Quick Actions</CardTitle>
           </CardHeader>
           <CardContent className="pt-6">
