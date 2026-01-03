@@ -28,9 +28,17 @@ export function HealthWellness({
                 { key: "speech", label: "Speech" },
                 { key: "generalHealth", label: "General Health" },
               ].map(({ key, label }) => (
-                <tr key={key} className="border-b">
-                  <td className="py-3 px-2 font-semibold text-gray-700">
-                    {label}
+                <tr key={key} className={`border-b ${
+                  formData[key as keyof typeof formData] === "" ||
+                  formData[key as keyof typeof formData] === undefined
+                    ? "bg-red-50"
+                    : ""
+                }`}>
+                  <td className="py-3 px-2 font-semibold text-gray-900">
+                    {label} {(formData[key as keyof typeof formData] === "" ||
+                    formData[key as keyof typeof formData] === undefined) && (
+                      <span className="text-red-500">*</span>
+                    )}
                   </td>
                   <td className="py-3 px-2 text-center">
                     <label className="flex items-center gap-2">

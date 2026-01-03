@@ -70,16 +70,26 @@ export function PersonalInformation({
           {/* Middle Name */}
           <div>
             <label className="block font-semibold text-gray-700 mb-2">
-              Middle Name
+              Middle Name <span className="text-red-500">*</span>
             </label>
             <input
               type="text"
               value={formData.middleName}
-              onChange={(e) => handleInputChange("middleName", e.target.value)}
+              onChange={(e) => {
+                handleInputChange("middleName", e.target.value);
+                clearError("middleName");
+              }}
               placeholder="e.g., Joe"
-              className="w-full px-4 py-3 border border-gray-300 rounded-lg
-                focus:outline-none focus:ring-2 focus:ring-primary"
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+                focus:ring-2 transition ${
+                  !formData.middleName
+                    ? "border-red-400 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-primary"
+                }`}
             />
+            {!formData.middleName && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
           </div>
         </div>
       </div>
@@ -88,13 +98,20 @@ export function PersonalInformation({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
-            Civil Status
+            Civil Status <span className="text-red-500">*</span>
           </label>
           <select
             value={formData.civilStatus}
-            onChange={(e) => handleInputChange("civilStatus", e.target.value)}
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg
-              focus:outline-none focus:ring-2 focus:ring-primary"
+            onChange={(e) => {
+              handleInputChange("civilStatus", e.target.value);
+              clearError("civilStatus");
+            }}
+            className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+              focus:ring-2 transition ${
+                !formData.civilStatus
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
           >
             <option value="">Select...</option>
             <option value="Single">Single</option>
@@ -108,19 +125,32 @@ export function PersonalInformation({
             <option value="Widowed">Widowed</option>
             <option value="Separated">Separated</option>
           </select>
+          {!formData.civilStatus && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
         </div>
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
-            Religion
+            Religion <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             value={formData.religion}
-            onChange={(e) => handleInputChange("religion", e.target.value)}
+            onChange={(e) => {
+              handleInputChange("religion", e.target.value);
+              clearError("religion");
+            }}
             placeholder="e.g., Catholic"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg
-              focus:outline-none focus:ring-2 focus:ring-primary"
+            className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+              focus:ring-2 transition ${
+                !formData.religion
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
           />
+          {!formData.religion && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
         </div>
       </div>
 
@@ -128,7 +158,7 @@ export function PersonalInformation({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
-            High School General Average
+            High School General Average <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -138,9 +168,16 @@ export function PersonalInformation({
               clearError("highSchoolAverage");
             }}
             placeholder="e.g., 85"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg
-              focus:outline-none focus:ring-2 focus:ring-primary"
+            className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+              focus:ring-2 transition ${
+                !formData.highSchoolAverage
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
           />
+          {!formData.highSchoolAverage && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
         </div>
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
@@ -222,45 +259,75 @@ export function PersonalInformation({
       {/* Place of Birth */}
       <div>
         <label className="block font-semibold text-gray-700 mb-2">
-          Place of Birth
+          Place of Birth <span className="text-red-500">*</span>
         </label>
         <input
           type="text"
           value={formData.placeOfBirth}
-          onChange={(e) => handleInputChange("placeOfBirth", e.target.value)}
+          onChange={(e) => {
+            handleInputChange("placeOfBirth", e.target.value);
+            clearError("placeOfBirth");
+          }}
           placeholder="e.g., Manila"
-          className="w-full px-4 py-3 border border-gray-300 rounded-lg
-            focus:outline-none focus:ring-2 focus:ring-primary"
+          className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+            focus:ring-2 transition ${
+              !formData.placeOfBirth
+                ? "border-red-400 focus:ring-red-500"
+                : "border-gray-300 focus:ring-primary"
+            }`}
         />
+        {!formData.placeOfBirth && (
+          <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+        )}
       </div>
 
       {/* Physical Attributes */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
-            Height (ft.)
+            Height (ft.) <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             value={formData.height}
-            onChange={(e) => handleInputChange("height", e.target.value)}
+            onChange={(e) => {
+              handleInputChange("height", e.target.value);
+              clearError("height");
+            }}
             placeholder="e.g., 5.8"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg
-              focus:outline-none focus:ring-2 focus:ring-primary"
+            className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+              focus:ring-2 transition ${
+                !formData.height
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
           />
+          {!formData.height && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
         </div>
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
-            Weight (kg.)
+            Weight (kg.) <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             value={formData.weight}
-            onChange={(e) => handleInputChange("weight", e.target.value)}
+            onChange={(e) => {
+              handleInputChange("weight", e.target.value);
+              clearError("weight");
+            }}
             placeholder="e.g., 70"
-            className="w-full px-4 py-3 border border-gray-300 rounded-lg
-              focus:outline-none focus:ring-2 focus:ring-primary"
+            className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+              focus:ring-2 transition ${
+                !formData.weight
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
           />
+          {!formData.weight && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
         </div>
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
@@ -312,6 +379,149 @@ export function PersonalInformation({
         {!formData.mobileNo && (
           <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
         )}
+      </div>
+
+      {/* Provincial Address */}
+      {/* Note: Field name "provincialAddressProvince" stores complete address for backwards compatibility */}
+      <div>
+        <label className="block font-semibold text-gray-700 mb-2">
+          Complete Provincial Address <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={formData.provincialAddressProvince}
+          onChange={(e) => {
+            handleInputChange("provincialAddressProvince", e.target.value);
+            clearError("provincialAddressProvince");
+          }}
+          placeholder="e.g., Barangay, Municipality, Province"
+          className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+            focus:ring-2 transition ${
+              !formData.provincialAddressProvince
+                ? "border-red-400 focus:ring-red-500"
+                : "border-gray-300 focus:ring-primary"
+            }`}
+        />
+        {!formData.provincialAddressProvince && (
+          <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+        )}
+      </div>
+
+      {/* Residential/City Address */}
+      {/* Note: Field name "residentialAddressProvince" stores complete address for backwards compatibility */}
+      <div>
+        <label className="block font-semibold text-gray-700 mb-2">
+          Complete Residential or City Address <span className="text-red-500">*</span>
+        </label>
+        <input
+          type="text"
+          value={formData.residentialAddressProvince}
+          onChange={(e) => {
+            handleInputChange("residentialAddressProvince", e.target.value);
+            clearError("residentialAddressProvince");
+          }}
+          placeholder="e.g., House No., Street, City"
+          className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+            focus:ring-2 transition ${
+              !formData.residentialAddressProvince
+                ? "border-red-400 focus:ring-red-500"
+                : "border-gray-300 focus:ring-primary"
+            }`}
+        />
+        {!formData.residentialAddressProvince && (
+          <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+        )}
+      </div>
+
+      {/* Employer Info */}
+      <div>
+        <label className="block font-semibold text-gray-700 mb-2">
+          If employed, the name and address of your employer:
+        </label>
+        <input
+          type="text"
+          value={formData.employerName}
+          onChange={(e) => handleInputChange("employerName", e.target.value)}
+          placeholder="e.g., Company Name, Address"
+          className="w-full px-4 py-3 border border-gray-300 rounded-lg
+            focus:outline-none focus:ring-2 focus:ring-primary"
+        />
+      </div>
+
+      {/* Emergency Contact Information */}
+      <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
+        <h3 className="font-semibold text-gray-900 mb-4">Emergency Contact Information</h3>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-2">
+            <label className="block font-semibold text-gray-700 mb-2">
+              Complete name of the person to be contacted in case of emergency: <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.emergencyContactName}
+              onChange={(e) => {
+                handleInputChange("emergencyContactName", e.target.value);
+                clearError("emergencyContactName");
+              }}
+              placeholder="e.g., Jane Doe"
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+                focus:ring-2 transition ${
+                  !formData.emergencyContactName
+                    ? "border-red-400 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-primary"
+                }`}
+            />
+            {!formData.emergencyContactName && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+          </div>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Relationship <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              value={formData.relationship}
+              onChange={(e) => {
+                handleInputChange("relationship", e.target.value);
+                clearError("relationship");
+              }}
+              placeholder="e.g., Mother"
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+                focus:ring-2 transition ${
+                  !formData.relationship
+                    ? "border-red-400 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-primary"
+                }`}
+            />
+            {!formData.relationship && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+          </div>
+          <div className="md:col-span-2">
+            <label className="block font-semibold text-gray-700 mb-2">
+              Telephone No.: <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="tel"
+              value={formData.emergencyContactPhone}
+              onChange={(e) => {
+                handleInputChange("emergencyContactPhone", e.target.value);
+                clearError("emergencyContactPhone");
+              }}
+              placeholder="e.g., 09123456789"
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+                focus:ring-2 transition ${
+                  !formData.emergencyContactPhone
+                    ? "border-red-400 focus:ring-red-500"
+                    : "border-gray-300 focus:ring-primary"
+                }`}
+            />
+            {!formData.emergencyContactPhone && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+          </div>
+        </div>
       </div>
 
       {/* File Upload Section for Supporting Documents */}

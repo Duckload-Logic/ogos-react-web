@@ -3,7 +3,6 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, AlertCircle, Save, AlertTriangle } from "lucide-react";
-import { useAddressForm } from "@/hooks/useAddressForm";
 import { PersonalInformation } from "@/features/pds/components/PersonalInformation";
 import { EducationalBackground } from "@/features/pds/components/EducationalBackground";
 import { FamilyBackground } from "@/features/pds/components/FamilyBackground";
@@ -240,6 +239,9 @@ export default function StudentForm() {
   const [lastSaved, setLastSaved] = useState<string>("");
   const [isMobileNav, setIsMobileNav] = useState(window.innerWidth < 1024);
   const [errors, setErrors] = useState<FormErrors>({});
+  const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
   // Validation functions
   const validateEmail = (email: string): boolean => {
@@ -407,9 +409,7 @@ export default function StudentForm() {
   const validatePersonalFields = (): boolean => {
     const errors: FormErrors = {};
 
-    if (!formData.lastName.trim()) {
-      errors.lastName = "Last name is required";
-    }
+    // Only validate truly required fields
     if (!formData.firstName.trim()) {
       errors.firstName = "First name is required";
     }
@@ -422,26 +422,6 @@ export default function StudentForm() {
       errors.mobileNo = "Mobile number is required";
     } else if (!validatePhone(formData.mobileNo)) {
       errors.mobileNo = "Invalid phone number";
-    }
-    if (!formData.dateOfBirth) {
-      errors.dateOfBirth = "Date of birth is required";
-    } else if (!validateDate(formData.dateOfBirth)) {
-      errors.dateOfBirth = "Invalid date";
-    }
-    if (!formData.course.trim()) {
-      errors.course = "Course is required";
-    }
-    if (
-      formData.highSchoolAverage &&
-      !validateGrade(formData.highSchoolAverage)
-    ) {
-      errors.highSchoolAverage = "Grade must be between 0 and 100";
-    }
-    if (formData.height && !validateHeight(formData.height)) {
-      errors.height = "Height must be between 3 and 8 feet";
-    }
-    if (formData.weight && !validateWeight(formData.weight)) {
-      errors.weight = "Weight must be between 20 and 300 kg";
     }
 
     setErrors((prev) => ({ ...prev, ...errors }));
@@ -521,8 +501,6 @@ export default function StudentForm() {
           ? 1
           : 0,
         reasonOther: formData.reasonOther ? 1 : 0,
-        expecting_scholarship: formData.expecting_scholarship ? 1 : 0,
-        scholarship_details: formData.scholarship_details ? 1 : 0,
       };
       filledCount = Object.values(enrollmentFields).filter(
         (v) => v === 1,
@@ -655,9 +633,7 @@ export default function StudentForm() {
   };
 
   const handleSubmit = () => {
-    const overallCompletion = getOverallCompletion();
-
-    // Run all validations
+    // Always run validations
     const personalValid = validatePersonalFields();
     const educationValid = validateEducationFields();
     const familyValid = validateFamilyFields();
@@ -678,17 +654,130 @@ export default function StudentForm() {
       return;
     }
 
-    alert("Form submitted successfully!");
+    // Show confirmation modal
+    setShowSubmitConfirm(true);
+  };
+
+  const confirmSubmit = () => {
+    setShowSubmitConfirm(false);
+    setShowSuccessPopup(true);
+  };
+
+  const handleSuccessClose = () => {
+    setShowSuccessPopup(false);
     localStorage.removeItem("studentFormData");
     setFormData(EMPTY_FORM);
     setCurrentSection(0);
   };
 
   const handleClearForm = () => {
-    if (window.confirm("Are you sure you want to clear all saved data?")) {
-      localStorage.removeItem("studentFormData");
-      setFormData(EMPTY_FORM);
-      alert("Form data cleared successfully");
+    setShowClearConfirm(true);
+  };
+
+  const confirmClearForm = () => {
+    setShowClearConfirm(false);
+    
+    // Clear only current section data
+    
+    if (currentSection === 0) {
+      // Clear Reason for Enrollment section
+      setFormData(prev => ({
+        ...prev,
+        reasonForEnrollment: {},
+        reasonOther: "",
+        expecting_scholarship: false,
+        scholarship_details: "",
+      }));
+    } else if (currentSection === 1) {
+      // Clear Personal Information section
+      setFormData(prev => ({
+        ...prev,
+        lastName: "",
+        firstName: "",
+        middleName: "",
+        civilStatus: "",
+        religion: "",
+        highSchoolAverage: "",
+        course: "",
+        email: "",
+        dateOfBirth: "",
+        placeOfBirth: "",
+        mobileNo: "",
+        height: "",
+        weight: "",
+        gender: "",
+        provincialAddressProvince: "",
+        provincialAddressMunicipality: "",
+        provincialAddressBarangay: "",
+        residentialAddressProvince: "",
+        residentialAddressMunicipality: "",
+        residentialAddressBarangay: "",
+        emergencyContactName: "",
+        emergencyContactPhone: "",
+        relationship: "",
+      }));
+    } else if (currentSection === 2) {
+      // Clear Educational Background section
+      setFormData(prev => ({
+        ...prev,
+        education: {
+          elementary: { school: "", location: "", public: "", yearGrad: "", awards: "" },
+          juniorHS: { school: "", location: "", public: "", yearGrad: "", awards: "" },
+          seniorHS: { school: "", location: "", public: "", yearGrad: "", awards: "" },
+          others: "",
+        },
+      }));
+    } else if (currentSection === 3) {
+      // Clear Family Background section
+      setFormData(prev => ({
+        ...prev,
+        fatherName: "",
+        fatherAge: "",
+        fatherEducation: "",
+        fatherOccupation: "",
+        fatherCompany: "",
+        motherName: "",
+        motherAge: "",
+        motherEducation: "",
+        motherOccupation: "",
+        motherCompany: "",
+        parentalStatus: "",
+        parentalDetails: "",
+        guardianName: "",
+        guardianAddress: "",
+        parentsIncome: "",
+        siblings: "",
+        brothers: "",
+        sisters: "",
+        gainfullyEmployed: "",
+        supportStudies: "",
+        supportFamily: "",
+        financialSupport: "",
+        weeklyAllowance: "",
+      }));
+    } else if (currentSection === 4) {
+      // Clear Health & Wellness section
+      setFormData(prev => ({
+        ...prev,
+        vision: "",
+        hearing: "",
+        mobility: "",
+        speech: "",
+        generalHealth: "",
+        consultedWith: "",
+        consultReason: "",
+        whenStarted: "",
+        numSessions: "",
+        dateConcluded: "",
+        dateTest: "",
+        testAdministered: "",
+        rs: "",
+        pr: "",
+        description: "",
+        significantNotesDate: "",
+        incident: "",
+        remarks: "",
+      }));
     }
   };
 
@@ -829,9 +918,8 @@ export default function StudentForm() {
                   const status = getSectionStatus(idx);
                   const percentage = calculateSectionCompletion(idx);
                   return (
-                    <button
+                    <div
                       key={section.id}
-                      onClick={() => setCurrentSection(idx)}
                       className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium text-xs sm:text-sm transition-colors flex flex-col items-center gap-1 min-w-fit ${
                         currentSection === idx
                           ? "bg-primary text-primary-foreground shadow-md"
@@ -854,7 +942,7 @@ export default function StudentForm() {
                         />
                       </div>
                       {status === "complete" && <Check className="w-3 h-3" />}
-                    </button>
+                    </div>
                   );
                 })}
               </div>
@@ -1030,7 +1118,7 @@ export default function StudentForm() {
                 onClick={handleClearForm}
                 className="px-6 py-3 bg-red-50 hover:bg-red-100 border border-red-300 text-red-700 font-semibold rounded-lg transition-colors"
               >
-                Clear All Data
+                Clear Section
               </button>
               {currentSection < sections.length - 1 ? (
                 <button
@@ -1055,6 +1143,96 @@ export default function StudentForm() {
           </div>
         </div>
       </div>
+
+      {/* Custom Clear Confirmation Modal */}
+      {showClearConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-sm border-0 shadow-2xl">
+            <CardHeader className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-t-lg">
+              <CardTitle className="text-lg">Clear Section Data?</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <p className="text-gray-700 mb-6">
+                Are you sure you want to clear all data in this section ({sections[currentSection].title})?
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowClearConfirm(false)}
+                  variant="outline"
+                  className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmClearForm}
+                  className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold"
+                >
+                  Clear Data
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Custom Submit Confirmation Modal */}
+      {showSubmitConfirm && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-sm border-0 shadow-2xl">
+            <CardHeader className="bg-gradient-to-r from-primary to-primary/90 text-primary-foreground rounded-t-lg">
+              <CardTitle className="text-lg">Submit Form?</CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <p className="text-gray-700 mb-6">
+                Are you sure you want to submit this form? Once submitted, your data will be saved and you can view it in your profile.
+              </p>
+              <div className="flex gap-3">
+                <Button
+                  onClick={() => setShowSubmitConfirm(false)}
+                  variant="outline"
+                  className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={confirmSubmit}
+                  className="flex-1 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold"
+                >
+                  Submit Form
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Custom Success Popup Modal */}
+      {showSuccessPopup && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-sm border-0 shadow-2xl">
+            <CardHeader className="bg-gradient-to-r from-green-600 to-green-500 text-white rounded-t-lg">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Check className="w-6 h-6" />
+                Form Submitted Successfully!
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <p className="text-gray-700 mb-2">
+                Your Personal Data Sheet has been successfully submitted.
+              </p>
+              <p className="text-gray-600 text-sm mb-6">
+                Your data is now saved in your profile and can be viewed at any time. Thank you for completing the form.
+              </p>
+              <Button
+                onClick={handleSuccessClose}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
+              >
+                Done
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
     </div>
   );
 }

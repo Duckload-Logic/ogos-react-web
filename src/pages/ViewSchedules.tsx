@@ -238,27 +238,6 @@ export default function ViewSchedules() {
           )}
         </section>
 
-        {/* Quick Actions */}
-        <Card className="border-0 shadow-sm mt-12">
-          <CardHeader className="bg-amber-50 border-b">
-            <CardTitle className="text-lg">Quick Actions</CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <Link to="/schedule">
-                <Button className="w-full bg-primary hover:bg-primary-dark text-primary-foreground font-semibold">
-                  Schedule New Appointment
-                </Button>
-              </Link>
-              <Link to="/excuse-slip">
-                <Button className="w-full bg-primary hover:bg-primary-dark text-primary-foreground font-semibold">
-                  Upload Excuse Slip
-                </Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-
         {/* Help Section */}
         <Card className="border-0 shadow-sm mt-8">
           <CardHeader className="bg-blue-50 border-b border-blue-200">

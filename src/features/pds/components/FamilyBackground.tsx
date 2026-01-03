@@ -19,56 +19,122 @@ export function FamilyBackground({
         <h3 className="font-semibold text-gray-900 mb-4">
           Father's Information
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            type="text"
-            placeholder="e.g., John Doe"
-            value={formData.fatherName}
-            onChange={(e) => handleInputChange("fatherName", e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          <input
-            type="text"
-            placeholder="Age e.g., 45"
-            value={formData.fatherAge}
-            onChange={(e) => {
-              handleInputChange("fatherAge", e.target.value);
-              clearError("fatherAge");
-            }}
-            className={`px-4 py-3 border rounded focus:outline-none focus:ring-2 focus:ring-primary ${
-              errors.fatherAge
-                ? "border-red-500 focus:ring-red-500"
-                : "border-gray-300"
-            }`}
-          />
-          {errors.fatherAge && (
-            <p className="text-red-500 text-xs mt-1">{errors.fatherAge}</p>
-          )}
-          <input
-            type="text"
-            placeholder="Educational Attainment"
-            value={formData.fatherEducation}
-            onChange={(e) =>
-              handleInputChange("fatherEducation", e.target.value)
-            }
-            className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          <input
-            type="text"
-            placeholder="Occupation"
-            value={formData.fatherOccupation}
-            onChange={(e) =>
-              handleInputChange("fatherOccupation", e.target.value)
-            }
-            className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          <input
-            type="text"
-            placeholder="Company"
-            value={formData.fatherCompany}
-            onChange={(e) => handleInputChange("fatherCompany", e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="md:col-span-2">
+            <label className="block font-semibold text-gray-700 mb-2">
+              Father's Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., John Doe"
+              value={formData.fatherName}
+              onChange={(e) => {
+                handleInputChange("fatherName", e.target.value);
+                clearError("fatherName");
+              }}
+              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                !formData.fatherName
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
+            />
+            {!formData.fatherName && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+          </div>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Age <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., 45"
+              value={formData.fatherAge}
+              onChange={(e) => {
+                handleInputChange("fatherAge", e.target.value);
+                clearError("fatherAge");
+              }}
+              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                !formData.fatherAge
+                  ? "border-red-400 focus:ring-red-500"
+                  : errors.fatherAge
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
+            />
+            {!formData.fatherAge && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+            {errors.fatherAge && (
+              <p className="text-red-500 text-xs mt-1">{errors.fatherAge}</p>
+            )}
+          </div>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Educational Attainment <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., Bachelor's"
+              value={formData.fatherEducation}
+              onChange={(e) => {
+                handleInputChange("fatherEducation", e.target.value);
+                clearError("fatherEducation");
+              }}
+              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                !formData.fatherEducation
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
+            />
+            {!formData.fatherEducation && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+          </div>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Occupation <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., Engineer"
+              value={formData.fatherOccupation}
+              onChange={(e) => {
+                handleInputChange("fatherOccupation", e.target.value);
+                clearError("fatherOccupation");
+              }}
+              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                !formData.fatherOccupation
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
+            />
+            {!formData.fatherOccupation && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+          </div>
+          <div className="md:col-span-2">
+            <label className="block font-semibold text-gray-700 mb-2">
+              Company <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., ABC Corporation"
+              value={formData.fatherCompany}
+              onChange={(e) => {
+                handleInputChange("fatherCompany", e.target.value);
+                clearError("fatherCompany");
+              }}
+              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                !formData.fatherCompany
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
+            />
+            {!formData.fatherCompany && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -76,61 +142,131 @@ export function FamilyBackground({
         <h3 className="font-semibold text-gray-900 mb-4">
           Mother's Information
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            type="text"
-            placeholder="e.g., Jane Doe"
-            value={formData.motherName}
-            onChange={(e) => handleInputChange("motherName", e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          <input
-            type="text"
-            placeholder="Age e.g., 40"
-            value={formData.motherAge}
-            onChange={(e) => {
-              handleInputChange("motherAge", e.target.value);
-              clearError("motherAge");
-            }}
-            className={`px-4 py-3 border rounded focus:outline-none focus:ring-2 focus:ring-primary ${
-              errors.motherAge
-                ? "border-red-500 focus:ring-red-500"
-                : "border-gray-300"
-            }`}
-          />
-          {errors.motherAge && (
-            <p className="text-red-500 text-xs mt-1">{errors.motherAge}</p>
-          )}
-          <input
-            type="text"
-            placeholder="Educational Attainment"
-            value={formData.motherEducation}
-            onChange={(e) =>
-              handleInputChange("motherEducation", e.target.value)
-            }
-            className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          <input
-            type="text"
-            placeholder="Occupation"
-            value={formData.motherOccupation}
-            onChange={(e) =>
-              handleInputChange("motherOccupation", e.target.value)
-            }
-            className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-          />
-          <input
-            type="text"
-            placeholder="Company"
-            value={formData.motherCompany}
-            onChange={(e) => handleInputChange("motherCompany", e.target.value)}
-            className="px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
-          />
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div className="md:col-span-2">
+            <label className="block font-semibold text-gray-700 mb-2">
+              Mother's Name <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., Jane Doe"
+              value={formData.motherName}
+              onChange={(e) => {
+                handleInputChange("motherName", e.target.value);
+                clearError("motherName");
+              }}
+              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                !formData.motherName
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
+            />
+            {!formData.motherName && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+          </div>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Age <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., 40"
+              value={formData.motherAge}
+              onChange={(e) => {
+                handleInputChange("motherAge", e.target.value);
+                clearError("motherAge");
+              }}
+              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                !formData.motherAge
+                  ? "border-red-400 focus:ring-red-500"
+                  : errors.motherAge
+                  ? "border-red-500 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
+            />
+            {!formData.motherAge && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+            {errors.motherAge && (
+              <p className="text-red-500 text-xs mt-1">{errors.motherAge}</p>
+            )}
+          </div>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Educational Attainment <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., Bachelor's"
+              value={formData.motherEducation}
+              onChange={(e) => {
+                handleInputChange("motherEducation", e.target.value);
+                clearError("motherEducation");
+              }}
+              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                !formData.motherEducation
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
+            />
+            {!formData.motherEducation && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+          </div>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Occupation <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., Teacher"
+              value={formData.motherOccupation}
+              onChange={(e) => {
+                handleInputChange("motherOccupation", e.target.value);
+                clearError("motherOccupation");
+              }}
+              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                !formData.motherOccupation
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
+            />
+            {!formData.motherOccupation && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+          </div>
+          <div className="md:col-span-2">
+            <label className="block font-semibold text-gray-700 mb-2">
+              Company <span className="text-red-500">*</span>
+            </label>
+            <input
+              type="text"
+              placeholder="e.g., ABC School"
+              value={formData.motherCompany}
+              onChange={(e) => {
+                handleInputChange("motherCompany", e.target.value);
+                clearError("motherCompany");
+              }}
+              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                !formData.motherCompany
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
+            />
+            {!formData.motherCompany && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
+          </div>
         </div>
       </div>
 
-      <div className="border rounded-lg p-4 bg-gray-50">
-        <h3 className="font-semibold text-gray-900 mb-4">Parental Status</h3>
+      <div className={`border rounded-lg p-4 ${
+        formData.parentalStatus ? "bg-gray-50" : "bg-red-50"
+      }`}>
+        <h3 className="font-semibold text-gray-900 mb-4">
+          Parental Status <span className="text-red-500">*</span>
+        </h3>
         <div className="space-y-3">
           {[
             "Married & Living Together",
@@ -172,19 +308,26 @@ export function FamilyBackground({
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
-            Your Guardian's Name:
+            Your Guardian's Name: <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
             value={formData.guardianName}
             onChange={(e) => handleInputChange("guardianName", e.target.value)}
             placeholder="e.g., Mary Doe"
-            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+              !formData.guardianName
+                ? "border-red-400 focus:ring-red-500"
+                : "border-gray-300 focus:ring-primary"
+            }`}
           />
+          {!formData.guardianName && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
         </div>
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
-            Address:
+            Address: <span className="text-red-500">*</span>
           </label>
           <input
             type="text"
@@ -193,8 +336,15 @@ export function FamilyBackground({
               handleInputChange("guardianAddress", e.target.value)
             }
             placeholder="e.g., Address of Guardian"
-            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+              !formData.guardianAddress
+                ? "border-red-400 focus:ring-red-500"
+                : "border-gray-300 focus:ring-primary"
+            }`}
           />
+          {!formData.guardianAddress && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
         </div>
       </div>
 
@@ -203,7 +353,7 @@ export function FamilyBackground({
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
-              Siblings (Including you):
+              Siblings (Including you): <span className="text-red-500">*</span>
             </label>
             <input
               type="number"
@@ -216,12 +366,17 @@ export function FamilyBackground({
                   clearError("siblings");
                 }
               }}
-              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary ${
-                errors.siblings
+              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 transition ${
+                !formData.siblings
+                  ? "border-red-400 focus:ring-red-500"
+                  : errors.siblings
                   ? "border-red-500 focus:ring-red-500"
-                  : "border-gray-300"
+                  : "border-gray-300 focus:ring-primary"
               }`}
             />
+            {!formData.siblings && (
+              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+            )}
             {errors.siblings && (
               <p className="text-red-500 text-xs mt-1">{errors.siblings}</p>
             )}
@@ -241,10 +396,12 @@ export function FamilyBackground({
                   clearError("brothers");
                 }
               }}
-              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary ${
-                errors.brothers
+              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 transition ${
+                formData.brothers === ""
+                  ? "border-red-400 focus:ring-red-500"
+                  : errors.brothers
                   ? "border-red-500 focus:ring-red-500"
-                  : "border-gray-300"
+                  : "border-gray-300 focus:ring-primary"
               }`}
             />
             {errors.brothers && (
@@ -266,10 +423,12 @@ export function FamilyBackground({
                   clearError("sisters");
                 }
               }}
-              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-primary ${
-                errors.sisters
+              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 transition ${
+                formData.sisters === ""
+                  ? "border-red-400 focus:ring-red-500"
+                  : errors.sisters
                   ? "border-red-500 focus:ring-red-500"
-                  : "border-gray-300"
+                  : "border-gray-300 focus:ring-primary"
               }`}
             />
             {errors.sisters && (
@@ -279,9 +438,9 @@ export function FamilyBackground({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-start">
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
+          <label className="block text-xs font-semibold text-gray-700 mb-2">
             How many are gainfully employed?
           </label>
           <input
@@ -295,12 +454,17 @@ export function FamilyBackground({
                 clearError("gainfullyEmployed");
               }
             }}
-            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 focus:ring-primary ${
-              errors.gainfullyEmployed
+            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+              !formData.gainfullyEmployed
+                ? "border-red-400 focus:ring-red-500"
+                : errors.gainfullyEmployed
                 ? "border-red-500 focus:ring-red-500"
-                : "border-gray-300"
+                : "border-gray-300 focus:ring-primary"
             }`}
           />
+          {!formData.gainfullyEmployed && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
           {errors.gainfullyEmployed && (
             <p className="text-red-500 text-xs mt-1">
               {errors.gainfullyEmployed}
@@ -308,7 +472,7 @@ export function FamilyBackground({
           )}
         </div>
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
+          <label className="block text-xs font-semibold text-gray-700 mb-2">
             How many support your studies?
           </label>
           <input
@@ -322,18 +486,23 @@ export function FamilyBackground({
                 clearError("supportStudies");
               }
             }}
-            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 focus:ring-primary ${
-              errors.supportStudies
+            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+              !formData.supportStudies
+                ? "border-red-400 focus:ring-red-500"
+                : errors.supportStudies
                 ? "border-red-500 focus:ring-red-500"
-                : "border-gray-300"
+                : "border-gray-300 focus:ring-primary"
             }`}
           />
+          {!formData.supportStudies && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
           {errors.supportStudies && (
             <p className="text-red-500 text-xs mt-1">{errors.supportStudies}</p>
           )}
         </div>
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
+          <label className="block text-xs font-semibold text-gray-700 mb-2">
             How many support your immediate family?
           </label>
           <input
@@ -347,12 +516,17 @@ export function FamilyBackground({
                 clearError("supportFamily");
               }
             }}
-            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 focus:ring-primary ${
-              errors.supportFamily
+            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+              !formData.supportFamily
+                ? "border-red-400 focus:ring-red-500"
+                : errors.supportFamily
                 ? "border-red-500 focus:ring-red-500"
-                : "border-gray-300"
+                : "border-gray-300 focus:ring-primary"
             }`}
           />
+          {!formData.supportFamily && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
           {errors.supportFamily && (
             <p className="text-red-500 text-xs mt-1">{errors.supportFamily}</p>
           )}
@@ -371,8 +545,15 @@ export function FamilyBackground({
               handleInputChange("financialSupport", e.target.value)
             }
             placeholder="e.g., Scholarship, Loan"
-            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+              !formData.financialSupport
+                ? "border-red-400 focus:ring-red-500"
+                : "border-gray-300 focus:ring-primary"
+            }`}
           />
+          {!formData.financialSupport && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
         </div>
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
@@ -384,14 +565,23 @@ export function FamilyBackground({
             onChange={(e) =>
               handleInputChange("weeklyAllowance", e.target.value)
             }
-            className="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary"
+            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+              !formData.weeklyAllowance
+                ? "border-red-400 focus:ring-red-500"
+                : "border-gray-300 focus:ring-primary"
+            }`}
           />
+          {!formData.weeklyAllowance && (
+            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+          )}
         </div>
       </div>
 
-      <div>
-        <label className="block font-semibold text-gray-700 mb-2">
-          Parents' Combined Total Monthly Income:
+      <div className={`border rounded-lg p-4 ${
+        formData.parentsIncome ? "bg-gray-50" : "bg-red-50"
+      }`}>
+        <label className="block font-semibold text-gray-900 mb-4">
+          Parents' Combined Total Monthly Income: <span className="text-red-500">*</span>
         </label>
         <div className="space-y-2">
           {[
@@ -414,9 +604,10 @@ export function FamilyBackground({
                 name="parentsIncome"
                 value={range}
                 checked={formData.parentsIncome === range}
-                onChange={(e) =>
-                  handleInputChange("parentsIncome", e.target.value)
-                }
+                onChange={(e) => {
+                  handleInputChange("parentsIncome", e.target.value);
+                  clearError("parentsIncome");
+                }}
                 className="w-4 h-4 text-primary"
               />
               <span className="text-gray-700 text-sm">{range}</span>
