@@ -81,6 +81,7 @@ interface FormData {
   guardianName: string;
   guardianAddress: string;
   parentsIncome: string;
+  parentsIncomeOther: string;
   siblings: string;
   brothers: string;
   sisters: string;
@@ -194,6 +195,7 @@ const EMPTY_FORM: FormData = {
   guardianName: "",
   guardianAddress: "",
   parentsIncome: "",
+  parentsIncomeOther: "",
   siblings: "",
   brothers: "",
   sisters: "",
@@ -246,6 +248,16 @@ export default function StudentForm() {
   const [validationError, setValidationError] = useState<string>("");
   const [validationErrorList, setValidationErrorList] = useState<string[]>([]);
   const [showValidationError, setShowValidationError] = useState(false);
+
+  // Auto-close validation error after 3 seconds
+  useEffect(() => {
+    if (showValidationError) {
+      const timer = setTimeout(() => {
+        setShowValidationError(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showValidationError]);
 
   // Validation functions
   const validateEmail = (email: string): boolean => {
@@ -873,6 +885,8 @@ export default function StudentForm() {
 
   const handleClearForm = () => {
     if (isSectionEmpty()) {
+      setValidationError("Nothing to Clear - There is no data in this section to clear.");
+      setShowValidationError(true);
       return;
     }
     setShowClearConfirm(true);
@@ -1471,38 +1485,44 @@ export default function StudentForm() {
         </div>
       )}
 
-      {/* Custom Validation Error Popup Modal */}
+      {/* Validation Error Modal Popup */}
       {showValidationError && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <Card className="w-full max-w-lg border-0 shadow-2xl">
-            <CardHeader className="bg-gradient-to-r from-red-600 to-red-500 text-white rounded-t-lg">
-              <CardTitle className="text-lg flex items-center gap-2">
-                <AlertTriangle className="w-6 h-6" />
-                Form Incomplete
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="pt-6">
-              <p className="text-gray-700 mb-4 font-medium">
-                {validationError}
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-red-600 text-white px-6 py-4">
+              <h3 className="text-lg font-bold">Unable to Submit</h3>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="px-6 py-4">
+              <p className="text-gray-700 font-semibold mb-4">
+                {validationError || "Please fix the following errors:"}
               </p>
-              {validationErrorList.length > 0 && (
-                <ul className="space-y-2 mb-6 bg-red-50 p-4 rounded-lg border border-red-200">
+              
+              {/* Error List */}
+              {validationErrorList.length > 0 ? (
+                <ul className="space-y-2 mb-4">
                   {validationErrorList.map((error, index) => (
-                    <li key={index} className="flex items-center gap-3">
-                      <span className="text-red-600 font-bold flex-shrink-0">•</span>
+                    <li key={index} className="flex items-start gap-3">
+                      <span className="text-red-600 font-bold text-lg flex-shrink-0 mt-0.5">•</span>
                       <span className="text-gray-700 text-sm">{error}</span>
                     </li>
                   ))}
                 </ul>
-              )}
-              <Button
+              ) : null}
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="bg-gray-100 px-6 py-3 flex justify-end">
+              <button
                 onClick={() => setShowValidationError(false)}
-                className="w-full bg-gray-300 hover:bg-gray-400 text-black font-semibold"
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors"
               >
-                Return
-              </Button>
-            </CardContent>
-          </Card>
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

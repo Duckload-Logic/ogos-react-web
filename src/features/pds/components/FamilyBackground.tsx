@@ -47,7 +47,9 @@ export function FamilyBackground({
               Age <span className="text-red-500">*</span>
             </label>
             <input
-              type="text"
+              type="number"
+              min="0"
+              max="150"
               placeholder="e.g., 45"
               value={formData.fatherAge}
               onChange={(e) => {
@@ -170,7 +172,9 @@ export function FamilyBackground({
               Age <span className="text-red-500">*</span>
             </label>
             <input
-              type="text"
+              type="number"
+              min="0"
+              max="150"
               placeholder="e.g., 40"
               value={formData.motherAge}
               onChange={(e) => {

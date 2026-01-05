@@ -65,15 +65,6 @@ export function Combobox({
 
       {open && (
         <div className="absolute top-full left-0 right-0 z-50 mt-2 rounded-lg border border-gray-200 bg-white shadow-lg">
-          <div className="p-2 border-b border-gray-200">
-            <input
-              type="text"
-              placeholder={searchPlaceholder}
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full px-3 py-2 text-sm border border-gray-300 rounded-md outline-none focus:ring-2 focus:ring-primary"
-            />
-          </div>
           <div className="max-h-60 overflow-y-auto">
             {filteredOptions.length === 0 ? (
               <div className="px-4 py-6 text-center text-sm text-gray-500">

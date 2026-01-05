@@ -179,7 +179,10 @@ export function PersonalInformation({
             High School General Average <span className="text-red-500">*</span>
           </label>
           <input
-            type="text"
+            type="number"
+            step="0.01"
+            min="0"
+            max="100"
             value={formData.highSchoolAverage}
             onChange={(e) => {
               handleInputChange("highSchoolAverage", e.target.value);
@@ -304,7 +307,9 @@ export function PersonalInformation({
             Height (ft.) <span className="text-red-500">*</span>
           </label>
           <input
-            type="text"
+            type="number"
+            step="0.1"
+            min="0"
             value={formData.height}
             onChange={(e) => {
               handleInputChange("height", e.target.value);
@@ -327,7 +332,9 @@ export function PersonalInformation({
             Weight (kg.) <span className="text-red-500">*</span>
           </label>
           <input
-            type="text"
+            type="number"
+            step="0.1"
+            min="0"
             value={formData.weight}
             onChange={(e) => {
               handleInputChange("weight", e.target.value);
@@ -379,9 +386,12 @@ export function PersonalInformation({
         </label>
         <input
           type="tel"
+          inputMode="numeric"
+          pattern="[0-9]*"
           value={formData.mobileNo}
           onChange={(e) => {
-            handleInputChange("mobileNo", e.target.value);
+            const value = e.target.value.replace(/[^0-9]/g, '');
+            handleInputChange("mobileNo", value);
             clearError("mobileNo");
           }}
           placeholder="e.g., 09123456789"

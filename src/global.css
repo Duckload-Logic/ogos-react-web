@@ -1,8 +1,26 @@
+/* stylelint-disable at-rule-no-unknown */
 /** @import must precede all other statements */
 @import url("https://fonts.googleapis.com/css2?family=Trajan+Pro:wght@400;700&display=swap");
 
+/* Fade out animation for notifications */
+@keyframes fadeOut {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+.notification-fadeout {
+  animation: fadeOut 0.5s ease-in-out 2.5s forwards;
+}
+
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind base;
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind components;
+/* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind utilities;
 
 @layer base {
@@ -101,38 +119,53 @@
 
 @layer base {
   * {
-    @apply border-border;
+    border-color: hsl(var(--border));
+    font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
   }
 
   body {
-    @apply bg-background text-foreground font-sans;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
+    font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
     font-size: 16px;
     line-height: 1.6;
   }
 
   h1 {
-    @apply text-4xl font-bold tracking-tight;
+    font-size: 2.25rem;
+    font-weight: bold;
+    letter-spacing: -0.02em;
+    font-family: 'Trajan Pro', Arial, sans-serif;
   }
 
   h2 {
-    @apply text-3xl font-bold tracking-tight;
+    font-size: 1.875rem;
+    font-weight: bold;
+    letter-spacing: -0.02em;
+    font-family: 'Trajan Pro', Arial, sans-serif;
   }
 
   h3 {
-    @apply text-2xl font-semibold;
+    font-size: 1.5rem;
+    font-weight: 600;
+    font-family: 'Trajan Pro', Arial, sans-serif;
   }
 
   h4 {
-    @apply text-xl font-semibold;
+    font-size: 1.25rem;
+    font-weight: 600;
+    font-family: 'Trajan Pro', Arial, sans-serif;
   }
 
   h5,
   h6 {
-    @apply text-lg font-semibold;
+    font-size: 1.125rem;
+    font-weight: 600;
+    font-family: 'Trajan Pro', Arial, sans-serif;
   }
 
   p {
-    @apply text-base;
+    font-size: 1rem;
   }
 
   :where(p, span, li, h1, h2, h3, h4, h5, h6, a, button, label, td, th) {
@@ -154,15 +187,19 @@
 
   /* PDS Form Standardization */
   .pds-label {
-    @apply text-base font-semibold text-gray-700;
+    font-size: 1rem;
+    font-weight: 600;
+    color: #374151;
   }
 
   .pds-input {
-    @apply text-base;
+    font-size: 1rem;
   }
 
   .pds-section-title {
-    @apply text-lg font-bold text-gray-900;
+    font-size: 1.125rem;
+    font-weight: bold;
+    color: #111827;
   }
 
   pre,

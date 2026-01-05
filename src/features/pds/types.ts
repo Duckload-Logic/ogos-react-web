@@ -60,6 +60,7 @@ export interface FormData {
   guardianName: string;
   guardianAddress: string;
   parentsIncome: string;
+  parentsIncomeOther: string;
   siblings: string;
   brothers: string;
   sisters: string;
