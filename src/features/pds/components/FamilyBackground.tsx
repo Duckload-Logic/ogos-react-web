@@ -614,6 +614,22 @@ export function FamilyBackground({
             </label>
           ))}
         </div>
+
+        {/* Input field for "Others, please specify:" */}
+        {formData.parentsIncome === "Others, please specify:" && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <input
+              type="text"
+              placeholder="Please specify other income range"
+              value={formData.parentsIncomeOther || ""}
+              onChange={(e) => {
+                handleInputChange("parentsIncomeOther", e.target.value);
+                clearError("parentsIncomeOther");
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+        )}
       </div>
     </div>
   );
