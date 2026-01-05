@@ -240,8 +240,12 @@ export default function StudentForm() {
   const [isMobileNav, setIsMobileNav] = useState(window.innerWidth < 1024);
   const [errors, setErrors] = useState<FormErrors>({});
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showClearSuccess, setShowClearSuccess] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [validationError, setValidationError] = useState<string>("");
+  const [validationErrorList, setValidationErrorList] = useState<string[]>([]);
+  const [showValidationError, setShowValidationError] = useState(false);
 
   // Validation functions
   const validateEmail = (email: string): boolean => {
@@ -500,12 +504,11 @@ export default function StudentForm() {
         )
           ? 1
           : 0,
-        reasonOther: formData.reasonOther ? 1 : 0,
       };
       filledCount = Object.values(enrollmentFields).filter(
         (v) => v === 1,
       ).length;
-      totalCount = 4;
+      totalCount = 1;
     } else if (sectionIndex === 1) {
       const personalFields = {
         lastName: formData.lastName ? 1 : 0,
@@ -632,25 +635,199 @@ export default function StudentForm() {
     }));
   };
 
+  const buildDetailedErrorMessage = (
+    personalValid: boolean,
+    educationValid: boolean,
+    familyValid: boolean,
+  ): string[] => {
+    const errorList: string[] = [];
+
+    if (!personalValid) {
+      if (!formData.firstName.trim())
+        errorList.push("Personal Information: First name is required");
+      if (!formData.email.trim())
+        errorList.push("Personal Information: Email is required");
+      else if (!validateEmail(formData.email))
+        errorList.push("Personal Information: Invalid email format");
+    }
+
+    if (!educationValid) {
+      [
+        { key: "elementary", label: "Elementary" },
+        { key: "juniorHS", label: "Junior HS" },
+        { key: "seniorHS", label: "Senior HS" },
+      ].forEach((level) => {
+        const levelData =
+          formData.education[level.key as keyof typeof formData.education];
+        if (typeof levelData === "object" && levelData !== null) {
+          if (
+            (levelData as any).school ||
+            (levelData as any).location ||
+            (levelData as any).public ||
+            (levelData as any).yearGrad
+          ) {
+            if (!(levelData as any).school)
+              errorList.push(`Education: ${level.label} - School name required`);
+            if (!(levelData as any).location)
+              errorList.push(`Education: ${level.label} - Location required`);
+            if (!(levelData as any).public)
+              errorList.push(
+                `Education: ${level.label} - Public/Private required`,
+              );
+            if (!(levelData as any).yearGrad)
+              errorList.push(
+                `Education: ${level.label} - Year graduated required`,
+              );
+            if (
+              (levelData as any).yearGrad &&
+              !validateYear((levelData as any).yearGrad)
+            )
+              errorList.push(`Education: ${level.label} - Invalid year`);
+          }
+        }
+      });
+    }
+
+    if (!familyValid) {
+      if (formData.fatherAge && !validateAge(formData.fatherAge))
+        errorList.push("Family: Father's age must be between 10 and 100");
+      if (formData.motherAge && !validateAge(formData.motherAge))
+        errorList.push("Family: Mother's age must be between 10 and 100");
+      if (formData.siblings && !validateNonNegative(formData.siblings))
+        errorList.push("Family: Siblings count cannot be negative");
+      if (formData.brothers && !validateNonNegative(formData.brothers))
+        errorList.push("Family: Brothers count cannot be negative");
+      if (formData.sisters && !validateNonNegative(formData.sisters))
+        errorList.push("Family: Sisters count cannot be negative");
+    }
+
+    return errorList;
+  };
+
+  const buildIncompleteSection = (): string[] => {
+    const incompleteSections: string[] = [];
+
+    for (let i = 0; i < 5; i++) {
+      const completion = calculateSectionCompletion(i);
+      if (completion < 100) {
+        incompleteSections.push(
+          `${sections[i].title}: ${completion}% complete`,
+        );
+      }
+    }
+
+    return incompleteSections;
+  };
+
+  const buildMissingFieldsMessage = (): string[] => {
+    const missingList: string[] = [];
+
+    // Section 0: Reason for Enrollment
+    const hasReason = Object.values(formData.reasonForEnrollment).some((v) => v);
+    if (!hasReason) {
+      missingList.push("Reason for Enrollment: Please select at least one reason");
+    }
+
+    // Section 1: Personal Information
+    const personalMissing: string[] = [];
+    if (!formData.firstName.trim()) personalMissing.push("First Name");
+    if (!formData.lastName.trim()) personalMissing.push("Last Name");
+    if (!formData.email.trim()) personalMissing.push("Email");
+    if (!formData.dateOfBirth) personalMissing.push("Date of Birth");
+    if (!formData.gender) personalMissing.push("Gender");
+    if (!formData.mobileNo.trim()) personalMissing.push("Mobile Number");
+    if (personalMissing.length > 0) {
+      missingList.push(`Personal Information: ${personalMissing.join(", ")}`);
+    }
+
+    // Section 2: Educational Background
+    const educationMissing: string[] = [];
+    const levels = [
+      { key: "elementary", label: "Elementary" },
+      { key: "juniorHS", label: "Junior HS" },
+      { key: "seniorHS", label: "Senior HS" },
+    ];
+    let hasAnyEducation = false;
+    levels.forEach((level) => {
+      const levelData =
+        formData.education[level.key as keyof typeof formData.education];
+      if (typeof levelData === "object" && levelData !== null) {
+        if (
+          (levelData as any).school ||
+          (levelData as any).location ||
+          (levelData as any).public ||
+          (levelData as any).yearGrad
+        ) {
+          hasAnyEducation = true;
+          if (!(levelData as any).school)
+            educationMissing.push(`${level.label}: School`);
+          if (!(levelData as any).location)
+            educationMissing.push(`${level.label}: Location`);
+          if (!(levelData as any).public)
+            educationMissing.push(`${level.label}: Public/Private`);
+          if (!(levelData as any).yearGrad)
+            educationMissing.push(`${level.label}: Year Graduated`);
+        }
+      }
+    });
+    if (!hasAnyEducation) {
+      missingList.push("Educational Background: Please fill in at least one education level");
+    } else if (educationMissing.length > 0) {
+      missingList.push(`Educational Background: ${educationMissing.join(", ")}`);
+    }
+
+    // Section 3: Family Background
+    const familyMissing: string[] = [];
+    if (!formData.fatherName.trim()) familyMissing.push("Father's Name");
+    if (!formData.motherName.trim()) familyMissing.push("Mother's Name");
+    if (familyMissing.length > 0) {
+      missingList.push(`Family Background: ${familyMissing.join(", ")}`);
+    }
+
+    // Section 4: Health
+    const healthMissing: string[] = [];
+    if (!formData.vision) healthMissing.push("Vision");
+    if (!formData.hearing) healthMissing.push("Hearing");
+    if (!formData.mobility) healthMissing.push("Mobility");
+    if (!formData.speech) healthMissing.push("Speech");
+    if (!formData.generalHealth) healthMissing.push("General Health");
+    if (healthMissing.length > 0) {
+      missingList.push(`Health: ${healthMissing.join(", ")}`);
+    }
+
+    return missingList;
+  };
+
   const handleSubmit = () => {
-    // Always run validations
+    // Check completion first - if form is incomplete, show which sections are missing
+    if (overallCompletion < 100) {
+      const incompleteSections = buildIncompleteSection();
+      setValidationError(
+        `Please complete the following sections:`,
+      );
+      setValidationErrorList(incompleteSections);
+      setShowValidationError(true);
+      return;
+    }
+
+    // Only run detailed validations if form is 100% complete
     const personalValid = validatePersonalFields();
     const educationValid = validateEducationFields();
     const familyValid = validateFamilyFields();
 
     if (!personalValid || !educationValid || !familyValid) {
+      const errorList = buildDetailedErrorMessage(
+        personalValid,
+        educationValid,
+        familyValid,
+      );
       setErrors((prev) => ({
         ...prev,
         submitError: "Please fix all errors before submitting the form.",
       }));
-      alert("Please fix all validation errors before submitting.");
-      return;
-    }
-
-    if (overallCompletion < 100) {
-      alert(
-        `Form is ${overallCompletion}% complete. Please fill in all required sections before submitting.`,
-      );
+      setValidationError("Please fix the following errors before submitting:");
+      setValidationErrorList(errorList);
+      setShowValidationError(true);
       return;
     }
 
@@ -670,7 +847,34 @@ export default function StudentForm() {
     setCurrentSection(0);
   };
 
+
+  const isSectionEmpty = (): boolean => {
+    if (currentSection === 0) {
+      return Object.values(formData.reasonForEnrollment).every(v => !v) && !formData.reasonOther;
+    } else if (currentSection === 1) {
+      return !formData.lastName && !formData.firstName && !formData.middleName && 
+             !formData.civilStatus && !formData.religion && !formData.highSchoolAverage &&
+             !formData.course && !formData.email && !formData.dateOfBirth && !formData.placeOfBirth &&
+             !formData.mobileNo && !formData.height && !formData.weight && !formData.gender;
+    } else if (currentSection === 2) {
+      const education = formData.education;
+      return !education.elementary.school && !education.elementary.location &&
+             !education.juniorHS.school && !education.juniorHS.location &&
+             !education.seniorHS.school && !education.seniorHS.location && !education.others;
+    } else if (currentSection === 3) {
+      return !formData.fatherName && !formData.motherName && !formData.guardianName &&
+             !formData.siblings && !formData.parentsIncome && !formData.financialSupport;
+    } else if (currentSection === 4) {
+      return !formData.vision && !formData.hearing && !formData.mobility && !formData.speech &&
+             !formData.generalHealth && !formData.consultedWith && !formData.dateTest && !formData.rs && !formData.pr;
+    }
+    return true;
+  };
+
   const handleClearForm = () => {
+    if (isSectionEmpty()) {
+      return;
+    }
     setShowClearConfirm(true);
   };
 
@@ -779,6 +983,13 @@ export default function StudentForm() {
         remarks: "",
       }));
     }
+    
+    // Show success popup
+    setShowClearSuccess(true);
+  };
+
+  const handleClearSuccessClose = () => {
+    setShowClearSuccess(false);
   };
 
   const overallCompletion = getOverallCompletion();
@@ -1022,21 +1233,17 @@ export default function StudentForm() {
                         <span className="font-semibold text-gray-700">
                           Expecting Scholarship Offer
                         </span>
+                        <span className={`text-sm font-medium ${
+                          formData.expecting_scholarship
+                            ? "text-green-600"
+                            : "text-gray-500"
+                        }`}>
+                          {formData.expecting_scholarship ? "Yes" : "No"}
+                        </span>
                       </label>
-                      {formData.expecting_scholarship && (
-                        <input
-                          type="text"
-                          value={formData.scholarship_details}
-                          onChange={(e) =>
-                            handleInputChange(
-                              "scholarship_details",
-                              e.target.value,
-                            )
-                          }
-                          placeholder="Please specify"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary mt-3"
-                        />
-                      )}
+                      <p className="text-sm text-gray-500 mt-2 ml-8">
+                        (Optional - this does not affect your progress)
+                      </p>
                     </div>
                   </div>
                 )}
@@ -1105,18 +1312,23 @@ export default function StudentForm() {
 
             {/* Form Navigation Buttons */}
             <div className="flex flex-col md:flex-row gap-4 mt-8">
-              <button
-                onClick={() =>
-                  setCurrentSection(Math.max(0, currentSection - 1))
-                }
-                disabled={currentSection === 0}
-                className="px-6 py-3 bg-gray-200 hover:bg-gray-300 disabled:opacity-50 text-gray-900 font-semibold rounded-lg transition-colors"
-              >
-                Previous
-              </button>
+              {currentSection > 0 && (
+                <button
+                  onClick={() =>
+                    setCurrentSection(Math.max(0, currentSection - 1))
+                  }
+                  className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold rounded-lg transition-colors"
+                >
+                  Previous
+                </button>
+              )}
               <button
                 onClick={handleClearForm}
-                className="px-6 py-3 bg-red-50 hover:bg-red-100 border border-red-300 text-red-700 font-semibold rounded-lg transition-colors"
+                className={`px-6 py-3 font-semibold rounded-lg transition-colors ${
+                  isSectionEmpty()
+                    ? "bg-gray-200 hover:bg-gray-300 text-gray-600 border border-gray-300"
+                    : "bg-red-50 hover:bg-red-100 border border-red-300 text-red-700"
+                }`}
               >
                 Clear Section
               </button>
@@ -1175,6 +1387,31 @@ export default function StudentForm() {
         </div>
       )}
 
+      {/* Custom Clear Success Modal */}
+      {showClearSuccess && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-sm border-0 shadow-2xl">
+            <CardHeader className="bg-gradient-to-r from-green-600 to-green-500 text-white rounded-t-lg">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Check className="w-6 h-6" />
+                Section Cleared Successfully
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <p className="text-gray-700 mb-6">
+                All data in the "{sections[currentSection].title}" section has been cleared.
+              </p>
+              <Button
+                onClick={handleClearSuccessClose}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
+              >
+                Done
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
       {/* Custom Submit Confirmation Modal */}
       {showSubmitConfirm && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -1228,6 +1465,41 @@ export default function StudentForm() {
                 className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
               >
                 Done
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Custom Validation Error Popup Modal */}
+      {showValidationError && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-lg border-0 shadow-2xl">
+            <CardHeader className="bg-gradient-to-r from-red-600 to-red-500 text-white rounded-t-lg">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <AlertTriangle className="w-6 h-6" />
+                Form Incomplete
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <p className="text-gray-700 mb-4 font-medium">
+                {validationError}
+              </p>
+              {validationErrorList.length > 0 && (
+                <ul className="space-y-2 mb-6 bg-red-50 p-4 rounded-lg border border-red-200">
+                  {validationErrorList.map((error, index) => (
+                    <li key={index} className="flex items-center gap-3">
+                      <span className="text-red-600 font-bold flex-shrink-0">•</span>
+                      <span className="text-gray-700 text-sm">{error}</span>
+                    </li>
+                  ))}
+                </ul>
+              )}
+              <Button
+                onClick={() => setShowValidationError(false)}
+                className="w-full bg-gray-300 hover:bg-gray-400 text-black font-semibold"
+              >
+                Return
               </Button>
             </CardContent>
           </Card>

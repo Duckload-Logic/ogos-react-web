@@ -1,5 +1,5 @@
 /** @import must precede all other statements */
-@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Trajan+Pro:wght@400;700&display=swap");
 
 @tailwind base;
 @tailwind components;
@@ -105,7 +105,7 @@
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans;
     font-size: 16px;
     line-height: 1.6;
   }
@@ -149,6 +149,20 @@
   textarea,
   select {
     min-height: 44px;
+    font-size: 16px;
+  }
+
+  /* PDS Form Standardization */
+  .pds-label {
+    @apply text-base font-semibold text-gray-700;
+  }
+
+  .pds-input {
+    @apply text-base;
+  }
+
+  .pds-section-title {
+    @apply text-lg font-bold text-gray-900;
   }
 
   pre,

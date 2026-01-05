@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Calendar, FileText, Trash2 } from "lucide-react";
+import { ArrowLeft, Calendar, FileText, Trash2, AlertCircle, X, CheckCircle } from "lucide-react";
+import { useState } from "react";
 
 interface Appointment {
   id: string;
@@ -42,10 +43,30 @@ const MOCK_APPOINTMENTS: Appointment[] = [
 const MOCK_EXCUSE_SLIPS: ReviewedExcuseSlip[] = [];
 
 export default function ViewSchedules() {
-  const handleCancelAppointment = (id: string) => {
-    if (window.confirm("Are you sure you want to cancel this appointment?")) {
-      alert(`Appointment ${id} cancelled successfully`);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [appointmentToDelete, setAppointmentToDelete] = useState<string | null>(null);
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+
+  const handleDeleteClick = (id: string) => {
+    setAppointmentToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (appointmentToDelete) {
+      setDeleteModalOpen(false);
+      setSuccessModalOpen(true);
+      setAppointmentToDelete(null);
     }
+  };
+
+  const cancelDelete = () => {
+    setDeleteModalOpen(false);
+    setAppointmentToDelete(null);
+  };
+
+  const closeSuccessModal = () => {
+    setSuccessModalOpen(false);
   };
 
   return (
@@ -148,7 +169,7 @@ export default function ViewSchedules() {
                         Reschedule
                       </Button>
                       <Button
-                        onClick={() => handleCancelAppointment(appointment.id)}
+                        onClick={() => handleDeleteClick(appointment.id)}
                         variant="outline"
                         className="flex-1 border-red-300 text-red-600 hover:bg-red-50"
                       >
@@ -237,6 +258,61 @@ export default function ViewSchedules() {
             </div>
           )}
         </section>
+
+        {/* Delete Confirmation Modal */}
+        {deleteModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <Card className="max-w-sm w-full border-0 shadow-xl">
+              <div className="bg-red-600 text-white px-6 py-4 flex items-center gap-3 rounded-t-lg">
+                <AlertCircle className="w-6 h-6" />
+                <h3 className="text-lg font-bold">Cancel Appointment</h3>
+              </div>
+              <CardContent className="pt-6 pb-6">
+                <p className="text-gray-700 mb-6">
+                  Are you sure you want to cancel this appointment? This action cannot be undone.
+                </p>
+                <div className="flex gap-3">
+                  <Button
+                    onClick={cancelDelete}
+                    variant="outline"
+                    className="flex-1 border-gray-300 text-gray-700 hover:bg-gray-100"
+                  >
+                    No, Keep it
+                  </Button>
+                  <Button
+                    onClick={confirmDelete}
+                    className="flex-1 bg-red-600 hover:bg-red-700 text-white font-semibold"
+                  >
+                    Yes, Cancel
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {/* Success Modal */}
+        {successModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+            <Card className="max-w-sm w-full border-0 shadow-xl">
+              <div className="bg-green-600 text-white px-6 py-4 flex items-center gap-3 rounded-t-lg">
+                <CheckCircle className="w-6 h-6" />
+                <h3 className="text-lg font-bold">Appointment Cancelled</h3>
+              </div>
+              <CardContent className="pt-6 pb-6 text-center">
+                <p className="text-gray-700 mb-6">
+                  Your appointment has been successfully cancelled.
+                </p>
+                <Button
+                  onClick={closeSuccessModal}
+                  className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
+                >
+                  Done
+                </Button>
+              </CardContent>
+            </Card>
+          </div>
+        )}
 
         {/* Help Section */}
         <Card className="border-0 shadow-sm mt-8">

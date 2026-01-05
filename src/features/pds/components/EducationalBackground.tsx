@@ -202,7 +202,7 @@ export function EducationalBackground({
       ))}
 
       <div>
-        <label className="block font-semibold text-gray-700 mb-2">
+        <label className="pds-label mb-2">
           Others:
         </label>
         <input

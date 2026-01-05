@@ -48,7 +48,7 @@ src/
 ├── config/           # Configuration files
 ├── assets/           # Images and icons
 ├── lib/              # Utilities and helpers
-├── App.jsx           # Main app component
+├── App.tsx           # Main app component
 └── main.jsx          # Entry point
 ```
 

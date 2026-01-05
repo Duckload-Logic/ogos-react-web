@@ -21,7 +21,7 @@ export function FamilyBackground({
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="md:col-span-2">
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Father's Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -43,7 +43,7 @@ export function FamilyBackground({
             )}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Age <span className="text-red-500">*</span>
             </label>
             <input
@@ -70,7 +70,7 @@ export function FamilyBackground({
             )}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Educational Attainment <span className="text-red-500">*</span>
             </label>
             <input
@@ -92,7 +92,7 @@ export function FamilyBackground({
             )}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Occupation <span className="text-red-500">*</span>
             </label>
             <input
@@ -114,7 +114,7 @@ export function FamilyBackground({
             )}
           </div>
           <div className="md:col-span-2">
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Company <span className="text-red-500">*</span>
             </label>
             <input
@@ -144,7 +144,7 @@ export function FamilyBackground({
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
           <div className="md:col-span-2">
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Mother's Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -166,7 +166,7 @@ export function FamilyBackground({
             )}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Age <span className="text-red-500">*</span>
             </label>
             <input
@@ -193,7 +193,7 @@ export function FamilyBackground({
             )}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Educational Attainment <span className="text-red-500">*</span>
             </label>
             <input
@@ -215,7 +215,7 @@ export function FamilyBackground({
             )}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Occupation <span className="text-red-500">*</span>
             </label>
             <input
@@ -237,7 +237,7 @@ export function FamilyBackground({
             )}
           </div>
           <div className="md:col-span-2">
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Company <span className="text-red-500">*</span>
             </label>
             <input
@@ -307,7 +307,7 @@ export function FamilyBackground({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
+          <label className="pds-label mb-2">
             Your Guardian's Name: <span className="text-red-500">*</span>
           </label>
           <input
@@ -326,7 +326,7 @@ export function FamilyBackground({
           )}
         </div>
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
+          <label className="pds-label mb-2">
             Address: <span className="text-red-500">*</span>
           </label>
           <input
@@ -535,7 +535,7 @@ export function FamilyBackground({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
+          <label className="pds-label mb-2">
             Please indicate other sources of financial support:
           </label>
           <input
@@ -556,7 +556,7 @@ export function FamilyBackground({
           )}
         </div>
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
+          <label className="pds-label mb-2">
             Your weekly school allowance:
           </label>
           <input
