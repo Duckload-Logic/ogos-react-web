@@ -1,9 +1,0 @@
-{
-  "stylelint.enable": false,
-  "css.lint.unknownAtRules": "ignore",
-  "css.lint.compatibleVendorPrefixes": "ignore",
-  "css.lint.vendorPrefix": "ignore",
-  "css.lint.universalSelector": "ignore",
-  "css.lint.zeroUnits": "ignore",
-  "css.lint.fontFaceProperties": "ignore"
-}
