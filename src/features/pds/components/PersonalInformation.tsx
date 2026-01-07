@@ -1,6 +1,5 @@
 import { FormData } from "@/features/pds/types";
 import { Combobox } from "@/components/ui/combobox";
-import { User } from "@/types/user";
 
 const COURSE_OPTIONS = [
   // Undergraduate Programs
@@ -47,7 +46,7 @@ export function PersonalInformation({
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Last Name */}
           <div>
-            <label className="pds-label mb-2">
+            <label className="block font-semibold text-gray-700 mb-2">
               Last Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -59,7 +58,7 @@ export function PersonalInformation({
                 clearError("lastName");
               }}
               placeholder="e.g., Doe"
-              className={`pds-input w-full px-4 py-3 border rounded-lg focus:outline-none
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none
                 focus:ring-2 transition ${
                   !formData.lastName
                     ? "border-red-400 focus:ring-red-500"
@@ -73,7 +72,7 @@ export function PersonalInformation({
 
           {/* First Name */}
           <div>
-            <label className="pds-label mb-2">
+            <label className="block font-semibold text-gray-700 mb-2">
               First Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -85,7 +84,7 @@ export function PersonalInformation({
                 clearError("firstName");
               }}
               placeholder="e.g., John"
-              className={`pds-input w-full px-4 py-3 border rounded-lg focus:outline-none
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none
                 focus:ring-2 transition ${
                   !formData.firstName
                     ? "border-red-400 focus:ring-red-500"
@@ -99,7 +98,7 @@ export function PersonalInformation({
 
           {/* Middle Name */}
           <div>
-            <label className="pds-label mb-2">
+            <label className="block font-semibold text-gray-700 mb-2">
               Middle Name <span className="text-red-500">*</span>
             </label>
             <input
@@ -111,7 +110,7 @@ export function PersonalInformation({
                 clearError("middleName");
               }}
               placeholder="e.g., Joe"
-              className={`pds-input w-full px-4 py-3 border rounded-lg focus:outline-none
+              className={`w-full px-4 py-3 border rounded-lg focus:outline-none
                 focus:ring-2 transition ${
                   !formData.middleName
                     ? "border-red-400 focus:ring-red-500"
@@ -128,7 +127,7 @@ export function PersonalInformation({
       {/* Civil Status & Religion */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="pds-label mb-2">
+          <label className="block font-semibold text-gray-700 mb-2">
             Civil Status <span className="text-red-500">*</span>
           </label>
           <select
@@ -161,7 +160,7 @@ export function PersonalInformation({
           )}
         </div>
         <div>
-          <label className="pds-label mb-2">
+          <label className="block font-semibold text-gray-700 mb-2">
             Religion <span className="text-red-500">*</span>
           </label>
           <input
@@ -188,14 +187,11 @@ export function PersonalInformation({
       {/* Academic Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="pds-label mb-2">
+          <label className="block font-semibold text-gray-700 mb-2">
             High School General Average <span className="text-red-500">*</span>
           </label>
           <input
-            type="number"
-            step="0.01"
-            min="0"
-            max="100"
+            type="text"
             value={formData.highSchoolAverage}
             onChange={(e) => {
               handleInputChange("highSchoolAverage", e.target.value);
@@ -214,25 +210,27 @@ export function PersonalInformation({
           )}
         </div>
         <div>
-          <label className="pds-label mb-2">
+          <label className="block font-semibold text-gray-700 mb-2">
             Course <span className="text-red-500">*</span>
           </label>
-          <Combobox
-            options={COURSE_OPTIONS}
+          <select
             value={formData.course}
-            onValueChange={(value) => {
-              handleInputChange("course", value);
+            onChange={(e) => {
+              handleInputChange("course", e.target.value);
               clearError("course");
             }}
-            placeholder="Select a course..."
-            searchPlaceholder="Search courses..."
-            emptyMessage="No course found."
-            className={`w-full ${
-              !formData.course
-                ? "border-red-400 focus:ring-red-500"
-                : "border-gray-300 focus:ring-primary"
-            }`}
-          />
+            className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+              focus:ring-2 transition ${
+                !formData.course
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
+          >
+            <option value="">Select Course</option>
+            <option value="CS">Computer Science</option>
+            <option value="ENG">Civil Engineering</option>
+            <option value="ME">Mechanical Engineering</option>
+          </select>
           {!formData.course && (
             <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
           )}
@@ -242,7 +240,7 @@ export function PersonalInformation({
       {/* Contact & Birth Info */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="pds-label mb-2">
+          <label className="block font-semibold text-gray-700 mb-2">
             Email Address <span className="text-red-500">*</span>
           </label>
           <input
@@ -266,7 +264,7 @@ export function PersonalInformation({
           )}
         </div>
         <div>
-          <label className="pds-label mb-2">
+          <label className="block font-semibold text-gray-700 mb-2">
             Date of Birth <span className="text-red-500">*</span>
           </label>
           <input
@@ -291,7 +289,7 @@ export function PersonalInformation({
 
       {/* Place of Birth */}
       <div>
-        <label className="pds-label mb-2">
+        <label className="block font-semibold text-gray-700 mb-2">
           Place of Birth <span className="text-red-500">*</span>
         </label>
         <input
@@ -317,13 +315,11 @@ export function PersonalInformation({
       {/* Physical Attributes */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="pds-label mb-2">
+          <label className="block font-semibold text-gray-700 mb-2">
             Height (ft.) <span className="text-red-500">*</span>
           </label>
           <input
-            type="number"
-            step="0.1"
-            min="0"
+            type="text"
             value={formData.height}
             onChange={(e) => {
               handleInputChange("height", e.target.value);
@@ -342,13 +338,11 @@ export function PersonalInformation({
           )}
         </div>
         <div>
-          <label className="pds-label mb-2">
+          <label className="block font-semibold text-gray-700 mb-2">
             Weight (kg.) <span className="text-red-500">*</span>
           </label>
           <input
-            type="number"
-            step="0.1"
-            min="0"
+            type="text"
             value={formData.weight}
             onChange={(e) => {
               handleInputChange("weight", e.target.value);
@@ -367,7 +361,7 @@ export function PersonalInformation({
           )}
         </div>
         <div>
-          <label className="pds-label mb-2">
+          <label className="block font-semibold text-gray-700 mb-2">
             Gender <span className="text-red-500">*</span>
           </label>
           <select
@@ -395,17 +389,14 @@ export function PersonalInformation({
 
       {/* Mobile Number */}
       <div>
-        <label className="pds-label mb-2">
+        <label className="block font-semibold text-gray-700 mb-2">
           Mobile Number <span className="text-red-500">*</span>
         </label>
         <input
           type="tel"
-          inputMode="numeric"
-          pattern="[0-9]*"
           value={formData.mobileNo}
           onChange={(e) => {
-            const value = e.target.value.replace(/[^0-9]/g, '');
-            handleInputChange("mobileNo", value);
+            handleInputChange("mobileNo", e.target.value);
             clearError("mobileNo");
           }}
           placeholder="e.g., 09123456789"
@@ -424,7 +415,7 @@ export function PersonalInformation({
       {/* Provincial Address */}
       <div>
         <label className="pds-label mb-2">
-          Provincial Address <span className="text-red-500">*</span>
+          Complete Provincial Address <span className="text-red-500">*</span>
         </label>
         {[
           { key: "provincialAddressStreet", label: "Street/Lot/Blk", placeholder: "e.g., Blk 12 Lot 5" },
@@ -466,7 +457,7 @@ export function PersonalInformation({
       {/* Residential/City Address */}
       <div>
         <label className="pds-label mb-2">
-          Residential or City Address <span className="text-red-500">*</span>
+          Complete Residential or City Address <span className="text-red-500">*</span>
         </label>
         {[
           { key: "residentialAddressStreet", label: "Street/Lot/Blk", placeholder: "e.g., Blk 12 Lot 5" },
@@ -507,7 +498,7 @@ export function PersonalInformation({
 
       {/* Employer Info */}
       <div>
-        <label className="pds-label mb-2">
+        <label className="block font-semibold text-gray-700 mb-2">
           If employed, the name and address of your employer:
         </label>
         <input
@@ -525,7 +516,7 @@ export function PersonalInformation({
         <h3 className="font-semibold text-gray-900 mb-4">Emergency Contact Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="md:col-span-2">
-            <label className="pds-label mb-2">
+            <label className="block font-semibold text-gray-700 mb-2">
               Complete name of the person to be contacted in case of emergency: <span className="text-red-500">*</span>
             </label>
             <input
@@ -548,7 +539,7 @@ export function PersonalInformation({
             )}
           </div>
           <div>
-            <label className="pds-label mb-2">
+            <label className="block font-semibold text-gray-700 mb-2">
               Relationship <span className="text-red-500">*</span>
             </label>
             <input
@@ -571,7 +562,7 @@ export function PersonalInformation({
             )}
           </div>
           <div className="md:col-span-2">
-            <label className="pds-label mb-2">
+            <label className="block font-semibold text-gray-700 mb-2">
               Telephone No.: <span className="text-red-500">*</span>
             </label>
             <input
@@ -593,6 +584,27 @@ export function PersonalInformation({
               <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
             )}
           </div>
+        </div>
+      </div>
+
+      {/* File Upload Section for Supporting Documents */}
+      <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Upload className="w-5 h-5 text-blue-600" />
+          <h3 className="font-semibold text-blue-900">Supporting Documents</h3>
+        </div>
+        <p className="text-sm text-blue-700 mb-4">
+          Upload scans of your birth certificate, ID, or other relevant documents
+        </p>
+        <div className="flex flex-col gap-3">
+          <label className="flex items-center justify-center w-full px-4 py-6 border-2 border-dashed border-blue-300 rounded-lg cursor-pointer hover:bg-blue-100 transition">
+            <div className="text-center">
+              <Upload className="w-8 h-8 text-blue-600 mx-auto mb-2" />
+              <p className="text-sm font-medium text-blue-900">Click to upload files</p>
+              <p className="text-xs text-blue-700">PNG, JPG, PDF up to 5MB</p>
+            </div>
+            <input type="file" className="hidden" multiple accept="image/*,.pdf" />
+          </label>
         </div>
       </div>
     </div>

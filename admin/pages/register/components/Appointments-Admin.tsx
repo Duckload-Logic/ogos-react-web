@@ -1,4 +1,4 @@
-import Layout from "@/components/Layout";
+import Layout from "../components/Layout";
 import { useState, useRef } from "react";
 import { ChevronLeft, ChevronRight, Eye, Clock } from "lucide-react";
 
@@ -374,3 +374,5 @@ export default function Appointments() {
     </Layout>
   );
 }
+
+

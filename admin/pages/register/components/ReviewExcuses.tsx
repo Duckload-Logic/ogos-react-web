@@ -1,4 +1,4 @@
-import Layout from "@/components/Layout";
+import Layout from "../components/Layout";
 import { useState } from "react";
 import { Download, CheckCircle, Clock, X } from "lucide-react";
 
@@ -248,3 +248,5 @@ export default function ReviewExcuses() {
     </Layout>
   );
 }
+
+

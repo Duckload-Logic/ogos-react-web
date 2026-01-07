@@ -1,4 +1,4 @@
-import Layout from "@/components/Layout";
+import Layout from "../components/Layout";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight, Eye, Check, X, Clock } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -367,3 +367,5 @@ export default function AppointmentsManagement() {
 function AvailabilityForm() {
   return null;
 }
+
+

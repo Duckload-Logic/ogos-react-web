@@ -1,4 +1,4 @@
-import Layout from "@/components/Layout";
+import Layout from "../components/Layout";
 import { useState } from "react";
 import { Download, Eye } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -227,3 +227,5 @@ function ReportForm({ onGenerate }: { onGenerate: (type: string) => void }) {
     </form>
   );
 }
+
+
