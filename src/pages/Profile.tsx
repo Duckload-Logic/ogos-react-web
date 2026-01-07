@@ -43,7 +43,6 @@ export default function Profile() {
     phone: additionalInfo?.studentProfile?.contactNo || '-',
     address: fullAddress,
     dateOfBirth: additionalInfo?.studentProfile?.birthDate ? convertDateToReadable(additionalInfo.studentProfile.birthDate) : '-',
-    studentNumber: additionalInfo?.studentProfile?.studentNumber || '-',
     placeOfBirth: additionalInfo?.studentProfile?.placeOfBirth || '-',
   };
 
@@ -83,10 +82,6 @@ export default function Profile() {
               {/* Left Column - Basic Info */}
               <div className="lg:col-span-1 space-y-4">
                 <div>
-                  <label className="text-sm font-medium text-gray-600">Student Number</label>
-                  <p className="text-gray-900 font-medium">{profileData.studentNumber}</p>
-                </div>
-                <div>
                   <label className="text-sm font-medium text-gray-600">Date of Birth</label>
                   <p className="text-gray-900 font-medium">{profileData.dateOfBirth}</p>
                 </div>
@@ -114,7 +109,8 @@ export default function Profile() {
                   <textarea
                     value={profileData.address}
                     readOnly
-                    className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm resize-vertical min-h-20"
+                    disabled
+                    className="w-full h-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm resize-vertical min-h-20 resize-none"
                   />
                 </div>
               </div>

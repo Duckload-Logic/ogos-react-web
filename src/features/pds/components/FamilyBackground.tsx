@@ -65,7 +65,6 @@ export function FamilyBackground({
               type="date"
               min="0"
               max="150"
-              placeholder="e.g., 45"
               value={formData.fatherBirthDate}
               onChange={(e) => {
                 handleInputChange("fatherBirthDate", e.target.value);
@@ -92,7 +91,7 @@ export function FamilyBackground({
             </label>
             <input
               type="text"
-              placeholder="e.g., Bachelor's"
+              placeholder="e.g., College"
               value={formData.fatherEducation}
               onChange={(e) => {
                 handleInputChange("fatherEducation", e.target.value);
@@ -231,7 +230,7 @@ export function FamilyBackground({
             </label>
             <input
               type="text"
-              placeholder="e.g., Bachelor's"
+              placeholder="e.g., College"
               value={formData.motherEducation}
               onChange={(e) => {
                 handleInputChange("motherEducation", e.target.value);

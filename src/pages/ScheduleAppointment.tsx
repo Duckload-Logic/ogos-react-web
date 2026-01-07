@@ -6,6 +6,13 @@ import { ArrowLeft, ChevronLeft, ChevronRight, Check, AlertCircle } from "lucide
 import { useAppointments } from "@/features/appointments/hooks/useAppointments";
 import { useAuth } from "@/context";
 
+const mapDateToString = (date: Date): string => {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 export default function ScheduleAppointment() {
   const { user } = useAuth();
   const {
@@ -24,23 +31,13 @@ export default function ScheduleAppointment() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Fetch available slots when date changes
+  
   useEffect(() => {
-  if (selectedDate) {
-    // 1. Extract local year, month, and day
-    const year = selectedDate.getFullYear();
-    // Months are 0-indexed in JS, so add 1. Pad with '0' for YYYY-MM-DD format.
-    const month = String(selectedDate.getMonth() + 1).padStart(2, '0');
-    const day = String(selectedDate.getDate()).padStart(2, '0');
-    
-    // 2. Combine into the accurate date string
-    const formattedDate = `${year}-${month}-${day}`;
-    
-    // 3. Trigger the fetch with the accurate string
-    fetchAvailableSlots(formattedDate);
-    setSelectedTime("");
-  }
-}, [selectedDate, fetchAvailableSlots]);
+    if (selectedDate) {
+      fetchAvailableSlots(mapDateToString(selectedDate));
+      setSelectedTime("");
+    }
+  }, [selectedDate, fetchAvailableSlots]);
 
   const handleSchedule = async () => {
     if (!selectedDate || !selectedTime || !reason.trim()) {
@@ -60,7 +57,7 @@ export default function ScheduleAppointment() {
       const appointment = await createAppointment({
         userId: user.id,
         reason: reason,
-        scheduledDate: selectedDate.toISOString().split('T')[0],
+        scheduledDate: mapDateToString(selectedDate),
         scheduledTime: selectedTime,
         concernCategory: '',
       });
@@ -261,7 +258,6 @@ export default function ScheduleAppointment() {
             </Card>
           </div>
           
-          {availableSlots.length}
           {/* Time Slots Section */}
           <div className="lg:w-72 lg:flex-shrink-0">
             <Card className="border-0 shadow-sm h-full">

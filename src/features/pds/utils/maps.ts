@@ -48,7 +48,6 @@ export const mapPersonalInfo = (formData: FormData, user: any) => {
     religion: formData.religion || '',
     heightFt: parseFloat(formData.height) || 0,
     weightKg: parseFloat(formData.weight) || 0,
-    studentNumber: user?.email?.split('@')[0] || '',
     course: formData.course || '',
     highSchoolGWA: parseFloat(formData.highSchoolAverage),
     placeOfBirth: formData.placeOfBirth || '',
