@@ -208,6 +208,16 @@
     color: #111827;
   }
 
+  .pill {
+
+  }
+
+  .pill:disabled {
+    background-color: #e5e7eb;
+    color: #9ca3af;
+    cursor: not-allowed;
+  }
+
   pre,
   code {
     overflow-x: auto;

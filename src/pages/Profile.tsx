@@ -1,23 +1,51 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context";
+import { useStudentForm } from "@/features/pds/hooks/useStudentForm";
+import { studentService } from "@/features/pds/services/service";
 
-// WIP: Profile Page
+const convertDateToReadable = (dateStr: string) => {
+  const date = new Date(dateStr);
+  return date.toLocaleDateString(undefined, {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  });
+}
 
 export default function Profile() {
-  const { username } = useAuth();
+  const { user } = useAuth();
+  const [additionalInfo, setAdditionalInfo] = useState<any>(null);
 
-  // Mock user data - in real app, this would come from API/database
-  const [profileData] = useState({
-    firstName: "John",
-    middleInitial: "D",
-    surname: "Santos",
-    email: "john.d.santos@gmail.com",
-    phone: "+63 917 123 4567",
-    address: "123 Oshu, Taguig City, Metro Manila",
-    dateOfBirth: "1997-05-15",
-    gender: "Male",
-  });
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    const fetchProfile = async () => {
+      const data = await studentService.getStudentProfile(user.id);
+      setAdditionalInfo(data);
+    };
+
+    fetchProfile();
+  }, [user]);
+
+  
+
+  const residential = additionalInfo?.addresses?.find((addr: any) => addr.addressType === 'Residential');
+  const fullAddress = residential 
+    ? `${residential.streetLotBlk}, ${residential.barangayName}, ${residential.cityName}, ${residential.regionName}`
+    : '-';
+
+  const profileData = {
+    firstName: user?.firstName,
+    middleInitial: user?.middleName ? user.middleName.charAt(0) + '.' : '',
+    surname: user?.lastName,
+    email: user?.email,
+    phone: additionalInfo?.studentProfile?.contactNo || '-',
+    address: fullAddress,
+    dateOfBirth: additionalInfo?.studentProfile?.birthDate ? convertDateToReadable(additionalInfo.studentProfile.birthDate) : '-',
+    studentNumber: additionalInfo?.studentProfile?.studentNumber || '-',
+    placeOfBirth: additionalInfo?.studentProfile?.placeOfBirth || '-',
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -46,7 +74,7 @@ export default function Profile() {
             {/* Student Header */}
             <div className="mb-6 pb-6 border-b">
               <h3 className="text-lg font-bold text-primary">
-                {profileData.surname}, {profileData.firstName} {profileData.middleInitial}. ({username})
+                {profileData.surname}, {profileData.firstName} {profileData.middleInitial}
               </h3>
             </div>
 
@@ -56,17 +84,7 @@ export default function Profile() {
               <div className="lg:col-span-1 space-y-4">
                 <div>
                   <label className="text-sm font-medium text-gray-600">Student Number</label>
-                  <p className="text-gray-900 font-medium">{username}</p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Name</label>
-                  <p className="text-gray-900 font-medium">
-                    {profileData.surname}, {profileData.firstName} {profileData.middleInitial}.
-                  </p>
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600">Gender</label>
-                  <p className="text-gray-900 font-medium">{profileData.gender}</p>
+                  <p className="text-gray-900 font-medium">{profileData.studentNumber}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600">Date of Birth</label>
@@ -74,7 +92,7 @@ export default function Profile() {
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600">Place of Birth</label>
-                  <p className="text-gray-900 font-medium">-</p>
+                  <p className="text-gray-900 font-medium">{profileData.placeOfBirth}</p>
                 </div>
                 <div>
                   <label className="text-sm font-medium text-gray-600">Mobile No.</label>
@@ -95,26 +113,6 @@ export default function Profile() {
                   </label>
                   <textarea
                     value={profileData.address}
-                    readOnly
-                    className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm resize-vertical min-h-20"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600 block mb-2">
-                    Permanent Address
-                  </label>
-                  <textarea
-                    value=""
-                    readOnly
-                    className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm resize-vertical min-h-20"
-                  />
-                </div>
-                <div>
-                  <label className="text-sm font-medium text-gray-600 block mb-2">
-                    Name of Spouse (if married)
-                  </label>
-                  <textarea
-                    value=""
                     readOnly
                     className="w-full px-3 py-2 border border-gray-300 rounded bg-gray-50 text-gray-900 text-sm resize-vertical min-h-20"
                   />

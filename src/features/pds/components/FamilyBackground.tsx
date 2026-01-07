@@ -1,4 +1,5 @@
 import { FormData, FormErrors } from "@/features/pds/types";
+import { PARENTAL_STATUS_MAP } from "../utils/maps";
 
 interface FamilyBackgroundProps {
   formData: FormData;
@@ -19,58 +20,74 @@ export function FamilyBackground({
         <h3 className="font-semibold text-gray-900 mb-4">
           Father's Information
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-2">
-            <label className="block font-semibold text-gray-700 mb-2">
-              Father's Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="e.g., John Doe"
-              value={formData.fatherName}
-              onChange={(e) => {
-                handleInputChange("fatherName", e.target.value);
-                clearError("fatherName");
-              }}
-              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
-                !formData.fatherName
-                  ? "border-red-400 focus:ring-red-500"
-                  : "border-gray-300 focus:ring-primary"
-              }`}
-            />
-            {!formData.fatherName && (
-              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
-            )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { key: "fatherFirstName", label: "First Name", placeholder: "Enter first name" },
+              { key: "fatherMiddleName", label: "Middle Name", placeholder: "Enter middle name" },
+              { key: "fatherLastName", label: "Last Name", placeholder: "Enter last name" },
+            ].map(( field ) => {
+              const fieldValue = formData[field.key as keyof typeof formData];
+              const stringValue = typeof fieldValue === 'string' ? fieldValue : '';
+              
+              return (
+                <div key={field.key} className="flex flex-col">
+                  <label className="pds-label mb-2">
+                    {field.label} {field.key !== "fatherMiddleName" && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={field.placeholder}
+                    value={stringValue} 
+                    onChange={(e) => {
+                      handleInputChange(field.key, e.target.value);
+                      clearError(field.key);
+                    }}
+                    className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                      // Middle name is optional, don't show red border if empty
+                      field.key !== "fatherMiddleName" && !formData[field.key as keyof typeof formData]
+                        ? "border-red-400 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-primary"
+                    }`}
+                  />
+                  {field.key !== "fatherMiddleName" && !formData[field.key as keyof typeof formData] && (
+                    <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+                  )}
+                </div>
+              )
+            })}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
-              Age <span className="text-red-500">*</span>
+            <label className="pds-label mb-2">
+              Birth Date <span className="text-red-500">*</span>
             </label>
             <input
-              type="text"
+              type="date"
+              min="0"
+              max="150"
               placeholder="e.g., 45"
-              value={formData.fatherAge}
+              value={formData.fatherBirthDate}
               onChange={(e) => {
-                handleInputChange("fatherAge", e.target.value);
-                clearError("fatherAge");
+                handleInputChange("fatherBirthDate", e.target.value);
+                clearError("fatherBirthDate");
               }}
               className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
-                !formData.fatherAge
+                !formData.fatherBirthDate
                   ? "border-red-400 focus:ring-red-500"
-                  : errors.fatherAge
+                  : errors.fatherBirthDate
                   ? "border-red-500 focus:ring-red-500"
                   : "border-gray-300 focus:ring-primary"
               }`}
             />
-            {!formData.fatherAge && (
+            {!formData.fatherBirthDate && (
               <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
             )}
-            {errors.fatherAge && (
-              <p className="text-red-500 text-xs mt-1">{errors.fatherAge}</p>
+            {errors.fatherBirthDate && (
+              <p className="text-red-500 text-xs mt-1">{errors.fatherBirthDate}</p>
             )}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Educational Attainment <span className="text-red-500">*</span>
             </label>
             <input
@@ -92,7 +109,7 @@ export function FamilyBackground({
             )}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Occupation <span className="text-red-500">*</span>
             </label>
             <input
@@ -114,7 +131,7 @@ export function FamilyBackground({
             )}
           </div>
           <div className="md:col-span-2">
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Company <span className="text-red-500">*</span>
             </label>
             <input
@@ -142,58 +159,74 @@ export function FamilyBackground({
         <h3 className="font-semibold text-gray-900 mb-4">
           Mother's Information
         </h3>
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="md:col-span-2">
-            <label className="block font-semibold text-gray-700 mb-2">
-              Mother's Name <span className="text-red-500">*</span>
-            </label>
-            <input
-              type="text"
-              placeholder="e.g., Jane Doe"
-              value={formData.motherName}
-              onChange={(e) => {
-                handleInputChange("motherName", e.target.value);
-                clearError("motherName");
-              }}
-              className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
-                !formData.motherName
-                  ? "border-red-400 focus:ring-red-500"
-                  : "border-gray-300 focus:ring-primary"
-              }`}
-            />
-            {!formData.motherName && (
-              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
-            )}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="md:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
+            {[
+              { key: "motherFirstName", label: "First Name", placeholder: "Enter first name" },
+              { key: "motherMiddleName", label: "Middle Name", placeholder: "Enter middle name" },
+              { key: "motherLastName", label: "Last Name", placeholder: "Enter last name" },
+            ].map(( field ) => {
+              const fieldValue = formData[field.key as keyof typeof formData];
+              const stringValue = typeof fieldValue === 'string' ? fieldValue : '';
+              
+              return (
+                <div key={field.key} className="flex flex-col">
+                  <label className="pds-label mb-2">
+                    {field.label} {field.key !== "motherMiddleName" && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    type="text"
+                    placeholder={field.placeholder}
+                    value={stringValue} 
+                    onChange={(e) => {
+                      handleInputChange(field.key, e.target.value);
+                      clearError(field.key);
+                    }}
+                    className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                      // Middle name is optional, don't show red border if empty
+                      field.key !== "motherMiddleName" && !formData[field.key as keyof typeof formData]
+                        ? "border-red-400 focus:ring-red-500"
+                        : "border-gray-300 focus:ring-primary"
+                    }`}
+                  />
+                  {field.key !== "motherMiddleName" && !formData[field.key as keyof typeof formData] && (
+                    <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+                  )}
+                </div>
+              )
+            })}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
-              Age <span className="text-red-500">*</span>
+            <label className="pds-label mb-2">
+              Birth Date <span className="text-red-500">*</span>
             </label>
             <input
-              type="text"
+              type="date"
+              min="0"
+              max="150"
               placeholder="e.g., 40"
-              value={formData.motherAge}
+              value={formData.motherBirthDate}
               onChange={(e) => {
-                handleInputChange("motherAge", e.target.value);
-                clearError("motherAge");
+                handleInputChange("motherBirthDate", e.target.value);
+                clearError("motherBirthDate");
               }}
               className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
-                !formData.motherAge
+                !formData.motherBirthDate
                   ? "border-red-400 focus:ring-red-500"
-                  : errors.motherAge
+                  : errors.motherBirthDate
                   ? "border-red-500 focus:ring-red-500"
                   : "border-gray-300 focus:ring-primary"
               }`}
             />
-            {!formData.motherAge && (
+            {!formData.motherBirthDate && (
               <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
             )}
-            {errors.motherAge && (
-              <p className="text-red-500 text-xs mt-1">{errors.motherAge}</p>
+            {errors.motherBirthDate && (
+              <p className="text-red-500 text-xs mt-1">{errors.motherBirthDate}</p>
             )}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Educational Attainment <span className="text-red-500">*</span>
             </label>
             <input
@@ -215,7 +248,7 @@ export function FamilyBackground({
             )}
           </div>
           <div>
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Occupation <span className="text-red-500">*</span>
             </label>
             <input
@@ -237,7 +270,7 @@ export function FamilyBackground({
             )}
           </div>
           <div className="md:col-span-2">
-            <label className="block font-semibold text-gray-700 mb-2">
+            <label className="pds-label mb-2">
               Company <span className="text-red-500">*</span>
             </label>
             <input
@@ -262,29 +295,24 @@ export function FamilyBackground({
       </div>
 
       <div className={`border rounded-lg p-4 ${
-        formData.parentalStatus ? "bg-gray-50" : "bg-red-50"
+        formData.parentalStatusID ? "bg-gray-50" : "bg-red-50"
       }`}>
         <h3 className="font-semibold text-gray-900 mb-4">
           Parental Status <span className="text-red-500">*</span>
         </h3>
         <div className="space-y-3">
-          {[
-            "Married & Living Together",
-            "Married but Living Separately",
-            "Divorced",
-            "Annulled",
-            "Single Parent",
-            "Father/Mother working abroad",
-            "Deceased, please specify:",
-          ].map((status) => (
-            <label key={status} className="flex items-center gap-3">
+          {/* Map over entries so you have access to both the ID (key) and the Status (value) */}
+          {Object.entries(PARENTAL_STATUS_MAP).map(([id, status]) => (
+            <label key={id} className="flex items-center gap-3">
               <input
                 type="radio"
                 name="parentalStatus"
-                value={status}
-                checked={formData.parentalStatus === status}
+                // The value should be the ID
+                value={id} 
+                // Compare IDs directly for the checked state
+                checked={String(formData.parentalStatusID) === String(id)}
                 onChange={(e) =>
-                  handleInputChange("parentalStatus", e.target.value)
+                  handleInputChange("parentalStatusID", e.target.value)
                 }
                 className="w-4 h-4 text-primary"
               />
@@ -292,11 +320,13 @@ export function FamilyBackground({
             </label>
           ))}
         </div>
-        {formData.parentalStatus === "Deceased, please specify:" && (
+
+        {/* Check the status string by looking up the ID in the map */}
+        {PARENTAL_STATUS_MAP[formData.parentalStatusID] === "Deceased, please specify:" && (
           <input
             type="text"
             placeholder="Specify details"
-            value={formData.parentalDetails}
+            value={formData.parentalDetails || ""} // Fallback to empty string if null
             onChange={(e) =>
               handleInputChange("parentalDetails", e.target.value)
             }
@@ -307,7 +337,7 @@ export function FamilyBackground({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
+          <label className="pds-label mb-2">
             Your Guardian's Name: <span className="text-red-500">*</span>
           </label>
           <input
@@ -326,7 +356,7 @@ export function FamilyBackground({
           )}
         </div>
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
+          <label className="pds-label mb-2">
             Address: <span className="text-red-500">*</span>
           </label>
           <input
@@ -356,30 +386,12 @@ export function FamilyBackground({
               Siblings (Including you): <span className="text-red-500">*</span>
             </label>
             <input
+              disabled
               type="number"
               min="0"
-              value={formData.siblings}
-              onChange={(e) => {
-                const val = e.target.value;
-                if (val === "" || !val.startsWith("-")) {
-                  handleInputChange("siblings", val);
-                  clearError("siblings");
-                }
-              }}
-              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 transition ${
-                !formData.siblings
-                  ? "border-red-400 focus:ring-red-500"
-                  : errors.siblings
-                  ? "border-red-500 focus:ring-red-500"
-                  : "border-gray-300 focus:ring-primary"
-              }`}
+              value={(parseInt(formData.brothers) + parseInt(formData.sisters) + 1).toString()}
+              className={`w-full px-3 py-2 border rounded focus:outline-none focus:ring-2 transition`}
             />
-            {!formData.siblings && (
-              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
-            )}
-            {errors.siblings && (
-              <p className="text-red-500 text-xs mt-1">{errors.siblings}</p>
-            )}
           </div>
           <div>
             <label className="block text-sm font-semibold text-gray-700 mb-2">
@@ -535,7 +547,7 @@ export function FamilyBackground({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
+          <label className="pds-label mb-2">
             Please indicate other sources of financial support:
           </label>
           <input
@@ -556,7 +568,7 @@ export function FamilyBackground({
           )}
         </div>
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
+          <label className="pds-label mb-2">
             Your weekly school allowance:
           </label>
           <input
@@ -578,12 +590,12 @@ export function FamilyBackground({
       </div>
 
       <div className={`border rounded-lg p-4 ${
-        formData.parentsIncome ? "bg-gray-50" : "bg-red-50"
+        formData.monthlyFamilyIncome ? "bg-gray-50" : "bg-red-50"
       }`}>
         <label className="block font-semibold text-gray-900 mb-4">
           Parents' Combined Total Monthly Income: <span className="text-red-500">*</span>
         </label>
-        <div className="space-y-2">
+        <div className="space-y-2 grid grid-cols-1 md:grid-cols-2">
           {[
             "Below P5,000",
             "P5,001 - P10,000",
@@ -601,12 +613,12 @@ export function FamilyBackground({
             <label key={range} className="flex items-center gap-3">
               <input
                 type="radio"
-                name="parentsIncome"
+                name="monthlyFamilyIncome"
                 value={range}
-                checked={formData.parentsIncome === range}
+                checked={formData.monthlyFamilyIncome === range}
                 onChange={(e) => {
-                  handleInputChange("parentsIncome", e.target.value);
-                  clearError("parentsIncome");
+                  handleInputChange("monthlyFamilyIncome", e.target.value);
+                  clearError("monthlyFamilyIncome");
                 }}
                 className="w-4 h-4 text-primary"
               />
@@ -614,6 +626,22 @@ export function FamilyBackground({
             </label>
           ))}
         </div>
+
+        {/* Input field for "Others, please specify:" */}
+        {formData.monthlyFamilyIncome === "Others, please specify:" && (
+          <div className="mt-4 pt-4 border-t border-gray-200">
+            <input
+              type="text"
+              placeholder="Please specify other income range"
+              value={formData.monthlyFamilyIncomeOther || ""}
+              onChange={(e) => {
+                handleInputChange("monthlyFamilyIncomeOther", e.target.value);
+                clearError("monthlyFamilyIncomeOther");
+              }}
+              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

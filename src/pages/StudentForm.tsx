@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { useStudentForm } from "@/features/pds/hooks/useStudentForm";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, AlertCircle, Save, AlertTriangle } from "lucide-react";
@@ -9,106 +9,14 @@ import { FamilyBackground } from "@/features/pds/components/FamilyBackground";
 import { HealthWellness } from "@/features/pds/components/HealthWellness";
 import { TestResults } from "@/features/pds/components/TestResults";
 import { SignificantNotes } from "@/features/pds/components/SignificantNotes";
-
-interface FormData {
-  reasonForEnrollment: { [key: string]: boolean };
-  reasonOther: string;
-  expecting_scholarship: boolean;
-  scholarship_details: string;
-
-  lastName: string;
-  firstName: string;
-  middleName: string;
-  civilStatus: string;
-  religion: string;
-  highSchoolAverage: string;
-  course: string;
-  email: string;
-  dateOfBirth: string;
-  placeOfBirth: string;
-  mobileNo: string;
-  height: string;
-  weight: string;
-  gender: string;
-  provincialAddressProvince: string;
-  provincialAddressMunicipality: string;
-  provincialAddressBarangay: string;
-  residentialAddressProvince: string;
-  residentialAddressMunicipality: string;
-  residentialAddressBarangay: string;
-  employerName: string;
-  emergencyContactName: string;
-  emergencyContactPhone: string;
-  relationship: string;
-
-  education: {
-    elementary: {
-      school: string;
-      location: string;
-      public: string;
-      yearGrad: string;
-      awards: string;
-    };
-    juniorHS: {
-      school: string;
-      location: string;
-      public: string;
-      yearGrad: string;
-      awards: string;
-    };
-    seniorHS: {
-      school: string;
-      location: string;
-      public: string;
-      yearGrad: string;
-      awards: string;
-    };
-    others: string;
-  };
-
-  fatherName: string;
-  fatherAge: string;
-  fatherEducation: string;
-  fatherOccupation: string;
-  fatherCompany: string;
-  motherName: string;
-  motherAge: string;
-  motherEducation: string;
-  motherOccupation: string;
-  motherCompany: string;
-  parentalStatus: string;
-  parentalDetails: string;
-  guardianName: string;
-  guardianAddress: string;
-  parentsIncome: string;
-  siblings: string;
-  brothers: string;
-  sisters: string;
-  gainfullyEmployed: string;
-  supportStudies: string;
-  supportFamily: string;
-  financialSupport: string;
-  weeklyAllowance: string;
-
-  vision: string;
-  hearing: string;
-  mobility: string;
-  speech: string;
-  generalHealth: string;
-  consultedWith: string;
-  consultReason: string;
-  whenStarted: string;
-  numSessions: string;
-  dateConcluded: string;
-  dateTest: string;
-  testAdministered: string;
-  rs: string;
-  pr: string;
-  description: string;
-  significantNotesDate: string;
-  incident: string;
-  remarks: string;
-}
+import { FormData } from "@/features/pds/types";
+import {
+  mapEnrollmentReasons,
+  mapPersonalInfo,
+  mapEducationInfo,
+  mapFamilyInfo,
+  mapHealthInfo,
+} from '@/features/pds/utils/maps';
 
 interface FormErrors {
   [key: string]: string;
@@ -124,6 +32,7 @@ const REASONS_OPTIONS = [
   "Adequate School Facilities",
   "Son / Daughter of PUP Employee",
   "Closer Student-Faculty Relations",
+  "Expecting Scholarship Offer",
 ];
 
 const EMPTY_FORM: FormData = {
@@ -148,13 +57,17 @@ const EMPTY_FORM: FormData = {
   provincialAddressProvince: "",
   provincialAddressMunicipality: "",
   provincialAddressBarangay: "",
+  provincialAddressRegion: "", // ADD THIS - Missing!
+  provincialAddressStreet: "", // ADD THIS - Missing!
   residentialAddressProvince: "",
   residentialAddressMunicipality: "",
   residentialAddressBarangay: "",
+  residentialAddressRegion: "", // ADD THIS - Missing!
+  residentialAddressStreet: "", // ADD THIS - Missing!
   employerName: "",
   emergencyContactName: "",
   emergencyContactPhone: "",
-  relationship: "",
+  emergencyContactRelationship: "",
   education: {
     elementary: {
       school: "",
@@ -179,22 +92,26 @@ const EMPTY_FORM: FormData = {
     },
     others: "",
   },
-  fatherName: "",
-  fatherAge: "",
+  fatherFirstName: "",
+  fatherMiddleName: "",
+  fatherLastName: "",
   fatherEducation: "",
   fatherOccupation: "",
   fatherCompany: "",
-  motherName: "",
-  motherAge: "",
+  fatherBirthDate: "", // ADD THIS - Missing!
+  motherFirstName: "",
+  motherMiddleName: "",
+  motherLastName: "",
   motherEducation: "",
   motherOccupation: "",
   motherCompany: "",
-  parentalStatus: "",
+  motherBirthDate: "", // ADD THIS - Missing!
+  parentalStatusID: 0,
   parentalDetails: "",
   guardianName: "",
   guardianAddress: "",
-  parentsIncome: "",
-  siblings: "",
+  monthlyFamilyIncome: "",
+  monthlyFamilyIncomeOther: "",
   brothers: "",
   sisters: "",
   gainfullyEmployed: "",
@@ -231,8 +148,10 @@ const sections = [
 ];
 
 export default function StudentForm() {
+  const { user, studentRecordId, isLoading, error, initializeStudentRecord, loadSavedFormData, saveSection, submitOnboarding } = useStudentForm();
   const [currentSection, setCurrentSection] = useState(0);
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
+  const [isSaving, setIsSaving] = useState(false);
   const [autoSaveStatus, setAutoSaveStatus] = useState<
     "saving" | "saved" | "idle"
   >("idle");
@@ -240,8 +159,143 @@ export default function StudentForm() {
   const [isMobileNav, setIsMobileNav] = useState(window.innerWidth < 1024);
   const [errors, setErrors] = useState<FormErrors>({});
   const [showClearConfirm, setShowClearConfirm] = useState(false);
+  const [showClearSuccess, setShowClearSuccess] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+  const [validationError, setValidationError] = useState<string>("");
+  const [validationErrorList, setValidationErrorList] = useState<string[]>([]);
+  const [showValidationError, setShowValidationError] = useState(false);
+
+  useEffect(() => {
+    const init = async () => {
+      await initializeStudentRecord();
+    };
+    init();
+  }, [user?.id]);
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (studentRecordId) {
+        const savedData = await loadSavedFormData();
+        console.log("Loaded saved data:", savedData);
+        if (savedData) {
+          setFormData(savedData);
+        } else {
+          // Try to load from localStorage if backend data not available
+          const localData = localStorage.getItem("studentFormData");
+          if (localData) {
+            try {
+              setFormData(JSON.parse(localData));
+            } catch (e) {
+              console.error("Failed to load saved data:", e);
+            }
+          }
+        }
+      }
+    };
+    loadData();
+  }, [studentRecordId]);
+
+  const handleNextSection = async () => {
+    if (!studentRecordId) {
+      alert('Student record not initialized');
+      return;
+    }
+
+    setIsSaving(true);
+    let sectionData: any;
+    let sectionName: string;
+
+    try {
+      switch (currentSection) {
+        case 0: // Enrollment Reasons
+          sectionName = 'enrollment';
+          sectionData = mapEnrollmentReasons(formData);
+          break;
+
+        case 1: // Personal Information
+          sectionName = 'personal';
+          sectionData = mapPersonalInfo(formData, user);
+          break;
+
+        case 2: // Educational Background
+          sectionName = 'education';
+          sectionData = mapEducationInfo(formData);
+          break;
+
+        case 3: // Family Background
+          sectionName = 'family';
+          sectionData = mapFamilyInfo(formData);
+          break;
+
+        case 4: // Health
+          sectionName = 'health';
+          sectionData = mapHealthInfo(formData);
+          break;
+
+        default:
+          setIsSaving(false);
+          return;
+      }
+
+      const success = await saveSection(sectionName, sectionData);
+
+      if (success) {
+        setCurrentSection(Math.min(sections.length - 1, currentSection + 1));
+        setAutoSaveStatus('saved');
+        setTimeout(() => setAutoSaveStatus('idle'), 2000);
+      } else {
+        alert(error || 'Failed to save section');
+      }
+    } catch (err: any) {
+      console.error('Error saving section:', err);
+      alert('An error occurred while saving. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const confirmSubmit = async () => {
+    setShowSubmitConfirm(false);
+    setIsSaving(true);
+
+    try {
+      // Save enrollment reasons
+      await saveSection('enrollment', mapEnrollmentReasons(formData));
+      
+      // Save personal information
+      await saveSection('personal', mapPersonalInfo(formData, user));
+      
+      // Save educational background
+      await saveSection('education', mapEducationInfo(formData));
+      
+      // Save family background
+      await saveSection('family', mapFamilyInfo(formData));
+      
+      // Save health information
+      await saveSection('health', mapHealthInfo(formData));
+
+      await submitOnboarding();
+
+      localStorage.removeItem(`user${user?.id}FormData`);
+      setShowSuccessPopup(true);
+    } catch (err: any) {
+      console.error('Error submitting form:', err);
+      alert(error || 'Failed to submit form. Please try again.');
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  // Auto-close validation error after 3 seconds
+  useEffect(() => {
+    if (showValidationError) {
+      const timer = setTimeout(() => {
+        setShowValidationError(false);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [showValidationError]);
 
   // Validation functions
   const validateEmail = (email: string): boolean => {
@@ -368,15 +422,6 @@ export default function StudentForm() {
   const validateFamilyFields = (): boolean => {
     const errors: FormErrors = {};
 
-    if (formData.fatherAge && !validateAge(formData.fatherAge)) {
-      errors.fatherAge = "Father's age must be between 10 and 100";
-    }
-    if (formData.motherAge && !validateAge(formData.motherAge)) {
-      errors.motherAge = "Mother's age must be between 10 and 100";
-    }
-    if (formData.siblings && !validateNonNegative(formData.siblings)) {
-      errors.siblings = "Siblings count cannot be negative";
-    }
     if (formData.brothers && !validateNonNegative(formData.brothers)) {
       errors.brothers = "Brothers count cannot be negative";
     }
@@ -430,7 +475,7 @@ export default function StudentForm() {
 
   // Load from localStorage on mount
   useEffect(() => {
-    const savedData = localStorage.getItem("studentFormData");
+    const savedData = localStorage.getItem(`user${user?.id}FormData`);
     if (savedData) {
       try {
         setFormData(JSON.parse(savedData));
@@ -445,7 +490,7 @@ export default function StudentForm() {
     const saveTimer = setTimeout(() => {
       if (Object.keys(formData).length > 0) {
         setAutoSaveStatus("saving");
-        localStorage.setItem("studentFormData", JSON.stringify(formData));
+        sessionStorage.setItem(`user${user?.id}FormData`, JSON.stringify(formData));
         setAutoSaveStatus("saved");
         setLastSaved(new Date().toLocaleTimeString());
 
@@ -500,12 +545,11 @@ export default function StudentForm() {
         )
           ? 1
           : 0,
-        reasonOther: formData.reasonOther ? 1 : 0,
       };
       filledCount = Object.values(enrollmentFields).filter(
         (v) => v === 1,
       ).length;
-      totalCount = 4;
+      totalCount = 1;
     } else if (sectionIndex === 1) {
       const personalFields = {
         lastName: formData.lastName ? 1 : 0,
@@ -546,14 +590,39 @@ export default function StudentForm() {
             : 0;
       totalCount = 100;
     } else if (sectionIndex === 3) {
+      let fatherInfo = ( 
+        formData.fatherFirstName && 
+        formData.fatherLastName &&
+        formData.fatherBirthDate &&
+        formData.fatherEducation &&
+        formData.fatherOccupation &&
+        formData.fatherCompany
+      );
+      let motherInfo = ( 
+        formData.motherFirstName && 
+        formData.motherLastName &&
+        formData.motherBirthDate &&
+        formData.motherEducation &&
+        formData.motherOccupation &&
+        formData.motherCompany 
+      );
       const familyFields = {
-        fatherName: formData.fatherName ? 1 : 0,
-        motherName: formData.motherName ? 1 : 0,
-        siblings: formData.siblings ? 1 : 0,
-        parentsIncome: formData.parentsIncome ? 1 : 0,
+        parentsInfo: (fatherInfo && motherInfo ? 1 : 0),
+        guardiansInfo: (
+          formData.guardianName && 
+          formData.guardianAddress ? 1 : 0
+        ),
+        parentalStatus: formData.parentalStatusID || formData.parentalDetails ? 1 : 0,
+        supportingFamily: (
+          formData.gainfullyEmployed && 
+          formData.supportStudies && 
+          formData.supportFamily && 
+          formData.financialSupport && 
+          formData.weeklyAllowance? 1 : 0),
+        monthlyFamilyIncome: formData.monthlyFamilyIncome || formData.monthlyFamilyIncomeOther ? 1 : 0,
       };
       filledCount = Object.values(familyFields).filter((v) => v === 1).length;
-      totalCount = 4;
+      totalCount = 5;
     } else if (sectionIndex === 4) {
       const healthFields = {
         vision: formData.vision ? 1 : 0,
@@ -591,16 +660,24 @@ export default function StudentForm() {
   ) => {
     if (section && section !== "others") {
       // Handle nested education fields (elementary, juniorHS, seniorHS)
-      setFormData((prev) => ({
-        ...prev,
-        education: {
-          ...prev.education,
-          [section]: {
-            ...(prev.education[section as keyof typeof prev.education] as Record<string, string>),
-            [field]: value,
+      const validSections = ['elementary', 'juniorHS', 'seniorHS'] as const;
+      
+      if (validSections.includes(section as any)) {
+        setFormData((prev) => ({
+          ...prev,
+          education: {
+            ...prev.education,
+            [section]: {
+              // Get the current education level, ensuring it's an object
+              ...(typeof prev.education[section as keyof typeof prev.education] === 'object' 
+                ? prev.education[section as keyof typeof prev.education] 
+                : {}
+              ) as Record<string, string>,
+              [field]: value as string, // Education fields are always strings
+            },
           },
-        },
-      }));
+        }));
+      }
     } else if (section === "others") {
       // Handle education.others which is a string, not a nested object
       setFormData((prev) => ({
@@ -611,6 +688,7 @@ export default function StudentForm() {
         },
       }));
     } else {
+      // Handle top-level fields
       setFormData((prev) => ({
         ...prev,
         [field]: value,
@@ -632,35 +710,200 @@ export default function StudentForm() {
     }));
   };
 
+  const buildDetailedErrorMessage = (
+    personalValid: boolean,
+    educationValid: boolean,
+    familyValid: boolean,
+  ): string[] => {
+    const errorList: string[] = [];
+
+    if (!personalValid) {
+      if (!formData.firstName.trim())
+        errorList.push("Personal Information: First name is required");
+      if (!formData.email.trim())
+        errorList.push("Personal Information: Email is required");
+      else if (!validateEmail(formData.email))
+        errorList.push("Personal Information: Invalid email format");
+    }
+
+    if (!educationValid) {
+      [
+        { key: "elementary", label: "Elementary" },
+        { key: "juniorHS", label: "Junior HS" },
+        { key: "seniorHS", label: "Senior HS" },
+      ].forEach((level) => {
+        const levelData =
+          formData.education[level.key as keyof typeof formData.education];
+        if (typeof levelData === "object" && levelData !== null) {
+          if (
+            (levelData as any).school ||
+            (levelData as any).location ||
+            (levelData as any).public ||
+            (levelData as any).yearGrad
+          ) {
+            if (!(levelData as any).school)
+              errorList.push(`Education: ${level.label} - School name required`);
+            if (!(levelData as any).location)
+              errorList.push(`Education: ${level.label} - Location required`);
+            if (!(levelData as any).public)
+              errorList.push(
+                `Education: ${level.label} - Public/Private required`,
+              );
+            if (!(levelData as any).yearGrad)
+              errorList.push(
+                `Education: ${level.label} - Year graduated required`,
+              );
+            if (
+              (levelData as any).yearGrad &&
+              !validateYear((levelData as any).yearGrad)
+            )
+              errorList.push(`Education: ${level.label} - Invalid year`);
+          }
+        }
+      });
+    }
+
+    if (!familyValid) {
+      if (formData.brothers && !validateNonNegative(formData.brothers))
+        errorList.push("Family: Brothers count cannot be negative");
+      if (formData.sisters && !validateNonNegative(formData.sisters))
+        errorList.push("Family: Sisters count cannot be negative");
+    }
+
+    return errorList;
+  };
+
+  const buildIncompleteSection = (): string[] => {
+    const incompleteSections: string[] = [];
+
+    for (let i = 0; i < 5; i++) {
+      const completion = calculateSectionCompletion(i);
+      if (completion < 100) {
+        incompleteSections.push(
+          `${sections[i].title}: ${completion}% complete`,
+        );
+      }
+    }
+
+    return incompleteSections;
+  };
+
+  const buildMissingFieldsMessage = (): string[] => {
+    const missingList: string[] = [];
+
+    // Section 0: Reason for Enrollment
+    const hasReason = Object.values(formData.reasonForEnrollment).some((v) => v);
+    if (!hasReason) {
+      missingList.push("Reason for Enrollment: Please select at least one reason");
+    }
+
+    // Section 1: Personal Information
+    const personalMissing: string[] = [];
+    if (!formData.firstName.trim()) personalMissing.push("First Name");
+    if (!formData.lastName.trim()) personalMissing.push("Last Name");
+    if (!formData.email.trim()) personalMissing.push("Email");
+    if (!formData.dateOfBirth) personalMissing.push("Date of Birth");
+    if (!formData.gender) personalMissing.push("Gender");
+    if (!formData.mobileNo.trim()) personalMissing.push("Mobile Number");
+    if (personalMissing.length > 0) {
+      missingList.push(`Personal Information: ${personalMissing.join(", ")}`);
+    }
+
+    // Section 2: Educational Background
+    const educationMissing: string[] = [];
+    const levels = [
+      { key: "elementary", label: "Elementary" },
+      { key: "juniorHS", label: "Junior HS" },
+      { key: "seniorHS", label: "Senior HS" },
+    ];
+    let hasAnyEducation = false;
+    levels.forEach((level) => {
+      const levelData =
+        formData.education[level.key as keyof typeof formData.education];
+      if (typeof levelData === "object" && levelData !== null) {
+        if (
+          (levelData as any).school ||
+          (levelData as any).location ||
+          (levelData as any).public ||
+          (levelData as any).yearGrad
+        ) {
+          hasAnyEducation = true;
+          if (!(levelData as any).school)
+            educationMissing.push(`${level.label}: School`);
+          if (!(levelData as any).location)
+            educationMissing.push(`${level.label}: Location`);
+          if (!(levelData as any).public)
+            educationMissing.push(`${level.label}: Public/Private`);
+          if (!(levelData as any).yearGrad)
+            educationMissing.push(`${level.label}: Year Graduated`);
+        }
+      }
+    });
+    if (!hasAnyEducation) {
+      missingList.push("Educational Background: Please fill in at least one education level");
+    } else if (educationMissing.length > 0) {
+      missingList.push(`Educational Background: ${educationMissing.join(", ")}`);
+    }
+
+    // Section 3: Family Background
+    const familyMissing: string[] = [];
+    if (!formData.fatherFirstName.trim()) familyMissing.push("Father's First Name");
+    if (!formData.fatherLastName.trim()) familyMissing.push("Father's Last Name");
+    if (!formData.motherFirstName.trim()) familyMissing.push("Mother's First Name");
+    if (!formData.motherLastName.trim()) familyMissing.push("Mother's Last Name");
+    if (familyMissing.length > 0) {
+      missingList.push(`Family Background: ${familyMissing.join(", ")}`);
+    }
+
+    // Section 4: Health
+    const healthMissing: string[] = [];
+    if (!formData.vision) healthMissing.push("Vision");
+    if (!formData.hearing) healthMissing.push("Hearing");
+    if (!formData.mobility) healthMissing.push("Mobility");
+    if (!formData.speech) healthMissing.push("Speech");
+    if (!formData.generalHealth) healthMissing.push("General Health");
+    if (healthMissing.length > 0) {
+      missingList.push(`Health: ${healthMissing.join(", ")}`);
+    }
+
+    return missingList;
+  };
+
   const handleSubmit = () => {
-    // Always run validations
+    // Check completion first - if form is incomplete, show which sections are missing
+    if (overallCompletion < 100) {
+      const incompleteSections = buildIncompleteSection();
+      setValidationError(
+        `Please complete the following sections:`,
+      );
+      setValidationErrorList(incompleteSections);
+      setShowValidationError(true);
+      return;
+    }
+
+    // Only run detailed validations if form is 100% complete
     const personalValid = validatePersonalFields();
     const educationValid = validateEducationFields();
     const familyValid = validateFamilyFields();
 
     if (!personalValid || !educationValid || !familyValid) {
+      const errorList = buildDetailedErrorMessage(
+        personalValid,
+        educationValid,
+        familyValid,
+      );
       setErrors((prev) => ({
         ...prev,
         submitError: "Please fix all errors before submitting the form.",
       }));
-      alert("Please fix all validation errors before submitting.");
-      return;
-    }
-
-    if (overallCompletion < 100) {
-      alert(
-        `Form is ${overallCompletion}% complete. Please fill in all required sections before submitting.`,
-      );
+      setValidationError("Please fix the following errors before submitting:");
+      setValidationErrorList(errorList);
+      setShowValidationError(true);
       return;
     }
 
     // Show confirmation modal
     setShowSubmitConfirm(true);
-  };
-
-  const confirmSubmit = () => {
-    setShowSubmitConfirm(false);
-    setShowSuccessPopup(true);
   };
 
   const handleSuccessClose = () => {
@@ -670,7 +913,36 @@ export default function StudentForm() {
     setCurrentSection(0);
   };
 
+  const isSectionEmpty = (): boolean => {
+    if (currentSection === 0) {
+      return Object.values(formData.reasonForEnrollment).every(v => !v) && !formData.reasonOther;
+    } else if (currentSection === 1) {
+      return !formData.lastName && !formData.firstName && !formData.middleName && 
+             !formData.civilStatus && !formData.religion && !formData.highSchoolAverage &&
+             !formData.course && !formData.email && !formData.dateOfBirth && !formData.placeOfBirth &&
+             !formData.mobileNo && !formData.height && !formData.weight && !formData.gender;
+    } else if (currentSection === 2) {
+      const education = formData.education;
+      return !education.elementary.school && !education.elementary.location &&
+             !education.juniorHS.school && !education.juniorHS.location &&
+             !education.seniorHS.school && !education.seniorHS.location && !education.others;
+    } else if (currentSection === 3) {
+      return !formData.fatherFirstName && !formData.fatherLastName && 
+      !formData.motherFirstName && !formData.motherLastName && !formData.guardianName &&
+             !formData.monthlyFamilyIncome && !formData.financialSupport;
+    } else if (currentSection === 4) {
+      return !formData.vision && !formData.hearing && !formData.mobility && !formData.speech &&
+             !formData.generalHealth && !formData.consultedWith && !formData.dateTest && !formData.rs && !formData.pr;
+    }
+    return true;
+  };
+
   const handleClearForm = () => {
+    if (isSectionEmpty()) {
+      setValidationError("Nothing to Clear - There is no data in this section to clear.");
+      setShowValidationError(true);
+      return;
+    }
     setShowClearConfirm(true);
   };
 
@@ -709,12 +981,17 @@ export default function StudentForm() {
         provincialAddressProvince: "",
         provincialAddressMunicipality: "",
         provincialAddressBarangay: "",
+        provincialAddressRegion: "", // Add this
+        provincialAddressStreet: "", // Add this
         residentialAddressProvince: "",
         residentialAddressMunicipality: "",
         residentialAddressBarangay: "",
+        residentialAddressRegion: "", // Add this
+        residentialAddressStreet: "", // Add this
+        employerName: "",
         emergencyContactName: "",
         emergencyContactPhone: "",
-        relationship: "",
+        emergencyContactRelationship: "", // FIXED - was 'relationship'
       }));
     } else if (currentSection === 2) {
       // Clear Educational Background section
@@ -736,16 +1013,20 @@ export default function StudentForm() {
         fatherEducation: "",
         fatherOccupation: "",
         fatherCompany: "",
+        fatherBirthDate: "", // Add this
         motherName: "",
         motherAge: "",
         motherEducation: "",
         motherOccupation: "",
         motherCompany: "",
+        motherBirthDate: "", // Add this
+        motherMaidenName: "", // Add this
         parentalStatus: "",
         parentalDetails: "",
         guardianName: "",
         guardianAddress: "",
         parentsIncome: "",
+        parentsIncomeOther: "", // Make sure this is included
         siblings: "",
         brothers: "",
         sisters: "",
@@ -779,6 +1060,13 @@ export default function StudentForm() {
         remarks: "",
       }));
     }
+    
+    // Show success popup
+    setShowClearSuccess(true);
+  };
+
+  const handleClearSuccessClose = () => {
+    setShowClearSuccess(false);
   };
 
   const overallCompletion = getOverallCompletion();
@@ -977,7 +1265,7 @@ export default function StudentForm() {
                             <input
                               type="checkbox"
                               checked={
-                                formData.reasonForEnrollment[reason] || false
+                                formData.reasonForEnrollment[reason] == true || false
                               }
                               onChange={() => handleReasonChange(reason)}
                               className="w-5 h-5 rounded border-gray-300 text-primary"
@@ -1005,45 +1293,13 @@ export default function StudentForm() {
                         className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
-
-                    <div className="border-t pt-6">
-                      <label className="flex items-center gap-3 cursor-pointer">
-                        <input
-                          type="checkbox"
-                          checked={formData.expecting_scholarship}
-                          onChange={(e) =>
-                            handleInputChange(
-                              "expecting_scholarship",
-                              e.target.checked,
-                            )
-                          }
-                          className="w-5 h-5 rounded border-gray-300 text-primary"
-                        />
-                        <span className="font-semibold text-gray-700">
-                          Expecting Scholarship Offer
-                        </span>
-                      </label>
-                      {formData.expecting_scholarship && (
-                        <input
-                          type="text"
-                          value={formData.scholarship_details}
-                          onChange={(e) =>
-                            handleInputChange(
-                              "scholarship_details",
-                              e.target.value,
-                            )
-                          }
-                          placeholder="Please specify"
-                          className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary mt-3"
-                        />
-                      )}
-                    </div>
                   </div>
                 )}
 
                 {/* Section 1: Personal Information */}
                 {currentSection === 1 && (
                   <PersonalInformation
+                    user={user}
                     formData={formData}
                     handleInputChange={handleInputChange}
                     clearError={clearError}
@@ -1105,28 +1361,30 @@ export default function StudentForm() {
 
             {/* Form Navigation Buttons */}
             <div className="flex flex-col md:flex-row gap-4 mt-8">
-              <button
-                onClick={() =>
-                  setCurrentSection(Math.max(0, currentSection - 1))
-                }
-                disabled={currentSection === 0}
-                className="px-6 py-3 bg-gray-200 hover:bg-gray-300 disabled:opacity-50 text-gray-900 font-semibold rounded-lg transition-colors"
-              >
-                Previous
-              </button>
+              {currentSection > 0 && (
+                <button
+                  onClick={() =>
+                    setCurrentSection(Math.max(0, currentSection - 1))
+                  }
+                  className="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-900 font-semibold rounded-lg transition-colors"
+                >
+                  Previous
+                </button>
+              )}
               <button
                 onClick={handleClearForm}
-                className="px-6 py-3 bg-red-50 hover:bg-red-100 border border-red-300 text-red-700 font-semibold rounded-lg transition-colors"
+                className={`px-6 py-3 font-semibold rounded-lg transition-colors ${
+                  isSectionEmpty()
+                    ? "bg-gray-200 hover:bg-gray-300 text-gray-600 border border-gray-300"
+                    : "bg-red-50 hover:bg-red-100 border border-red-300 text-red-700"
+                }`}
               >
                 Clear Section
               </button>
               {currentSection < sections.length - 1 ? (
                 <button
-                  onClick={() =>
-                    setCurrentSection(
-                      Math.min(sections.length - 1, currentSection + 1),
-                    )
-                  }
+                  onClick={handleNextSection}
+                  disabled={isLoading}
                   className="flex-1 px-6 py-3 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold rounded-lg transition-colors"
                 >
                   Next
@@ -1134,9 +1392,10 @@ export default function StudentForm() {
               ) : (
                 <Button
                   onClick={handleSubmit}
+                  disabled={isLoading}
                   className="flex-1 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold px-6 py-3"
                 >
-                  Submit Form
+                  {isLoading ? 'Submitting...' : 'Submit Form'}
                 </Button>
               )}
             </div>
@@ -1170,6 +1429,31 @@ export default function StudentForm() {
                   Clear Data
                 </Button>
               </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Custom Clear Success Modal */}
+      {showClearSuccess && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <Card className="w-full max-w-sm border-0 shadow-2xl">
+            <CardHeader className="bg-gradient-to-r from-green-600 to-green-500 text-white rounded-t-lg">
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Check className="w-6 h-6" />
+                Section Cleared Successfully
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="pt-6">
+              <p className="text-gray-700 mb-6">
+                All data in the "{sections[currentSection].title}" section has been cleared.
+              </p>
+              <Button
+                onClick={handleClearSuccessClose}
+                className="w-full bg-green-600 hover:bg-green-700 text-white font-semibold"
+              >
+                Done
+              </Button>
             </CardContent>
           </Card>
         </div>
@@ -1231,6 +1515,47 @@ export default function StudentForm() {
               </Button>
             </CardContent>
           </Card>
+        </div>
+      )}
+
+      {/* Validation Error Modal Popup */}
+      {showValidationError && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full overflow-hidden">
+            {/* Modal Header */}
+            <div className="bg-red-600 text-white px-6 py-4">
+              <h3 className="text-lg font-bold">Unable to Submit</h3>
+            </div>
+            
+            {/* Modal Body */}
+            <div className="px-6 py-4">
+              <p className="text-gray-700 font-semibold mb-4">
+                {validationError || "Please fix the following errors:"}
+              </p>
+              
+              {/* Error List */}
+              {validationErrorList.length > 0 ? (
+                <ul className="space-y-2 mb-4">
+                  {validationErrorList.map((error, index) => (
+                    <li key={index} className="flex items-start gap-3">
+                      <span className="text-red-600 font-bold text-lg flex-shrink-0 mt-0.5">•</span>
+                      <span className="text-gray-700 text-sm">{error}</span>
+                    </li>
+                  ))}
+                </ul>
+              ) : null}
+            </div>
+            
+            {/* Modal Footer */}
+            <div className="bg-gray-100 px-6 py-3 flex justify-end">
+              <button
+                onClick={() => setShowValidationError(false)}
+                className="bg-red-600 hover:bg-red-700 text-white font-semibold px-6 py-2 rounded-lg transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

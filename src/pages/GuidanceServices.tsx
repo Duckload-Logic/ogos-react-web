@@ -13,22 +13,26 @@ const PROGRAMS = [
 ];
 
 export default function GuidanceServices() {
-  const {user} = useAuth();
+  const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
 
   useEffect(() => {
     const checkFormStatus = async () => {
-      // To check if user has completed the form
-      const formCompleted = localStorage.getItem("formCompleted");
-      if (!formCompleted) {
-        const completed = await checkStudentOnboardingStatus(user?.id || 0);
+      try {
+        if (!user?.id) {
+          console.warn('User not authenticated or user ID missing');
+          return;
+        }
+        const completed = await checkStudentOnboardingStatus(user.id);
         setShowForm(!completed);
+      } catch (err) {
+        console.error('Error checking onboarding status:', err);
+      } finally {
       }
     };
 
     checkFormStatus();
   }, [user?.id]);
-
 
   return (
     <div className="min-h-screen bg-gray-50">

@@ -1,115 +1,73 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
-
-interface User {
-  fullName: string;
-  email: string;
-  password: string;
-}
+import { apiClient } from "@/lib/api";
+import { User } from "@/types/user";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  username: string | null;
-  login: (username: string, password: string) => boolean;
-  register: (
-    fullName: string,
-    email: string,
-    password: string,
-  ) => { success: boolean; error?: string };
+  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
   logout: () => void;
+  isLoading: boolean;
+  user: User | null; // Allow null here
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const STORAGE_KEY = "authUsers";
-const CURRENT_USER_KEY = "authUsername";
-
-// Helper to get all registered users
-const getRegisteredUsers = (): User[] => {
-  const users = localStorage.getItem(STORAGE_KEY);
-  return users ? JSON.parse(users) : [];
-};
-
-// Helper to save users
-const saveUsers = (users: User[]) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(users));
-};
-
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState<string | null>(null);
+  const [user, setUser] = useState<User | null>(null); // Use the User type
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Check if user is already logged in on mount
-  useEffect(() => {
-    const storedUsername = localStorage.getItem(CURRENT_USER_KEY);
-    if (storedUsername) {
+  // Define fetch function inside or outside useEffect
+  const fetchUserData = async () => {
+    try {
+      const { data } = await apiClient.get('/users/me');
+      setUser(data);
       setIsAuthenticated(true);
-      setUsername(storedUsername);
+    } catch (error) {
+      console.error('Session invalid', error);
+      logout(); // Clear storage if token is expired/invalid
+    } finally {
+      setIsLoading(false);
     }
+  };
 
-    // Initialize with default student account on first load
-    const users = getRegisteredUsers();
-    const studentExists = users.some((user) => user.email === "student");
-    if (!studentExists) {
-      users.push({
-        fullName: "Student User",
-        email: "student",
-        password: "password",
-      });
-      saveUsers(users);
+  useEffect(() => {
+    const token = localStorage.getItem('accessToken');
+    if (token) {
+      fetchUserData();
+    } else {
+      setIsLoading(false);
     }
   }, []);
 
-  const login = (inputUsername: string, inputPassword: string): boolean => {
-    const users = getRegisteredUsers();
-    const user = users.find(
-      (u) => u.email === inputUsername && u.password === inputPassword,
-    );
+  const login = async (email: string, password: string) => {
+    try {
+      const { data } = await apiClient.post('/auth/login', { email, password });
 
-    if (user) {
-      setIsAuthenticated(true);
-      setUsername(user.email);
-      localStorage.setItem(CURRENT_USER_KEY, user.email);
-      return true;
+      localStorage.setItem('accessToken', data.token);
+      localStorage.setItem('refreshToken', data.refreshToken);
+
+      // After login, fetch the full user profile
+      await fetchUserData();
+
+      return { success: true };
+    } catch (error: any) {
+      return {
+        success: false,
+        error: error.response?.data?.error || 'Login failed. Please try again.',
+      };
     }
-    return false;
-  };
-
-  const register = (
-    fullName: string,
-    email: string,
-    password: string,
-  ): { success: boolean; error?: string } => {
-    const users = getRegisteredUsers();
-
-    // Check if email already exists
-    if (users.some((user) => user.email === email)) {
-      return { success: false, error: "Email already registered" };
-    }
-
-    // Add new user
-    users.push({ fullName, email, password });
-    saveUsers(users);
-
-    // Auto-login after registration
-    setIsAuthenticated(true);
-    setUsername(email);
-    localStorage.setItem(CURRENT_USER_KEY, email);
-
-    return { success: true };
   };
 
   const logout = () => {
+    localStorage.removeItem('accessToken');
+    localStorage.removeItem('refreshToken');
     setIsAuthenticated(false);
-    setUsername(null);
-    localStorage.removeItem(CURRENT_USER_KEY);
+    setUser(null);
   };
 
   return (
-    <AuthContext.Provider
-      value={{ isAuthenticated, username, login, register, logout }}
-    >
+    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, isLoading }}>
       {children}
     </AuthContext.Provider>
   );

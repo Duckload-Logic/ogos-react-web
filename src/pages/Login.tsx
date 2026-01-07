@@ -33,53 +33,34 @@ export default function Login() {
     setError("");
     setIsLoading(true);
 
-    // Strict Validation
+    // Validation
     if (!username || !password) {
       setError("Please enter both email/username and password");
       setIsLoading(false);
       return;
     }
 
-    // Validate username/email format
     const isEmail = username.includes("@");
     
-    if (isEmail) {
-      if (!validateEmail(username)) {
-        setError("Please enter a valid email address (e.g., user@domain.com)");
-        setIsLoading(false);
-        return;
-      }
-    } else {
-      if (!validateUsername(username)) {
-        setError("Username must be between 3 and 50 characters");
-        setIsLoading(false);
-        return;
-      }
+    if (isEmail && !validateEmail(username)) {
+      setError("Please enter a valid email address");
+      setIsLoading(false);
+      return;
     }
 
-    // Validate password
     if (!validatePassword(password)) {
       setError("Password must be at least 6 characters long");
       setIsLoading(false);
       return;
     }
 
-    // Check for empty spaces
-    if (username.includes(" ") || password.includes(" ")) {
-      setError("Username and password cannot contain spaces");
-      setIsLoading(false);
-      return;
-    }
-
-    // Simulate loading delay
-    await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Login mode
-    const success = login(username, password);
-    if (success) {
+    // Call API
+    const result = await login(username, password);
+    
+    if (result.success) {
       navigate("/");
     } else {
-      setError("Invalid email/username or password. Please try again");
+      setError(result.error || "Invalid credentials");
     }
 
     setIsLoading(false);
