@@ -1,27 +1,31 @@
 import { RouteObject } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import NotFound from "@/pages/NotFound";
-
-// Student pages
 import Header from "@/components/Header";
-import Login from "@/pages/Login";
-import Register from "@/pages/Register";
-import GuidanceServices from "@/pages/student/GuidanceServices";
-import ScheduleAppointment from "@/pages/student/ScheduleAppointment";
-import StudentForm from "@/pages/student/StudentForm";
-import ExcuseSlip from "@/pages/student/ExcuseSlip";
-import ViewSchedules from "@/pages/student/ViewSchedules";
-import Profile from "@/pages/Profile";
 
-// Admin pages
-import Dashboard from "@/pages/admin/Dashboard";
-import IndexFrontdesk from "@/pages/admin/Index-Frontdesk";
-import StudentRecords from "@/pages/admin/StudentRecords";
-import Appointments from "@/pages/admin/Appointments";
-import AppointmentsManagement from "@/pages/admin/AppointmentsManagement";
-import ReviewExcuses from "@/pages/admin/ReviewExcuses";
-import Reports from "@/pages/admin/Reports";
-import Frontdesk from "@/pages/admin/Frontdesk";
+// Shared
+import NotFound from "@/pages/shared/NotFound";
+
+// Auth Feature
+import Login from "@/features/auth/pages/Login";
+import Register from "@/features/auth/pages/Register";
+
+// Student Features
+import GuidanceServices from "@/features/guidance-services/pages/GuidanceServices";
+import ScheduleAppointment from "@/features/appointments/pages/ScheduleAppointment";
+import StudentForm from "@/features/pds/pages/StudentForm";
+import ExcuseSlip from "@/features/excuse-slips/pages/ExcuseSlip";
+import ViewSchedules from "@/features/schedules/pages/ViewSchedules";
+import Profile from "@/features/profile/pages/Profile";
+
+// Admin Feature
+import Dashboard from "@/features/admin/pages/Dashboard";
+import IndexFrontdesk from "@/features/admin/pages/Index-Frontdesk";
+import StudentRecords from "@/features/admin/pages/StudentRecords";
+import Appointments from "@/features/admin/pages/Appointments";
+import AppointmentsManagement from "@/features/admin/pages/AppointmentsManagement";
+import ReviewExcuses from "@/features/admin/pages/ReviewExcuses";
+import Reports from "@/features/admin/pages/Reports";
+import Frontdesk from "@/features/admin/pages/Frontdesk";
 
 export const routes: RouteObject[] = [
   // Public routes
@@ -30,7 +34,7 @@ export const routes: RouteObject[] = [
 
   // Student routes
   {
-    path: "/",
+    path: "/student",
     element: (
       <ProtectedRoute requiredRole="student">
         <Header />
@@ -39,7 +43,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/schedule",
+    path: "/student/schedule",
     element: (
       <ProtectedRoute requiredRole="student">
         <Header />
@@ -48,7 +52,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/form",
+    path: "/student/form",
     element: (
       <ProtectedRoute requiredRole="student">
         <Header />
@@ -57,7 +61,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/excuse-slip",
+    path: "/student/excuse-slip",
     element: (
       <ProtectedRoute requiredRole="student">
         <Header />
@@ -66,7 +70,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/schedules",
+    path: "/student/schedules",
     element: (
       <ProtectedRoute requiredRole="student">
         <Header />
@@ -75,7 +79,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/profile",
+    path: "/student/profile",
     element: (
       <ProtectedRoute requiredRole="student">
         <Header />
@@ -148,6 +152,14 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute requiredRole="frontdesk">
         <Appointments />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/frontdesk/review-excuses",
+    element: (
+      <ProtectedRoute requiredRole="frontdesk">
+        <ReviewExcuses />
       </ProtectedRoute>
     ),
   },
