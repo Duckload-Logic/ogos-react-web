@@ -3,6 +3,13 @@
  * Centralized app-wide constants and configuration
  */
 
+// Role to route mapping
+export const ROLE_ROUTES = {
+  1: "/student", // Student role
+  2: "/admin", // Admin role
+  3: "/frontdesk", // Frontdesk role
+} as const;
+
 // Course options
 export const COURSE_OPTIONS = [
   { value: "CS", label: "Computer Science" },
