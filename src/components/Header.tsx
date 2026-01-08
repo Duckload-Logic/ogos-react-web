@@ -8,7 +8,7 @@ import PUPLogo from "@/assets/images/PUPLogo.png";
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isProfileOpen, setIsProfileOpen] = useState(false);
-  const { isAuthenticated, username, logout } = useAuth();
+  const { isAuthenticated, user, logout } = useAuth();
   const location = useLocation();
 
   // Don't show header on login and register pages
@@ -69,7 +69,7 @@ export default function Header() {
                 className="flex items-center gap-2 p-2 hover:bg-primary-dark rounded transition-colors"
               >
                 <User className="w-5 h-5" />
-                <span className="hidden sm:inline">{username || "User"}</span>
+                <span className="hidden sm:inline">{user?.lastName || "User"}</span>
               </button>
 
               {isProfileOpen && (
