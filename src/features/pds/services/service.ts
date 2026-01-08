@@ -12,8 +12,8 @@ export const studentService = {
     return data;
   },
 
-  async getStudentRecordId(userID: number) {
-    const { data } = await apiClient.get(`/students/record/id/${userID}`);
+  async getStudentRecord(userID: number) {
+    const { data } = await apiClient.get(`/students/record/${userID}`);
     return data.studentRecordID;
   },
 
