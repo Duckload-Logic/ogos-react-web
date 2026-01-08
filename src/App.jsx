@@ -5,7 +5,6 @@ import { Header } from './components'
 function App() {
   return (
     <>
-      <Header />
       <Routes>
         {routes.map((route) => (
           <Route key={route.path} {...route} />
