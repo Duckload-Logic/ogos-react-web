@@ -63,8 +63,19 @@ export default function Login() {
         2: "admin",
         3: "frontdesk",
       };
-      
-      const role = roleMap[result.roleId!];
+      const roleId = result?.roleId;
+      if (!roleId) {
+        setError("User role not found");
+        setIsLoading(false);
+        return;
+      }
+
+      const role = roleMap[roleId];
+      if (role === undefined) {
+        setError("Unknown user role");
+        setIsLoading(false);
+        return;
+      }
 
       if (role === "admin") {
         navigate("/admin", { replace: true });

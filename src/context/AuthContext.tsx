@@ -23,21 +23,27 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { data } = await apiClient.get('/users/me');
       setUser(data);
       setIsAuthenticated(true);
+      return data;
     } catch (error) {
       console.error('Session invalid', error);
       logout(); // Clear storage if token is expired/invalid
+      return null
     } finally {
       setIsLoading(false);
     }
   };
 
   useEffect(() => {
-    const token = localStorage.getItem('accessToken');
-    if (token) {
-      fetchUserData();
-    } else {
-      setIsLoading(false);
-    }
+    const fetchData = async () => {
+      const token = localStorage.getItem('accessToken');
+      if (token) {
+        await fetchUserData();
+      } else {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -48,9 +54,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       localStorage.setItem('refreshToken', data.refreshToken);
 
       // After login, fetch the full user profile
-      await fetchUserData();
+      const userData = await fetchUserData();
 
-      return { success: true, roleId: user?.roleId };
+      return { success: true, roleId: userData?.roleId };
     } catch (error: any) {
       return {
         success: false,
