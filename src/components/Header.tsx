@@ -17,10 +17,10 @@ export default function Header() {
   }
 
   const navigationItems = [
-    { label: "Home", href: "/" },
-    { label: "Schedule Appointment", href: "/schedule" },
-    { label: "View Schedules", href: "/schedules" },
-    { label: "Excuse Slip", href: "/excuse-slip" },
+    { label: "Home", href: "/student" },
+    { label: "Schedule Appointment", href: "/student/schedule" },
+    { label: "View Schedules", href: "/student/schedules" },
+    { label: "Excuse Slip", href: "/student/excuse-slip" },
   ];
 
   return (
@@ -29,7 +29,7 @@ export default function Header() {
       <div className="bg-primary px-4 py-4 md:px-8">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo Section */}
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/login" className="flex items-center gap-3">
             <div className="h-16 flex-shrink-0">
               <img
                 src={PUPLogo}
@@ -39,10 +39,9 @@ export default function Header() {
             </div>
             <div className="hidden sm:block">
               <h1 className="text-base md:text-lg font-bold leading-tight">
-                Polytechnic University
+                Polytechnic University of the Philippines - Taguig
               </h1>
               <p className="text-xs md:text-sm opacity-90">
-                of the Philippines - Taguig
               </p>
             </div>
           </Link>
@@ -75,7 +74,7 @@ export default function Header() {
               {isProfileOpen && (
                 <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg border z-50">
                   <Link
-                    to="/profile"
+                    to="/student/profile"
                     className="block px-4 py-2 hover:bg-gray-100"
                   >
                     My Profile
