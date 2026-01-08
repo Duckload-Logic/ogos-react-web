@@ -4,10 +4,10 @@ import { User } from "@/types/user";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; error?: string }>;
+  login: (email: string, password: string) => Promise<{ success: boolean; roleId?: number; error?: string }>;
   logout: () => void;
   isLoading: boolean;
-  user: User | null; // Allow null here
+  user: User | null; 
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       // After login, fetch the full user profile
       await fetchUserData();
 
-      return { success: true };
+      return { success: true, roleId: user?.roleId };
     } catch (error: any) {
       return {
         success: false,

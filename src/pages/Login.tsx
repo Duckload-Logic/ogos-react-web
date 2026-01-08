@@ -56,9 +56,23 @@ export default function Login() {
 
     // Call API
     const result = await login(username, password);
-    
+ 
     if (result.success) {
-      navigate("/");
+      const roleMap: { [key: number]: string } = {
+        1: "student",
+        2: "admin",
+        3: "frontdesk",
+      };
+      
+      const role = roleMap[result.roleId!];
+
+      if (role === "admin") {
+        navigate("/admin", { replace: true });
+      } else if (role === "frontdesk") {
+        navigate("/frontdesk", { replace: true });
+      } else if (role === "student") {
+        navigate("/", { replace: true });
+      }
     } else {
       setError(result.error || "Invalid credentials");
     }
