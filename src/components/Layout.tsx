@@ -2,17 +2,28 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Menu, X, LogOut } from "lucide-react";
 import { useState } from "react";
-import { useAuth } from "@/lib/auth-context";
+import { useAuth } from "@/context";
+import PUPLogo from "@/assets/images/PUPLogo.png";
 
 interface LayoutProps {
   children: React.ReactNode;
   title?: string;
 }
 
+interface NavItem {
+  label: string;
+  href: string;
+}
+
+/**
+ * Unified Layout Component
+ * Works for both admin and student roles
+ * Automatically adjusts navigation based on user role
+ */
 export default function Layout({ children, title }: LayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -20,14 +31,41 @@ export default function Layout({ children, title }: LayoutProps) {
     navigate("/login");
   };
 
-  const navigationItems = [
-    { label: "Student Records", href: "/student-records" },
-    { label: "Appointments", href: "/appointments" },
-    { label: "View Schedule", href: "/view-schedule" },
-    { label: "Review Excuses Slip", href: "/review-excuses" },
-    { label: "Reports", href: "/reports" },
-    { label: "Logs", href: "/logs" },
-  ];
+  // Define navigation items based on role
+  const navigationItems = React.useMemo(() => {
+    if (!user) return [];
+    
+    if (user.roleId === 3) {
+      // Front Desk role
+      return [
+        { label: "Dashboard", href: "/frontdesk" },
+        { label: "Review Excuses Slip", href: "/frontdesk/review-excuses" },
+      ];
+    }
+
+    if (user.roleId === 2) {
+      // Admin role
+      return [
+        { label: "Dashboard", href: "/admin" },
+        { label: "Student Records", href: "/admin/student-records" },
+        { label: "Appointments Request", href: "/admin/appointments" },
+        { label: "View Schedule", href: "/admin/view-schedule" },
+        { label: "Review Excuses Slip", href: "/admin/review-excuses" },
+        { label: "Reports", href: "/admin/reports" },
+      ];
+    }
+
+    // Default/Student role
+    return [];
+  }, [user]);
+
+  // Get role label for display
+  const getRoleLabel = (): string => {
+    if (!user) return "";
+    if (user.roleId === 3) return "Front Desk Account";
+    if (user.roleId === 2) return "Admin Account";
+    return "Student Account";
+  };
 
   return (
     <div className="flex h-screen bg-gray-50">
@@ -40,7 +78,7 @@ export default function Layout({ children, title }: LayoutProps) {
         <div className="p-6 border-b border-sidebar-border">
           <h1 className="text-xl font-bold flex items-center gap-2">
             <img
-              src="/PUPLogo.png"
+              src={PUPLogo}
               alt="PUP Logo"
               className="w-10 h-10 rounded-full"
             />
@@ -88,7 +126,7 @@ export default function Layout({ children, title }: LayoutProps) {
                 PUP-Taguig Guidance Information System
               </h2>
             </div>
-            <div className="text-sm opacity-90">Admin Account</div>
+            <div className="text-sm opacity-90">{getRoleLabel()}</div>
           </div>
         </header>
 
