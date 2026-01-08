@@ -1,0 +1,149 @@
+import { useState, useEffect } from "react";
+import { Loader, Calendar } from "lucide-react";
+import { useAppointments } from "@/features/appointments/hooks/useAppointments";
+import { useAuth } from "@/context";
+import {
+  ScheduleHeader,
+  ScheduleErrorAlert,
+  UpcomingAppointmentsList,
+  CancelledAppointmentsList,
+  ExcuseSlipsSection,
+  CancelAppointmentModal,
+  SuccessModal,
+  HelpSection,
+} from "@/features/schedules/components";
+
+/**
+ * ViewSchedules - Main page for viewing user's schedules and appointments
+ * Orchestrates multiple sub-components for displaying:
+ * - Upcoming appointments
+ * - Cancelled appointments
+ * - Excuse slips section
+ * - Action modals (cancel, success)
+ */
+export default function ViewSchedules() {
+  const { user } = useAuth();
+  const {
+    appointments,
+    loading,
+    error,
+    fetchAppointments,
+    cancelAppointment,
+    clearError,
+  } = useAppointments();
+
+  // Modal and state management
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [appointmentToDelete, setAppointmentToDelete] = useState<number | null>(
+    null,
+  );
+  const [successModalOpen, setSuccessModalOpen] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  // Load appointments on component mount
+  useEffect(() => {
+    if (user?.id) {
+      fetchAppointments();
+    }
+  }, [user?.id, fetchAppointments]);
+
+  // Event handlers
+  const handleDeleteClick = (id: number) => {
+    setAppointmentToDelete(id);
+    setDeleteModalOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (appointmentToDelete) {
+      setIsDeleting(true);
+      clearError();
+      try {
+        const success = await cancelAppointment(appointmentToDelete);
+        if (success) {
+          setDeleteModalOpen(false);
+          setSuccessModalOpen(true);
+          setAppointmentToDelete(null);
+        }
+      } finally {
+        setIsDeleting(false);
+      }
+    }
+  };
+
+  const handleCancelDelete = () => {
+    setDeleteModalOpen(false);
+    setAppointmentToDelete(null);
+  };
+
+  const handleCloseSuccess = () => {
+    setSuccessModalOpen(false);
+  };
+
+  // Loading state
+  if (loading && appointments.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="flex flex-col items-center gap-3">
+          <Loader className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-gray-600">Loading appointments...</p>
+        </div>
+      </div>
+    );
+  }
+
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <ScheduleHeader
+        title="My Schedules"
+        description="View your appointments and excuse slip status"
+      />
+
+      {/* Error Alert */}
+      {error && (
+        <ScheduleErrorAlert error={error} onClose={clearError} />
+      )}
+
+      {/* Main Content */}
+      <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-12">
+        {/* Upcoming Appointments Section */}
+        <section className="mb-12">
+          <h2 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
+            <Calendar className="w-6 h-6" />
+            Your Upcoming Appointments
+          </h2>
+          <UpcomingAppointmentsList
+            appointments={appointments}
+            onDeleteClick={handleDeleteClick}
+            isDeleting={isDeleting}
+          />
+        </section>
+
+        {/* Cancelled Appointments Section */}
+        <CancelledAppointmentsList appointments={appointments} />
+
+        {/* Excuse Slips Section */}
+        <ExcuseSlipsSection />
+
+        {/* Help Section */}
+        <HelpSection />
+      </div>
+
+      {/* Modals */}
+      <CancelAppointmentModal
+        isOpen={deleteModalOpen}
+        isDeleting={isDeleting}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
+
+      <SuccessModal
+        isOpen={successModalOpen}
+        title="Appointment Cancelled"
+        message="Your appointment has been successfully cancelled."
+        onClose={handleCloseSuccess}
+      />
+    </div>
+  );
+}
