@@ -1,21 +1,17 @@
 import { useState, useCallback, useEffect } from 'react';
-import { appointmentService, type Appointment, type TimeSlot } from '../services/service';
+import { appointmentService } from '../services/service';
+import {
+  type Appointment,
+  type TimeSlot,
+  type AppointmentStatus,
+  type CreateAppointmentRequest,
+  type UseAppointmentsReturn,
+} from '../types';
 import { useAuth } from '@/context';
-
-type AppointmentStatus = 'Pending' | 'Approved' | 'Completed' | 'Cancelled' | 'Rescheduled';
-
-interface UseAppointmentsReturn {
-  appointments: Appointment[];
-  availableSlots: TimeSlot[];
-  loading: boolean;
-  error: string | null;
-  fetchAppointments: () => Promise<void>;
-  fetchAvailableSlots: (date?: string) => Promise<void>;
-  createAppointment: (request: any) => Promise<Appointment | null>;
-  updateAppointmentStatus: (id: number, status: AppointmentStatus) => Promise<boolean>;
-  cancelAppointment: (id: number) => Promise<boolean>;
-  clearError: () => void;
-}
+import {
+  extractErrorMessage,
+  formatAvailableSlots,
+} from '../utils';
 
 export const useAppointments = (): UseAppointmentsReturn => {
   const { user } = useAuth();
@@ -42,7 +38,7 @@ export const useAppointments = (): UseAppointmentsReturn => {
       const data = await appointmentService.getAllAppointments();
       setAppointments(data);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || 'Failed to fetch appointments';
+      const errorMessage = extractErrorMessage(err, 'Failed to fetch appointments');
       setError(errorMessage);
       console.error('Error fetching appointments:', err);
     } finally {
@@ -55,17 +51,10 @@ export const useAppointments = (): UseAppointmentsReturn => {
     setError(null);
     try {
       const data = await appointmentService.getAvailableSlots(date);
-      const formattedSlots = Array.isArray(data)
-        ? data
-        : Object.entries(data).map(([startTime, booked], index) => ({
-            slotId: index + 1,
-            startTime,
-            isNotTaken: booked as boolean,
-          }));
-
+      const formattedSlots = formatAvailableSlots(data);
       setAvailableSlots(formattedSlots);
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || 'Failed to fetch available slots';
+      const errorMessage = extractErrorMessage(err, 'Failed to fetch available slots');
       setError(errorMessage);
       console.error('Error fetching available slots:', err);
     } finally {
@@ -74,7 +63,7 @@ export const useAppointments = (): UseAppointmentsReturn => {
   }, []);
 
   const createAppointment = useCallback(
-    async (request: any): Promise<Appointment | null> => {
+    async (request: CreateAppointmentRequest): Promise<Appointment | null> => {
       if (!user?.id) {
         setError('User not authenticated');
         return null;
@@ -87,7 +76,7 @@ export const useAppointments = (): UseAppointmentsReturn => {
         setAppointments((prev) => [...prev, newAppointment]);
         return newAppointment;
       } catch (err: any) {
-        const errorMessage = err.response?.data?.error || 'Failed to create appointment';
+        const errorMessage = extractErrorMessage(err, 'Failed to create appointment');
         setError(errorMessage);
         console.error('Error creating appointment:', err);
         return null;
@@ -111,7 +100,7 @@ export const useAppointments = (): UseAppointmentsReturn => {
         );
         return true;
       } catch (err: any) {
-        const errorMessage = err.response?.data?.error || 'Failed to update appointment status';
+        const errorMessage = extractErrorMessage(err, 'Failed to update appointment status');
         setError(errorMessage);
         console.error('Error updating appointment status:', err);
         return false;
@@ -136,7 +125,7 @@ export const useAppointments = (): UseAppointmentsReturn => {
       }
       return success;
     } catch (err: any) {
-      const errorMessage = err.response?.data?.error || 'Failed to cancel appointment';
+      const errorMessage = extractErrorMessage(err, 'Failed to cancel appointment');
       setError(errorMessage);
       console.error('Error cancelling appointment:', err);
       return false;

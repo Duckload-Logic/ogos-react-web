@@ -1,0 +1,46 @@
+/**
+ * Appointment Feature Types
+ * 
+ * Central location for all TypeScript interfaces and types
+ * used throughout the appointments feature.
+ */
+
+export interface TimeSlot {
+  slotId: number;
+  startTime: string;
+  isNotTaken: boolean;
+}
+
+export interface Appointment {
+  id: number;
+  userId: number;
+  reason: string;
+  scheduledDate: string;
+  scheduledTime: string;
+  concernCategory: string;
+  status: AppointmentStatus;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export type AppointmentStatus = 'Pending' | 'Approved' | 'Completed' | 'Cancelled' | 'Rescheduled';
+
+export interface CreateAppointmentRequest {
+  reason: string;
+  scheduledDate: string;
+  scheduledTime: string;
+  concernCategory?: string;
+}
+
+export interface UseAppointmentsReturn {
+  appointments: Appointment[];
+  availableSlots: TimeSlot[];
+  loading: boolean;
+  error: string | null;
+  fetchAppointments: () => Promise<void>;
+  fetchAvailableSlots: (date?: string) => Promise<void>;
+  createAppointment: (request: CreateAppointmentRequest) => Promise<Appointment | null>;
+  updateAppointmentStatus: (id: number, status: AppointmentStatus) => Promise<boolean>;
+  cancelAppointment: (id: number) => Promise<boolean>;
+  clearError: () => void;
+}

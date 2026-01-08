@@ -1,29 +1,10 @@
 import { apiClient } from '@/lib/api';
-
-export interface TimeSlot {
-  slotId: number;
-  startTime: string;
-  isNotTaken: boolean;
-}
-
-export interface Appointment {
-  id: number;
-  userId: number;
-  reason: string;
-  scheduledDate: string;
-  scheduledTime: string;
-  concernCategory: string;
-  status: 'Pending' | 'Approved' | 'Completed' | 'Cancelled' | 'Rescheduled';
-  createdAt: Date;
-  updatedAt: Date;
-}
-
-export interface CreateAppointmentRequest {
-  reason: string;
-  scheduledDate: string;
-  scheduledTime: string;
-  concernCategory?: string;
-}
+import type {
+  TimeSlot,
+  Appointment,
+  CreateAppointmentRequest,
+  AppointmentStatus,
+} from '../types';
 
 class AppointmentService {
   // Get available slots for a specific date
