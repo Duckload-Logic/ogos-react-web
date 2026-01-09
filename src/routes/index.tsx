@@ -1,4 +1,4 @@
-import { RouteObject } from "react-router-dom";
+import { RouteObject, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import Header from "@/components/Header";
 
@@ -28,6 +28,9 @@ import Reports from "@/features/admin/pages/Reports";
 import Frontdesk from "@/features/admin/pages/Frontdesk";
 
 export const routes: RouteObject[] = [
+  // Root route - redirect to login
+  { path: "/", element: <Navigate to="/login" replace /> },
+
   // Public routes
   { path: "/login", element: <Login /> },
   { path: "/register", element: <Register /> },
