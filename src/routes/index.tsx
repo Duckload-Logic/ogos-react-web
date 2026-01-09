@@ -19,13 +19,12 @@ import Profile from "@/features/profile/pages/Profile";
 
 // Admin Feature
 import Dashboard from "@/features/admin/pages/Dashboard";
-import IndexFrontdesk from "@/features/admin/pages/Index-Frontdesk";
 import StudentRecords from "@/features/admin/pages/StudentRecords";
 import Appointments from "@/features/admin/pages/Appointments";
 import AppointmentsManagement from "@/features/admin/pages/AppointmentsManagement";
 import ReviewExcuses from "@/features/admin/pages/ReviewExcuses";
 import Reports from "@/features/admin/pages/Reports";
-import Frontdesk from "@/features/admin/pages/Frontdesk";
+import Frontdesk from "@/features/frontdesk/pages/Frontdesk";
 
 export const routes: RouteObject[] = [
   // Root route - redirect to login
@@ -146,7 +145,7 @@ export const routes: RouteObject[] = [
     path: "/frontdesk",
     element: (
       <ProtectedRoute requiredRole="frontdesk">
-        <IndexFrontdesk />
+        <Frontdesk />
       </ProtectedRoute>
     ),
   },
