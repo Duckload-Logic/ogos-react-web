@@ -2,6 +2,9 @@ import { FormData } from "@/features/students/types";
 import { Combobox } from "@/components/ui/combobox";
 import { User } from "@/types/user";
 import locations from "@/config/ph_locations.json";
+import { useState } from "react";
+import { is } from "zod/v4/locales";
+import { set } from "zod";
 
 const COURSE_OPTIONS = [
   // Undergraduate Programs
@@ -34,6 +37,8 @@ export function PersonalInformation({
   handleInputChange,
   clearError,
 }: PersonalInformationProps) {
+  const [isSameAddress, setIsSameAddress] = useState(false);
+
   formData.lastName = user?.lastName || '';
   formData.firstName = user?.firstName || '';
   formData.middleName = user?.middleName || '';
@@ -74,6 +79,45 @@ export function PersonalInformation({
     handleInputChange("residentialAddressMunicipality", val);
     handleInputChange("residentialAddressBarangay", "");     // Reset child
     clearError("residentialAddressMunicipality");
+  };
+
+  const handleSameAddressToggle = (checked: boolean) => {
+    const isProvincialAddressComplete = 
+      formData.provincialAddressRegion &&
+      formData.provincialAddressMunicipality &&
+      formData.provincialAddressBarangay &&
+      formData.provincialAddressStreet;
+    
+    if (!isProvincialAddressComplete && checked) {
+      alert("Please complete the Provincial Address fields before syncing.");
+      setIsSameAddress(false);
+      return;
+    }
+
+    setIsSameAddress(checked);
+    if (checked) {
+      // Sync all fields
+      handleInputChange("residentialAddressRegion", formData.provincialAddressRegion);
+      handleInputChange("residentialAddressMunicipality", formData.provincialAddressMunicipality);
+      handleInputChange("residentialAddressBarangay", formData.provincialAddressBarangay);
+      handleInputChange("residentialAddressStreet", formData.provincialAddressStreet);
+
+      clearError("residentialAddressRegion");
+      clearError("residentialAddressMunicipality");
+      clearError("residentialAddressBarangay");
+      clearError("residentialAddressStreet");
+    } else {
+      // Clear residential fields
+      handleInputChange("residentialAddressRegion", "");
+      handleInputChange("residentialAddressMunicipality", "");
+      handleInputChange("residentialAddressBarangay", "");
+      handleInputChange("residentialAddressStreet", "");
+
+      clearError("residentialAddressRegion");
+      clearError("residentialAddressMunicipality");
+      clearError("residentialAddressBarangay");
+      clearError("residentialAddressStreet");
+    }
   };
 
   return (
@@ -516,6 +560,18 @@ export function PersonalInformation({
         </div>
       </div>
 
+      <div className="flex items-center space-x-2 py-4 border-t border-b border-gray-100 my-4">
+        <input
+          type="checkbox"
+          id="sameAsProvincial"
+          className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+          onChange={(e) => handleSameAddressToggle(e.target.checked)}
+        />
+        <label htmlFor="sameAsProvincial" className="text-sm font-medium text-gray-700 cursor-pointer">
+          Residential address is the same as provincial address
+        </label>
+      </div>
+
       {/* Residential/City Address */}
       <div className="space-y-4">
         <label className="students-label">Provincial Address <span className="text-red-500">*</span></label>
@@ -530,6 +586,7 @@ export function PersonalInformation({
               onValueChange={handleResidentialRegionChange}
               placeholder="Select Region"
               className="h-[3.5rem]"
+              disabled={isSameAddress}
             />
           </div>
 
@@ -540,7 +597,7 @@ export function PersonalInformation({
               options={provincialCities}
               value={formData.residentialAddressMunicipality}
               onValueChange={handleResidentialCityChange}
-              disabled={!formData.residentialAddressRegion}
+              disabled={!formData.residentialAddressRegion || isSameAddress}
               placeholder={formData.residentialAddressRegion ? "Select City" : "Select Region first"}
               className="h-[3.5rem]"
             />
@@ -553,7 +610,7 @@ export function PersonalInformation({
               options={provincialBarangays}
               value={formData.residentialAddressBarangay}
               onValueChange={(val) => handleInputChange("residentialAddressBarangay", val)}
-              disabled={!formData.residentialAddressMunicipality}
+              disabled={!formData.residentialAddressMunicipality || isSameAddress}
               placeholder={formData.residentialAddressMunicipality ? "Select Barangay" : "Select City first"}
               className="h-[3.5rem]"
             />
@@ -568,6 +625,7 @@ export function PersonalInformation({
               onChange={(e) => handleInputChange("residentialAddressStreet", e.target.value)}
               className="students-input w-full h-[3.5rem] px-4 py-2 border rounded-lg"
               placeholder="e.g. Blk 12 Lot 5"
+              disabled={isSameAddress}
             />
           </div>
         </div>
