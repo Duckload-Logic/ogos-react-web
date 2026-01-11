@@ -16,6 +16,29 @@
   animation: fadeOut 0.5s ease-in-out 2.5s forwards;
 }
 
+/* Red blink animation for alert (2 blinks) */
+@keyframes redBlink {
+  0% {
+    background-color: rgb(254, 243, 192);
+  }
+  25% {
+    background-color: rgb(220, 38, 38);
+  }
+  50% {
+    background-color: rgb(254, 243, 192);
+  }
+  75% {
+    background-color: rgb(220, 38, 38);
+  }
+  100% {
+    background-color: rgb(254, 243, 192);
+  }
+}
+
+.alert-blink {
+  animation: redBlink 1.2s ease-in-out 1;
+}
+
 /* stylelint-disable-next-line at-rule-no-unknown */
 @tailwind base;
 /* stylelint-disable-next-line at-rule-no-unknown */
