@@ -19,8 +19,8 @@ export interface Appointment {
   scheduledTime: string;
   concernCategory: string;
   status: AppointmentStatus;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type AppointmentStatus = 'Pending' | 'Approved' | 'Completed' | 'Cancelled' | 'Rescheduled';
@@ -40,5 +40,7 @@ export interface UseAppointmentsReturn {
   fetchAppointments: (fetchAll?: boolean, status?: string, startDate?: string, endDate?: string) => Promise<void>;
   fetchAvailableSlots: (date?: string) => Promise<void>;
   createAppointment: (request: CreateAppointmentRequest) => Promise<Appointment | null>;
+  cancelAppointment: (appointmentId: number | Appointment) => Promise<boolean>;
+  rescheduleAppointment: (appointmentId: number, payload: CreateAppointmentRequest) => Promise<Appointment | null>;
   clearError: () => void;
 }
