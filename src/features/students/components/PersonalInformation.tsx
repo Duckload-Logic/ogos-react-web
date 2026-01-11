@@ -658,8 +658,8 @@ export function PersonalInformation({
               {
                 [ 
                   {label: "First Name", field: "emergencyContactFirstName"},
-                  {label: "Last Name", field: "emergencyContactLastName"},
                   {label: "Middle Name", field: "emergencyContactMiddleName"},
+                  {label: "Last Name", field: "emergencyContactLastName"},
                 ].map((field) => (
                   <div key={field.field}> {/* Wrapped in a div or fragment with a key */}
                     <input
@@ -672,12 +672,12 @@ export function PersonalInformation({
                       placeholder={`Enter ${field.label}`}
                       className={`w-full px-4 py-3 border rounded-lg focus:outline-none
                         focus:ring-2 transition ${
-                          !formData[field.field as keyof FormData]
+                          !formData[field.field as keyof FormData] && !(field.label === "Middle Name")
                             ? "border-red-400 focus:ring-red-500"
                             : "border-gray-300 focus:ring-primary"
                         }`}
                     />
-                    {!formData[field.field as keyof FormData] && (
+                    {!formData[field.field as keyof FormData] && !(field.label === "Middle Name") && (
                       <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
                     )}
                   </div>
