@@ -394,50 +394,52 @@ export function FamilyBackground({
         )}
       </div>
  
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6">
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
             Your Guardian's Name: <span className="text-red-500">*</span>
           </label>
-          {
-          [
-              { key: "guardianFirstName", label: "First Name", placeholder: "Enter first name" },
-              { key: "guardianMiddleName", label: "Middle Name", placeholder: "Enter middle name" },
-              { key: "guardianLastName", label: "Last Name", placeholder: "Enter last name" },
-            ].map(( field ) => {
-              const fieldValue = formData[field.key as keyof typeof formData];
-              const stringValue = typeof fieldValue === 'string' ? fieldValue : '';
-              
-              return (
-                <div key={field.key} className="flex flex-col">
-                  <label className="students-label mb-2">
-                    {field.label} {field.key !== "guardianMiddleName" && <span className="text-red-500">*</span>}
-                  </label>
-                  <input
-                    type="text"
-                    placeholder={field.placeholder}
-                    value={stringValue} 
-                    onChange={(e) => {
-                      handleInputChange(field.key, e.target.value);
-                      clearError(field.key);
-                    }}
-                    className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
-                      // Middle name is optional, don't show red border if empty
-                      field.key !== "guardianMiddleName" && !formData[field.key as keyof typeof formData]
-                        ? "border-red-400 focus:ring-red-500"
-                        : "border-gray-300 focus:ring-primary"
-                    }`}
-                  />
-                  {field.key !== "guardianMiddleName" && !formData[field.key as keyof typeof formData] && (
-                    <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
-                  )}
-                </div>
-              )
-            })}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            {
+            [
+                { key: "guardianFirstName", label: "First Name", placeholder: "Enter first name" },
+                { key: "guardianMiddleName", label: "Middle Name", placeholder: "Enter middle name" },
+                { key: "guardianLastName", label: "Last Name", placeholder: "Enter last name" },
+              ].map(( field ) => {
+                const fieldValue = formData[field.key as keyof typeof formData];
+                const stringValue = typeof fieldValue === 'string' ? fieldValue : '';
+                
+                return (
+                  <div key={field.key} className="flex flex-col">
+                    <label className="students-label mb-2">
+                      {field.label} {field.key !== "guardianMiddleName" && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={field.placeholder}
+                      value={stringValue} 
+                      onChange={(e) => {
+                        handleInputChange(field.key, e.target.value);
+                        clearError(field.key);
+                      }}
+                      className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                        // Middle name is optional, don't show red border if empty
+                        field.key !== "guardianMiddleName" && !formData[field.key as keyof typeof formData]
+                          ? "border-red-400 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-primary"
+                      }`}
+                    />
+                    {field.key !== "guardianMiddleName" && !formData[field.key as keyof typeof formData] && (
+                      <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
         </div>
 
         <div>
-          <div className="flex items-center space-x-2 py-4 border-t border-gray-200 my-4">
+          <div className="flex items-center space-x-2 py-2 border-gray-200">
             <input
               type="checkbox"
               id="sameAsProvincial"
@@ -445,13 +447,13 @@ export function FamilyBackground({
               onChange={(e) => handleSameAddressToggle(e.target.checked)}
             />
             <label htmlFor="sameAsProvincial" className="text-sm font-medium text-gray-700 cursor-pointer">
-              Residential address is the same as provincial address
+              Guardian address is the same as residential address
             </label>
           </div>
 
           {/* Guardian Address */}
           <div className="space-y-4">
-            <label className="students-label">Residential Address <span className="text-red-500">*</span></label>
+            <label className="students-label">Guardian Address <span className="text-red-500">*</span></label>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Region */}
@@ -459,10 +461,10 @@ export function FamilyBackground({
               <label className="text-xs text-gray-500 mb-1 block">Region</label>
               <Combobox
                 options={provincialRegions}
-                value={formData.residentialAddressRegion}
+                value={formData.guardianAddressRegion}
                 onValueChange={handleGuardianRegionChange}
                 placeholder="Select Region"
-                className="h-[3.5rem]"
+                className="h-[3.2rem]"
                 disabled={isSameAddress}
               />
             </div>
@@ -472,11 +474,11 @@ export function FamilyBackground({
               <label className="text-xs text-gray-500 mb-1 block">City/Municipality</label>
               <Combobox
                 options={provincialCities}
-                value={formData.residentialAddressMunicipality}
+                value={formData.guardianAddressMunicipality}
                 onValueChange={handleGuardianCityChange}
-                disabled={!formData.residentialAddressRegion || isSameAddress}
-                placeholder={formData.residentialAddressRegion ? "Select City" : "Select Region first"}
-                className="h-[3.5rem]"
+                disabled={!formData.guardianAddressRegion || isSameAddress}
+                placeholder={formData.guardianAddressRegion ? "Select City" : "Select Region first"}
+                className="h-[3.2rem]"
               />
             </div>
   
@@ -485,11 +487,11 @@ export function FamilyBackground({
               <label className="text-xs text-gray-500 mb-1 block">Barangay</label>
               <Combobox
                 options={provincialBarangays}
-                value={formData.residentialAddressBarangay}
-                onValueChange={(val) => handleInputChange("residentialAddressBarangay", val)}
-                disabled={!formData.residentialAddressMunicipality || isSameAddress}
-                placeholder={formData.residentialAddressMunicipality ? "Select Barangay" : "Select City first"}
-                className="h-[3.5rem]"
+                value={formData.guardianAddressBarangay}
+                onValueChange={(val) => handleInputChange("guardianAddressBarangay", val)}
+                disabled={!formData.guardianAddressMunicipality || isSameAddress}
+                placeholder={formData.guardianAddressMunicipality ? "Select Barangay" : "Select City first"}
+                className="h-[3.2rem]"
               />
             </div>
   
@@ -500,7 +502,7 @@ export function FamilyBackground({
                 type="text"
                 value={formData.residentialAddressStreet}
                 onChange={(e) => handleInputChange("residentialAddressStreet", e.target.value)}
-                className="students-input w-full h-[3.5rem] px-4 py-2 border rounded-lg"
+                className="students-input w-full h-[3.2rem] px-4 py-2 border rounded-lg"
                 placeholder="e.g. Blk 12 Lot 5"
                 disabled={isSameAddress}
               />
