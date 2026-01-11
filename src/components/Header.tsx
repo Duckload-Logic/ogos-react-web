@@ -62,8 +62,24 @@ export default function Header() {
 
           {/* Right Section: Profile Display + Mobile Menu */}
           <div className="flex items-center gap-4">
-            {/* Profile Display - No Dropdown */}
-            <div className="flex items-center gap-2 text-primary-foreground">
+            {/* Profile Display with Logout */}
+            <div className="hidden md:flex items-center gap-0">
+              <div className="flex items-center gap-2 text-primary-foreground px-4 py-3">
+                <User className="w-5 h-5" />
+                <span className="text-sm font-medium">{user?.lastName || "User"}</span>
+              </div>
+              <button
+                onClick={logout}
+                className="group relative flex items-center gap-2 px-4 py-3 text-sm font-medium transition-colors duration-300 hover:bg-primary-dark/20"
+              >
+                <LogOut className="w-4 h-4" />
+                <span>Logout</span>
+                <div className="absolute bottom-0 left-0 right-0 h-1 bg-secondary transition-opacity duration-300 opacity-0 group-hover:opacity-100 rounded-full"></div>
+              </button>
+            </div>
+            
+            {/* Mobile Profile Display */}
+            <div className="flex md:hidden items-center gap-2 text-primary-foreground px-4 py-3">
               <User className="w-5 h-5" />
               <span className="text-sm font-medium">{user?.lastName || "User"}</span>
             </div>
@@ -96,6 +112,16 @@ export default function Header() {
               {item.label}
             </Link>
           ))}
+          <button
+            onClick={() => {
+              logout();
+              setIsMenuOpen(false);
+            }}
+            className="w-full flex items-center gap-2 px-4 py-3 text-base font-medium rounded transition-all duration-300 ease-out hover:bg-black/20 hover:translate-x-2 text-left"
+          >
+            <LogOut className="w-4 h-4" />
+            <span>Logout</span>
+          </button>
         </nav>
       )}
     </header>
