@@ -40,7 +40,9 @@ export interface FormData {
   residentialAddressRegion: string;
   residentialAddressStreet: string;
   employerName: string;
-  emergencyContactName: string;
+  emergencyContactFirstName: string;
+  emergencyContactLastName: string;
+  emergencyContactMiddleName: string;
   emergencyContactPhone: string;
   emergencyContactRelationship: string; // Fixed: was 'relationship'
   education: {
