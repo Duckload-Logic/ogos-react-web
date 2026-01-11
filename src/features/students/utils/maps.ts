@@ -54,7 +54,9 @@ export const mapPersonalInfo = (formData: FormData, user: any) => {
     birthDate: formData.dateOfBirth || '',
     contactNo: formData.mobileNo || '',
     emergencyContact: {
-      emergencyContactName: formData.emergencyContactName || '',
+      emergencyContactFirstName: formData.emergencyContactFirstName || '',
+      emergencyContactLastName: formData.emergencyContactLastName || '',
+      emergencyContactMiddleName: formData.emergencyContactMiddleName || '',
       emergencyContactPhone: formData.emergencyContactPhone || '',
       emergencyContactRelationship: formData.emergencyContactRelationship || '', // Fixed field name
     },
