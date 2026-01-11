@@ -36,6 +36,7 @@ interface PersonalInformationProps {
   formData: FormData;
   handleInputChange: (field: string, value: string | boolean) => void;
   clearError: (field: string) => void;
+  locations: Record<string, any>;
 }
 
 export function PersonalInformation({
@@ -43,6 +44,7 @@ export function PersonalInformation({
   formData,
   handleInputChange,
   clearError,
+  locations,
 }: PersonalInformationProps) {
   const [isSameAddress, setIsSameAddress] = useState(false);
 
