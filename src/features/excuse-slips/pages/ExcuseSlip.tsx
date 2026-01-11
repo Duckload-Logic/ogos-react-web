@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -38,6 +38,11 @@ export default function ExcuseSlip() {
   const [excuseSlips, setExcuseSlips] =
     useState<ExcuseSlip[]>(MOCK_EXCUSE_SLIPS);
   const [isUploading, setIsUploading] = useState(false);
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsPageLoaded(true);
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -105,6 +110,47 @@ export default function ExcuseSlip() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <style>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slideUpLeft {
+          from {
+            opacity: 0;
+            transform: translateY(8px) translateX(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) translateX(0);
+          }
+        }
+        @keyframes slideUpRight {
+          from {
+            opacity: 0;
+            transform: translateY(8px) translateX(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0) translateX(0);
+          }
+        }
+        .template-card {
+          animation: slideUpLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+        }
+        .upload-card {
+          animation: slideUpRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both;
+        }
+        .slips-list {
+          animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+        }
+      `}</style>
       {/* Hero Section */}
       <div className="bg-primary text-primary-foreground py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -124,7 +170,7 @@ export default function ExcuseSlip() {
           {/* Left Column: Template Download and Excuse Slips List */}
           <div className="lg:col-span-1 space-y-6">
             {/* Template Download Section */}
-            <Card className="border-0 shadow-sm bg-primary-foreground">
+            <Card className="border-0 shadow-sm bg-primary-foreground template-card">
               <CardHeader className="bg-primary border-b py-4">
                 <CardTitle className="text-lg text-primary-foreground flex items-center gap-2">
                   <Download className="w-5 h-5" />
@@ -146,7 +192,7 @@ export default function ExcuseSlip() {
             </Card>
 
             {/* Excuse Slips List */}
-            <div className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm">
+            <div className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm slips-list">
               <h2 className="text-xl font-bold text-primary mb-4">Excuse Slips List</h2>
             {excuseSlips.length === 0 ? (
               <Card className="border-0 shadow-sm">
@@ -217,7 +263,7 @@ export default function ExcuseSlip() {
           {/* Right Column: Upload Form and Information */}
           <div className="lg:col-span-2 space-y-6">
             {/* Upload Form Card */}
-            <Card className="border-0 shadow-sm">
+            <Card className="border-0 shadow-sm upload-card">
               <CardHeader className="bg-gray-50 border-b py-6 px-6">
                 <CardTitle className="text-xl flex items-center gap-2">
                   <Upload className="w-5 h-5 text-primary" />
