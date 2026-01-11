@@ -1,6 +1,7 @@
 import { FormData } from "@/features/students/types";
 import { Combobox } from "@/components/ui/combobox";
 import { User } from "@/types/user";
+import locations from "@/config/ph_locations.json";
 
 const COURSE_OPTIONS = [
   // Undergraduate Programs
@@ -38,7 +39,42 @@ export function PersonalInformation({
   formData.middleName = user?.middleName || '';
   formData.email = user?.email || '';
 
-  console.log('User in PersonalInformation:', user);
+  const provincialRegions = Object.keys(locations).map((r) => ({ label: r, value: r }));
+  
+  const provincialCities = formData.provincialAddressRegion 
+    ? Object.keys((locations as any)[formData.provincialAddressRegion] || {}).map(c => ({ label: c, value: c }))
+    : [];
+
+  const provincialBarangays = (formData.provincialAddressRegion && formData.provincialAddressMunicipality)
+    ? ((locations as any)[formData.provincialAddressRegion][formData.provincialAddressMunicipality] || []).map((b: string) => ({ label: b, value: b }))
+    : [];
+
+  // Helper to handle cascading resets
+  const handleProvincialRegionChange = (val: string) => {
+    handleInputChange("provincialAddressRegion", val);
+    handleInputChange("provincialAddressMunicipality", ""); // Reset child
+    handleInputChange("provincialAddressBarangay", "");     // Reset grandchild
+    clearError("provincialAddressRegion");
+  };
+
+  const handleResidentialRegionChange = (val: string) => {
+    handleInputChange("residentialAddressRegion", val);
+    handleInputChange("residentialAddressMunicipality", ""); // Reset child
+    handleInputChange("residentialAddressBarangay", "");     // Reset grandchild
+    clearError("residentialAddressRegion");
+  };
+
+  const handleProvincialCityChange = (val: string) => {
+    handleInputChange("provincialAddressMunicipality", val);
+    handleInputChange("provincialAddressBarangay", "");     // Reset child
+    clearError("provincialAddressMunicipality");
+  };
+
+  const handleResidentialCityChange = (val: string) => {
+    handleInputChange("residentialAddressMunicipality", val);
+    handleInputChange("residentialAddressBarangay", "");     // Reset child
+    clearError("residentialAddressMunicipality");
+  };
 
   return (
     <div className="space-y-6">
@@ -424,87 +460,117 @@ export function PersonalInformation({
       </div>
 
       {/* Provincial Address */}
-      <div>
-        <label className="students-label mb-2">
-          Provincial Address <span className="text-red-500">*</span>
-        </label>
-        {[
-          { key: "provincialAddressStreet", label: "Street/Lot/Blk", placeholder: "e.g., Blk 12 Lot 5" },
-          { key: "provincialAddressBarangay", label: "Barangay", placeholder: "e.g., San Jose" },
-          { key: "provincialAddressMunicipality", label: "Municipality/City", placeholder: "e.g., Calamba" },
-          { key: "provincialAddressRegion", label: "Region", placeholder: "e.g., Region IV-A " }
-        ].map((field) => {
-          const fieldValue = formData[field.key as keyof typeof formData];
-          const stringValue = typeof fieldValue === 'string' ? fieldValue : '';
-          
-          return (
-            <div key={field.key} className="mb-3">
-              <label className="text-xs text-gray-500 mb-1 block">{field.label}</label>
-              <input
-                type="text"
-                value={stringValue}
-                onChange={(e) => {
-                  handleInputChange(field.key, e.target.value);
-                  clearError(field.key);
-                }}
-                placeholder={field.placeholder}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none
-                  focus:ring-2 transition ${
-                    !stringValue
-                      ? "border-red-400 focus:ring-red-500"
-                      : "border-gray-300 focus:ring-primary"
-                  }`}
-              />
-              {!stringValue && (
-                <p className="text-red-500 text-xs mt-1 font-medium">
-                  {field.label} is required
-                </p>
-              )}
-            </div>
-          );
-        })}
+      <div className="space-y-4">
+        <label className="students-label">Provincial Address <span className="text-red-500">*</span></label>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Region */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Region</label>
+            <Combobox
+              options={provincialRegions}
+              value={formData.provincialAddressRegion}
+              onValueChange={handleProvincialRegionChange}
+              placeholder="Select Region"
+              className="h-[3.5rem]"
+            />
+          </div>
+
+          {/* City / Municipality */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">City/Municipality</label>
+            <Combobox
+              options={provincialCities}
+              value={formData.provincialAddressMunicipality}
+              onValueChange={handleProvincialCityChange}
+              disabled={!formData.provincialAddressRegion}
+              placeholder={formData.provincialAddressRegion ? "Select City" : "Select Region first"}
+              className="h-[3.5rem]"
+            />
+          </div>
+
+          {/* Barangay */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Barangay</label>
+            <Combobox
+              options={provincialBarangays}
+              value={formData.provincialAddressBarangay}
+              onValueChange={(val) => handleInputChange("provincialAddressBarangay", val)}
+              disabled={!formData.provincialAddressMunicipality}
+              placeholder={formData.provincialAddressMunicipality ? "Select Barangay" : "Select City first"}
+              className="h-[3.5rem]"
+            />
+          </div>
+
+          {/* Street */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Street/Lot/Blk</label>
+            <input
+              type="text"
+              value={formData.provincialAddressStreet}
+              onChange={(e) => handleInputChange("provincialAddressStreet", e.target.value)}
+              className="students-input w-full h-[3.5rem] px-4 py-2 border rounded-lg"
+              placeholder="e.g. Blk 12 Lot 5"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Residential/City Address */}
-      <div>
-        <label className="students-label mb-2">
-          Residential or City Address <span className="text-red-500">*</span>
-        </label>
-        {[
-          { key: "residentialAddressStreet", label: "Street/Lot/Blk", placeholder: "e.g., Blk 12 Lot 5" },
-          { key: "residentialAddressBarangay", label: "Barangay", placeholder: "e.g., San Jose" },
-          { key: "residentialAddressMunicipality", label: "Municipality/City", placeholder: "e.g., Calamba" },
-          { key: "residentialAddressRegion", label: "Region", placeholder: "e.g., Region IV-A " }
-        ].map((field) => {
-          const fieldValue = formData[field.key as keyof typeof formData];
-          const stringValue = typeof fieldValue === 'string' ? fieldValue : '';
-          
-          return (
-            <div key={field.key} className="mb-3">
-              <label className="text-xs text-gray-500 mb-1 block">{field.label}</label>
-              <input
-                type="text"
-                value={stringValue}
-                onChange={(e) => {
-                  handleInputChange(field.key, e.target.value);
-                  clearError(field.key);
-                }}
-                placeholder={field.placeholder}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none
-                  focus:ring-2 transition ${
-                    !stringValue
-                      ? "border-red-400 focus:ring-red-500"
-                      : "border-gray-300 focus:ring-primary"
-                  }`}
-              />
-              {!stringValue && (
-                <p className="text-red-500 text-xs mt-1 font-medium">
-                  {field.label} is required
-                </p>
-              )}
-            </div>
-          );
-        })}
+      <div className="space-y-4">
+        <label className="students-label">Provincial Address <span className="text-red-500">*</span></label>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Region */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Region</label>
+            <Combobox
+              options={provincialRegions}
+              value={formData.residentialAddressRegion}
+              onValueChange={handleResidentialRegionChange}
+              placeholder="Select Region"
+              className="h-[3.5rem]"
+            />
+          </div>
+
+          {/* City / Municipality */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">City/Municipality</label>
+            <Combobox
+              options={provincialCities}
+              value={formData.residentialAddressMunicipality}
+              onValueChange={handleResidentialCityChange}
+              disabled={!formData.residentialAddressRegion}
+              placeholder={formData.residentialAddressRegion ? "Select City" : "Select Region first"}
+              className="h-[3.5rem]"
+            />
+          </div>
+
+          {/* Barangay */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Barangay</label>
+            <Combobox
+              options={provincialBarangays}
+              value={formData.residentialAddressBarangay}
+              onValueChange={(val) => handleInputChange("residentialAddressBarangay", val)}
+              disabled={!formData.residentialAddressMunicipality}
+              placeholder={formData.residentialAddressMunicipality ? "Select Barangay" : "Select City first"}
+              className="h-[3.5rem]"
+            />
+          </div>
+
+          {/* Street */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Street/Lot/Blk</label>
+            <input
+              type="text"
+              value={formData.residentialAddressStreet}
+              onChange={(e) => handleInputChange("residentialAddressStreet", e.target.value)}
+              className="students-input w-full h-[3.5rem] px-4 py-2 border rounded-lg"
+              placeholder="e.g. Blk 12 Lot 5"
+            />
+          </div>
+        </div>
       </div>
 
       {/* Employer Info */}
