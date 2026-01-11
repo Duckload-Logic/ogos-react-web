@@ -1,5 +1,6 @@
 import { RouteObject, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { PDSGate } from "@/components/PDSGate";
 import Header from "@/components/Header";
 
 // Shared
@@ -48,8 +49,10 @@ export const routes: RouteObject[] = [
     path: "/student/schedule",
     element: (
       <ProtectedRoute requiredRole="student">
-        <Header />
-        <ScheduleAppointment />
+        <PDSGate>
+          <Header />
+          <ScheduleAppointment />
+        </PDSGate>
       </ProtectedRoute>
     ),
   },
@@ -66,8 +69,10 @@ export const routes: RouteObject[] = [
     path: "/student/excuse-slip",
     element: (
       <ProtectedRoute requiredRole="student">
-        <Header />
-        <ExcuseSlip />
+        <PDSGate>
+          <Header />
+          <ExcuseSlip />
+        </PDSGate>
       </ProtectedRoute>
     ),
   },
@@ -75,8 +80,10 @@ export const routes: RouteObject[] = [
     path: "/student/schedules",
     element: (
       <ProtectedRoute requiredRole="student">
-        <Header />
-        <ViewSchedules />
+        <PDSGate>
+          <Header />
+          <ViewSchedules />
+        </PDSGate>
       </ProtectedRoute>
     ),
   },
@@ -84,8 +91,10 @@ export const routes: RouteObject[] = [
     path: "/student/profile",
     element: (
       <ProtectedRoute requiredRole="student">
-        <Header />
-        <Profile />
+        <PDSGate>
+          <Header />
+          <Profile />
+        </PDSGate>
       </ProtectedRoute>
     ),
   },
