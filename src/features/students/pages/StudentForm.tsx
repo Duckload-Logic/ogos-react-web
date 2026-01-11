@@ -58,15 +58,17 @@ const EMPTY_FORM: FormData = {
   provincialAddressProvince: "",
   provincialAddressMunicipality: "",
   provincialAddressBarangay: "",
-  provincialAddressRegion: "", // ADD THIS - Missing!
-  provincialAddressStreet: "", // ADD THIS - Missing!
+  provincialAddressRegion: "",
+  provincialAddressStreet: "", 
   residentialAddressProvince: "",
   residentialAddressMunicipality: "",
   residentialAddressBarangay: "",
-  residentialAddressRegion: "", // ADD THIS - Missing!
-  residentialAddressStreet: "", // ADD THIS - Missing!
+  residentialAddressRegion: "",
+  residentialAddressStreet: "",
   employerName: "",
-  emergencyContactName: "",
+  emergencyContactFirstName: "",
+  emergencyContactLastName: "",
+  emergencyContactMiddleName: "",
   emergencyContactPhone: "",
   emergencyContactRelationship: "",
   education: {
@@ -204,6 +206,15 @@ export default function StudentForm() {
       return;
     }
 
+    if (currentSection === 0) {
+      const isValid = validateEnrollmentReasons();
+      if (!isValid) {
+        setValidationError("Please select at least one reason for enrollment.");
+        setShowValidationError(true);
+        return; // Stop the user from proceeding
+      }
+    }
+
     setIsSaving(true);
     let sectionData: any;
     let sectionName: string;
@@ -300,6 +311,25 @@ export default function StudentForm() {
       return () => clearTimeout(timer);
     }
   }, [showValidationError]);
+
+  const validateEnrollmentReasons = () => {
+    // Get all keys where the value is true
+    const selectedReasons = Object.entries(formData.reasonForEnrollment || {})
+      .filter(([_, value]) => value === true);
+
+    // If no checkboxes are checked AND the 'other' text field is empty
+    if (selectedReasons.length === 0 && !formData.reasonOther?.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        reasonForEnrollment: "Please select at least one reason for enrollment."
+      }));
+      return false;
+    }
+
+    // Clear error if valid
+    clearError("reasonForEnrollment");
+    return true;
+  };
 
   // Validation functions
   const validateEmail = (email: string): boolean => {
@@ -1258,7 +1288,7 @@ export default function StudentForm() {
                   <div className="space-y-6">
                     <div>
                       <h2 className="text-2xl font-bold mb-4 text-primary">
-                        Your reason/s for enrolling in this University:
+                        Your reason/s for enrolling in this University: *
                       </h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {REASONS_OPTIONS.map((reason) => (
@@ -1533,7 +1563,7 @@ export default function StudentForm() {
             
             {/* Modal Body */}
             <div className="px-6 py-4">
-              <p className="text-gray-700 font-semibold mb-4">
+              <p className="text-gray-700 font mb-4">
                 {validationError || "Please fix the following errors:"}
               </p>
               
@@ -1542,7 +1572,7 @@ export default function StudentForm() {
                 <ul className="space-y-2 mb-4">
                   {validationErrorList.map((error, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="text-red-600 font-bold text-lg flex-shrink-0 mt-0.5">•</span>
+                      <span className="text-red-600 text-lg flex-shrink-0 mt-0.5">•</span>
                       <span className="text-gray-700 text-sm">{error}</span>
                     </li>
                   ))}
