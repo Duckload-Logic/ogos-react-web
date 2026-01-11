@@ -39,6 +39,11 @@ export default function ViewSchedules() {
   );
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsPageLoaded(true);
+  }, []);
 
   // Load appointments on component mount
   useEffect(() => {
@@ -94,6 +99,43 @@ export default function ViewSchedules() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <style>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slideDown {
+          from {
+            opacity: 0;
+            transform: translateY(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .error-alert {
+          animation: slideDown 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+        }
+        .upcoming-section {
+          animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both;
+        }
+        .cancelled-section {
+          animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+        }
+        .excuse-section {
+          animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.25s both;
+        }
+        .help-section {
+          animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both;
+        }
+      `}</style>
       {/* Header */}
       <ScheduleHeader
         title="My Schedules"
@@ -102,13 +144,15 @@ export default function ViewSchedules() {
 
       {/* Error Alert */}
       {error && (
-        <ScheduleErrorAlert error={error} onClose={clearError} />
+        <div className="error-alert">
+          <ScheduleErrorAlert error={error} onClose={clearError} />
+        </div>
       )}
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-12">
         {/* Upcoming Appointments Section */}
-        <section className="mb-12">
+        <section className="mb-12 upcoming-section">
           <h2 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">
             <Calendar className="w-6 h-6" />
             Your Upcoming Appointments
@@ -121,13 +165,19 @@ export default function ViewSchedules() {
         </section>
 
         {/* Cancelled Appointments Section */}
-        <CancelledAppointmentsList appointments={appointments} />
+        <div className="cancelled-section">
+          <CancelledAppointmentsList appointments={appointments} />
+        </div>
 
         {/* Excuse Slips Section */}
-        <ExcuseSlipsSection />
+        <div className="excuse-section">
+          <ExcuseSlipsSection />
+        </div>
 
         {/* Help Section */}
-        <HelpSection />
+        <div className="help-section">
+          <HelpSection />
+        </div>
       </div>
 
       {/* Modals */}
