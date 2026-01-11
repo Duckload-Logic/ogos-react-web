@@ -52,7 +52,7 @@ export default function Header() {
               <Link
                 key={item.href}
                 to={item.href}
-                className="px-3 py-2 text-sm font-medium hover:bg-primary-dark rounded transition-colors"
+                className="px-3 py-2 text-sm font-medium rounded relative transition-all duration-300 ease-out hover:shadow-lg hover:bg-primary-dark/80 transform hover:-translate-y-1 before:absolute before:bottom-0 before:left-0 before:h-1 before:bg-accent before:rounded-full before:w-0 before:transition-all before:duration-300 hover:before:w-full"
               >
                 {item.label}
               </Link>
@@ -65,23 +65,23 @@ export default function Header() {
             <div className="relative">
               <button
                 onClick={() => setIsProfileOpen(!isProfileOpen)}
-                className="flex items-center gap-2 p-2 hover:bg-primary-dark rounded transition-colors"
+                className="flex items-center gap-2 p-2 rounded transition-all duration-300 ease-out hover:bg-primary-dark/80 hover:shadow-md"
               >
-                <User className="w-5 h-5" />
+                <User className="w-5 h-5 transition-transform duration-300" />
                 <span className="hidden sm:inline">{user?.lastName || "User"}</span>
               </button>
 
               {isProfileOpen && (
-                <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg border z-50">
+                <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg border z-50 overflow-hidden">
                   <Link
                     to="/student/profile"
-                    className="block px-4 py-2 hover:bg-gray-100"
+                    className="block px-4 py-2 transition-all duration-300 ease-out hover:bg-gray-100 hover:translate-x-2"
                   >
                     My Profile
                   </Link>
                   <button
                     onClick={logout}
-                    className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                    className="w-full text-left px-4 py-2 transition-all duration-300 ease-out hover:bg-gray-100 hover:translate-x-2 flex items-center gap-2"
                   >
                     <LogOut className="w-4 h-4" /> Logout
                   </button>
@@ -112,7 +112,7 @@ export default function Header() {
               key={item.href}
               to={item.href}
               onClick={() => setIsMenuOpen(false)}
-              className="block px-4 py-3 text-base font-medium hover:bg-black/10 rounded transition-colors"
+              className="block px-4 py-3 text-base font-medium rounded transition-all duration-300 ease-out hover:bg-black/20 hover:translate-x-2"
             >
               {item.label}
             </Link>
@@ -120,7 +120,7 @@ export default function Header() {
           {/* Mobile Profile */}
           <Link
             to="/profile"
-            className="block px-4 py-3 text-base font-medium hover:bg-black/10 rounded transition-colors"
+            className="block px-4 py-3 text-base font-medium rounded transition-all duration-300 ease-out hover:bg-black/20 hover:translate-x-2"
           >
             My Profile
           </Link>
