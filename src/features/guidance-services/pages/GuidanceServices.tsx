@@ -70,14 +70,14 @@ export default function GuidanceServices() {
         )}
 
         {/* How Can We Help You Section */}
-        <section className="bg-white rounded-lg shadow-sm p-6 md:p-8">
-          <h2 className="text-2xl md:text-3xl font-bold mb-8 text-primary">
+        <section className="bg-white rounded-lg shadow-sm p-7 md:p-9 mb-8">
+          <h2 className="text-2xl md:text-3xl font-bold mb-7 text-primary">
             How Can We Help You?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {PROGRAMS.map((program, index) => (
-              <div key={index} className="border-l-4 border-primary pl-4 py-2">
-                <h3 className="font-semibold text-lg text-gray-900">
+              <div key={index} className="border-l-4 border-primary pl-4 py-3 transition-all duration-300 hover:bg-gray-50 hover:pl-5 rounded cursor-pointer">
+                <h3 className="font-semibold text-lg text-gray-900 transition-colors duration-300 hover:text-primary">
                   {program.title}
                 </h3>
               </div>
