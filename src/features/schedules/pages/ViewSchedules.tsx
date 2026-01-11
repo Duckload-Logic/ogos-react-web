@@ -12,6 +12,7 @@ import {
   SuccessModal,
   HelpSection,
 } from "@/features/schedules/components";
+import { Appointment } from "@/features/appointments";
 
 /**
  * ViewSchedules - Main page for viewing user's schedules and appointments
@@ -34,7 +35,7 @@ export default function ViewSchedules() {
 
   // Modal and state management
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [appointmentToDelete, setAppointmentToDelete] = useState<number | null>(
+  const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(
     null,
   );
   const [successModalOpen, setSuccessModalOpen] = useState(false);
@@ -53,8 +54,8 @@ export default function ViewSchedules() {
   }, [user?.id, fetchAppointments]);
 
   // Event handlers
-  const handleDeleteClick = (id: number) => {
-    setAppointmentToDelete(id);
+  const handleDeleteClick = (appointment: Appointment) => {
+    setAppointmentToDelete(appointment);
     setDeleteModalOpen(true);
   };
 
@@ -64,6 +65,7 @@ export default function ViewSchedules() {
       clearError();
       try {
         const success = await cancelAppointment(appointmentToDelete);
+        console.log('Cancel appointment success:', success);
         if (success) {
           setDeleteModalOpen(false);
           setSuccessModalOpen(true);

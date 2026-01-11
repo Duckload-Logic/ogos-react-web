@@ -54,7 +54,9 @@ export const mapPersonalInfo = (formData: FormData, user: any) => {
     birthDate: formData.dateOfBirth || '',
     contactNo: formData.mobileNo || '',
     emergencyContact: {
-      emergencyContactName: formData.emergencyContactName || '',
+      emergencyContactFirstName: formData.emergencyContactFirstName || '',
+      emergencyContactLastName: formData.emergencyContactLastName || '',
+      emergencyContactMiddleName: formData.emergencyContactMiddleName || '',
       emergencyContactPhone: formData.emergencyContactPhone || '',
       emergencyContactRelationship: formData.emergencyContactRelationship || '', // Fixed field name
     },
@@ -138,8 +140,10 @@ export const mapFamilyInfo = (formData: FormData): FamilyBackgroundData => {
     siblingSisters: parseInt(formData.sisters) || 0,
     monthlyFamilyIncome: formData.monthlyFamilyIncome || '',
     parents,
-    guardianName: formData.guardianName || undefined,
-    guardianAddress: formData.guardianAddress || undefined,
+    guardianFirstName: formData.guardianFirstName || undefined,
+    guardianLastName: formData.guardianLastName || undefined,
+    guardianMiddleName: formData.guardianMiddleName || undefined,
+    guardianAddress: `${formData.guardianAddressStreet || ''}, ${formData.guardianAddressBarangay || ''}, ${formData.guardianAddressMunicipality || ''}, ${formData.guardianAddressRegion || ''}`.trim().replace(/^,|,$/g, '') || undefined,
     employedFamilyMembersCount: parseInt(formData.gainfullyEmployed) || 0,
     supportsStudiesCount: parseInt(formData.supportStudies) || 0,
     supportsFamilyCount: parseInt(formData.supportFamily) || 0,

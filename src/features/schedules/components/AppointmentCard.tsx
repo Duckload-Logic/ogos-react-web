@@ -7,22 +7,11 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Loader, Trash2 } from "lucide-react";
 import { formatDate, formatTime, getStatusColor } from "@/features/schedules/utils/formatters";
-
-export interface Appointment {
-  id: number;
-  userId: number;
-  reason: string;
-  scheduledDate: string;
-  scheduledTime: string;
-  concernCategory: string;
-  status: 'Pending' | 'Approved' | 'Completed' | 'Cancelled' | 'Rescheduled';
-  createdAt: Date;
-  updatedAt: Date;
-}
+import { Appointment } from "@/features/appointments";
 
 export interface AppointmentCardProps {
   appointment: Appointment;
-  onDelete: (id: number) => void;
+  onDelete: (apt: Appointment) => void;
   isDeleting: boolean;
 }
 
@@ -85,7 +74,7 @@ export function AppointmentCard({
               Reschedule (Soon)
             </Button>
             <Button
-              onClick={() => onDelete(appointment.id)}
+              onClick={() => onDelete(appointment)}
               disabled={isDeleting}
               variant="outline"
               className="flex-1 border-red-300 text-red-600 hover:bg-red-50"

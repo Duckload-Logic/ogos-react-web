@@ -18,6 +18,13 @@ import {
   mapFamilyInfo,
   mapHealthInfo,
 } from '@/features/students/utils/maps';
+import locations from '@/config/ph_locations.json'
+
+type PHLocations = {
+  [regionName: string]: {
+    [cityName: string]: string[]; // Array of Barangay names
+  };
+};
 
 interface FormErrors {
   [key: string]: string;
@@ -58,15 +65,17 @@ const EMPTY_FORM: FormData = {
   provincialAddressProvince: "",
   provincialAddressMunicipality: "",
   provincialAddressBarangay: "",
-  provincialAddressRegion: "", // ADD THIS - Missing!
-  provincialAddressStreet: "", // ADD THIS - Missing!
+  provincialAddressRegion: "",
+  provincialAddressStreet: "", 
   residentialAddressProvince: "",
   residentialAddressMunicipality: "",
   residentialAddressBarangay: "",
-  residentialAddressRegion: "", // ADD THIS - Missing!
-  residentialAddressStreet: "", // ADD THIS - Missing!
+  residentialAddressRegion: "",
+  residentialAddressStreet: "",
   employerName: "",
-  emergencyContactName: "",
+  emergencyContactFirstName: "",
+  emergencyContactLastName: "",
+  emergencyContactMiddleName: "",
   emergencyContactPhone: "",
   emergencyContactRelationship: "",
   education: {
@@ -109,8 +118,14 @@ const EMPTY_FORM: FormData = {
   motherBirthDate: "", // ADD THIS - Missing!
   parentalStatusID: 0,
   parentalDetails: "",
-  guardianName: "",
-  guardianAddress: "",
+  guardianFirstName: "",
+  guardianLastName: "",
+  guardianMiddleName: "",
+  guardianAddressProvince: "",
+  guardianAddressMunicipality: "",
+  guardianAddressBarangay: "",
+  guardianAddressRegion: "",
+  guardianAddressStreet: "",
   monthlyFamilyIncome: "",
   monthlyFamilyIncomeOther: "",
   brothers: "",
@@ -202,6 +217,15 @@ export default function StudentForm() {
     if (!studentRecordId) {
       alert('Student record not initialized');
       return;
+    }
+
+    if (currentSection === 0) {
+      const isValid = validateEnrollmentReasons();
+      if (!isValid) {
+        setValidationError("Please select at least one reason for enrollment.");
+        setShowValidationError(true);
+        return; // Stop the user from proceeding
+      }
     }
 
     setIsSaving(true);
@@ -300,6 +324,25 @@ export default function StudentForm() {
       return () => clearTimeout(timer);
     }
   }, [showValidationError]);
+
+  const validateEnrollmentReasons = () => {
+    // Get all keys where the value is true
+    const selectedReasons = Object.entries(formData.reasonForEnrollment || {})
+      .filter(([_, value]) => value === true);
+
+    // If no checkboxes are checked AND the 'other' text field is empty
+    if (selectedReasons.length === 0 && !formData.reasonOther?.trim()) {
+      setErrors((prev) => ({
+        ...prev,
+        reasonForEnrollment: "Please select at least one reason for enrollment."
+      }));
+      return false;
+    }
+
+    // Clear error if valid
+    clearError("reasonForEnrollment");
+    return true;
+  };
 
   // Validation functions
   const validateEmail = (email: string): boolean => {
@@ -549,11 +592,12 @@ export default function StudentForm() {
         )
           ? 1
           : 0,
+        reasonOther: formData.reasonOther ? 1 : 0,
       };
       filledCount = Object.values(enrollmentFields).filter(
         (v) => v === 1,
       ).length;
-      totalCount = 1;
+      totalCount = enrollmentFields.reasonForEnrollment + enrollmentFields.reasonOther;
     } else if (sectionIndex === 1) {
       const personalFields = {
         mobileNo: formData.mobileNo ? 1 : 0,
@@ -610,8 +654,12 @@ export default function StudentForm() {
       const familyFields = {
         parentsInfo: (fatherInfo && motherInfo ? 1 : 0),
         guardiansInfo: (
-          formData.guardianName && 
-          formData.guardianAddress ? 1 : 0
+          formData.guardianFirstName &&
+          formData.guardianLastName &&
+          formData.guardianAddressMunicipality &&
+          formData.guardianAddressBarangay &&
+          formData.guardianAddressRegion && 
+          formData.guardianAddressStreet ? 1 : 0
         ),
         supportingFamily: (
           formData.gainfullyEmployed && 
@@ -928,7 +976,7 @@ export default function StudentForm() {
              !education.seniorHS.school && !education.seniorHS.location && !education.others;
     } else if (currentSection === 3) {
       return !formData.fatherFirstName && !formData.fatherLastName && 
-      !formData.motherFirstName && !formData.motherLastName && !formData.guardianName &&
+      !formData.motherFirstName && !formData.motherLastName && !formData.guardianFirstName && !formData.guardianLastName &&
              !formData.monthlyFamilyIncome && !formData.financialSupport;
     } else if (currentSection === 4) {
       return !formData.vision && !formData.hearing && !formData.mobility && !formData.speech &&
@@ -1258,7 +1306,7 @@ export default function StudentForm() {
                   <div className="space-y-6">
                     <div>
                       <h2 className="text-2xl font-bold mb-4 text-primary">
-                        Your reason/s for enrolling in this University:
+                        Your reason/s for enrolling in this University: *
                       </h2>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         {REASONS_OPTIONS.map((reason) => (
@@ -1307,6 +1355,7 @@ export default function StudentForm() {
                     formData={formData}
                     handleInputChange={handleInputChange}
                     clearError={clearError}
+                    locations={locations as PHLocations}
                   />
                 )}
 
@@ -1330,6 +1379,7 @@ export default function StudentForm() {
                     errors={errors}
                     handleInputChange={handleInputChange}
                     clearError={clearError}
+                    locations={locations as PHLocations}
                   />
                 )}
 
@@ -1533,7 +1583,7 @@ export default function StudentForm() {
             
             {/* Modal Body */}
             <div className="px-6 py-4">
-              <p className="text-gray-700 font-semibold mb-4">
+              <p className="text-gray-700 font mb-4">
                 {validationError || "Please fix the following errors:"}
               </p>
               
@@ -1542,7 +1592,7 @@ export default function StudentForm() {
                 <ul className="space-y-2 mb-4">
                   {validationErrorList.map((error, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="text-red-600 font-bold text-lg flex-shrink-0 mt-0.5">•</span>
+                      <span className="text-red-600 text-lg flex-shrink-0 mt-0.5">•</span>
                       <span className="text-gray-700 text-sm">{error}</span>
                     </li>
                   ))}

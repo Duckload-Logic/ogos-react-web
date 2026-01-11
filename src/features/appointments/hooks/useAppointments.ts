@@ -102,6 +102,56 @@ export const useAppointments = (): UseAppointmentsReturn => {
     [user?.id],
   );
 
+  const cancelAppointment = useCallback(
+    async (appointmentId: number | Appointment): Promise<boolean> => {
+      const id = typeof appointmentId === 'number' ? appointmentId : appointmentId.id;
+
+      setLoading(true);
+      setError(null);
+      try {
+        await appointmentService.cancelAppointment(id);
+        setAppointments((prev) =>
+          prev.map((apt) =>
+            apt.id === id ? { ...apt, status: 'Cancelled' } : apt
+          )
+        );
+        return true;
+      } catch (err: any) {
+        const errorMessage = extractErrorMessage(err, 'Failed to cancel appointment');
+        setError(errorMessage);
+        console.error('Error cancelling appointment:', err);
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    }, 
+    []
+  );
+  
+  const rescheduleAppointment = useCallback(
+    async (appointmentId: number, payload: CreateAppointmentRequest): Promise<Appointment | null> => {
+      setLoading(true);
+      setError(null);
+      try {
+        const updatedAppointment = await appointmentService.rescheduleAppointment(appointmentId, payload);
+        setAppointments((prev) =>
+          prev.map((apt) =>
+            apt.id === appointmentId ? updatedAppointment : apt
+          )
+        );
+        return updatedAppointment;
+      } catch (err: any) {
+        const errorMessage = extractErrorMessage(err, 'Failed to reschedule appointment');
+        setError(errorMessage);
+        console.error('Error rescheduling appointment:', err);
+        return null;
+      } finally {
+        setLoading(false);
+      }
+    },
+    []
+  );
+
   return {
     appointments,
     availableSlots,
@@ -110,6 +160,8 @@ export const useAppointments = (): UseAppointmentsReturn => {
     fetchAppointments,
     fetchAvailableSlots,
     createAppointment,
+    cancelAppointment,
+    rescheduleAppointment,
     clearError,
   };
 };

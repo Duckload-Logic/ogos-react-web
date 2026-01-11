@@ -1,6 +1,10 @@
 import { FormData } from "@/features/students/types";
 import { Combobox } from "@/components/ui/combobox";
 import { User } from "@/types/user";
+import locations from "@/config/ph_locations.json";
+import { useState } from "react";
+import { is } from "zod/v4/locales";
+import { set } from "zod";
 
 const COURSE_OPTIONS = [
   // Undergraduate Programs
@@ -20,11 +24,23 @@ const COURSE_OPTIONS = [
   { label: "Diploma in Office Management Technology", value: "DOMT" },
 ];
 
+const RELATIONSHIP_OPTIONS = [
+  { label: "Mother", value: "Father" },
+  { label: "Father", value: "Mother" },
+  { label: "Guardian", value: "Guardian" },
+  { label: "Other", value: "Other" },
+];
+
 interface PersonalInformationProps {
   user: User | null;
   formData: FormData;
   handleInputChange: (field: string, value: string | boolean) => void;
   clearError: (field: string) => void;
+  locations: {
+    [regionName: string]: {
+      [cityName: string]: string[]; // Array of Barangay names
+    };
+  };
 }
 
 export function PersonalInformation({
@@ -32,13 +48,90 @@ export function PersonalInformation({
   formData,
   handleInputChange,
   clearError,
+  locations,
 }: PersonalInformationProps) {
+  const [isSameAddress, setIsSameAddress] = useState(false);
+
   formData.lastName = user?.lastName || '';
   formData.firstName = user?.firstName || '';
   formData.middleName = user?.middleName || '';
   formData.email = user?.email || '';
 
-  console.log('User in PersonalInformation:', user);
+  const provincialRegions = Object.keys(locations).map((r) => ({ label: r, value: r }));
+  
+  const provincialCities = formData.provincialAddressRegion 
+    ? Object.keys((locations as any)[formData.provincialAddressRegion] || {}).map(c => ({ label: c, value: c }))
+    : [];
+
+  const provincialBarangays = (formData.provincialAddressRegion && formData.provincialAddressMunicipality)
+    ? ((locations as any)[formData.provincialAddressRegion][formData.provincialAddressMunicipality] || []).map((b: string) => ({ label: b, value: b }))
+    : [];
+
+  // Helper to handle cascading resets
+  const handleProvincialRegionChange = (val: string) => {
+    handleInputChange("provincialAddressRegion", val);
+    handleInputChange("provincialAddressMunicipality", ""); // Reset child
+    handleInputChange("provincialAddressBarangay", "");     // Reset grandchild
+    clearError("provincialAddressRegion");
+  };
+
+  const handleResidentialRegionChange = (val: string) => {
+    handleInputChange("residentialAddressRegion", val);
+    handleInputChange("residentialAddressMunicipality", ""); // Reset child
+    handleInputChange("residentialAddressBarangay", "");     // Reset grandchild
+    clearError("residentialAddressRegion");
+  };
+
+  const handleProvincialCityChange = (val: string) => {
+    handleInputChange("provincialAddressMunicipality", val);
+    handleInputChange("provincialAddressBarangay", "");     // Reset child
+    clearError("provincialAddressMunicipality");
+  };
+
+  const handleResidentialCityChange = (val: string) => {
+    handleInputChange("residentialAddressMunicipality", val);
+    handleInputChange("residentialAddressBarangay", "");     // Reset child
+    clearError("residentialAddressMunicipality");
+  };
+
+  const handleSameAddressToggle = (checked: boolean) => {
+    const isProvincialAddressComplete = 
+      formData.provincialAddressRegion &&
+      formData.provincialAddressMunicipality &&
+      formData.provincialAddressBarangay &&
+      formData.provincialAddressStreet;
+    
+    if (!isProvincialAddressComplete && checked) {
+      alert("Please complete the Provincial Address fields before syncing.");
+      setIsSameAddress(false);
+      return;
+    }
+
+    setIsSameAddress(checked);
+    if (checked) {
+      // Sync all fields
+      handleInputChange("residentialAddressRegion", formData.provincialAddressRegion);
+      handleInputChange("residentialAddressMunicipality", formData.provincialAddressMunicipality);
+      handleInputChange("residentialAddressBarangay", formData.provincialAddressBarangay);
+      handleInputChange("residentialAddressStreet", formData.provincialAddressStreet);
+
+      clearError("residentialAddressRegion");
+      clearError("residentialAddressMunicipality");
+      clearError("residentialAddressBarangay");
+      clearError("residentialAddressStreet");
+    } else {
+      // Clear residential fields
+      handleInputChange("residentialAddressRegion", "");
+      handleInputChange("residentialAddressMunicipality", "");
+      handleInputChange("residentialAddressBarangay", "");
+      handleInputChange("residentialAddressStreet", "");
+
+      clearError("residentialAddressRegion");
+      clearError("residentialAddressMunicipality");
+      clearError("residentialAddressBarangay");
+      clearError("residentialAddressStreet");
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -424,87 +517,131 @@ export function PersonalInformation({
       </div>
 
       {/* Provincial Address */}
-      <div>
-        <label className="students-label mb-2">
-          Provincial Address <span className="text-red-500">*</span>
+      <div className="space-y-4">
+        <label className="students-label">Provincial Address <span className="text-red-500">*</span></label>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Region */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Region</label>
+            <Combobox
+              options={provincialRegions}
+              value={formData.provincialAddressRegion}
+              onValueChange={handleProvincialRegionChange}
+              placeholder="Select Region"
+              className="h-[3.5rem]"
+            />
+          </div>
+
+          {/* City / Municipality */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">City/Municipality</label>
+            <Combobox
+              options={provincialCities}
+              value={formData.provincialAddressMunicipality}
+              onValueChange={handleProvincialCityChange}
+              disabled={!formData.provincialAddressRegion}
+              placeholder={formData.provincialAddressRegion ? "Select City" : "Select Region first"}
+              className="h-[3.5rem]"
+            />
+          </div>
+
+          {/* Barangay */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Barangay</label>
+            <Combobox
+              options={provincialBarangays}
+              value={formData.provincialAddressBarangay}
+              onValueChange={(val) => handleInputChange("provincialAddressBarangay", val)}
+              disabled={!formData.provincialAddressMunicipality}
+              placeholder={formData.provincialAddressMunicipality ? "Select Barangay" : "Select City first"}
+              className="h-[3.5rem]"
+            />
+          </div>
+
+          {/* Street */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Street/Lot/Blk</label>
+            <input
+              type="text"
+              value={formData.provincialAddressStreet}
+              onChange={(e) => handleInputChange("provincialAddressStreet", e.target.value)}
+              className="students-input w-full h-[3.5rem] px-4 py-2 border rounded-lg"
+              placeholder="e.g. Blk 12 Lot 5"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="flex items-center space-x-2 py-4 border-t border-gray-200 my-4">
+        <input
+          type="checkbox"
+          id="sameAsProvincial"
+          className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+          onChange={(e) => handleSameAddressToggle(e.target.checked)}
+        />
+        <label htmlFor="sameAsProvincial" className="text-sm font-medium text-gray-700 cursor-pointer">
+          Residential address is the same as provincial address
         </label>
-        {[
-          { key: "provincialAddressStreet", label: "Street/Lot/Blk", placeholder: "e.g., Blk 12 Lot 5" },
-          { key: "provincialAddressBarangay", label: "Barangay", placeholder: "e.g., San Jose" },
-          { key: "provincialAddressMunicipality", label: "Municipality/City", placeholder: "e.g., Calamba" },
-          { key: "provincialAddressRegion", label: "Region", placeholder: "e.g., Region IV-A " }
-        ].map((field) => {
-          const fieldValue = formData[field.key as keyof typeof formData];
-          const stringValue = typeof fieldValue === 'string' ? fieldValue : '';
-          
-          return (
-            <div key={field.key} className="mb-3">
-              <label className="text-xs text-gray-500 mb-1 block">{field.label}</label>
-              <input
-                type="text"
-                value={stringValue}
-                onChange={(e) => {
-                  handleInputChange(field.key, e.target.value);
-                  clearError(field.key);
-                }}
-                placeholder={field.placeholder}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none
-                  focus:ring-2 transition ${
-                    !stringValue
-                      ? "border-red-400 focus:ring-red-500"
-                      : "border-gray-300 focus:ring-primary"
-                  }`}
-              />
-              {!stringValue && (
-                <p className="text-red-500 text-xs mt-1 font-medium">
-                  {field.label} is required
-                </p>
-              )}
-            </div>
-          );
-        })}
       </div>
 
       {/* Residential/City Address */}
-      <div>
-        <label className="students-label mb-2">
-          Residential or City Address <span className="text-red-500">*</span>
-        </label>
-        {[
-          { key: "residentialAddressStreet", label: "Street/Lot/Blk", placeholder: "e.g., Blk 12 Lot 5" },
-          { key: "residentialAddressBarangay", label: "Barangay", placeholder: "e.g., San Jose" },
-          { key: "residentialAddressMunicipality", label: "Municipality/City", placeholder: "e.g., Calamba" },
-          { key: "residentialAddressRegion", label: "Region", placeholder: "e.g., Region IV-A " }
-        ].map((field) => {
-          const fieldValue = formData[field.key as keyof typeof formData];
-          const stringValue = typeof fieldValue === 'string' ? fieldValue : '';
-          
-          return (
-            <div key={field.key} className="mb-3">
-              <label className="text-xs text-gray-500 mb-1 block">{field.label}</label>
-              <input
-                type="text"
-                value={stringValue}
-                onChange={(e) => {
-                  handleInputChange(field.key, e.target.value);
-                  clearError(field.key);
-                }}
-                placeholder={field.placeholder}
-                className={`w-full px-4 py-3 border rounded-lg focus:outline-none
-                  focus:ring-2 transition ${
-                    !stringValue
-                      ? "border-red-400 focus:ring-red-500"
-                      : "border-gray-300 focus:ring-primary"
-                  }`}
-              />
-              {!stringValue && (
-                <p className="text-red-500 text-xs mt-1 font-medium">
-                  {field.label} is required
-                </p>
-              )}
-            </div>
-          );
-        })}
+      <div className="space-y-4">
+        <label className="students-label">Residential Address <span className="text-red-500">*</span></label>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Region */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Region</label>
+            <Combobox
+              options={provincialRegions}
+              value={formData.residentialAddressRegion}
+              onValueChange={handleResidentialRegionChange}
+              placeholder="Select Region"
+              className="h-[3.5rem]"
+              disabled={isSameAddress}
+            />
+          </div>
+
+          {/* City / Municipality */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">City/Municipality</label>
+            <Combobox
+              options={provincialCities}
+              value={formData.residentialAddressMunicipality}
+              onValueChange={handleResidentialCityChange}
+              disabled={!formData.residentialAddressRegion || isSameAddress}
+              placeholder={formData.residentialAddressRegion ? "Select City" : "Select Region first"}
+              className="h-[3.5rem]"
+            />
+          </div>
+
+          {/* Barangay */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Barangay</label>
+            <Combobox
+              options={provincialBarangays}
+              value={formData.residentialAddressBarangay}
+              onValueChange={(val) => handleInputChange("residentialAddressBarangay", val)}
+              disabled={!formData.residentialAddressMunicipality || isSameAddress}
+              placeholder={formData.residentialAddressMunicipality ? "Select Barangay" : "Select City first"}
+              className="h-[3.5rem]"
+            />
+          </div>
+
+          {/* Street */}
+          <div>
+            <label className="text-xs text-gray-500 mb-1 block">Street/Lot/Blk</label>
+            <input
+              type="text"
+              value={formData.residentialAddressStreet}
+              onChange={(e) => handleInputChange("residentialAddressStreet", e.target.value)}
+              className="students-input w-full h-[3.5rem] px-4 py-2 border rounded-lg"
+              placeholder="e.g. Blk 12 Lot 5"
+              disabled={isSameAddress}
+            />
+          </div>
+        </div>
       </div>
 
       {/* Employer Info */}
@@ -526,47 +663,59 @@ export function PersonalInformation({
       <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
         <h3 className="font-semibold text-gray-900 mb-4">Emergency Contact Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2">
+          <div className="md:col-span-3">
             <label className="students-label mb-2">
               Complete name of the person to be contacted in case of emergency: <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              value={formData.emergencyContactName}
-              onChange={(e) => {
-                handleInputChange("emergencyContactName", e.target.value);
-                clearError("emergencyContactName");
-              }}
-              placeholder="e.g., Jane Doe"
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none
-                focus:ring-2 transition ${
-                  !formData.emergencyContactName
-                    ? "border-red-400 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-primary"
-                }`}
-            />
-            {!formData.emergencyContactName && (
-              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {
+                [ 
+                  {label: "First Name", field: "emergencyContactFirstName"},
+                  {label: "Middle Name", field: "emergencyContactMiddleName"},
+                  {label: "Last Name", field: "emergencyContactLastName"},
+                ].map((field) => (
+                  <div key={field.field}> {/* Wrapped in a div or fragment with a key */}
+                    <input
+                      type="text"
+                      value={formData[field.field as keyof FormData] as string || ''} 
+                      onChange={(e) => {
+                        handleInputChange(field.field, e.target.value);
+                        clearError(field.field);
+                      }}
+                      placeholder={`Enter ${field.label}`}
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+                        focus:ring-2 transition ${
+                          !formData[field.field as keyof FormData] && !(field.label === "Middle Name")
+                            ? "border-red-400 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-primary"
+                        }`}
+                    />
+                    {!formData[field.field as keyof FormData] && !(field.label === "Middle Name") && (
+                      <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+                    )}
+                  </div>
+                ))
+              }
+            </div>
+            
           </div>
           <div>
             <label className="students-label mb-2">
               Relationship <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
+            <Combobox
+              options={RELATIONSHIP_OPTIONS}
               value={formData.emergencyContactRelationship}
-              onChange={(e) => {
-                handleInputChange("emergencyContactRelationship", e.target.value);
+              onValueChange={(value) => {
+                handleInputChange("emergencyContactRelationship", value);
                 clearError("emergencyContactRelationship");
               }}
-              placeholder="e.g., Mother"
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none
-                focus:ring-2 transition ${
-                  !formData.emergencyContactRelationship
-                    ? "border-red-400 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-primary"
-                }`}
+              placeholder="Select Relationship"
+              className={`w-full h-[3.2rem] ${
+                !formData.emergencyContactRelationship
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
             />
             {!formData.emergencyContactRelationship && (
               <p className="text-red-500 text-xs mt-1 font-medium">Required</p>

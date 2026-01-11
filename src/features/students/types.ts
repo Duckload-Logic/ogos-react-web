@@ -40,7 +40,9 @@ export interface FormData {
   residentialAddressRegion: string;
   residentialAddressStreet: string;
   employerName: string;
-  emergencyContactName: string;
+  emergencyContactFirstName: string;
+  emergencyContactLastName: string;
+  emergencyContactMiddleName: string;
   emergencyContactPhone: string;
   emergencyContactRelationship: string; // Fixed: was 'relationship'
   education: {
@@ -65,8 +67,14 @@ export interface FormData {
   motherBirthDate: string;
   parentalStatusID: number;
   parentalDetails: string;
-  guardianName: string;
-  guardianAddress: string;
+  guardianFirstName: string;
+  guardianLastName: string;
+  guardianMiddleName: string;
+  guardianAddressProvince: string;
+  guardianAddressMunicipality: string;
+  guardianAddressBarangay: string;
+  guardianAddressRegion: string;
+  guardianAddressStreet: string;
   monthlyFamilyIncome: string;
   monthlyFamilyIncomeOther: string;
   brothers: string;
@@ -125,7 +133,9 @@ export interface FamilyBackgroundData {
   siblingSisters: number;
   monthlyFamilyIncome: string;
   parents: GuardianData[]; // Changed from 'guardians' to 'parents'
-  guardianName?: string;
+  guardianFirstName?: string;
+  guardianLastName?: string;
+  guardianMiddleName?: string;
   guardianAddress?: string;
   employedFamilyMembersCount: number;
   supportsStudiesCount: number;

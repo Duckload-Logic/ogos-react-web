@@ -5,6 +5,7 @@ import type {
   CreateAppointmentRequest,
   AppointmentStatus,
 } from '../types';
+import * as appointmentServiceAPI from '@/services/appointmentService';
 
 class AppointmentService {
   // Get available slots for a specific date
@@ -59,9 +60,8 @@ class AppointmentService {
   // Get appointments for a specific student/user
   async getStudentAppointments(userId: number): Promise<Appointment[]> {
     try {
-      // Use the same endpoint - the backend will get userID from auth context
-      const response = await apiClient.get('/appointments');
-      return response.data.data || [];
+      // Use the centralized service
+      return await appointmentServiceAPI.getStudentAppointments(userId);
     } catch (error) {
       console.error('Error fetching student appointments:', error);
       throw error;
@@ -71,8 +71,7 @@ class AppointmentService {
   // Get a specific appointment by ID
   async getAppointmentById(id: number): Promise<Appointment> {
     try {
-      const response = await apiClient.get(`/appointments/${id}`);
-      return response.data.data;
+      return await appointmentServiceAPI.getAppointmentById(id);
     } catch (error) {
       console.error('Error fetching appointment:', error);
       throw error;
@@ -82,10 +81,61 @@ class AppointmentService {
   // Create a new appointment
   async createAppointment(request: CreateAppointmentRequest): Promise<Appointment> {
     try {
-      const response = await apiClient.post('/appointments', request);
-      return response.data.data;
+      return await appointmentServiceAPI.createAppointment(request);
     } catch (error) {
       console.log('Error creating appointment:', error);
+      throw error;
+    }
+  }
+
+  // Update appointment status (connect to admin feature)
+  async updateAppointmentStatus(appointmentId: number, status: AppointmentStatus): Promise<Appointment> {
+    try {
+      return await appointmentServiceAPI.updateAppointmentStatus(appointmentId, status);
+    } catch (error) {
+      console.error('Error updating appointment status:', error);
+      throw error;
+    }
+  }
+
+  // Approve an appointment (connect to admin feature)
+  async approveAppointment(appointmentId: number): Promise<Appointment> {
+    try {
+      return await appointmentServiceAPI.approveAppointment(appointmentId);
+    } catch (error) {
+      console.error('Error approving appointment:', error);
+      throw error;
+    }
+  }
+
+  // Complete an appointment (connect to admin feature)
+  async completeAppointment(appointmentId: number): Promise<Appointment> {
+    try {
+      return await appointmentServiceAPI.completeAppointment(appointmentId);
+    } catch (error) {
+      console.error('Error completing appointment:', error);
+      throw error;
+    }
+  }
+
+  // Cancel an appointment (connect to admin feature)
+  async cancelAppointment(appointmentId: number | Appointment): Promise<Appointment> {
+    try {
+      // Handle both ID and full Appointment object
+      const id = typeof appointmentId === 'number' ? appointmentId : appointmentId.id;
+      return await appointmentServiceAPI.cancelAppointment(id);
+    } catch (error) {
+      console.error('Error cancelling appointment:', error);
+      throw error;
+    }
+  }
+
+  // Reschedule an appointment (connect to admin feature)
+  async rescheduleAppointment(appointmentId: number, payload: CreateAppointmentRequest): Promise<Appointment> {
+    try {
+      return await appointmentServiceAPI.rescheduleAppointment(appointmentId, payload);
+    } catch (error) {
+      console.error('Error rescheduling appointment:', error);
       throw error;
     }
   }

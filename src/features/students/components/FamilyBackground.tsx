@@ -1,11 +1,18 @@
 import { FormData, FormErrors } from "@/features/students/types";
 import { PARENTAL_STATUS_MAP } from "../utils/maps";
+import { Combobox } from "@/components/ui/combobox";
+import { useState } from "react";
 
 interface FamilyBackgroundProps {
   formData: FormData;
   errors: FormErrors;
   handleInputChange: (field: string, value: string | boolean) => void;
   clearError: (field: string) => void;
+  locations: {
+    [regionName: string]: {
+      [cityName: string]: string[]; // Array of Barangay names
+    };
+  };
 }
 
 export function FamilyBackground({
@@ -13,7 +20,60 @@ export function FamilyBackground({
   errors,
   handleInputChange,
   clearError,
+  locations,
 }: FamilyBackgroundProps) {
+  const [isSameAddress, setIsSameAddress] = useState(false);
+  const provincialRegions = Object.keys(locations).map((r) => ({ label: r, value: r }));
+  
+  const provincialCities = formData.provincialAddressRegion 
+    ? Object.keys((locations as any)[formData.provincialAddressRegion] || {}).map(c => ({ label: c, value: c }))
+    : [];
+
+  const provincialBarangays = (formData.provincialAddressRegion && formData.provincialAddressMunicipality)
+    ? ((locations as any)[formData.provincialAddressRegion][formData.provincialAddressMunicipality] || []).map((b: string) => ({ label: b, value: b }))
+    : [];
+
+  // Helper to handle cascading resets
+  const handleGuardianRegionChange = (val: string) => {
+    handleInputChange("guardianAddressRegion", val);
+    handleInputChange("guardianAddressMunicipality", ""); // Reset child
+    handleInputChange("guardianAddressBarangay", "");     // Reset grandchild
+    clearError("guardianAddressRegion");
+  };
+
+  const handleGuardianCityChange = (val: string) => {
+    handleInputChange("guardianAddressMunicipality", val);
+    handleInputChange("guardianAddressBarangay", "");     // Reset child
+    clearError("guardianAddressMunicipality");
+  };
+
+  const handleSameAddressToggle = (checked: boolean) => {
+    setIsSameAddress(checked);
+    if (checked) {
+      // Sync all fields
+      handleInputChange("guardianAddressRegion", formData.provincialAddressRegion);
+      handleInputChange("guardianAddressMunicipality", formData.provincialAddressMunicipality);
+      handleInputChange("guardianAddressBarangay", formData.provincialAddressBarangay);
+      handleInputChange("guardianAddressStreet", formData.provincialAddressStreet);
+
+      clearError("guardianAddressRegion");
+      clearError("guardianAddressMunicipality");
+      clearError("guardianAddressBarangay");
+      clearError("guardianAddressStreet");
+    } else {
+      // Clear residential fields
+      handleInputChange("guardianAddressRegion", "");
+      handleInputChange("guardianAddressMunicipality", "");
+      handleInputChange("guardianAddressBarangay", "");
+      handleInputChange("guardianAddressStreet", "");
+
+      clearError("guardianAddressRegion");
+      clearError("guardianAddressMunicipality");
+      clearError("guardianAddressBarangay");
+      clearError("guardianAddressStreet");
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="border rounded-lg p-4 bg-gray-50">
@@ -193,7 +253,7 @@ export function FamilyBackground({
                   )}
                 </div>
               )
-            })}
+            })} 
           </div>
           <div>
             <label className="students-label mb-2">
@@ -333,47 +393,122 @@ export function FamilyBackground({
           />
         )}
       </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+ 
+      <div className="grid grid-cols-1 gap-6">
         <div>
           <label className="block font-semibold text-gray-700 mb-2">
             Your Guardian's Name: <span className="text-red-500">*</span>
           </label>
-          <input
-            type="text"
-            value={formData.guardianName}
-            onChange={(e) => handleInputChange("guardianName", e.target.value)}
-            placeholder="e.g., Mary Doe"
-            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
-              !formData.guardianName
-                ? "border-red-400 focus:ring-red-500"
-                : "border-gray-300 focus:ring-primary"
-            }`}
-          />
-          {!formData.guardianName && (
-            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
-          )}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-2">
+            {
+            [
+                { key: "guardianFirstName", label: "First Name", placeholder: "Enter first name" },
+                { key: "guardianMiddleName", label: "Middle Name", placeholder: "Enter middle name" },
+                { key: "guardianLastName", label: "Last Name", placeholder: "Enter last name" },
+              ].map(( field ) => {
+                const fieldValue = formData[field.key as keyof typeof formData];
+                const stringValue = typeof fieldValue === 'string' ? fieldValue : '';
+                
+                return (
+                  <div key={field.key} className="flex flex-col">
+                    <label className="students-label mb-2">
+                      {field.label} {field.key !== "guardianMiddleName" && <span className="text-red-500">*</span>}
+                    </label>
+                    <input
+                      type="text"
+                      placeholder={field.placeholder}
+                      value={stringValue} 
+                      onChange={(e) => {
+                        handleInputChange(field.key, e.target.value);
+                        clearError(field.key);
+                      }}
+                      className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
+                        // Middle name is optional, don't show red border if empty
+                        field.key !== "guardianMiddleName" && !formData[field.key as keyof typeof formData]
+                          ? "border-red-400 focus:ring-red-500"
+                          : "border-gray-300 focus:ring-primary"
+                      }`}
+                    />
+                    {field.key !== "guardianMiddleName" && !formData[field.key as keyof typeof formData] && (
+                      <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
         </div>
+
         <div>
-          <label className="block font-semibold text-gray-700 mb-2">
-            Address: <span className="text-red-500">*</span>
-          </label>
-          <input
-            type="text"
-            value={formData.guardianAddress}
-            onChange={(e) =>
-              handleInputChange("guardianAddress", e.target.value)
-            }
-            placeholder="e.g., Address of Guardian"
-            className={`w-full px-4 py-3 border rounded focus:outline-none focus:ring-2 transition ${
-              !formData.guardianAddress
-                ? "border-red-400 focus:ring-red-500"
-                : "border-gray-300 focus:ring-primary"
-            }`}
-          />
-          {!formData.guardianAddress && (
-            <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
-          )}
+          <div className="flex items-center space-x-2 py-2 border-gray-200">
+            <input
+              type="checkbox"
+              id="sameAsProvincial"
+              className="w-4 h-4 text-primary border-gray-300 rounded focus:ring-primary"
+              onChange={(e) => handleSameAddressToggle(e.target.checked)}
+            />
+            <label htmlFor="sameAsProvincial" className="text-sm font-medium text-gray-700 cursor-pointer">
+              Guardian address is the same as residential address
+            </label>
+          </div>
+
+          {/* Guardian Address */}
+          <div className="space-y-4">
+            <label className="students-label">Guardian Address <span className="text-red-500">*</span></label>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Region */}
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Region</label>
+              <Combobox
+                options={provincialRegions}
+                value={formData.guardianAddressRegion}
+                onValueChange={handleGuardianRegionChange}
+                placeholder="Select Region"
+                className="h-[3.2rem]"
+                disabled={isSameAddress}
+              />
+            </div>
+  
+            {/* City / Municipality */}
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">City/Municipality</label>
+              <Combobox
+                options={provincialCities}
+                value={formData.guardianAddressMunicipality}
+                onValueChange={handleGuardianCityChange}
+                disabled={!formData.guardianAddressRegion || isSameAddress}
+                placeholder={formData.guardianAddressRegion ? "Select City" : "Select Region first"}
+                className="h-[3.2rem]"
+              />
+            </div>
+  
+            {/* Barangay */}
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Barangay</label>
+              <Combobox
+                options={provincialBarangays}
+                value={formData.guardianAddressBarangay}
+                onValueChange={(val) => handleInputChange("guardianAddressBarangay", val)}
+                disabled={!formData.guardianAddressMunicipality || isSameAddress}
+                placeholder={formData.guardianAddressMunicipality ? "Select Barangay" : "Select City first"}
+                className="h-[3.2rem]"
+              />
+            </div>
+  
+            {/* Street */}
+            <div>
+              <label className="text-xs text-gray-500 mb-1 block">Street/Lot/Blk</label>
+              <input
+                type="text"
+                value={formData.residentialAddressStreet}
+                onChange={(e) => handleInputChange("residentialAddressStreet", e.target.value)}
+                className="students-input w-full h-[3.2rem] px-4 py-2 border rounded-lg"
+                placeholder="e.g. Blk 12 Lot 5"
+                disabled={isSameAddress}
+              />
+            </div>
+          </div>
+        </div>
         </div>
       </div>
 

@@ -81,8 +81,8 @@ export const updateAppointment = async (
 /**
  * Cancel appointment
  */
-export const cancelAppointment = async (id: string): Promise<Appointment> => {
-  return apiClient.patch(`/appointments/${id}`, { status: "cancelled" });
+export const cancelAppointment = async (appointment: Appointment): Promise<Appointment> => {
+  return apiClient.patch(`/appointments/${appointment.id}`, { appointment });
 };
 
 /**
