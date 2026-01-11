@@ -1,62 +1,50 @@
 import Layout from "@/components/Layout";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Eye, Clock } from "lucide-react";
-
-interface Appointment {
-  id: string;
-  studentName: string;
-  date: string;
-  time: string;
-  reason: string;
-  status: "scheduled" | "completed" | "cancelled";
-  date_raw: string;
-}
+import { useAppointments } from "@/features/appointments/hooks/useAppointments";
+import { useUser } from "@/hooks/useUser";
+import { User } from "@/types/user";
 
 export default function Appointments() {
-  const [appointments] = useState<Appointment[]>([
-    {
-      id: "001",
-      studentName: "Juan Dela Cruz",
-      date: "Jan 15, 2025",
-      time: "09:00 AM",
-      reason: "Academic counseling",
-      status: "scheduled",
-      date_raw: "2025-01-15",
-    },
-    {
-      id: "002",
-      studentName: "Maria Santos",
-      date: "Jan 15, 2025",
-      time: "10:00 AM",
-      reason: "Personal concerns",
-      status: "scheduled",
-      date_raw: "2025-01-15",
-    },
-    {
-      id: "003",
-      studentName: "Carlos Reyes",
-      date: "Jan 14, 2025",
-      time: "02:00 PM",
-      reason: "Course selection",
-      status: "completed",
-      date_raw: "2025-01-14",
-    },
-    {
-      id: "004",
-      studentName: "Angela Dela Cruz",
-      date: "Jan 13, 2025",
-      time: "11:00 AM",
-      reason: "Scholarship inquiry",
-      status: "cancelled",
-      date_raw: "2025-01-13",
-    },
-  ]);
+  const { fetchAppointments, appointments: hookAppointments } = useAppointments();
+  const { fetchUserData } = useUser();
+  const [ students, setStudents ] = useState<User[]>([]);
 
-  const [currentMonth, setCurrentMonth] = useState(new Date(2025, 0)); // January 2025
+  useEffect(() => {
+    const loadAppointments = async () => {
+      await fetchAppointments(true, "Approved");
+    };
+
+    loadAppointments();
+  }, [fetchAppointments]);
+
+  useEffect(() => {
+    const fetchAllStudents = async () => {
+      if (hookAppointments.length === 0) return;
+
+      try {
+        // Get unique IDs to avoid redundant API calls
+        const uniqueStudentIds = [...new Set(hookAppointments.map((apt) => apt.userId))];
+        
+        // Fetch all user data in parallel
+        const studentData = await Promise.all(
+          uniqueStudentIds.map((id) => fetchUserData(id))
+        );
+        
+        setStudents(studentData);
+      } catch (err) {
+        console.error("Failed to fetch students:", err);
+      }
+    };
+
+    fetchAllStudents();
+  }, [hookAppointments]);
+
+  const [currentMonth, setCurrentMonth] = useState(new Date()); 
   const touchStartX = useRef<number | null>(null);
 
   const bookedDates = new Set(
-    appointments.map((apt) => new Date(apt.date_raw).getDate()),
+    hookAppointments.map((apt) => new Date(apt.scheduledDate).getDate()),
   );
 
   const today = new Date();
@@ -116,24 +104,24 @@ export default function Appointments() {
           {[
             {
               label: "Total Appointments",
-              value: appointments.length,
+              value: hookAppointments.length,
               color: "bg-blue-100 text-blue-600",
             },
             {
               label: "Scheduled",
-              value: appointments.filter((a) => a.status === "scheduled")
+              value: hookAppointments.filter((a) => a.status === "Approved")
                 .length,
               color: "bg-yellow-100 text-yellow-600",
             },
             {
               label: "Completed",
-              value: appointments.filter((a) => a.status === "completed")
+              value: hookAppointments.filter((a) => a.status === "Completed")
                 .length,
               color: "bg-green-100 text-green-600",
             },
             {
               label: "Cancelled",
-              value: appointments.filter((a) => a.status === "cancelled")
+              value: hookAppointments.filter((a) => a.status === "Cancelled")
                 .length,
               color: "bg-red-100 text-red-600",
             },
@@ -323,7 +311,8 @@ export default function Appointments() {
                     </tr>
                   </thead>
                   <tbody className="divide-y">
-                    {appointments.map((apt, idx) => (
+                    {hookAppointments.map((apt, idx) => (
+                      
                       <tr
                         key={apt.id}
                         className={`hover:bg-gray-50 transition-colors ${
@@ -331,13 +320,13 @@ export default function Appointments() {
                         }`}
                       >
                         <td className="px-4 py-3 font-medium text-foreground text-xs">
-                          {apt.studentName}
+                          {students.find((s) => s.id === apt.userId)?.lastName  || '-'}, {students.find((s) => s.id === apt.userId)?.firstName || '-'}
                         </td>
                         <td className="px-4 py-3 text-foreground text-xs">
-                          {apt.date}
+                          {apt.scheduledDate}
                         </td>
                         <td className="px-4 py-3 text-foreground text-xs">
-                          {apt.time}
+                          {apt.scheduledTime}
                         </td>
                         <td className="px-4 py-3 text-foreground text-xs">
                           {apt.reason}
@@ -362,7 +351,7 @@ export default function Appointments() {
                 </table>
               </div>
 
-              {appointments.length === 0 && (
+              {hookAppointments.length === 0 && (
                 <div className="px-6 py-12 text-center">
                   <p className="text-gray-500">No appointments scheduled.</p>
                 </div>

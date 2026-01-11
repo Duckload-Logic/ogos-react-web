@@ -23,9 +23,35 @@ class AppointmentService {
   async getAllAppointments(): Promise<Appointment[]> {
     try {
       const response = await apiClient.get('/appointments');
-      return response.data.data || [];
+      // Handle null or undefined response
+      if (!response || !response.data) {
+        return [];
+      }
+      // API returns array directly, not wrapped in a data property
+      return Array.isArray(response.data) ? response.data : response.data.data || [];
     } catch (error) {
       console.error('Error fetching appointments:', error);
+      throw error;
+    }
+  }
+
+  // Get all appointments (admin - all users)
+  async getAllAppointmentsAdmin(status: string = "", startDate: string = "", endDate: string = ""): Promise<Appointment[]> {
+    try {
+      let url = '/appointments/all?';
+      if (status) url += `status=${status}&`;
+      if (startDate) url += `start_date=${startDate}&`;
+      if (endDate) url += `end_date=${endDate}&`;
+      
+      const response = await apiClient.get(url);
+      // Handle null or undefined response
+      if (!response || !response.data) {
+        return [];
+      }
+      
+      return Array.isArray(response.data) ? response.data : response.data.data || [];
+    } catch (error) {
+      console.error('Error fetching all appointments:', error);
       throw error;
     }
   }
@@ -57,31 +83,9 @@ class AppointmentService {
   async createAppointment(request: CreateAppointmentRequest): Promise<Appointment> {
     try {
       const response = await apiClient.post('/appointments', request);
-      return response.data;
-    } catch (error) {
-      console.log('Error creating appointment:', error);
-      throw error;
-    }
-  }
-
-  // Update appointment status
-  async updateAppointmentStatus(id: number, status: string): Promise<Appointment> {
-    try {
-      const response = await apiClient.put(`/appointments/${id}/status`, { status });
       return response.data.data;
     } catch (error) {
-      console.error('Error updating appointment status:', error);
-      throw error;
-    }
-  }
-
-  // Cancel an appointment
-  async cancelAppointment(id: number): Promise<boolean> {
-    try {
-      await apiClient.put(`/appointments/${id}/status`, { status: 'Cancelled' });
-      return true;
-    } catch (error) {
-      console.error('Error cancelling appointment:', error);
+      console.log('Error creating appointment:', error);
       throw error;
     }
   }

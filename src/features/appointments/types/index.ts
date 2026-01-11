@@ -37,10 +37,8 @@ export interface UseAppointmentsReturn {
   availableSlots: TimeSlot[];
   loading: boolean;
   error: string | null;
-  fetchAppointments: () => Promise<void>;
+  fetchAppointments: (fetchAll?: boolean, status?: string, startDate?: string, endDate?: string) => Promise<void>;
   fetchAvailableSlots: (date?: string) => Promise<void>;
   createAppointment: (request: CreateAppointmentRequest) => Promise<Appointment | null>;
-  updateAppointmentStatus: (id: number, status: AppointmentStatus) => Promise<boolean>;
-  cancelAppointment: (id: number) => Promise<boolean>;
   clearError: () => void;
 }
