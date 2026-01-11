@@ -25,7 +25,7 @@ export function ExcuseSlipsSection() {
           <p className="text-gray-500 text-base mt-2">
             Submit your excuse slips for review in the Excuse Slip section.
           </p>
-          <Link to="/excuse-slip" className="mt-4 inline-block">
+          <Link to="/student/excuse-slip" className="mt-4 inline-block">
             <Button className="bg-primary hover:bg-primary-dark text-primary-foreground font-semibold">
               Upload Excuse Slip
             </Button>
