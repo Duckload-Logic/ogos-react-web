@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
-import { checkStudentOnboardingStatus } from "@/features/students/services/service";
+import { checkStudentOnboardingStatus, studentService } from "@/features/students/services/service";
 import { useAuth } from "@/context";
 
 const PROGRAMS = [
@@ -16,10 +16,27 @@ export default function GuidanceServices() {
   const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
+  const [additionalInfo, setAdditionalInfo] = useState<any>(null);
 
   useEffect(() => {
     setIsPageLoaded(true);
   }, []);
+
+  useEffect(() => {
+    if (!user?.id) return;
+    
+    const fetchProfile = async () => {
+      try {
+        const data = await studentService.getStudentProfile(user.id);
+        setAdditionalInfo(data);
+      } catch (err) {
+        console.error('Error fetching profile:', err);
+        // Continue without additional info if fetch fails
+      }
+    };
+
+    fetchProfile();
+  }, [user?.id]);
 
   useEffect(() => {
     const checkFormStatus = async () => {
@@ -110,18 +127,52 @@ export default function GuidanceServices() {
         )}
 
         {/* How Can We Help You Section */}
-        <section className="bg-white rounded-lg shadow-sm p-7 md:p-9 mb-8 programs-section">
-          <h2 className="text-2xl md:text-3xl font-bold mb-7 text-primary">
+        <section className="bg-white rounded-lg shadow-sm p-5 md:p-6 mb-8 programs-section">
+          <h2 className="text-lg md:text-xl font-bold mb-4 text-primary">
             How Can We Help You?
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {PROGRAMS.map((program, index) => (
-              <div key={index} className="border-l-4 border-primary pl-4 py-3 transition-all duration-300 hover:bg-gray-50 hover:pl-5 rounded cursor-pointer program-card">
-                <h3 className="font-semibold text-lg text-gray-900 transition-colors duration-300 hover:text-primary">
+              <div key={index} className="border-l-4 border-primary pl-3 py-3 transition-all duration-300 hover:bg-gray-50 hover:pl-4 rounded cursor-pointer program-card">
+                <h3 className="font-semibold text-sm md:text-base text-gray-900 transition-colors duration-300 hover:text-primary">
                   {program.title}
                 </h3>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Student Dashboard Section */}
+        <section className="bg-white rounded-lg shadow-sm p-7 md:p-9 mb-8 programs-section" style={{ animationDelay: '0.25s' }}>
+          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-primary">
+            Student Dashboard
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Name Card */}
+            <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</label>
+              <p className="text-gray-900 font-bold text-lg mt-2">
+                {user?.lastName}, {user?.firstName} {user?.middleName ? user.middleName.charAt(0) + '.' : ''}
+              </p>
+            </div>
+
+            {/* Student Number Card */}
+            <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Student Number</label>
+              <p className="text-gray-900 font-bold text-lg mt-2">{additionalInfo?.studentProfile?.studentNumber || '-'}</p>
+            </div>
+
+            {/* Contact Card */}
+            <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Contact</label>
+              <p className="text-gray-900 font-bold text-lg mt-2">{additionalInfo?.studentProfile?.contactNo || '-'}</p>
+            </div>
+
+            {/* Email Card */}
+            <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Email</label>
+              <p className="text-gray-900 font-bold text-lg mt-2">{user?.email || '-'}</p>
+            </div>
           </div>
         </section>
       </div>
