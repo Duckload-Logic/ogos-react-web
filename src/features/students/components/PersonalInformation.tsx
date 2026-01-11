@@ -36,7 +36,11 @@ interface PersonalInformationProps {
   formData: FormData;
   handleInputChange: (field: string, value: string | boolean) => void;
   clearError: (field: string) => void;
-  locations: Record<string, any>;
+  locations: {
+    [regionName: string]: {
+      [cityName: string]: string[]; // Array of Barangay names
+    };
+  };
 }
 
 export function PersonalInformation({

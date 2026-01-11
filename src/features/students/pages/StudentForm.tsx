@@ -20,6 +20,12 @@ import {
 } from '@/features/students/utils/maps';
 import locations from '@/config/ph_locations.json'
 
+type PHLocations = {
+  [regionName: string]: {
+    [cityName: string]: string[]; // Array of Barangay names
+  };
+};
+
 interface FormErrors {
   [key: string]: string;
 }
@@ -1349,7 +1355,7 @@ export default function StudentForm() {
                     formData={formData}
                     handleInputChange={handleInputChange}
                     clearError={clearError}
-                    locations={locations}
+                    locations={locations as PHLocations}
                   />
                 )}
 
@@ -1373,7 +1379,7 @@ export default function StudentForm() {
                     errors={errors}
                     handleInputChange={handleInputChange}
                     clearError={clearError}
-                    locations={locations}
+                    locations={locations as PHLocations}
                   />
                 )}
 
