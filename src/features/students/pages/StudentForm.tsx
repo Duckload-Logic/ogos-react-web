@@ -18,6 +18,7 @@ import {
   mapFamilyInfo,
   mapHealthInfo,
 } from '@/features/students/utils/maps';
+import locations from '@/config/ph_locations.json'
 
 interface FormErrors {
   [key: string]: string;
@@ -111,8 +112,14 @@ const EMPTY_FORM: FormData = {
   motherBirthDate: "", // ADD THIS - Missing!
   parentalStatusID: 0,
   parentalDetails: "",
-  guardianName: "",
-  guardianAddress: "",
+  guardianFirstName: "",
+  guardianLastName: "",
+  guardianMiddleName: "",
+  guardianAddressProvince: "",
+  guardianAddressMunicipality: "",
+  guardianAddressBarangay: "",
+  guardianAddressRegion: "",
+  guardianAddressStreet: "",
   monthlyFamilyIncome: "",
   monthlyFamilyIncomeOther: "",
   brothers: "",
@@ -641,8 +648,12 @@ export default function StudentForm() {
       const familyFields = {
         parentsInfo: (fatherInfo && motherInfo ? 1 : 0),
         guardiansInfo: (
-          formData.guardianName && 
-          formData.guardianAddress ? 1 : 0
+          formData.guardianFirstName &&
+          formData.guardianLastName &&
+          formData.guardianAddressMunicipality &&
+          formData.guardianAddressBarangay &&
+          formData.guardianAddressRegion && 
+          formData.guardianAddressStreet ? 1 : 0
         ),
         supportingFamily: (
           formData.gainfullyEmployed && 
@@ -959,7 +970,7 @@ export default function StudentForm() {
              !education.seniorHS.school && !education.seniorHS.location && !education.others;
     } else if (currentSection === 3) {
       return !formData.fatherFirstName && !formData.fatherLastName && 
-      !formData.motherFirstName && !formData.motherLastName && !formData.guardianName &&
+      !formData.motherFirstName && !formData.motherLastName && !formData.guardianFirstName && !formData.guardianLastName &&
              !formData.monthlyFamilyIncome && !formData.financialSupport;
     } else if (currentSection === 4) {
       return !formData.vision && !formData.hearing && !formData.mobility && !formData.speech &&
@@ -1338,6 +1349,7 @@ export default function StudentForm() {
                     formData={formData}
                     handleInputChange={handleInputChange}
                     clearError={clearError}
+                    locations={locations}
                   />
                 )}
 
@@ -1361,6 +1373,7 @@ export default function StudentForm() {
                     errors={errors}
                     handleInputChange={handleInputChange}
                     clearError={clearError}
+                    locations={locations}
                   />
                 )}
 
