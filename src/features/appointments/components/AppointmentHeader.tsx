@@ -8,7 +8,7 @@ interface AppointmentHeaderProps {
 }
 
 export default function AppointmentHeader({
-  backTo = "/guidance-services",
+  backTo = "/student",
   title,
   subtitle,
 }: AppointmentHeaderProps) {
