@@ -111,44 +111,24 @@ export default function ExcuseSlip() {
   return (
     <div className="min-h-screen bg-gray-50">
       <style>{`
-        @keyframes slideUp {
+        @keyframes slideUpSmooth {
           from {
             opacity: 0;
-            transform: translateY(8px);
+            transform: translateY(6px);
           }
           to {
             opacity: 1;
             transform: translateY(0);
           }
         }
-        @keyframes slideUpLeft {
-          from {
-            opacity: 0;
-            transform: translateY(8px) translateX(-8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) translateX(0);
-          }
-        }
-        @keyframes slideUpRight {
-          from {
-            opacity: 0;
-            transform: translateY(8px) translateX(8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) translateX(0);
-          }
-        }
         .template-card {
-          animation: slideUpLeft 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+          animation: slideUpSmooth 0.4s ease-out 0.08s both;
         }
         .upload-card {
-          animation: slideUpRight 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.15s both;
+          animation: slideUpSmooth 0.4s ease-out 0.12s both;
         }
         .slips-list {
-          animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+          animation: slideUpSmooth 0.4s ease-out 0.16s both;
         }
       `}</style>
       {/* Hero Section */}
