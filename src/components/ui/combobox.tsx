@@ -10,6 +10,7 @@ export interface ComboboxProps {
   searchPlaceholder?: string
   emptyMessage?: string
   className?: string
+  disabled?: boolean
 }
 
 export function Combobox({
@@ -20,6 +21,7 @@ export function Combobox({
   searchPlaceholder = "Search...",
   emptyMessage = "No option found.",
   className,
+  disabled = false,
 }: ComboboxProps) {
   const [open, setOpen] = React.useState(false)
   const [search, setSearch] = React.useState("")
@@ -39,6 +41,7 @@ export function Combobox({
           "relative w-full flex items-center rounded-lg border bg-background px-4 py-2 text-sm ring-offset-background transition-colors focus-within:outline-none focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2",
           !value ? "border-red-400" : "border-gray-300",
           open && "ring-2 ring-primary ring-offset-2",
+          disabled && "bg-gray-100 opacity-50 cursor-not-allowed",
           className
         )}
       >
@@ -50,13 +53,15 @@ export function Combobox({
             type="text"
             placeholder={placeholder}
             value={search}
+            disabled={disabled}
             onChange={(e) => setSearch(e.target.value)}
-            onFocus={() => setOpen(true)}
-            className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground text-sm"
+            onFocus={() => !disabled && setOpen(true)}
+            className="flex-1 bg-transparent outline-none placeholder:text-muted-foreground text-sm disabled:opacity-50 disabled:cursor-not-allowed"
           />
         )}
         <button
-          onClick={() => setOpen(!open)}
+          onClick={() => !disabled && setOpen(!open)}
+          disabled={disabled}
           className="ml-2 h-4 w-4 shrink-0 opacity-50 hover:opacity-100"
         >
           <ChevronDown className="h-4 w-4" />
