@@ -107,17 +107,17 @@ export default function GuidanceServices() {
         {/* URGENT: PDS Completion Alert Banner */}
         {showForm && (
           <div className="mb-8 bg-yellow-100 border-l-4 border-yellow-500 p-4 sm:p-6 rounded-lg shadow-md alert-banner">
-            <div className="flex items-start gap-3">
-              <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
+            <div className="flex items-start gap-2">
+              <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
               <div className="flex-1">
-                <h3 className="font-bold text-lg text-yellow-800 mb-2">
+                <h3 className="font-bold text-sm text-yellow-800 mb-1">
                   Important: Complete Your Personal Data Sheet
                 </h3>
-                <p className="text-yellow-700 text-sm sm:text-base mb-4">
+                <p className="text-yellow-700 text-xs sm:text-sm mb-2">
                   You must complete this form to access all guidance services. Your information helps us provide better support and counseling.
                 </p>
                 <Link to="/student/form">
-                  <Button className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold">
+                  <Button className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold text-xs py-1 px-3 h-auto">
                     Complete Form Now
                   </Button>
                 </Link>
@@ -143,38 +143,47 @@ export default function GuidanceServices() {
         </section>
 
         {/* Student Dashboard Section */}
-        <section className="bg-white rounded-lg shadow-sm p-7 md:p-9 mb-8 programs-section" style={{ animationDelay: '0.25s' }}>
-          <h2 className="text-2xl md:text-3xl font-bold mb-6 text-primary">
+        <section className="bg-white rounded-lg shadow-sm p-5 md:p-6 mb-8 programs-section" style={{ animationDelay: '0.25s' }}>
+          <h2 className="text-lg md:text-xl font-bold mb-4 text-primary">
             Student Dashboard
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Name Card */}
-            <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+            <div className="pb-4 border-b border-gray-200">
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</label>
-              <p className="text-gray-900 font-bold text-lg mt-2">
+              <p className="text-gray-900 font-bold text-sm mt-1">
                 {user?.lastName}, {user?.firstName} {user?.middleName ? user.middleName.charAt(0) + '.' : ''}
               </p>
             </div>
 
             {/* Student Number Card */}
-            <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+            <div className="pb-4 border-b border-gray-200">
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Student Number</label>
-              <p className="text-gray-900 font-bold text-lg mt-2">{additionalInfo?.studentProfile?.studentNumber || '-'}</p>
+              <p className="text-gray-900 font-bold text-sm mt-1">{additionalInfo?.studentProfile?.studentNumber || '-'}</p>
             </div>
 
             {/* Contact Card */}
-            <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+            <div className="pb-4">
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Contact</label>
-              <p className="text-gray-900 font-bold text-lg mt-2">{additionalInfo?.studentProfile?.contactNo || '-'}</p>
+              <p className="text-gray-900 font-bold text-sm mt-1">{additionalInfo?.studentProfile?.contactNo || '-'}</p>
             </div>
 
             {/* Email Card */}
-            <div className="bg-gray-50 rounded-lg p-5 border border-gray-200">
+            <div className="pb-4">
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Email</label>
-              <p className="text-gray-900 font-bold text-lg mt-2">{user?.email || '-'}</p>
+              <p className="text-gray-900 font-bold text-sm mt-1">{user?.email || '-'}</p>
             </div>
           </div>
         </section>
+
+        {/* I Hereby Statement Section */}
+        {!showForm && (
+          <section className="bg-green-50 border-l-4 border-green-500 rounded-lg p-5 md:p-6 mb-8 programs-section" style={{ animationDelay: '0.3s' }}>
+            <p className="text-sm md:text-base text-gray-700 leading-relaxed">
+              <span className="font-semibold text-green-700">I hereby declare</span> that all the information stated in this document is true and correct to the best of my knowledge and belief.
+            </p>
+          </section>
+        )}
       </div>
     </div>
   );
