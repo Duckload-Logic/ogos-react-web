@@ -7,6 +7,7 @@ import PUPLogo from "@/assets/images/PUPLogo.png";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const { isAuthenticated, user, logout } = useAuth();
   const location = useLocation();
 
@@ -26,9 +27,9 @@ export default function Header() {
     <header className="bg-primary text-primary-foreground sticky top-0 z-50 shadow-md">
       {/* Top Bar with Logo and Logout */}
       <div className="bg-primary px-4 py-4 md:px-8">
-        <div className="max-w-7xl mx-auto flex items-center justify-between gap-4">
+        <div className="max-w-7xl mx-auto flex items-center justify-between">
           {/* Logo Section */}
-          <Link to="/login" className="flex items-center gap-3 min-w-0">
+          <Link to="/login" className="flex items-center gap-3">
             <div className="h-16 flex-shrink-0">
               <img
                 src={PUPLogo}
@@ -36,8 +37,8 @@ export default function Header() {
                 className="h-full object-contain"
               />
             </div>
-            <div className="hidden sm:block min-w-0">
-              <h1 className="text-base md:text-lg font-bold leading-tight truncate">
+            <div className="hidden sm:block">
+              <h1 className="text-base md:text-lg font-bold leading-tight">
                 Polytechnic University of the Philippines - Taguig
               </h1>
               <p className="text-xs md:text-sm opacity-90">
@@ -46,48 +47,52 @@ export default function Header() {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center gap-0 flex-shrink-0">
+          <nav className="hidden lg:flex items-center gap-1">
             {navigationItems.map((item) => (
-              <div key={item.href} className="group relative">
-                <Link
-                  to={item.href}
-                  className="px-4 py-3 text-sm font-medium transition-colors duration-300 group-hover:bg-primary-dark/20 block whitespace-nowrap"
-                >
-                  {item.label}
-                </Link>
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-secondary transition-opacity duration-300 opacity-0 group-hover:opacity-100 rounded-full"></div>
-              </div>
+              <Link
+                key={item.href}
+                to={item.href}
+                className="px-3 py-2 text-sm font-medium hover:bg-primary-dark rounded transition-colors"
+              >
+                {item.label}
+              </Link>
             ))}
           </nav>
 
-          {/* Right Section: Profile Display + Mobile Menu */}
-          <div className="flex items-center gap-4 flex-shrink-0">
-            {/* Profile Display with Logout */}
-            <div className="hidden md:flex items-center gap-0">
-              <div className="flex items-center gap-2 text-primary-foreground px-4 py-3 whitespace-nowrap">
-                <User className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm font-medium truncate">{user?.lastName || "User"}</span>
-              </div>
+          {/* Right Section: Profile + Mobile Menu */}
+          <div className="flex items-center gap-2">
+            {/* Profile Section */}
+            <div className="relative">
               <button
-                onClick={logout}
-                className="hidden lg:flex group relative items-center gap-2 px-4 py-3 text-sm font-medium transition-colors duration-300 hover:bg-primary-dark/20 flex-shrink-0 whitespace-nowrap"
+                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                className="flex items-center gap-2 p-2 hover:bg-primary-dark rounded transition-colors"
               >
-                <LogOut className="w-4 h-4 flex-shrink-0" />
-                <span>Logout</span>
-                <div className="absolute bottom-0 left-0 right-0 h-1 bg-secondary transition-opacity duration-300 opacity-0 group-hover:opacity-100 rounded-full"></div>
+                <User className="w-5 h-5" />
+                <span className="hidden sm:inline">{user?.lastName || "User"}</span>
               </button>
-            </div>
-            
-            {/* Mobile Profile Display */}
-            <div className="flex md:hidden items-center gap-2 text-primary-foreground px-4 py-3 whitespace-nowrap">
-              <User className="w-5 h-5 flex-shrink-0" />
-              <span className="text-sm font-medium truncate">{user?.lastName || "User"}</span>
+
+              {isProfileOpen && (
+                <div className="absolute right-0 mt-2 w-48 bg-white text-black rounded shadow-lg border z-50">
+                  <Link
+                    to="/student/profile"
+                    className="block px-4 py-2 hover:bg-gray-100"
+                  >
+                    My Profile
+                  </Link>
+                  <button
+                    onClick={logout}
+                    className="w-full text-left px-4 py-2 hover:bg-gray-100 flex items-center gap-2"
+                  >
+                    <LogOut className="w-4 h-4" /> Logout
+                  </button>
+                </div>
+              )}
             </div>
 
             {/* Mobile Menu Toggle */}
             <button
               onClick={() => setIsMenuOpen(!isMenuOpen)}
-              className="lg:hidden p-2 hover:bg-primary-dark rounded transition-colors flex-shrink-0"
+              className="lg:hidden p-2 hover:bg-primary-dark rounded transition-colors"
             >
               {isMenuOpen ? (
                 <X className="w-6 h-6" />
@@ -107,21 +112,18 @@ export default function Header() {
               key={item.href}
               to={item.href}
               onClick={() => setIsMenuOpen(false)}
-              className="block px-4 py-3 text-base font-medium rounded transition-all duration-300 ease-out hover:bg-black/20 hover:translate-x-2"
+              className="block px-4 py-3 text-base font-medium hover:bg-black/10 rounded transition-colors"
             >
               {item.label}
             </Link>
           ))}
-          <button
-            onClick={() => {
-              logout();
-              setIsMenuOpen(false);
-            }}
-            className="w-full flex items-center gap-2 px-4 py-3 text-base font-medium rounded transition-all duration-300 ease-out hover:bg-black/20 hover:translate-x-2 text-left"
+          {/* Mobile Profile */}
+          <Link
+            to="/profile"
+            className="block px-4 py-3 text-base font-medium hover:bg-black/10 rounded transition-colors"
           >
-            <LogOut className="w-4 h-4" />
-            <span>Logout</span>
-          </button>
+            My Profile
+          </Link>
         </nav>
       )}
     </header>

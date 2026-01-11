@@ -5,7 +5,6 @@
 
 export { default as Header } from "./Header";
 export { ProtectedRoute } from "./ProtectedRoute";
-export { PDSGate } from "./PDSGate";
 
 // Re-export UI components for convenience
 export * from "./ui/button";
