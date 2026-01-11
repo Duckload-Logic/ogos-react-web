@@ -183,7 +183,7 @@ export default function ExcuseSlip() {
               <Button
                 onClick={handleUploadExcuseSlip}
                 disabled={isUploading}
-                className="w-full bg-primary hover:bg-primary-dark text-primary-foreground font-semibold py-3 text-base"
+                className="w-full bg-primary hover:bg-secondary text-primary-foreground hover:text-gray-900 font-semibold py-3 text-base transition-all duration-300"
               >
                 {isUploading ? "Uploading..." : "Upload Excuse Slip"}
               </Button>

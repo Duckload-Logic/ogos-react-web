@@ -26,7 +26,7 @@ export function ExcuseSlipsSection() {
             Submit your excuse slips for review in the Excuse Slip section.
           </p>
           <Link to="/student/excuse-slip" className="mt-4 inline-block">
-            <Button className="bg-primary hover:bg-primary-dark text-primary-foreground font-semibold">
+            <Button className="bg-primary hover:bg-secondary text-primary-foreground hover:text-gray-900 font-semibold transition-all duration-300">
               Upload Excuse Slip
             </Button>
           </Link>
