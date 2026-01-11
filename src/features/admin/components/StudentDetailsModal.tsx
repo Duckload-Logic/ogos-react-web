@@ -4,10 +4,6 @@ interface Student {
   name: string;
   course: string;
   email: string;
-  phone: string;
-  dateEnrolled: string;
-  institutionType?: "Private" | "Public";
-  numberOfSiblings?: number;
 }
 
 interface StudentDetailsModalProps {
@@ -85,14 +81,6 @@ export default function StudentDetailsModal({
                 <p className="text-xs font-medium text-muted-foreground mb-1">Email</p>
                 <p className="text-sm text-foreground">{student.email}</p>
               </div>
-              <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1">Phone</p>
-                <p className="text-sm text-foreground">{student.phone}</p>
-              </div>
-              <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1">Date Enrolled</p>
-                <p className="text-sm text-foreground">{student.dateEnrolled}</p>
-              </div>
             </div>
           )}
 
@@ -102,19 +90,11 @@ export default function StudentDetailsModal({
                 <p className="text-xs font-medium text-muted-foreground mb-1">Course</p>
                 <p className="text-sm text-foreground">{student.course}</p>
               </div>
-              <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1">Institution Type</p>
-                <p className="text-sm text-foreground">{student.institutionType || "N/A"}</p>
-              </div>
             </div>
           )}
 
           {activeTab === "family" && (
             <div className="space-y-4">
-              <div>
-                <p className="text-xs font-medium text-muted-foreground mb-1">Number of Siblings</p>
-                <p className="text-sm text-foreground">{student.numberOfSiblings ?? "N/A"}</p>
-              </div>
               <p className="text-sm text-muted-foreground italic">More family information can be added here</p>
             </div>
           )}

@@ -5,7 +5,8 @@ interface StudentSearchAndFilterProps {
   onSearchChange: (value: string) => void;
   selectedCourse: string;
   onCourseChange: (value: string) => void;
-  courses: string[];
+
+  courses: { value: string; label: string }[];
 }
 
 export default function StudentSearchAndFilter({
@@ -51,8 +52,8 @@ export default function StudentSearchAndFilter({
             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           >
             {courses.map((course) => (
-              <option key={course} value={course}>
-                {course}
+              <option key={course.value} value={course.value}>
+                {course.label}
               </option>
             ))}
           </select>

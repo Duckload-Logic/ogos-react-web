@@ -6,10 +6,6 @@ interface Student {
   name: string;
   course: string;
   email: string;
-  phone: string;
-  dateEnrolled: string;
-  institutionType?: "Private" | "Public";
-  numberOfSiblings?: number;
 }
 
 interface StudentCardsGridProps {
@@ -88,13 +84,13 @@ export default function StudentCardsGrid({
                 <Eye size={14} />
                 View
               </button>
-              <button
+              {/* <button
                 onClick={() => onDeleteClick(student)}
                 className="flex-1 flex items-center justify-center gap-1 px-3 py-2 bg-red-900 text-white rounded hover:bg-red-950 transition-colors text-xs font-medium"
               >
                 <Trash2 size={14} />
                 Delete
-              </button>
+              </button> */}
             </div>
           </div>
         </div>

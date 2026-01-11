@@ -21,7 +21,7 @@ interface AddStudentModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSubmit: (data: AddStudentForm) => void;
-  courses: string[];
+  courses: { value: string; label: string }[];
 }
 
 export default function AddStudentModal({
@@ -75,8 +75,8 @@ export default function AddStudentModal({
               >
                 <option value="">Select Course</option>
                 {courses.slice(1).map((course) => (
-                  <option key={course} value={course}>
-                    {course}
+                  <option key={course.value} value={course.value}>
+                    {course.label}
                   </option>
                 ))}
               </select>
