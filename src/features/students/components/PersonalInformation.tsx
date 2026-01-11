@@ -24,6 +24,13 @@ const COURSE_OPTIONS = [
   { label: "Diploma in Office Management Technology", value: "DOMT" },
 ];
 
+const RELATIONSHIP_OPTIONS = [
+  { label: "Mother", value: "Father" },
+  { label: "Father", value: "Mother" },
+  { label: "Guardian", value: "Guardian" },
+  { label: "Other", value: "Other" },
+];
+
 interface PersonalInformationProps {
   user: User | null;
   formData: FormData;
@@ -690,20 +697,19 @@ export function PersonalInformation({
             <label className="students-label mb-2">
               Relationship <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
+            <Combobox
+              options={RELATIONSHIP_OPTIONS}
               value={formData.emergencyContactRelationship}
-              onChange={(e) => {
-                handleInputChange("emergencyContactRelationship", e.target.value);
+              onValueChange={(value) => {
+                handleInputChange("emergencyContactRelationship", value);
                 clearError("emergencyContactRelationship");
               }}
-              placeholder="e.g., Mother"
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none
-                focus:ring-2 transition ${
-                  !formData.emergencyContactRelationship
-                    ? "border-red-400 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-primary"
-                }`}
+              placeholder="Select Relationship"
+              className={`w-full h-[3.2rem] ${
+                !formData.emergencyContactRelationship
+                  ? "border-red-400 focus:ring-red-500"
+                  : "border-gray-300 focus:ring-primary"
+              }`}
             />
             {!formData.emergencyContactRelationship && (
               <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
