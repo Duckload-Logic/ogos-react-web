@@ -45,6 +45,45 @@ export function CancelledAppointmentsList({
     setCurrentPage((prev) => Math.min(prev + 1, totalPages));
   };
 
+  const getPaginationNumbers = () => {
+    const pages: (number | string)[] = [];
+    const windowSize = 3; // The number of visible page numbers in the middle/active area
+
+    if (totalPages <= 4) {
+      // Small enough to show all without ellipsis
+      for (let i = 1; i <= totalPages; i++) {
+        pages.push(i);
+      }
+    } else {
+      // Dynamic Sliding Window Logic
+      if (currentPage <= 2) {
+        // Near the start: [1, 2, 3, ...]
+        for (let i = 1; i <= windowSize; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+        // Optionally add the last page here if you want it visible
+        // pages.push(totalPages); 
+      } else if (currentPage >= totalPages - 1) {
+        // Near the end: [..., total-2, total-1, total]
+        pages.push("...");
+        for (let i = totalPages - 2; i <= totalPages; i++) {
+          pages.push(i);
+        }
+      } else {
+        // In the middle: [..., current-1, current, current+1, ...]
+        pages.push("...");
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pages.push(i);
+        }
+        pages.push("...");
+      }
+    }
+
+    return pages;
+  };
+
+
   return (
     <section className="mb-12">
       <h2 className="text-2xl font-bold text-gray-600 mb-6 flex items-center gap-2">
@@ -105,20 +144,26 @@ export function CancelledAppointmentsList({
               </Button>
 
               <div className="flex items-center gap-1">
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCurrentPage(page)}
-                    className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
-                      currentPage === page
-                        ? "bg-primary text-primary-foreground"
-                        : "border border-gray-300 text-gray-700 hover:bg-gray-50"
-                    }`}
-                  >
-                    {page}
-                  </button>
-                ))}
-              </div>
+                  {getPaginationNumbers().map((page, index) => (
+                    page === "..." ? (
+                      <span key={`ellipsis-${index}`} className="px-2 py-1 text-gray-500">
+                        ...
+                      </span>
+                    ) : (
+                      <button
+                        key={page}
+                        onClick={() => setCurrentPage(page as number)}
+                        className={`px-3 py-1 rounded text-sm font-medium transition-colors ${
+                          currentPage === page
+                            ? "bg-primary text-primary-foreground"
+                            : "border border-gray-300 text-gray-700 hover:bg-gray-50"
+                        }`}
+                      >
+                        {page}
+                      </button>
+                    )
+                  ))}
+                </div>
 
               <Button
                 variant="outline"
