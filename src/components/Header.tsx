@@ -38,9 +38,10 @@ export default function Header() {
             </div>
             <div className="hidden sm:block min-w-0">
               <h1 className="text-base md:text-lg font-bold leading-tight truncate">
-                Polytechnic University of the Philippines - Taguig
+                PUPT Online Guidance Office Services
               </h1>
               <p className="text-xs md:text-sm opacity-90">
+                Polytechnic University of the Philippines - Taguig
               </p>
             </div>
           </Link>
