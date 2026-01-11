@@ -15,6 +15,11 @@ const PROGRAMS = [
 export default function GuidanceServices() {
   const { user } = useAuth();
   const [showForm, setShowForm] = useState(false);
+  const [isPageLoaded, setIsPageLoaded] = useState(false);
+
+  useEffect(() => {
+    setIsPageLoaded(true);
+  }, []);
 
   useEffect(() => {
     const checkFormStatus = async () => {
@@ -36,6 +41,41 @@ export default function GuidanceServices() {
 
   return (
     <div className="min-h-screen bg-gray-50">
+      <style>{`
+        @keyframes slideUp {
+          from {
+            opacity: 0;
+            transform: translateY(8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        @keyframes slideUpStagger {
+          from {
+            opacity: 0;
+            transform: translateY(12px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+        .alert-banner {
+          animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
+        }
+        .programs-section {
+          animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
+        }
+        .program-card {
+          animation: slideUpStagger 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
+        }
+        .program-card:nth-child(1) { animation-delay: 0.3s; }
+        .program-card:nth-child(2) { animation-delay: 0.35s; }
+        .program-card:nth-child(3) { animation-delay: 0.4s; }
+        .program-card:nth-child(4) { animation-delay: 0.45s; }
+      `}</style>
       {/* Hero Section */}
       <div className="bg-primary text-primary-foreground py-8 md:py-12">
         <div className="max-w-7xl mx-auto px-4 md:px-8">
@@ -49,7 +89,7 @@ export default function GuidanceServices() {
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-12">
         {/* URGENT: PDS Completion Alert Banner */}
         {showForm && (
-          <div className="mb-8 bg-yellow-100 border-l-4 border-yellow-500 p-4 sm:p-6 rounded-lg shadow-md">
+          <div className="mb-8 bg-yellow-100 border-l-4 border-yellow-500 p-4 sm:p-6 rounded-lg shadow-md alert-banner">
             <div className="flex items-start gap-3">
               <AlertTriangle className="w-6 h-6 text-yellow-600 flex-shrink-0 mt-1" />
               <div className="flex-1">
@@ -70,13 +110,13 @@ export default function GuidanceServices() {
         )}
 
         {/* How Can We Help You Section */}
-        <section className="bg-white rounded-lg shadow-sm p-7 md:p-9 mb-8">
+        <section className="bg-white rounded-lg shadow-sm p-7 md:p-9 mb-8 programs-section">
           <h2 className="text-2xl md:text-3xl font-bold mb-7 text-primary">
             How Can We Help You?
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {PROGRAMS.map((program, index) => (
-              <div key={index} className="border-l-4 border-primary pl-4 py-3 transition-all duration-300 hover:bg-gray-50 hover:pl-5 rounded cursor-pointer">
+              <div key={index} className="border-l-4 border-primary pl-4 py-3 transition-all duration-300 hover:bg-gray-50 hover:pl-5 rounded cursor-pointer program-card">
                 <h3 className="font-semibold text-lg text-gray-900 transition-colors duration-300 hover:text-primary">
                   {program.title}
                 </h3>
