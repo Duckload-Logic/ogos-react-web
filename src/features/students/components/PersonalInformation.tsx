@@ -560,7 +560,7 @@ export function PersonalInformation({
         </div>
       </div>
 
-      <div className="flex items-center space-x-2 py-4 border-t border-b border-gray-100 my-4">
+      <div className="flex items-center space-x-2 py-4 border-t border-gray-200 my-4">
         <input
           type="checkbox"
           id="sameAsProvincial"
@@ -574,7 +574,7 @@ export function PersonalInformation({
 
       {/* Residential/City Address */}
       <div className="space-y-4">
-        <label className="students-label">Provincial Address <span className="text-red-500">*</span></label>
+        <label className="students-label">Residential Address <span className="text-red-500">*</span></label>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {/* Region */}
@@ -650,28 +650,41 @@ export function PersonalInformation({
       <div className="bg-gray-50 p-4 rounded-lg border border-gray-200">
         <h3 className="font-semibold text-gray-900 mb-4">Emergency Contact Information</h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <div className="md:col-span-2">
+          <div className="md:col-span-3">
             <label className="students-label mb-2">
               Complete name of the person to be contacted in case of emergency: <span className="text-red-500">*</span>
             </label>
-            <input
-              type="text"
-              value={formData.emergencyContactName}
-              onChange={(e) => {
-                handleInputChange("emergencyContactName", e.target.value);
-                clearError("emergencyContactName");
-              }}
-              placeholder="e.g., Jane Doe"
-              className={`w-full px-4 py-3 border rounded-lg focus:outline-none
-                focus:ring-2 transition ${
-                  !formData.emergencyContactName
-                    ? "border-red-400 focus:ring-red-500"
-                    : "border-gray-300 focus:ring-primary"
-                }`}
-            />
-            {!formData.emergencyContactName && (
-              <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
-            )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {
+                [ 
+                  {label: "First Name", field: "emergencyContactFirstName"},
+                  {label: "Last Name", field: "emergencyContactLastName"},
+                  {label: "Middle Name", field: "emergencyContactMiddleName"},
+                ].map((field) => (
+                  <div key={field.field}> {/* Wrapped in a div or fragment with a key */}
+                    <input
+                      type="text"
+                      value={formData[field.field as keyof FormData] as string || ''} 
+                      onChange={(e) => {
+                        handleInputChange(field.field, e.target.value);
+                        clearError(field.field);
+                      }}
+                      placeholder={`Enter ${field.label}`}
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none
+                        focus:ring-2 transition ${
+                          !formData[field.field as keyof FormData]
+                            ? "border-red-400 focus:ring-red-500"
+                            : "border-gray-300 focus:ring-primary"
+                        }`}
+                    />
+                    {!formData[field.field as keyof FormData] && (
+                      <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
+                    )}
+                  </div>
+                ))
+              }
+            </div>
+            
           </div>
           <div>
             <label className="students-label mb-2">
