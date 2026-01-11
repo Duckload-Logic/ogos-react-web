@@ -48,8 +48,7 @@ export default function Layout({ children, title }: LayoutProps) {
       return [
         { label: "Dashboard", href: "/admin" },
         { label: "Student Records", href: "/admin/student-records" },
-        { label: "Appointments Request", href: "/admin/appointments" },
-        { label: "View Schedule", href: "/admin/view-schedule" },
+        { label: "Manage Appointments", href: "/admin/appointments" },
         { label: "Review Excuses Slip", href: "/admin/review-excuses" },
         { label: "Reports", href: "/admin/reports" },
       ];

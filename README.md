@@ -39,7 +39,7 @@ npm run lint
 ```
 src/
 ├── components/        # Reusable UI components (shadcn/ui)
-├── features/         # Feature modules (pds, appointments, etc.)
+├── features/         # Feature modules (students, appointments, etc.)
 ├── pages/            # Page components (Login, StudentForm, etc.)
 ├── routes/           # Route definitions
 ├── context/          # React Context (AuthContext)

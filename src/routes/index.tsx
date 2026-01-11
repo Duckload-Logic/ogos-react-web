@@ -12,7 +12,7 @@ import Register from "@/features/auth/pages/Register";
 // Student Features
 import GuidanceServices from "@/features/guidance-services/pages/GuidanceServices";
 import ScheduleAppointment from "@/features/appointments/pages/ScheduleAppointment";
-import StudentForm from "@/features/pds/pages/StudentForm";
+import StudentForm from "@/features/students/pages/StudentForm";
 import ExcuseSlip from "@/features/excuse-slips/pages/ExcuseSlip";
 import ViewSchedules from "@/features/schedules/pages/ViewSchedules";
 import Profile from "@/features/profile/pages/Profile";

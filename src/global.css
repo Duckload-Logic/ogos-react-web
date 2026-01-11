@@ -186,24 +186,24 @@
   }
 
   /* PDS Form Standardization */
-  .pds-label {
+  .students-label {
     display: block;
     font-size: 1rem;
     font-weight: 600;
     color: #374151;
   }
 
-  .pds-input {
+  .students-input {
     font-size: 1rem;
   }
 
-  .pds-input:disabled {
+  .students-input:disabled {
     background-color: #f1f1f1;
     color: #acb1b9;
     cursor: not-allowed;
   }
 
-  .pds-section-title {
+  .students-section-title {
     font-size: 1.125rem;
     font-weight: bold;
     color: #111827;
