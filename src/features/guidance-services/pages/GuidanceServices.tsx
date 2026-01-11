@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
-import { checkStudentOnboardingStatus } from "@/features/pds/services/service";
+import { checkStudentOnboardingStatus } from "@/features/students/services/service";
 import { useAuth } from "@/context";
 
 const PROGRAMS = [

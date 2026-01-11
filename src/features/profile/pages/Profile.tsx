@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useAuth } from "@/context";
-import { useStudentForm } from "@/features/pds/hooks/useStudentForm";
-import { studentService } from "@/features/pds/services/service";
+import { useStudentForm } from "@/features/students/hooks/useStudentForm";
+import { studentService } from "@/features/students/services/service";
 
 const convertDateToReadable = (dateStr: string) => {
   const date = new Date(dateStr);
