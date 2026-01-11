@@ -579,11 +579,12 @@ export default function StudentForm() {
         )
           ? 1
           : 0,
+        reasonOther: formData.reasonOther ? 1 : 0,
       };
       filledCount = Object.values(enrollmentFields).filter(
         (v) => v === 1,
       ).length;
-      totalCount = 1;
+      totalCount = enrollmentFields.reasonForEnrollment + enrollmentFields.reasonOther;
     } else if (sectionIndex === 1) {
       const personalFields = {
         mobileNo: formData.mobileNo ? 1 : 0,
