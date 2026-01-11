@@ -119,6 +119,28 @@ export default function ExcuseSlip() {
 
       {/* Main Content */}
       <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-12">
+        {/* Template Download Section - MOVED TO TOP */}
+        <Card className="border-0 shadow-sm mb-8">
+          <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b py-3">
+            <CardTitle className="text-base">
+              Download Excuse Slip Template
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="pt-3 pb-3">
+            <p className="text-gray-600 mb-3 text-sm">
+              Download our template to fill out your excuse slip before uploading.
+            </p>
+            <Button
+              onClick={handleDownloadTemplate}
+              variant="outline"
+              className="flex items-center gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold text-sm py-2 h-auto"
+            >
+              <Download className="w-4 h-4" />
+              Download Template
+            </Button>
+          </CardContent>
+        </Card>
+
         {/* Upload Section */}
         <Card className="border-0 shadow-sm mb-8">
           <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b">
@@ -188,29 +210,6 @@ export default function ExcuseSlip() {
                 {isUploading ? "Uploading..." : "Upload Excuse Slip"}
               </Button>
             </div>
-          </CardContent>
-        </Card>
-
-        {/* Template Download Section */}
-        <Card className="border-0 shadow-sm mb-8">
-          <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b">
-            <CardTitle className="text-lg">
-              Download Excuse Slip Template
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="pt-6">
-            <p className="text-gray-600 mb-4">
-              Download our template to fill out your excuse slip before
-              uploading.
-            </p>
-            <Button
-              onClick={handleDownloadTemplate}
-              variant="outline"
-              className="flex items-center gap-2 border-primary text-primary hover:bg-primary hover:text-primary-foreground font-semibold"
-            >
-              <Download className="w-5 h-5" />
-              Download Template
-            </Button>
           </CardContent>
         </Card>
 
