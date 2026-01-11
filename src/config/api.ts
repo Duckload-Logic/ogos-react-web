@@ -16,10 +16,10 @@ export const API_ENDPOINTS = {
 
   // PDS/Form endpoints
   PDS: {
-    SUBMIT: `${API_BASE_URL}/pds/submit`,
-    GET: (id: string) => `${API_BASE_URL}/pds/${id}`,
-    UPDATE: (id: string) => `${API_BASE_URL}/pds/${id}`,
-    LIST: `${API_BASE_URL}/pds`,
+    SUBMIT: `${API_BASE_URL}/students/submit`,
+    GET: (id: string) => `${API_BASE_URL}/students/${id}`,
+    UPDATE: (id: string) => `${API_BASE_URL}/students/${id}`,
+    LIST: `${API_BASE_URL}/students`,
   },
 
   // Excuse Slip endpoints
