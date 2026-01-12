@@ -1,72 +1,33 @@
 import Layout from "@/components/Layout";
-import { useState } from "react";
-import { ChevronLeft, ChevronRight, Edit2, Trash2, Plus, X, Check } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ChevronLeft, ChevronRight, AlertCircle, Loader, Calendar, Eye, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { Card } from "@/components/ui/card";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
-
-interface Schedule {
-  id: string;
-  adminName: string;
-  date: string;
-  startTime: string;
-  endTime: string;
-  title: string;
-  description?: string;
-}
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { useAdminSchedules } from "../hooks";
+import { ScheduleActionModal } from "../components";
+import { Appointment, CreateAppointmentRequest } from "@/services/appointmentService";
 
 export default function Frontdesk() {
-  const [currentMonth, setCurrentMonth] = useState(new Date(2026, 0)); // January 2026
-  const [schedules, setSchedules] = useState<Schedule[]>([
-    {
-      id: "1",
-      adminName: "Ms. Garcia",
-      date: "2026-01-06",
-      startTime: "09:00",
-      endTime: "10:00",
-      title: "Student Counseling",
-      description: "Academic guidance session",
-    },
-    {
-      id: "2",
-      adminName: "Mr. Santos",
-      date: "2026-01-06",
-      startTime: "10:30",
-      endTime: "11:30",
-      title: "Curriculum Review",
-      description: "Course planning discussion",
-    },
-    {
-      id: "3",
-      adminName: "Ms. Garcia",
-      date: "2026-01-07",
-      startTime: "14:00",
-      endTime: "15:00",
-      title: "Staff Meeting",
-      description: "Department meeting",
-    },
-  ]);
+  const [currentMonth, setCurrentMonth] = useState(new Date(2026, 0));
+  const [selectedDay, setSelectedDay] = useState<number | null>(null);
+  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [modalAction, setModalAction] = useState<"view" | "reschedule" | null>(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalLoading, setModalLoading] = useState(false);
 
-  const [editingSchedule, setEditingSchedule] = useState<Schedule | null>(null);
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [selectedDateForNewSchedule, setSelectedDateForNewSchedule] = useState<string | null>(null);
-  const [formData, setFormData] = useState<Omit<Schedule, "id">>({
-    adminName: "",
-    date: "",
-    startTime: "",
-    endTime: "",
-    title: "",
-    description: "",
-  });
+  const {
+    appointments,
+    isLoading,
+    error,
+    rescheduleAppointment,
+    fetchAppointments,
+  } = useAdminSchedules();
+
+  useEffect(() => {
+    fetchAppointments();
+  }, [fetchAppointments]);
 
   // Get days in month
   const getDaysInMonth = (date: Date) => {
@@ -95,75 +56,75 @@ export default function Frontdesk() {
     return `${displayHour}:${minutes} ${ampm}`;
   };
 
-  // Get schedules for a specific date
-  const getSchedulesForDate = (day: number) => {
+  // Get appointments for a specific date
+  const getAppointmentsForDate = (day: number) => {
     const dateStr = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    return schedules.filter((s) => s.date === dateStr);
-  };
-
-  // Handle add/edit schedule
-  const handleSaveSchedule = () => {
-    if (!formData.adminName || !formData.date || !formData.startTime || !formData.endTime || !formData.title) {
-      alert("Please fill in all required fields");
-      return;
-    }
-
-    if (editingSchedule) {
-      setSchedules(
-        schedules.map((s) =>
-          s.id === editingSchedule.id ? { ...formData, id: editingSchedule.id } : s
-        )
+    return appointments.filter((apt) => {
+      // Normalize the scheduled date to YYYY-MM-DD format (handle both with and without time)
+      if (!apt.scheduledDate) return false;
+      const aptDatePart = apt.scheduledDate.split("T")[0];
+      return (
+        aptDatePart === dateStr &&
+        (apt.status === "Approved" || apt.status === "Rescheduled")
       );
-    } else {
-      setSchedules([
-        ...schedules,
-        {
-          ...formData,
-          id: Date.now().toString(),
-        },
-      ]);
+    });
+  };
+
+  const hasDayAppointments = (day: number) => {
+    return getAppointmentsForDate(day).length > 0;
+  };
+
+  const getSelectedDayAppointments = () => {
+    if (!selectedDay) return [];
+    return getAppointmentsForDate(selectedDay);
+  };
+
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case "Approved":
+        return "bg-green-100 text-green-800";
+      case "Rescheduled":
+        return "bg-blue-100 text-blue-800";
+      case "Pending":
+        return "bg-yellow-100 text-yellow-800";
+      case "Completed":
+        return "bg-purple-100 text-purple-800";
+      case "Cancelled":
+        return "bg-red-100 text-red-800";
+      default:
+        return "bg-gray-100 text-gray-800";
     }
-
-    setFormData({
-      adminName: "",
-      date: "",
-      startTime: "",
-      endTime: "",
-      title: "",
-      description: "",
-    });
-    setEditingSchedule(null);
-    setIsDialogOpen(false);
   };
 
-  // Handle edit schedule
-  const handleEditSchedule = (schedule: Schedule) => {
-    setEditingSchedule(schedule);
-    setFormData(schedule);
-    setSelectedDateForNewSchedule(null);
-    setIsDialogOpen(true);
+  const handleViewAppointment = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setModalAction("view");
+    setModalOpen(true);
   };
 
-  // Handle add schedule for a specific date
-  const handleAddScheduleForDate = (day: number) => {
-    const dateStr = `${currentMonth.getFullYear()}-${String(currentMonth.getMonth() + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    setEditingSchedule(null);
-    setSelectedDateForNewSchedule(dateStr);
-    setFormData({
-      adminName: "",
-      date: dateStr,
-      startTime: "",
-      endTime: "",
-      title: "",
-      description: "",
-    });
-    setIsDialogOpen(true);
+  const handleRescheduleAppointment = (appointment: Appointment) => {
+    setSelectedAppointment(appointment);
+    setModalAction("reschedule");
+    setModalOpen(true);
   };
 
-  // Handle delete schedule
-  const handleDeleteSchedule = (id: string) => {
-    if (confirm("Are you sure you want to delete this schedule?")) {
-      setSchedules(schedules.filter((s) => s.id !== id));
+  const handleModalClose = () => {
+    setModalOpen(false);
+    setSelectedAppointment(null);
+    setModalAction(null);
+  };
+
+  const handleModalConfirm = async (data: CreateAppointmentRequest) => {
+    if (!selectedAppointment) return;
+    setModalLoading(true);
+    try {
+      await rescheduleAppointment(selectedAppointment.id, data);
+      handleModalClose();
+      await fetchAppointments();
+    } catch (error) {
+      console.error("Error rescheduling:", error);
+    } finally {
+      setModalLoading(false);
     }
   };
 
@@ -195,6 +156,22 @@ export default function Frontdesk() {
           <h1 className="text-3xl font-bold text-gray-900">Frontdesk Dashboard</h1>
           <p className="text-gray-600 mt-2">View and manage admin schedules</p>
         </div>
+
+        {/* Error Alert */}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertDescription>{error}</AlertDescription>
+          </Alert>
+        )}
+
+        {/* Loading State */}
+        {isLoading && (
+          <div className="flex items-center justify-center py-8">
+            <Loader className="h-6 w-6 animate-spin text-gray-600" />
+            <span className="ml-2 text-gray-600">Loading appointments...</span>
+          </div>
+        )}
 
         <div className="grid grid-cols-3 gap-6">
           {/* Calendar */}
@@ -233,39 +210,45 @@ export default function Frontdesk() {
               {/* Calendar grid */}
               <div className="grid grid-cols-7 gap-2">
                 {calendarDays.map((day, index) => {
-                  const daySchedules = day ? getSchedulesForDate(day) : [];
+                  const dayAppointments = day ? getAppointmentsForDate(day) : [];
                   const isToday = day === new Date().getDate() && currentMonth.getMonth() === new Date().getMonth() && currentMonth.getFullYear() === new Date().getFullYear();
+                  const hasAppointments = day && dayAppointments.length > 0;
+                  const isSelected = selectedDay === day;
 
                   return (
                     <div
                       key={index}
-                      onClick={() => day && handleAddScheduleForDate(day)}
-                      className={`min-h-24 p-2 border rounded-lg transition-colors ${
+                      onClick={() => {
+                        if (day) {
+                          setSelectedDay(selectedDay === day ? null : day);
+                        }
+                      }}
+                      className={`min-h-28 p-2 border rounded-lg transition-colors cursor-pointer ${
                         day
-                          ? "bg-white hover:bg-blue-50 cursor-pointer border-gray-200 hover:border-blue-400"
+                          ? "bg-white hover:bg-blue-50 border-gray-200 hover:border-blue-400"
                           : "bg-gray-50"
-                      } ${isToday ? "border-blue-500 bg-blue-50" : ""}`}
+                      } ${isToday ? "border-blue-500 bg-blue-50" : ""} ${
+                        hasAppointments ? "border-2 border-green-500 bg-green-50" : ""
+                      } ${isSelected ? "ring-2 ring-primary ring-offset-2" : ""}`}
                     >
                       {day && (
                         <div className="space-y-1 h-full flex flex-col">
-                          <div className={`text-sm font-semibold ${isToday ? "text-blue-600" : "text-gray-900"}`}>
+                          <div className={`text-sm font-semibold flex items-center justify-between ${isToday ? "text-blue-600" : "text-gray-900"}`}>
                             {day}
-                          </div>
-                          <div className="flex-1 space-y-1 overflow-y-auto">
-                            {daySchedules.length === 0 && (
-                              <div className="text-xs text-gray-400 italic">Click to add schedule</div>
+                            {hasAppointments && (
+                              <Calendar className="w-4 h-4 text-green-600" />
                             )}
-                            {daySchedules.map((schedule) => (
+                          </div>
+                          <div className="flex-1 space-y-1 overflow-y-auto text-xs">
+                            {dayAppointments.map((apt) => (
                               <div
-                                key={schedule.id}
-                                onClick={(e) => {
-                                  e.stopPropagation();
-                                  handleEditSchedule(schedule);
-                                }}
-                                className="bg-blue-100 text-blue-700 text-xs p-1 rounded truncate hover:bg-blue-200 cursor-pointer transition-colors"
-                                title={`${schedule.title}\n${formatTime(schedule.startTime)} - ${formatTime(schedule.endTime)}\n${schedule.adminName}`}
+                                key={apt.id}
+                                className={`px-1 py-0.5 rounded text-white truncate ${
+                                  apt.status === "Approved" ? "bg-green-600" : "bg-blue-600"
+                                }`}
+                                title={apt.reason}
                               >
-                                {schedule.title}
+                                {apt.scheduledTime}
                               </div>
                             ))}
                           </div>
@@ -278,140 +261,118 @@ export default function Frontdesk() {
             </div>
           </Card>
 
-          {/* Sidebar - Schedule Dialog */}
+          {/* Sidebar - Appointments for Selected Day */}
           <div className="space-y-4">
-            <Dialog open={isDialogOpen} onOpenChange={(open) => {
-              setIsDialogOpen(open);
-              if (!open) {
-                setEditingSchedule(null);
-                setSelectedDateForNewSchedule(null);
-              }
-            }}>
-              <DialogContent>
-                <DialogHeader>
-                  <DialogTitle>{editingSchedule ? "Edit Schedule" : "Add New Schedule"}</DialogTitle>
-                  <DialogDescription>
-                    {editingSchedule ? "Update the schedule details below" : "Create a new admin schedule"}
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="space-y-4">
-                  <div>
-                    <Label htmlFor="adminName">Admin Name *</Label>
-                    <Input
-                      id="adminName"
-                      value={formData.adminName}
-                      onChange={(e) => setFormData({ ...formData, adminName: e.target.value })}
-                      placeholder="Enter admin name"
-                      className="mb-4"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="date">Date *</Label>
-                    <Input
-                      id="date"
-                      type="date"
-                      value={formData.date}
-                      onChange={(e) => setFormData({ ...formData, date: e.target.value })}
-                      className="mb-4"
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="startTime">Start Time *</Label>
-                      <Input
-                        id="startTime"
-                        type="time"
-                        value={formData.startTime}
-                        onChange={(e) => setFormData({ ...formData, startTime: e.target.value })}
-                        className="mb-4"
-                      />
+            {/* Selected Day Appointments */}
+            {selectedDay && (
+              <Card className="p-4">
+                <h3 className="font-semibold mb-4">
+                  {new Date(currentMonth.getFullYear(), currentMonth.getMonth(), selectedDay).toLocaleDateString("en-US", {
+                    weekday: "short",
+                    month: "short",
+                    day: "numeric",
+                  })}
+                </h3>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {getSelectedDayAppointments().length === 0 ? (
+                    <div className="text-center py-6">
+                      <Calendar className="w-12 h-12 mx-auto text-gray-300 mb-2" />
+                      <p className="text-sm text-gray-500">No appointments scheduled for this day</p>
                     </div>
-                    <div>
-                      <Label htmlFor="endTime">End Time *</Label>
-                      <Input
-                        id="endTime"
-                        type="time"
-                        value={formData.endTime}
-                        onChange={(e) => setFormData({ ...formData, endTime: e.target.value })}
-                        className="mb-4"
-                      />
-                    </div>
-                  </div>
-                  <div>
-                    <Label htmlFor="title">Title *</Label>
-                    <Input
-                      id="title"
-                      value={formData.title}
-                      onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                      placeholder="e.g., Student Counseling"
-                      className="mb-4"
-                    />
-                  </div>
-                  <div>
-                    <Label htmlFor="description">Description</Label>
-                    <Input
-                      id="description"
-                      value={formData.description || ""}
-                      onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                      placeholder="Optional description"
-                      className="mb-4"
-                    />
-                  </div>
-                  <div className="flex gap-2 justify-end pt-4">
-                    <Button variant="outline" onClick={() => setIsDialogOpen(false)}>
-                      Cancel
-                    </Button>
-                    <Button onClick={handleSaveSchedule}>
-                      {editingSchedule ? "Update" : "Create"}
-                    </Button>
-                  </div>
+                  ) : (
+                    getSelectedDayAppointments().map((appointment) => (
+                      <div
+                        key={appointment.id}
+                        className="border rounded-lg p-3 space-y-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                        onClick={() => handleViewAppointment(appointment)}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-gray-900">{appointment.reason}</p>
+                            <p className="text-xs text-gray-600">User ID: {appointment.userId}</p>
+                          </div>
+                          <Badge className={getStatusColor(appointment.status)}>
+                            {appointment.status}
+                          </Badge>
+                        </div>
+                        <div className="text-xs text-gray-600 space-y-1">
+                          <p><span className="font-medium">Time:</span> {appointment.scheduledTime}</p>
+                          <p><span className="font-medium">Category:</span> {appointment.concernCategory}</p>
+                        </div>
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          className="w-full mt-2"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleRescheduleAppointment(appointment);
+                          }}
+                        >
+                          <Edit2 className="w-3 h-3 mr-1" />
+                          Reschedule
+                        </Button>
+                      </div>
+                    ))
+                  )}
                 </div>
-              </DialogContent>
-            </Dialog>
+              </Card>
+            )}
 
-            {/* Recent Schedules */}
-            <Card className="p-4">
-              <h3 className="font-semibold mb-4">Upcoming Schedules</h3>
-              <div className="space-y-3 max-h-96 overflow-y-auto">
-                {schedules
-                  .filter((s) => new Date(s.date) >= new Date(new Date().setHours(0, 0, 0, 0)))
-                  .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-                  .slice(0, 5)
-                  .map((schedule) => (
-                    <div key={schedule.id} className="border rounded-lg p-3 space-y-2">
-                      <div className="flex items-start justify-between">
-                        <div className="flex-1">
-                          <p className="text-sm font-semibold text-gray-900">{schedule.title}</p>
-                          <p className="text-xs text-gray-600">{schedule.adminName}</p>
+            {!selectedDay && (
+              <Card className="p-4">
+                <h3 className="font-semibold mb-4">Upcoming Appointments</h3>
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {appointments
+                    .filter((a) => {
+                      const aptDate = new Date(a.scheduledDate);
+                      return aptDate >= new Date(new Date().setHours(0, 0, 0, 0));
+                    })
+                    .filter((a) => ["Approved", "Rescheduled"].includes(a.status))
+                    .sort((a, b) => {
+                      const dateA = new Date(a.scheduledDate);
+                      const dateB = new Date(b.scheduledDate);
+                      return dateA.getTime() - dateB.getTime();
+                    })
+                    .slice(0, 5)
+                    .map((appointment) => (
+                      <div
+                        key={appointment.id}
+                        className="border rounded-lg p-3 space-y-2 hover:bg-blue-50 cursor-pointer transition-colors"
+                        onClick={() => handleViewAppointment(appointment)}
+                      >
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <p className="text-sm font-semibold text-gray-900">{appointment.reason}</p>
+                            <p className="text-xs text-gray-600">User ID: {appointment.userId}</p>
+                          </div>
+                          <Badge className={getStatusColor(appointment.status)}>
+                            {appointment.status}
+                          </Badge>
                         </div>
-                        <div className="flex gap-1">
-                          <button
-                            onClick={() => handleEditSchedule(schedule)}
-                            className="p-1 hover:bg-blue-100 rounded"
-                          >
-                            <Edit2 className="h-4 w-4 text-blue-600" />
-                          </button>
-                          <button
-                            onClick={() => handleDeleteSchedule(schedule.id)}
-                            className="p-1 hover:bg-red-100 rounded"
-                          >
-                            <Trash2 className="h-4 w-4 text-red-600" />
-                          </button>
+                        <div className="text-xs text-gray-600 space-y-1">
+                          <p><span className="font-medium">Date:</span> {new Date(appointment.scheduledDate).toLocaleDateString()}</p>
+                          <p><span className="font-medium">Time:</span> {appointment.scheduledTime}</p>
                         </div>
                       </div>
-                      <div className="text-xs text-gray-600">
-                        <p>{formatDate(schedule.date)}</p>
-                        <p>{formatTime(schedule.startTime)} - {formatTime(schedule.endTime)}</p>
-                      </div>
-                    </div>
-                  ))}
-              </div>
-            </Card>
+                    ))}
+                </div>
+              </Card>
+            )}
+
+            {/* Appointment Action Modal */}
+            {selectedAppointment && (
+              <ScheduleActionModal
+                isOpen={modalOpen}
+                appointment={selectedAppointment}
+                action={modalAction}
+                isLoading={modalLoading}
+                onClose={handleModalClose}
+                onConfirm={handleModalConfirm}
+              />
+            )}
           </div>
         </div>
       </div>
     </Layout>
   );
 }
-
-
