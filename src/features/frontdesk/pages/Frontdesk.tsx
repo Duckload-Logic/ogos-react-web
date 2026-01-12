@@ -7,7 +7,7 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
 import { useAdminSchedules } from "../hooks";
 import { ScheduleActionModal } from "../components";
-import { Appointment, CreateAppointmentRequest } from "@/services/appointmentService";
+import { Appointment, CreateAppointmentRequest } from "@/features/appointments/services";
 
 export default function Frontdesk() {
   const [currentMonth, setCurrentMonth] = useState(new Date(2026, 0));

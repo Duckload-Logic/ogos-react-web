@@ -6,7 +6,7 @@
 import { useState, useEffect } from "react";
 import { useAdminSchedules } from "../hooks";
 import { ScheduleCalendar, UpcomingSchedules, ScheduleActionModal } from "../components";
-import { Appointment, CreateAppointmentRequest } from "@/services/appointmentService";
+import { Appointment, CreateAppointmentRequest } from "@/features/appointments/services";
 import Layout from "@/components/Layout";
 import { AlertCircle, CheckCircle2, Loader } from "lucide-react";
 import { Alert, AlertDescription } from "@/components/ui/alert";

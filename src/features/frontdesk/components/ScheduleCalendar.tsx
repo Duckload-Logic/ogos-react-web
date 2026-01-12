@@ -6,7 +6,7 @@
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Appointment } from "@/services/appointmentService";
+import { Appointment } from "@/features/appointments/services";
 
 // Helper function to check if two dates are the same day
 const isSameDay = (date1: Date, date2: Date): boolean => {

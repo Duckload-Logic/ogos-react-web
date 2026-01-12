@@ -4,8 +4,8 @@
  */
 
 import { useState, useEffect, useCallback } from "react";
-import * as appointmentService from "@/services/appointmentService";
-import { Appointment } from "@/services/appointmentService";
+import * as appointmentService from "@/features/appointments/services";
+import { Appointment } from "@/features/appointments/services";
 
 export const useAdminSchedules = () => {
   const [appointments, setAppointments] = useState<Appointment[]>([]);

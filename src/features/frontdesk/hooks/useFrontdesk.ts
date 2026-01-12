@@ -4,8 +4,8 @@
  */
 
 import { useState, useCallback } from "react";
-import * as adminScheduleService from "@/services/adminScheduleService";
-import { AdminSchedule, CreateScheduleRequest, UpdateScheduleRequest } from "@/services/adminScheduleService";
+import * as adminScheduleService from "@/features/frontdesk/services";
+import { AdminSchedule, CreateScheduleRequest, UpdateScheduleRequest } from "@/features/frontdesk/services";
 
 export const useFrontdesk = () => {
   const [schedules, setSchedules] = useState<AdminSchedule[]>([]);

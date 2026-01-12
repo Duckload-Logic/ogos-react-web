@@ -15,7 +15,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Eye, Edit2 } from "lucide-react";
-import { Appointment } from "@/services/appointmentService";
+import { Appointment } from "@/features/appointments/services";
 
 // Helper function to check if two dates are the same day
 const isSameDay = (date1: Date, date2: Date): boolean => {

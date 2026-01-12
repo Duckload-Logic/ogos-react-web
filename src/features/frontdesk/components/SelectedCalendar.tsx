@@ -8,7 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { format, isSameDay, parseISO } from "date-fns";
-import { Appointment } from "@/services/appointmentService";
+import { Appointment } from "@/features/appointments/services";
 
 interface ScheduleCalendarProps {
   appointments: Appointment[];
