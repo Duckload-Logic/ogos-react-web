@@ -19,6 +19,7 @@ export const API_ENDPOINTS = {
     SUBMIT: `${API_BASE_URL}/students/submit`,
     GET: (id: string) => `${API_BASE_URL}/students/${id}`,
     UPDATE: (id: string) => `${API_BASE_URL}/students/${id}`,
+    DELETE: (id: string) => `${API_BASE_URL}/students/${id}`,
     LIST: `${API_BASE_URL}/students`,
   },
 
