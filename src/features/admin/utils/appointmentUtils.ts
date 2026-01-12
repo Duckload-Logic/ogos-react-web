@@ -3,7 +3,7 @@
  * Helper functions for appointment management
  */
 
-import { Appointment } from "@/services/appointmentService";
+import { Appointment } from "@/features/appointments/services";
 
 /**
  * Format appointment date for display

@@ -7,7 +7,7 @@ import { AdminCalendar } from "../components/AdminCalendar";
 import { AppointmentsList } from "../components/AppointmentsList";
 import { AppointmentActionModal } from "../components/AppointmentActionModal";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Appointment, APPOINTMENT_STATUSES } from "@/services/appointmentService";
+import { Appointment, APPOINTMENT_STATUSES } from "@/features/appointments/services";
 import { formatDate } from "@/features/schedules/utils/formatters";
 
 type StatusFilterType = "Pending" | "Approved" | "Completed" | "Cancelled";

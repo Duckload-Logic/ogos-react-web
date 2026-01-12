@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Appointment, CreateAppointmentRequest } from "@/services/appointmentService";
+import { Appointment, CreateAppointmentRequest } from "@/features/appointments/services";
 import { AlertCircle, CheckCircle, XCircle, Clock, Loader } from "lucide-react";
 import { formatDate } from "@/features/schedules/utils/formatters";
 import { useAppointments } from "@/features/appointments/hooks/useAppointments";
