@@ -9,7 +9,7 @@ export { ScheduleErrorAlert } from "./ScheduleErrorAlert";
 export type { ScheduleErrorAlertProps } from "./ScheduleErrorAlert";
 
 export { AppointmentCard } from "./AppointmentCard";
-export type { AppointmentCardProps, Appointment } from "./AppointmentCard";
+export type { AppointmentCardProps } from "./AppointmentCard";
 
 export { UpcomingAppointmentsList } from "./UpcomingAppointmentsList";
 export type { UpcomingAppointmentsListProps } from "./UpcomingAppointmentsList";
