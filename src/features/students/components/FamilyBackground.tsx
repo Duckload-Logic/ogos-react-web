@@ -1,4 +1,4 @@
-import { FormData, FormErrors } from "@/features/students/types";
+import { FormData, FormErrors } from "@/types";
 import { PARENTAL_STATUS_MAP } from "../utils/maps";
 import { Combobox } from "@/components/ui/combobox";
 import { useState } from "react";

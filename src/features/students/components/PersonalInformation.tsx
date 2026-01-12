@@ -1,4 +1,4 @@
-import { FormData } from "@/features/students/types";
+import { FormData } from "@/types";
 import { Combobox } from "@/components/ui/combobox";
 import { User } from "@/types/user";
 import locations from "@/config/ph_locations.json";

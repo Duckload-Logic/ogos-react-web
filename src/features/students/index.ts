@@ -1,10 +1,21 @@
 /**
- * Personal Data Sheet (PDS) Feature
- * 
- * Manages all components related to the Personal Data Sheet form,
- * organized by category: components, hooks, and API integration.
+ * Students Feature - Public API
+ * Personal Data Sheet (PDS) and student profile management
  */
 
+// Pages
+export { default as StudentForm } from "./pages/StudentForm";
+
+// @ts-expect-error Services
+export * from "./services"; 
+
+// @ts-expect-error  Hooks
+export * from "./hooks";
+
+// Types
+export * from "./types";
+
+// Components
 export {
   PersonalInformation,
   EducationalBackground,
