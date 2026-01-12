@@ -16,7 +16,6 @@ import ScheduleAppointment from "@/features/appointments/pages/ScheduleAppointme
 import StudentForm from "@/features/students/pages/StudentForm";
 import ExcuseSlip from "@/features/excuse-slips/pages/ExcuseSlip";
 import ViewSchedules from "@/features/schedules/pages/ViewSchedules";
-import Profile from "@/features/profile/pages/Profile";
 
 // Admin Feature
 import Dashboard from "@/features/admin/pages/Dashboard";
@@ -83,17 +82,6 @@ export const routes: RouteObject[] = [
         <PDSGate>
           <Header />
           <ViewSchedules />
-        </PDSGate>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/student/profile",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <PDSGate>
-          <Header />
-          <Profile />
         </PDSGate>
       </ProtectedRoute>
     ),
