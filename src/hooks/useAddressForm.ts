@@ -7,7 +7,7 @@ import {
   Province,
   Municipality,
   Barangay,
-} from "@/services/addressService";
+} from "@/lib/addressUtils";
 
 interface AddressFormState {
   province: string;
