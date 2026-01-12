@@ -81,7 +81,9 @@ export default function Layout({ children, title }: LayoutProps) {
               alt="PUP Logo"
               className="w-10 h-10 rounded-full"
             />
-            <span className="hidden sm:inline">PUPT</span>
+            <div className="flex flex-col">
+              <span className="hidden sm:inline text-sm">PUPT Online Guidance Office Services</span>
+            </div>
           </h1>
         </div>
 
@@ -121,9 +123,6 @@ export default function Layout({ children, title }: LayoutProps) {
               >
                 {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
               </button>
-              <h2 className="text-xl font-semibold hidden md:block">
-                PUP-Taguig Guidance Information System
-              </h2>
             </div>
             <div className="text-sm opacity-90">{getRoleLabel()}</div>
           </div>
