@@ -134,8 +134,8 @@ export default function Dashboard() {
       label: <Eye size={16}/>, 
       color: "bg-gray-500 text-white", 
       onClick: (appointment: any) => {
-      console.log("View appointment", appointment);
-    }}
+        console.log("View appointment", appointment);
+      }}
   ];
 
   const quickActions = [
