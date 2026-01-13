@@ -15,7 +15,8 @@ export interface FormErrors {
   [key: string]: string;
 }
 
-export interface FormData {
+// Personal Information Section
+export interface PersonalInformationData {
   reasonForEnrollment: { [key: string]: boolean };
   reasonOther: string;
   expecting_scholarship: boolean;
@@ -34,6 +35,10 @@ export interface FormData {
   height: string;
   weight: string;
   gender: string;
+}
+
+// Address Information Section
+export interface AddressInformationData {
   provincialAddressProvince: string;
   provincialAddressMunicipality: string;
   provincialAddressBarangay: string;
@@ -44,18 +49,30 @@ export interface FormData {
   residentialAddressBarangay: string;
   residentialAddressRegion: string;
   residentialAddressStreet: string;
-  employerName: string;
+}
+
+// Emergency Contact Section
+export interface EmergencyContactData {
   emergencyContactFirstName: string;
   emergencyContactLastName: string;
   emergencyContactMiddleName: string;
   emergencyContactPhone: string;
   emergencyContactRelationship: string;
+  employerName: string;
+}
+
+// Education Section
+export interface EducationData {
   education: {
     elementary: EducationLevel;
     juniorHS: EducationLevel;
     seniorHS: EducationLevel;
     others: string;
   };
+}
+
+// Family Background Section
+export interface FamilyInformationData {
   fatherFirstName: string;
   fatherMiddleName: string;
   fatherLastName: string;
@@ -84,11 +101,19 @@ export interface FormData {
   monthlyFamilyIncomeOther: string;
   brothers: string;
   sisters: string;
+}
+
+// Finance & Employment Section
+export interface FinanceEmploymentData {
   gainfullyEmployed: string;
   supportStudies: string;
   supportFamily: string;
   financialSupport: string;
   weeklyAllowance: string;
+}
+
+// Health & Wellness Section
+export interface HealthWellnessData {
   vision: string;
   hearing: string;
   mobility: string;
@@ -99,15 +124,35 @@ export interface FormData {
   whenStarted: string;
   numSessions: string;
   dateConcluded: string;
+}
+
+// Test Results Section
+export interface TestResultsData {
   dateTest: string;
   testAdministered: string;
   rs: string;
   pr: string;
   description: string;
+}
+
+// Significant Notes Section
+export interface SignificantNotesData {
   significantNotesDate: string;
   incident: string;
   remarks: string;
 }
+
+// Complete Form Data (aggregated)
+export interface FormData
+  extends PersonalInformationData,
+    AddressInformationData,
+    EmergencyContactData,
+    EducationData,
+    FamilyInformationData,
+    FinanceEmploymentData,
+    HealthWellnessData,
+    TestResultsData,
+    SignificantNotesData {}
 
 // Backend API Types
 export interface EducationalBackgroundData {
