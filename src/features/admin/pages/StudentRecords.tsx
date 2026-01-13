@@ -22,7 +22,6 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-import { email } from "zod";
 
 interface Student {
   id: string;

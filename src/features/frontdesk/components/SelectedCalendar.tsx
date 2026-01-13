@@ -3,7 +3,6 @@
  * Selectable calendar that highlights days with scheduled appointments
  */
 
-import { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";

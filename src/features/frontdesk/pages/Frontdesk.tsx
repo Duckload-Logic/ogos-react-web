@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import { useState, useEffect } from "react";
-import { ChevronLeft, ChevronRight, AlertCircle, Loader, Calendar, Eye, Edit2 } from "lucide-react";
+import { ChevronLeft, ChevronRight, AlertCircle, Loader, Calendar, Edit2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";

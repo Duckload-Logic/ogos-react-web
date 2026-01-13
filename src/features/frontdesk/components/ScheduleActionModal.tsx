@@ -26,7 +26,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Calendar, Clock, AlertTriangle, CheckCircle2, AlertCircle, Loader } from "lucide-react";
+import { Calendar, Clock, CheckCircle2, AlertCircle, Loader } from "lucide-react";
 import { Appointment, CreateAppointmentRequest } from "@/features/appointments/services";
 import { formatDate } from "@/features/schedules/utils/formatters";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";

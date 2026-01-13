@@ -1,7 +1,6 @@
 import { Link, useLocation } from "react-router-dom";
 import { User, LogOut, Menu, X } from "lucide-react";
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context";
 import PUPLogo from "@/assets/images/PUPLogo.png";
 

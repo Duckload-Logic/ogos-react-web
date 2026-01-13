@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { useAppointments } from "@/features/appointments/hooks/useAppointments";
 import { useUser } from "@/hooks/useUser";
 import { AdminCalendar } from "../components/AdminCalendar";
 import { AppointmentsList } from "../components/AppointmentsList";

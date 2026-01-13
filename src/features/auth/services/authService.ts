@@ -3,7 +3,7 @@
  * Centralized auth-related API calls
  */
 
-import { apiClient } from "@/lib/apiClient";
+import { apiClient } from "@/lib/api";
 
 export interface LoginPayload {
   email: string;

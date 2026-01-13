@@ -1,10 +1,7 @@
 import { FormData } from "@/types";
 import { Combobox } from "@/components/ui/combobox";
 import { User } from "@/types/user";
-import locations from "@/config/ph_locations.json";
 import { useState } from "react";
-import { is } from "zod/v4/locales";
-import { set } from "zod";
 
 const COURSE_OPTIONS = [
   // Undergraduate Programs

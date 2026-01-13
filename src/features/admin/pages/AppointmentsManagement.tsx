@@ -1,6 +1,6 @@
 import Layout from "@/components/Layout";
 import { useEffect, useRef, useState } from "react";
-import { ChevronLeft, ChevronRight, Eye, Check, X, AlertCircle, Clock } from "lucide-react";
+import { Eye, Check, X, AlertCircle, Clock } from "lucide-react";
 import { useAdminAppointments } from "../hooks/useAdminAppointments";
 import { useUser } from "@/hooks/useUser";
 import { AdminCalendar } from "../components/AdminCalendar";

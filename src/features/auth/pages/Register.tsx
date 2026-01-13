@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context";
 import { AuthHeader, AuthMessages, RegisterForm } from "@/features/auth/components";
 
 export default function Register() {
