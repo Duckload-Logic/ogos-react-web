@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/context";
 import { AuthHeader, AuthMessages, LoginForm } from "@/features/auth/components";
-import { isValidEmail, isValidPassword, isValidUsername } from "@/lib/validation";
+import { isValidEmail, isValidPassword, isValidUsername } from "@/utils/validation";
 import { ROLE_ROUTES } from "@/config/constants";
 
 export default function Login() {

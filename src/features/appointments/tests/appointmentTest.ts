@@ -1,5 +1,3 @@
-import { useState, useCallback } from 'react';
-
 export interface Appointment {
   id: number;
   studentRecordId: number;

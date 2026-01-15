@@ -1,3 +1,8 @@
+/**
+ * Global Student Types
+ * Shared across students, admin, and profile features
+ */
+
 export interface EducationLevel {
   school: string;
   location: string;
@@ -151,7 +156,7 @@ export interface FormData
 
 // Backend API Types
 export interface EducationalBackgroundData {
-  educationalLevel: string; // Changed from educationalLevelId
+  educationalLevel: string;
   schoolName: string;
   location: string;
   schoolType: 'Public' | 'Private';
@@ -168,7 +173,7 @@ export interface GuardianData {
   occupation: string;
   maidenName?: string;
   companyName: string;
-  relationship: number; // Changed from relationshipTypeId to match backend enum (1=Father, 2=Mother)
+  relationship: number;
 }
 
 export interface FamilyBackgroundData {
@@ -177,7 +182,7 @@ export interface FamilyBackgroundData {
   siblingsBrothers: number;
   siblingSisters: number;
   monthlyFamilyIncome: string;
-  parents: GuardianData[]; // Changed from 'guardians' to 'parents'
+  parents: GuardianData[];
   guardianFirstName?: string;
   guardianLastName?: string;
   guardianMiddleName?: string;

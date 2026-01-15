@@ -1,12 +1,11 @@
-import { useState, useCallback, useEffect } from 'react';
-import { appointmentService } from '../services/service';
+import { useState, useCallback } from 'react';
+import * as appointmentService from '../services';
 import {
   type Appointment,
   type TimeSlot,
-  type AppointmentStatus,
   type CreateAppointmentRequest,
   type UseAppointmentsReturn,
-} from '../types';
+} from '@/types';
 import { useAuth } from '@/context';
 import {
   extractErrorMessage,

@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useAuth } from '@/context';
 import { studentService } from '@/features/students/services/service';
 import { FormData } from '../types';
-import { CIVIL_STATUS_MAP, PARENTAL_STATUS_MAP, REASON_MAP } from '../utils/maps';
+import { CIVIL_STATUS_MAP, REASON_MAP } from '../utils/maps';
 
 const formatDateForInput = (dateString: string): string => {
   if (!dateString) return '';
@@ -39,7 +39,9 @@ const mapFormDataToBaseProfile = (formData: FormData) => {
     weightKg: formData.weight ? parseFloat(formData.weight) : null,
     genderId: formData.gender ? parseInt(formData.gender) : null,
     highSchoolGWA: formData.highSchoolAverage,
-    emergencyContactName: formData.emergencyContactName,
+    emergencyContactFirstName: formData.emergencyContactFirstName,
+    emergencyContactLastName: formData.emergencyContactLastName,
+    emergencyContactMiddleName: formData.emergencyContactMiddleName,
     emergencyContactPhone: formData.emergencyContactPhone,
     emergencyContactRelationship: formData.emergencyContactRelationship,
   };
@@ -150,8 +152,13 @@ const mapFormDataToFamily = (formData: FormData) => {
     background: {
       parentalStatusID: formData.parentalStatusID,
       parentalStatusDetails: formData.parentalDetails,
-      guardianName: formData.guardianName,
-      guardianAddress: formData.guardianAddress,
+      guardianFirstName: formData.guardianFirstName,
+      guardianLastName: formData.guardianLastName,
+      guardianMiddleName: formData.guardianMiddleName,
+      guardianAddressRegion: formData.guardianAddressRegion,
+      guardianAddressMunicipality: formData.guardianAddressMunicipality,
+      guardianAddressBarangay: formData.guardianAddressBarangay,
+      guardianAddressStreet: formData.guardianAddressStreet,
       siblingsBrothers: formData.brothers ? parseInt(formData.brothers) : 0,
       siblingSisters: formData.sisters ? parseInt(formData.sisters) : 0,
       monthlyFamilyIncome: formData.monthlyFamilyIncome ? parseFloat(formData.monthlyFamilyIncome) : null,
@@ -229,7 +236,9 @@ const mapToFormData = (data: any): FormData => {
     residentialAddressRegion: personalInfo.addresses?.find((a: any) => a.addressType === "Residential")?.regionName || "",
     residentialAddressStreet: personalInfo.addresses?.find((a: any) => a.addressType === "Residential")?.streetLotBlk || "",
     employerName: "",
-    emergencyContactName: personalInfo.emergencyContact?.emergencyContactName || "",
+    emergencyContactFirstName: personalInfo.emergencyContact?.emergencyContactFirstName || "",
+    emergencyContactLastName: personalInfo.emergencyContact?.emergencyContactLastName || "",
+    emergencyContactMiddleName: personalInfo.emergencyContact?.emergencyContactMiddleName || "",
     emergencyContactPhone: personalInfo.emergencyContact?.emergencyContactPhone || "",
     emergencyContactRelationship: personalInfo.emergencyContact?.emergencyContactRelationship || "",
     education: {
@@ -271,8 +280,14 @@ const mapToFormData = (data: any): FormData => {
     motherCompany: family.parents?.find((p: any) => p.relationship === "Mother")?.companyName || "",
     motherBirthDate: formatDateForInput(family.parents?.find((p: any) => p.relationship === "Mother")?.birthDate) || "",
     parentalDetails: family.background?.parentalStatusDetails || "",
-    guardianName: family.background?.guardianName || "",
-    guardianAddress: family.background?.guardianAddress || "",
+    guardianFirstName: family.background?.guardianFirstName || "",
+    guardianLastName: family.background?.guardianLastName || "",
+    guardianMiddleName: family.background?.guardianMiddleName || "",
+    guardianAddressRegion: family.background?.guardianAddressRegion || "",
+    guardianAddressProvince: family.background?.guardianAddressProvince || "",
+    guardianAddressMunicipality: family.background?.guardianAddressMunicipality || "",
+    guardianAddressBarangay: family.background?.guardianAddressBarangay || "",
+    guardianAddressStreet: family.background?.guardianAddressStreet || "",
     parentalStatusID: parseInt(family.background?.parentalStatusID || 1),
     monthlyFamilyIncome: family.background?.monthlyFamilyIncome?.toString() || "",
     monthlyFamilyIncomeOther: "",
@@ -344,7 +359,9 @@ export const useStudentForm = () => {
       residentialAddressRegion: "",
       residentialAddressStreet: "",
       employerName: "",
-      emergencyContactName: "",
+      emergencyContactFirstName: "",
+      emergencyContactLastName: "",
+      emergencyContactMiddleName: "",
       emergencyContactPhone: "",
       emergencyContactRelationship: "",
       education: {
@@ -387,8 +404,14 @@ export const useStudentForm = () => {
       motherBirthDate: "",
       parentalStatusID: 1,
       parentalDetails: "",
-      guardianName: "",
-      guardianAddress: "",
+      guardianFirstName: "",
+      guardianLastName: "",
+      guardianMiddleName: "",
+      guardianAddressRegion: "",
+      guardianAddressProvince: "",
+      guardianAddressMunicipality: "",
+      guardianAddressBarangay: "",
+      guardianAddressStreet: "",
       monthlyFamilyIncome: "",
       monthlyFamilyIncomeOther: "",
       brothers: "0",

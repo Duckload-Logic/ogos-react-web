@@ -1,4 +1,4 @@
-import { FormData } from "@/features/students/types";
+import { FormData } from "@/types";
 
 interface HealthWellnessProps {
   formData: FormData;

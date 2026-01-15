@@ -3,7 +3,7 @@
  * Centralized excuse slip API calls
  */
 
-import { apiClient } from "@/lib/apiClient";
+import { apiClient } from "@/lib/api";
 
 export interface ExcuseSlipPayload {
   date: string;

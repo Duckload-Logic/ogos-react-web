@@ -4,8 +4,8 @@
  */
 
 import { useAsyncOperation } from "./useAsyncOperation";
-import * as appointmentService from "@/services/appointmentService";
-import { Appointment, AppointmentPayload } from "@/services/appointmentService";
+import * as appointmentService from "@/features/appointments/services";
+import { Appointment, AppointmentPayload } from "@/features/appointments/services";
 
 export interface UseAppointmentsReturn {
   appointments: Appointment[] | null;

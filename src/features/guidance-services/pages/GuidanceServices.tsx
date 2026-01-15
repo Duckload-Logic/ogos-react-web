@@ -156,11 +156,7 @@ export default function GuidanceServices() {
               </p>
             </div>
 
-            {/* Student Number Card */}
-            <div className="pb-4 border-b border-gray-200">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Student Number</label>
-              <p className="text-gray-900 font-bold text-sm mt-1">{additionalInfo?.studentProfile?.studentNumber || '-'}</p>
-            </div>
+            
 
             {/* Contact Card */}
             <div className="pb-4">

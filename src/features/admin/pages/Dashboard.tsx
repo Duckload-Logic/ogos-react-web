@@ -8,7 +8,6 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
-import { useAppointments } from "@/features/appointments/hooks/useAppointments";
 import { useUser } from "@/hooks/useUser";
 import { AdminCalendar } from "../components/AdminCalendar";
 import { AppointmentsList } from "../components/AppointmentsList";
@@ -134,8 +133,8 @@ export default function Dashboard() {
       label: <Eye size={16}/>, 
       color: "bg-gray-500 text-white", 
       onClick: (appointment: any) => {
-      console.log("View appointment", appointment);
-    }}
+        console.log("View appointment", appointment);
+      }}
   ];
 
   const quickActions = [

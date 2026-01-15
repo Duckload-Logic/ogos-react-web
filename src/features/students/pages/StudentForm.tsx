@@ -10,7 +10,7 @@ import { FamilyBackground } from "@/features/students/components/FamilyBackgroun
 import { HealthWellness } from "@/features/students/components/HealthWellness";
 import { TestResults } from "@/features/students/components/TestResults";
 import { SignificantNotes } from "@/features/students/components/SignificantNotes";
-import { FormData } from "@/features/students/types";
+import { FormData } from "@/types";
 import {
   mapEnrollmentReasons,
   mapPersonalInfo,

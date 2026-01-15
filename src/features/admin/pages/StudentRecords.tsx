@@ -9,7 +9,19 @@ import type { AddStudentForm } from "../components/AddStudentModal";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { apiClient } from "@/lib/api";
-import { email } from "zod";
+import { API_ENDPOINTS } from "@/config/api";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 
 interface Student {
   id: string;
@@ -21,34 +33,38 @@ interface Student {
 
 export default function StudentRecords() {
   const [students, setStudents] = useState<Student[]>([]);
-
-  useEffect(() => {
-    const fetchStudents = async () => {
-      // Simulate fetching data from an API
-      const response = await apiClient.get("/students/records");
-      let toAppend = [];
-      response.data.students.map((student: any) => {
-          toAppend.push({
-            id: student.studentRecordId,
-            studentId: `2023-${String(students.length + 109).padStart(5, "0")}-TG-0`,
-            name: `${student.lastName}, ${student.firstName}`,
-            course: student.course,
-            email: student.email,
-        })
-
-        setStudents(toAppend);
-      });
-    };
-
-    fetchStudents();
-  }, [])
-
-
+  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
+  const [activeTab, setActiveTab] = useState("personal");
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
   const [selectedCourse, setSelectedCourse] = useState("All Courses");
   const [searchTerm, setSearchTerm] = useState("");
   const [showAdd, setShowAdd] = useState(false);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [activeTab, setActiveTab] = useState("personal");
+
+  useEffect(() => {
+    const fetchStudents = async () => {
+      try {
+        const response = await apiClient.get("/students/records");
+        let toAppend: Student[] = [];
+        response.data.students.map((student: any) => {
+          toAppend.push({
+            id: student.studentRecordId,
+            studentId: `2023-${String(toAppend.length + 109).padStart(5, "0")}-TG-0`,
+            name: `${student.lastName}, ${student.firstName}`,
+            course: student.course,
+            email: student.email,
+          });
+        });
+        setStudents(toAppend);
+      } catch (error) {
+        console.error("Error fetching students:", error);
+      }
+    };
+
+    fetchStudents();
+  }, []);
 
 const courses = [
   { value: "All Courses", label: "All Courses" },
@@ -84,6 +100,35 @@ const courses = [
     form.reset();
   };
 
+  const handleDeleteClick = (student: Student) => {
+    setStudentToDelete(student);
+    setDeleteError(null);
+    setDeleteConfirmOpen(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!studentToDelete) return;
+    
+    setIsDeleting(true);
+    setDeleteError(null);
+    
+    try {
+      // Attempt to delete from backend
+      await apiClient.delete(API_ENDPOINTS.PDS.DELETE(studentToDelete.id));
+      
+      // Remove from local state on success
+      setStudents(students.filter(s => s.id !== studentToDelete.id));
+      setDeleteConfirmOpen( false);
+      setStudentToDelete(null);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : "Failed to delete student record";
+      setDeleteError(errorMessage);
+      console.error("Error deleting student:", error);
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const filteredStudents = students.filter((s) => {
     const courseMatch =
       selectedCourse === "All Courses" || s.course === selectedCourse;
@@ -115,9 +160,7 @@ const courses = [
             setSelectedStudent(student);
             setActiveTab("personal");
           }}
-          onDeleteClick={(student) => {
-            console.log("Delete student:", student.id);
-          }}
+          onDeleteClick={handleDeleteClick}
         />
       </div>
       <AddStudentModal
@@ -135,6 +178,38 @@ const courses = [
         onTabChange={setActiveTab}
         onClose={() => setSelectedStudent(null)}
       />
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Student Record</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the student record for {studentToDelete?.name}? This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {deleteError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{deleteError}</AlertDescription>
+            </Alert>
+          )}
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleConfirmDelete}
+              disabled={isDeleting}
+              className="bg-red-600 hover:bg-red-700 text-white"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </Layout>
   );
 }

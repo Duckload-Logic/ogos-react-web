@@ -1,6 +1,6 @@
-import { Appointment } from "@/services/appointmentService";
+import { Appointment } from "@/features/appointments/services";
 import { formatDate } from "@/features/schedules/utils/formatters";
-import { ChevronLeft, ChevronRight, Eye } from "lucide-react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useState } from "react";
 
 interface AppointmentsListProps {

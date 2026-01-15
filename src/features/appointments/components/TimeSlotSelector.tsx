@@ -1,5 +1,5 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { TimeSlot } from "@/features/appointments/types";
+import type { TimeSlot } from "@/types";
 
 interface TimeSlotselectorProps {
   selectedDate: Date | undefined;

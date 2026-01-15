@@ -4,7 +4,7 @@
  */
 
 import { useState, useCallback, useRef, useEffect } from "react";
-import { validateFields, validateField, ValidationError } from "@/lib/validation";
+import { validateFields, validateField, ValidationError } from "@/utils/validation";
 
 export interface UseFormValidationReturn {
   errors: Record<string, string>;

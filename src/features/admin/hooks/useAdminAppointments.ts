@@ -4,13 +4,13 @@
  */
 
 import { useState, useCallback } from "react";
-import * as appointmentService from "@/services/appointmentService";
+import * as appointmentService from "@/features/appointments/services";
 import {
   Appointment,
   AppointmentFilters,
   CreateAppointmentRequest,
   APPOINTMENT_STATUSES,
-} from "@/services/appointmentService";
+} from "@/features/appointments/services";
 
 export interface UseAdminAppointmentsReturn {
   appointments: Appointment[];
