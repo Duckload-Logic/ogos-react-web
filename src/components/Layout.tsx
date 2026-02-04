@@ -1,7 +1,16 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Menu, X, LogOut } from "lucide-react";
-import { useState } from "react";
+import React, { useMemo, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  LogOut,
+  Home,
+  Users,
+  Calendar,
+  FileText,
+  BarChart3,
+  UserCircle,
+  Moon,
+  Sun,
+} from "lucide-react";
 import { useAuth } from "@/context";
 import PUPLogo from "@/assets/images/PUPLogo.png";
 
@@ -13,53 +22,68 @@ interface LayoutProps {
 interface NavItem {
   label: string;
   href: string;
+  icon: React.ReactNode;
 }
 
-/**
- * Unified Layout Component
- * Works for both admin and student roles
- * Automatically adjusts navigation based on user role
- */
 export default function Layout({ children, title }: LayoutProps) {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { logout, user } = useAuth();
+  const { user, logout } = useAuth();
+  const location = useLocation();
   const navigate = useNavigate();
+
+  const [isHovered, setIsHovered] = useState(false);
+  const [darkMode, setDarkMode] = useState(false);
+
+  const expanded = isHovered;
 
   const handleLogout = () => {
     logout();
     navigate("/login");
   };
 
-  // Define navigation items based on role
-  const navigationItems = React.useMemo(() => {
+  const navigationItems: NavItem[] = useMemo(() => {
     if (!user) return [];
-    
+
     if (user.roleId === 3) {
-      // Front Desk role
       return [
-        { label: "Dashboard", href: "/frontdesk" },
-        { label: "Review Excuses Slip", href: "/frontdesk/review-excuses" },
+        { label: "Dashboard", href: "/frontdesk", icon: <Home size={20} /> },
+        {
+          label: "Review Excuses",
+          href: "/frontdesk/review-excuses",
+          icon: <FileText size={20} />,
+        },
       ];
     }
 
     if (user.roleId === 2) {
-      // Admin role
       return [
-        { label: "Dashboard", href: "/admin" },
-        { label: "Student Records", href: "/admin/student-records" },
-        { label: "Manage Appointments", href: "/admin/appointments" },
-        { label: "Review Excuses Slip", href: "/admin/review-excuses" },
-        { label: "Reports", href: "/admin/reports" },
+        { label: "Dashboard", href: "/admin", icon: <Home size={20} /> },
+        {
+          label: "Student Records",
+          href: "/admin/student-records",
+          icon: <Users size={20} />,
+        },
+        {
+          label: "Appointments",
+          href: "/admin/appointments",
+          icon: <Calendar size={20} />,
+        },
+        {
+          label: "Review Excuses",
+          href: "/admin/review-excuses",
+          icon: <FileText size={20} />,
+        },
+        {
+          label: "Reports",
+          href: "/admin/reports",
+          icon: <BarChart3 size={20} />,
+        },
       ];
     }
 
-    // Default/Student role
     return [];
   }, [user]);
 
-  // Get role label for display
-  const getRoleLabel = (): string => {
+  const getRoleLabel = () => {
     if (!user) return "";
     if (user.roleId === 3) return "Front Desk Account";
     if (user.roleId === 2) return "Admin Account";
@@ -67,87 +91,166 @@ export default function Layout({ children, title }: LayoutProps) {
   };
 
   return (
-    <div className="flex h-screen bg-gray-50">
+    <div
+      className={`flex h-screen overflow-hidden transition-colors duration-300 ${
+        darkMode ? "bg-[#1A1A1A] text-gray-100" : "bg-gray-50 text-gray-900"
+      }`}
+    >
       {/* Sidebar */}
       <aside
-        className={`fixed md:static top-0 left-0 z-40 h-screen bg-primary text-primary-foreground flex flex-col transition-all duration-300 ${
-          sidebarOpen ? "w-64" : "w-0 md:w-64"
-        } overflow-hidden`}
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        className={`
+          fixed md:static z-40 h-full
+          transition-all duration-300 ease-in-out
+          ${expanded ? "w-64" : "w-16"}
+
+          ${
+            darkMode
+              ? "bg-transparent backdrop-blur-md border-r border-white/10 text-gray-100"
+              : "bg-primary text-primary-foreground"
+          }
+        `}
       >
-        <div className="p-6 border-b border-sidebar-border">
-          <h1 className="text-xl font-bold flex items-center gap-2">
-            <img
-              src={PUPLogo}
-              alt="PUP Logo"
-              className="w-10 h-10 rounded-full"
-            />
-            <div className="flex flex-col">
-              <span className="hidden sm:inline text-sm">PUPT Online Guidance Office Services</span>
+
+
+        {/* Logo */}
+        <div className="h-16 flex items-center gap-3 px-4 border-b border-sidebar-border">
+          <img src={PUPLogo} className="w-8 h-8 rounded-full" />
+          {expanded && (
+            <div className="text-xs leading-tight font-semibold">
+              Polytechnic University of the Philippines – Taguig
+              <div className="text-[10px] opacity-80">
+                Online Guidance Office Services
+              </div>
             </div>
-          </h1>
+          )}
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-6 font-sans text-sm font-medium">
-          {navigationItems.map((item) => (
-            <Link
-              key={item.href}
-              to={item.href}
-              className="px-6 py-3 text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-colors block border-l-4 border-transparent hover:border-sidebar-primary"
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              {item.label}
-            </Link>
-          ))}
+        {/* Navigation */}
+        <nav className="relative flex-1 py-4 text-sm font-medium overflow-visible">
+          {navigationItems.map((item) => {
+            const active = location.pathname === item.href;
+
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={`
+                  group relative flex items-center gap-3 px-4 py-3
+                  transition-colors duration-200
+                  ${
+                    darkMode
+                      ? active
+                        ? "bg-white/10 text-white"
+                        : "hover:bg-white/5"
+                      : active
+                        ? "bg-sidebar-accent text-sidebar-accent-foreground"
+                        : "hover:bg-sidebar-accent"
+                  }
+                `}
+              >
+                {/* Active Indicator */}
+                <span
+                  className={`
+                    absolute left-0 top-0 h-full w-1 bg-sidebar-primary
+                    transition-transform duration-300
+                    ${active ? "scale-y-100" : "scale-y-0"}
+                  `}
+                />
+
+                {/* Icon Animation */}
+                <div
+                  className="
+                    transition-transform duration-300 ease-out
+                    group-hover:rotate-[-10deg]
+                    group-hover:scale-110
+                  "
+                >
+                  {item.icon}
+                </div>
+
+                {expanded && <span>{item.label}</span>}
+
+                {!expanded && (
+                  <span
+                    className="
+                      absolute left-16 z-50 px-2 py-1 text-xs rounded
+                      bg-sidebar-accent text-sidebar-accent-foreground
+                      opacity-0 group-hover:opacity-100
+                      pointer-events-none whitespace-nowrap
+                      transition-opacity duration-200 delay-75
+                    "
+                  >
+                    {item.label}
+                  </span>
+                )}
+              </Link>
+            );
+          })}
         </nav>
-
-        <div className="p-6 border-t border-sidebar-border">
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-2 px-4 py-2 text-sidebar-foreground hover:bg-sidebar-accent rounded transition-colors text-left"
-          >
-            <LogOut size={18} />
-            <span>Logout</span>
-          </button>
-        </div>
       </aside>
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex-1 flex flex-col overflow-hidden relative">
+        {/* Darken content on sidebar hover */}
+        {isHovered && (
+          <div className="absolute inset-0 bg-black/20 z-10 pointer-events-none transition-opacity" />
+        )}
+
         {/* Header */}
-        <header className="bg-primary text-primary-foreground shadow-md">
-          <div className="px-6 py-4 flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <button
-                onClick={() => setSidebarOpen(!sidebarOpen)}
-                className="md:hidden p-2 hover:bg-primary-foreground/10 rounded transition-colors"
-              >
-                {sidebarOpen ? <X size={24} /> : <Menu size={24} />}
-              </button>
+        <header
+          className={`
+            h-16 flex items-center justify-between px-6
+            relative z-20 transition-colors duration-300
+
+            ${
+              darkMode
+                ? "bg-transparent backdrop-blur-md border-b border-white/10 text-gray-100"
+                : "bg-primary text-primary-foreground shadow"
+            }
+          `}
+      >
+
+          <span className="text-sm opacity-90">{title}</span>
+
+          <div className="flex items-center gap-3">
+            {/* Dark Mode Toggle */}
+            <button
+              onClick={() => setDarkMode(!darkMode)}
+              className="p-2 hover:bg-primary-foreground/10 rounded transition"
+            >
+              {darkMode ? <Sun size={18} /> : <Moon size={18} />}
+            </button>
+
+            {/* Admin Profile Icon */}
+            <div className="flex items-center gap-2">
+              <UserCircle size={28} />
+              <span className="text-sm hidden md:block">
+                {getRoleLabel()}
+              </span>
             </div>
-            <div className="text-sm opacity-90">{getRoleLabel()}</div>
+
+            {/* Logout */}
+            <button
+              onClick={handleLogout}
+              className="p-2 hover:bg-primary-foreground/10 rounded transition"
+            >
+              <LogOut size={18} />
+            </button>
           </div>
         </header>
 
-        {/* Content Area */}
-        <main className="flex-1 overflow-auto">
-          <div className="p-4 md:p-8">
-            {title && (
-              <div className="mb-6">
-                <h1 className="text-3xl font-bold text-foreground">{title}</h1>
-              </div>
-            )}
-            {children}
-          </div>
+        {/* Page Content */}
+        <main className="flex-1 overflow-auto p-4 md:p-8 relative z-0 bg-transparent">
+          {title && (
+            <h1 className="text-3xl font-bold text-foreground mb-6">
+              {title}
+            </h1>
+          )}
+          {children}
         </main>
       </div>
-
-      {/* Mobile Menu Overlay */}
-      {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 bg-black/50 z-30 md:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
     </div>
   );
 }
