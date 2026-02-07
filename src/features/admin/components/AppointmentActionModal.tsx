@@ -195,7 +195,7 @@ export const AppointmentActionModal = ({
     <>
       {/* Main Modal */}
       <Dialog open={isOpen && action !== "approve" && action !== "reject" && action !== "complete"} onOpenChange={onClose}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md bg-card border border-border rounded-lg">
           {action === "view" && appointment && (
             <>
               <DialogHeader>
@@ -208,46 +208,46 @@ export const AppointmentActionModal = ({
               <div className="space-y-4">
                 <div>
                   <Label className="font-semibold text-foreground">Student ID</Label>
-                  <p className="text-sm text-gray-600">{appointment.userId}</p>
+                  <p className="text-sm text-card-foreground">{appointment.userId}</p>
                 </div>
 
                 <div>
                   <Label className="font-semibold text-foreground">Date</Label>
-                  <p className="text-sm text-gray-600">{appointment.scheduledDate}</p>
+                  <p className="text-sm text-card-foreground">{appointment.scheduledDate}</p>
                 </div>
 
                 <div>
                   <Label className="font-semibold text-foreground">Time</Label>
-                  <p className="text-sm text-gray-600">{appointment.scheduledTime}</p>
+                  <p className="text-sm text-card-foreground">{appointment.scheduledTime}</p>
                 </div>
 
                 <div>
                   <Label className="font-semibold text-foreground">Reason</Label>
-                  <p className="text-sm text-gray-600">{appointment.reason}</p>
+                  <p className="text-sm text-card-foreground">{appointment.reason}</p>
                 </div>
 
                 <div>
                   <Label className="font-semibold text-foreground">Category</Label>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-card-foreground">
                     {appointment.concernCategory || "N/A"}
                   </p>
                 </div>
 
                 <div>
                   <Label className="font-semibold text-foreground">Status</Label>
-                  <p className="text-sm text-gray-600">{appointment.status}</p>
+                  <p className="text-sm text-card-foreground">{appointment.status}</p>
                 </div>
 
                 <div>
                   <Label className="font-semibold text-foreground">Created</Label>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-card-foreground">
                     {new Date(appointment.createdAt).toLocaleString()}
                   </p>
                 </div>
               </div>
 
               <div className="flex gap-2 justify-end mt-6">
-                <Button className="border-foreground " variant="outline" onClick={onClose}>
+                <Button className="border-foreground bg-background text-card-foreground" variant="outline" onClick={onClose}>
                   Close
                 </Button>
               </div>
@@ -316,7 +316,7 @@ export const AppointmentActionModal = ({
                       <Loader className="w-5 h-5 animate-spin text-blue-500" />
                     </div>
                   ) : availableSlots.length > 0 ? (
-                    <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto p-2 border rounded-lg bg-gray-50">
+                    <div className="grid grid-cols-4 gap-2 max-h-64 overflow-y-auto p-2 border rounded-lg bg-card border-border">
                       {availableSlots.map((slot) => {
                         const isOccupied = occupiedTimes.has(slot.startTime);
                         const isSelected = rescheduleData.scheduledTime === slot.startTime;
@@ -338,7 +338,7 @@ export const AppointmentActionModal = ({
                                 ? "bg-gray-300 text-gray-500 cursor-not-allowed"
                                 : isSelected
                                 ? "bg-blue-600 text-white"
-                                : "bg-white border border-gray-300 text-gray-700 hover:border-blue-500 hover:bg-blue-50"
+                                : "bg-card border border-border text-foreground hover:border-blue-500 dark:hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/50"
                             }`}
                           >
                             {slot.startTime}
@@ -403,7 +403,7 @@ export const AppointmentActionModal = ({
           onClose();
         }
       }}>
-        <AlertDialogContent className={`${actionConfig?.color}`}>
+        <AlertDialogContent className={`${actionConfig?.color} bg-background border border-${actionConfig?.color} rounded-lg`}>
           <AlertDialogHeader>
             <div className="flex items-center gap-3">
               {actionConfig?.icon}
