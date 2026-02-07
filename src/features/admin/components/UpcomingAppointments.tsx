@@ -22,18 +22,18 @@ export default function UpcomingAppointments({
   const getStatusColor = (status: string) => {
     switch (status) {
       case "scheduled":
-        return "bg-blue-100 text-blue-800";
+        return "bg-blue-500/20 text-blue-600 dark:text-blue-400";
       case "completed":
-        return "bg-green-100 text-green-800";
+        return "bg-green-500/20 text-green-600 dark:text-green-400";
       case "cancelled":
-        return "bg-red-100 text-red-800";
+        return "bg-red-500/20 text-red-600 dark:text-red-400";
       default:
-        return "bg-gray-100 text-gray-800";
+        return "bg-muted text-foreground";
     }
   };
 
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
+    <div className="rounded-lg shadow border border-border p-4">
       <h3 className="font-semibold text-foreground mb-4">
         Upcoming Appointments
       </h3>
@@ -41,7 +41,7 @@ export default function UpcomingAppointments({
         {appointments.slice(0, 5).map((appointment) => (
           <div
             key={appointment.id}
-            className="flex items-center justify-between p-3 border border-gray-100 rounded hover:bg-gray-50 transition-colors"
+            className="flex items-center justify-between p-3 border border-border rounded hover:bg-muted/50 dark:hover:bg-muted/30 transition-colors"
           >
             <div className="flex-1">
               <p className="font-medium text-foreground text-sm">
@@ -62,7 +62,7 @@ export default function UpcomingAppointments({
               </span>
               <button
                 onClick={() => onViewClick(appointment)}
-                className="p-1 hover:bg-gray-200 rounded transition-colors"
+                className="p-1 hover:bg-muted rounded transition-colors"
               >
                 <Eye size={14} className="text-foreground" />
               </button>

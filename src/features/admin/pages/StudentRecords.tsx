@@ -137,7 +137,6 @@ const courses = [
       searchTerm.trim() === "" ||
       s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
       s.studentId.toLowerCase().includes(searchTerm.toLowerCase());
 
     return courseMatch && searchMatch;

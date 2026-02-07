@@ -61,8 +61,8 @@ export const AppointmentsList = ({ title, appointments, students, status, select
   };
 
   return (
-    <div className={`bg-white rounded-lg shadow border border-gray-200 overflow-hidden ${className}`}>
-      <div className="p-5 border-b border-gray-200">
+    <div className={`bg-card rounded-lg shadow border border-border overflow-hidden ${className}`}>
+      <div className="p-5 border-b border-border">
         <h2 className="text-lg font-bold text-foreground">
           {title}
         </h2>
@@ -71,7 +71,7 @@ export const AppointmentsList = ({ title, appointments, students, status, select
       <div className="overflow-x-auto">
         {isLoading ? (
           <div className="p-8 text-center">
-            <p className="text-gray-500">Loading appointments...</p>
+            <p className="text-muted-foreground">Loading appointments...</p>
           </div>
         ) : (
         <table className="w-full">
@@ -102,8 +102,8 @@ export const AppointmentsList = ({ title, appointments, students, status, select
                (
                 <tr
                   key={apt.id}
-                  className={`hover:bg-gray-50 transition-colors ${
-                    idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                  className={`hover:bg-muted transition-colors ${
+                    idx % 2 === 0 ? "bg-card" : "bg-muted"
                   }`}
                 >
                   <td className="px-4 py-3 font-medium text-foreground text-xs text-center">
@@ -165,7 +165,7 @@ export const AppointmentsList = ({ title, appointments, students, status, select
 
       {filteredAppointments.length < 1 && (
         <div className="px-6 py-12 text-center">
-          <p className="text-gray-500">No appointments scheduled.</p>
+          <p className="text-card-foreground">No appointments scheduled.</p>
         </div>
       )}
       

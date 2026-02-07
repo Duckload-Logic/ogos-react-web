@@ -108,22 +108,22 @@ export default function Dashboard() {
     {
       label: "Scheduled",
       value: appointments.filter((a) => ['Approved', 'Rescheduled'].includes(a.status)).length,
-      color: "bg-blue-100 text-blue-600",
+      color: "bg-blue-100/90 text-blue-600 ",
     },
     {
       label: "Pending Requests",
       value: appointments.filter((a) => a.status === "Pending").length,
-      color: "bg-yellow-100 text-yellow-600",
+      color: "bg-yellow-100/90 text-yellow-600",
     },
     {
       label: "Completed",
       value: appointments.filter((a) => a.status === "Completed").length,
-      color: "bg-green-100 text-green-600",
+      color: "bg-green-100/90 text-green-600",
     },
     {
       label: "Cancelled",
       value: appointments.filter((a) => a.status === "Cancelled").length,
-      color: "bg-red-100 text-red-600",
+      color: "bg-red-100/90 text-red-600",
     },
   ];
 
@@ -166,7 +166,7 @@ export default function Dashboard() {
 
   return (
     <Layout title="Dashboard">
-      <div className="space-y-6">
+      <div className="flex flex-col gap-6 h-full">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((stat) => (
@@ -178,7 +178,7 @@ export default function Dashboard() {
         </div>
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
           {/* Calendar */}
           <AdminCalendar
             currentYear={currentMonth.getFullYear()}
@@ -225,10 +225,10 @@ export default function Dashboard() {
                     <Link
                       key={action.title}
                       to={action.href}
-                      className="bg-white rounded-lg shadow p-4 hover:shadow-lg transition-all hover:border-primary border border-gray-200 group"
+                      className="bg-card rounded-lg shadow p-4 hover:shadow-lg transition-all hover:border-primary border border-border group"
                     >
                       <div className="flex items-start gap-3">
-                        <div className="p-2 bg-primary/10 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
+                        <div className="p-2 bg-primary/20 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
                           <IconComponent
                             size={20}
                             className="text-primary group-hover:text-white"
@@ -238,7 +238,7 @@ export default function Dashboard() {
                           <h3 className="font-semibold text-sm text-foreground">
                             {action.title}
                           </h3>
-                          <p className="text-xs text-gray-600 mt-1">
+                          <p className="text-xs text-muted-foreground mt-1">
                             {action.description}
                           </p>
                         </div>

@@ -12,6 +12,16 @@
   }
 }
 
+/* Fade in animation for sidebar labels */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .notification-fadeout {
   animation: fadeOut 0.5s ease-in-out 2.5s forwards;
 }
@@ -35,6 +45,8 @@
 
     --card: 0 0% 100%;
     --card-foreground: 0 0% 13%;
+    --card-hover-background: 0 0% 90%;
+    --card-hover-foreground: 0 0% 13%;
 
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 13%;
@@ -58,23 +70,14 @@
     --border: 0 0% 90%;
     --input: 0 0% 96%;
     --ring: 0 64% 33%;
-
     --radius: 0.5rem;
-
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 0 0% 13%;
-
     --sidebar-primary: 0 64% 33%;
-
     --sidebar-primary-foreground: 0 0% 100%;
-
     --sidebar-accent: 45 93% 56%;
-
     --sidebar-accent-foreground: 0 0% 13%;
-
     --sidebar-border: 0 0% 85%;
-
     --sidebar-ring: 0 64% 33%;
   }
 
@@ -84,11 +87,13 @@
 
     --card: 0 0% 20%;
     --card-foreground: 0 0% 95%;
-
+    --card-hover-background: 0 0% 40%;
+    --card-hover-foreground: 0 0% 95%;
+    
     --popover: 0 0% 20%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 0 64% 45%;
+    --primary: 0 64% 55%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 45 93% 56%;
@@ -183,6 +188,14 @@
   select {
     min-height: 44px;
     font-size: 16px;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(0%) sepia(0%) grayscale(0%) brightness(100%);
+  }
+
+  .dark input[type="date"]::-webkit-calendar-picker-indicator {
+    filter: invert(100%) sepia(100%) grayscale(100%) brightness(200%);
   }
 
   /* PDS Form Standardization */

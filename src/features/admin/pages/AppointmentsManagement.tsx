@@ -140,20 +140,20 @@ export default function AppointmentsManagement() {
   const emptyDays = Array.from({ length: firstDay }, (_, i) => i);
 
   const calendarLegends: Record<StatusFilterType, any[]> = {
-    Pending: [{ color: "bg-yellow-500 border border-primary", label: "Pending" }],
+    Pending: [{ color: "bg-amber-400 border border-primary", label: "Pending" }],
     Approved: [
-      { color: "bg-blue-500 border border-primary", label: "Scheduled" },
+      { color: "bg-blue-600 border border-primary", label: "Scheduled" },
     ],
-    Completed: [{ color: "bg-blue-500 border border-primary", label: "Completed" }],
-    Cancelled: [{ color: "bg-red-500 border border-primary", label: "Cancelled" }],
+    Completed: [{ color: "bg-green-600 border border-primary", label: "Completed" }],
+    Cancelled: [{ color: "bg-rose-500 border border-primary", label: "Cancelled" }],
   };
 
   const statusColors: Record<StatusTypes, string> = {
-    Pending: "bg-yellow-500/80",
-    Approved: "bg-blue-500",
-    Completed: "bg-green-500",
-    Cancelled: "bg-red-500",
-    Rescheduled: "bg-purple-500",
+    Pending: "bg-amber-400",
+    Approved: "bg-blue-600",
+    Completed: "bg-green-600",
+    Cancelled: "bg-rose-500",
+    Rescheduled: "bg-blue-600",
   };
 
   // Action handlers
@@ -332,8 +332,8 @@ export default function AppointmentsManagement() {
         )}
 
         {/* Info Banner */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-900">
+        <div className="bg-card border border-blue-200 dark:border-blue-300 rounded-lg p-4">
+          <p className="text-sm text-blue-900 dark:text-blue-300">
             <strong>Note:</strong> Students request appointments in their
             portal. This page is for approving, rejecting, or managing
             appointment requests.
@@ -341,15 +341,15 @@ export default function AppointmentsManagement() {
         </div>
 
         {/* Quick Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-6 rounded-lg shadow border border-gray-200">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-card p-6 rounded-lg shadow border border-border">
           <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">
+            <label className="text-sm font-medium text-card-foreground mb-2 block">
               Status
             </label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as StatusFilterType)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+              className="bg-input w-full px-4 py-2 border border-border rounded-lg text-sm"
             >
               <option value="Pending">Pending</option>
               <option value="Approved">Scheduled</option>
@@ -359,26 +359,26 @@ export default function AppointmentsManagement() {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">
+            <label className="text-sm font-medium text-card-foreground mb-2 block">
               From Date
             </label>
             <input
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+              className="bg-input w-full px-4 py-2 border border-border rounded-lg text-sm text-card-foreground"
             />
           </div>
 
           <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">
+            <label className="text-sm font-medium text-card-foreground mb-2 block">
               To Date
             </label>
             <input
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+              className="bg-input w-full px-4 py-2 border border-border rounded-lg text-sm text-card-foreground"
             />
           </div>
         </div>
