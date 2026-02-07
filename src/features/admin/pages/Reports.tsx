@@ -84,8 +84,8 @@ export default function Reports() {
     <Layout title="Reports">
       <div className="space-y-6">
         {/* Filters */}
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-          <h3 className="font-semibold text-foreground mb-4">
+        <div className="bg-card rounded-lg shadow border border-border p-6">
+          <h3 className="font-semibold text-card-foreground mb-4">
             Filter by Type:
           </h3>
           <div className="flex flex-wrap gap-3">
@@ -97,7 +97,7 @@ export default function Reports() {
                   className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                     filterType === type
                       ? "bg-primary text-primary-foreground"
-                      : "bg-gray-200 text-foreground hover:bg-gray-300"
+                      : "bg-muted text-foreground hover:bg-muted/80"
                   }`}
                 >
                   {type.charAt(0).toUpperCase() + type.slice(1)}
@@ -112,14 +112,14 @@ export default function Reports() {
           {filteredReports.map((report) => (
             <div
               key={report.id}
-              className="bg-white rounded-lg shadow border border-gray-200 p-6 hover:shadow-lg transition-shadow"
+              className="bg-card rounded-lg shadow border border-border p-6 hover:shadow-lg transition-shadow"
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="flex-1">
-                  <h3 className="text-lg font-bold text-foreground">
+                  <h3 className="text-lg font-bold text-card-foreground">
                     {report.title}
                   </h3>
-                  <p className="text-sm text-gray-600 mt-1">
+                  <p className="text-sm text-muted-foreground mt-1">
                     {report.description}
                   </p>
                 </div>
@@ -132,14 +132,14 @@ export default function Reports() {
 
               <div className="space-y-2 mb-6">
                 <p className="text-sm">
-                  <span className="font-medium text-foreground">Course:</span>{" "}
-                  <span className="text-gray-600">{report.course}</span>
+                  <span className="font-medium text-card-foreground">Course:</span>{" "}
+                  <span className="text-muted-foreground">{report.course}</span>
                 </p>
                 <p className="text-sm">
-                  <span className="font-medium text-foreground">
+                  <span className="font-medium text-card-foreground">
                     Generated:
                   </span>{" "}
-                  <span className="text-gray-600">
+                  <span className="text-muted-foreground">
                     {formatDate(report.date)}
                   </span>
                 </p>
@@ -160,14 +160,14 @@ export default function Reports() {
         </div>
 
         {filteredReports.length === 0 && (
-          <div className="bg-white rounded-lg shadow border border-gray-200 p-12 text-center">
-            <p className="text-gray-500">No reports found.</p>
+          <div className="bg-card rounded-lg shadow border border-border p-12 text-center">
+            <p className="text-muted-foreground">No reports found.</p>
           </div>
         )}
 
         {/* Generate New Report */}
-        <div className="bg-white rounded-lg shadow border border-gray-200 p-6">
-          <h2 className="text-xl font-bold text-foreground mb-4">
+        <div className="bg-card rounded-lg shadow border border-border p-6">
+          <h2 className="text-xl font-bold text-card-foreground mb-4">
             Generate New Report
           </h2>
           <ReportForm onGenerate={(type) => alert(`Generating ${type} report`)} />
@@ -198,8 +198,8 @@ function ReportForm({ onGenerate }: { onGenerate: (type: string) => void }) {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-foreground mb-2">Report Type *</label>
-          <select {...form.register("reportType")} className="w-full px-4 py-2 border border-gray-300 rounded-lg">
+          <label className="block text-sm font-medium text-card-foreground mb-2">Report Type *</label>
+          <select {...form.register("reportType")} className="bg-input w-full px-4 py-2 border border-border rounded-lg">
             <option value="">Select Report Type</option>
             <option>Student Enrollment</option>
             <option>Appointment Statistics</option>
@@ -211,8 +211,8 @@ function ReportForm({ onGenerate }: { onGenerate: (type: string) => void }) {
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-foreground mb-2">Date Range</label>
-          <select {...form.register("dateRange")} className="w-full px-4 py-2 border border-gray-300 rounded-lg">
+          <label className="block text-sm font-medium text-card-foreground mb-2">Date Range</label>
+          <select {...form.register("dateRange")} className="bg-input w-full px-4 py-2 border border-border rounded-lg">
             <option value="This Month">This Month</option>
             <option value="Last Month">Last Month</option>
             <option value="Last 3 Months">Last 3 Months</option>
