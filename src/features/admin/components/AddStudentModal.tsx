@@ -43,7 +43,7 @@ export default function AddStudentModal({
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
-      <div className="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
+      <div className="bg-card rounded-lg shadow-lg w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
         <h3 className="text-lg font-semibold mb-4">Add Student Record</h3>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
@@ -56,7 +56,7 @@ export default function AddStudentModal({
               </label>
               <input
                 {...form.register("name")}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
               {form.formState.errors.name && (
                 <p className="text-sm text-destructive mt-1">
@@ -71,7 +71,7 @@ export default function AddStudentModal({
               </label>
               <select
                 {...form.register("course")}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="">Select Course</option>
                 {courses.slice(1).map((course) => (
@@ -93,7 +93,7 @@ export default function AddStudentModal({
               </label>
               <input
                 {...form.register("email")}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
               {form.formState.errors.email && (
                 <p className="text-sm text-destructive mt-1">
@@ -108,7 +108,7 @@ export default function AddStudentModal({
               </label>
               <input
                 {...form.register("phone")}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
               {form.formState.errors.phone && (
                 <p className="text-sm text-destructive mt-1">
@@ -123,7 +123,7 @@ export default function AddStudentModal({
               </label>
               <select
                 {...form.register("institutionType")}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <option value="Private">Private</option>
                 <option value="Public">Public</option>
@@ -140,7 +140,7 @@ export default function AddStudentModal({
                 {...form.register("numberOfSiblings", {
                   valueAsNumber: true,
                 })}
-                className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
               />
             </div>
           </div>
