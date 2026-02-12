@@ -9,6 +9,30 @@ import {
   useLocalStorageLoad,
   useMobileNavigation,
 } from "@/features/students/hooks/lifecycle";
+import {
+  validateEmail,
+  validatePhone,
+  validateYear,
+  validateNonNegative,
+} from "@/features/students/utils/fieldValidation";
+import {
+  validateEnrollmentReasonsSection,
+  validatePersonalSection,
+  validateEducationSection,
+  validateFamilySection,
+} from "@/features/students/utils/sectionValidation";
+import {
+  calculateSectionCompletion,
+  getSectionStatus,
+  getOverallCompletion,
+} from "@/features/students/utils/sectionCompletion";
+import {
+  ClearConfirmModal,
+  ClearSuccessModal,
+  SubmitConfirmModal,
+  SubmitSuccessModal,
+  ValidationErrorModal,
+} from "@/features/students/components/modals";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, AlertCircle, Save, AlertTriangle } from "lucide-react";
@@ -234,7 +258,7 @@ export default function StudentForm() {
     }
 
     if (currentSection === 0) {
-      const isValid = validateEnrollmentReasons();
+      const isValid = validateEnrollmentReasonsSection(formData, setErrors);
       if (!isValid) {
         setValidationError("Please select at least one reason for enrollment.");
         setShowValidationError(true);
@@ -329,342 +353,13 @@ export default function StudentForm() {
     }
   };
 
-  const validateEnrollmentReasons = () => {
-    // Get all keys where the value is true
-    const selectedReasons = Object.entries(formData.reasonForEnrollment || {})
-      .filter(([_, value]) => value === true);
-
-    // If no checkboxes are checked AND the 'other' text field is empty
-    if (selectedReasons.length === 0 && !formData.reasonOther?.trim()) {
-      setErrors((prev) => ({
-        ...prev,
-        reasonForEnrollment: "Please select at least one reason for enrollment."
-      }));
-      return false;
-    }
-
-    // Clear error if valid
-    clearError("reasonForEnrollment");
-    return true;
-  };
-
-  // Validation functions
-  const validateEmail = (email: string): boolean => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
-
-  const validatePhone = (phone: string): boolean => {
-    const phoneRegex = /^[0-9\s\-\+\(\)]+$/;
-    return phone.length >= 7 && phoneRegex.test(phone);
-  };
-
-  const validateNumber = (
-    value: string,
-    min?: number,
-    max?: number,
-  ): boolean => {
-    if (value === "") return true;
-    const num = parseInt(value);
-    if (isNaN(num)) return false;
-    if (min !== undefined && num < min) return false;
-    if (max !== undefined && num > max) return false;
-    return true;
-  };
-
-  const validateYear = (year: string): boolean => {
-    if (year === "") return true;
-    const y = parseInt(year);
-    const currentYear = new Date().getFullYear();
-    return !isNaN(y) && y >= 1950 && y <= currentYear + 1;
-  };
-
-  const validateDate = (date: string): boolean => {
-    if (date === "") return true;
-    const d = new Date(date);
-    return d instanceof Date && !isNaN(d.getTime());
-  };
-
-  const validateHeight = (height: string): boolean => {
-    if (height === "") return true;
-    const h = parseFloat(height);
-    return !isNaN(h) && h >= 3 && h <= 8;
-  };
-
-  const validateWeight = (weight: string): boolean => {
-    if (weight === "") return true;
-    const w = parseInt(weight);
-    return !isNaN(w) && w >= 20 && w <= 300;
-  };
-
-  const validateGrade = (grade: string): boolean => {
-    if (grade === "") return true;
-    const g = parseFloat(grade);
-    return !isNaN(g) && g >= 0 && g <= 100;
-  };
-
-  const validateRequired = (value: string | boolean): boolean => {
-    if (typeof value === "boolean") return true;
-    return value.trim().length > 0;
-  };
-
-  const validateAge = (age: string): boolean => {
-    return validateNumber(age, 10, 100);
-  };
-
-  const validateNonNegative = (value: string): boolean => {
-    if (value === "") return true;
-    const num = parseInt(value);
-    if (isNaN(num)) return false;
-    return num >= 0;
-  };
-
+  // Helper function for clearing field errors
   const clearError = (field: string) => {
     setErrors((prev) => {
       const newErrors = { ...prev };
       delete newErrors[field];
       return newErrors;
     });
-  };
-
-  const setError = (field: string, message: string) => {
-    setErrors((prev) => ({
-      ...prev,
-      [field]: message,
-    }));
-  };
-
-  const validateEducationFields = (): boolean => {
-    const errors: FormErrors = {};
-
-    [
-      { key: "elementary", label: "Elementary" },
-      { key: "juniorHS", label: "Junior HS" },
-      { key: "seniorHS", label: "Senior HS" },
-    ].forEach((level) => {
-      const levelData =
-        formData.education[level.key as keyof typeof formData.education];
-      if (typeof levelData === 'object' && levelData !== null) {
-        if (
-          (levelData as any).school ||
-          (levelData as any).location ||
-          (levelData as any).public ||
-          (levelData as any).yearGrad
-        ) {
-          if (!(levelData as any).school)
-            errors[`${level.key}_school`] = "School name is required";
-          if (!(levelData as any).location)
-            errors[`${level.key}_location`] = "Location is required";
-          if (!(levelData as any).public)
-            errors[`${level.key}_public`] = "Public/Private is required";
-          if (!(levelData as any).yearGrad)
-            errors[`${level.key}_yearGrad`] = "Year graduated is required";
-          if ((levelData as any).yearGrad && !validateYear((levelData as any).yearGrad)) {
-            errors[`${level.key}_yearGrad`] = "Invalid year";
-          }
-        }
-      }
-    });
-
-    setErrors(errors);
-    return Object.keys(errors).length === 0;
-  };
-
-  const validateFamilyFields = (): boolean => {
-    const errors: FormErrors = {};
-
-    if (formData.brothers && !validateNonNegative(formData.brothers)) {
-      errors.brothers = "Brothers count cannot be negative";
-    }
-    if (formData.sisters && !validateNonNegative(formData.sisters)) {
-      errors.sisters = "Sisters count cannot be negative";
-    }
-    if (
-      formData.gainfullyEmployed &&
-      !validateNonNegative(formData.gainfullyEmployed)
-    ) {
-      errors.gainfullyEmployed = "Count cannot be negative";
-    }
-    if (
-      formData.supportStudies &&
-      !validateNonNegative(formData.supportStudies)
-    ) {
-      errors.supportStudies = "Count cannot be negative";
-    }
-    if (
-      formData.supportFamily &&
-      !validateNonNegative(formData.supportFamily)
-    ) {
-      errors.supportFamily = "Count cannot be negative";
-    }
-
-    setErrors((prev) => ({ ...prev, ...errors }));
-    return Object.keys(errors).length === 0;
-  };
-
-  const validatePersonalFields = (): boolean => {
-    const errors: FormErrors = {};
-
-    // Only validate truly required fields
-    if (!formData.firstName.trim()) {
-      errors.firstName = "First name is required";
-    }
-    if (!formData.email.trim()) {
-      errors.email = "Email is required";
-    } else if (!validateEmail(formData.email)) {
-      errors.email = "Invalid email address";
-    }
-    if (!formData.mobileNo.trim()) {
-      errors.mobileNo = "Mobile number is required";
-    } else if (!validatePhone(formData.mobileNo)) {
-      errors.mobileNo = "Invalid phone number";
-    }
-
-    setErrors((prev) => ({ ...prev, ...errors }));
-    return Object.keys(errors).length === 0;
-  };
-
-  // Calculate section completion
-  const calculateSectionCompletion = (sectionIndex: number): number => {
-    const getFilledFields = (obj: any): number => {
-      if (!obj) return 0;
-      return Object.values(obj).filter((val) => {
-        if (typeof val === "string") return val.length > 0;
-        if (typeof val === "boolean") return true;
-        if (typeof val === "number") return val !== 0;
-        if (typeof val === "object" && val !== null)
-          return getFilledFields(val) > 0;
-        return false;
-      }).length;
-    };
-
-    const getTotalFields = (obj: any): number => {
-      if (!obj) return 1;
-      return Object.values(obj).reduce((count: number, val: unknown): number => {
-        if (typeof val === "object" && val !== null) {
-          return count + getTotalFields(val);
-        }
-        return count + 1;
-      }, 0) as number;
-    };
-
-    let filledCount: number = 0;
-    let totalCount: number = 0;
-
-    if (sectionIndex === 0) {
-      const enrollmentFields = {
-        reasonForEnrollment: Object.values(formData.reasonForEnrollment).some(
-          (v) => v,
-        )
-          ? 1
-          : 0,
-        reasonOther: formData.reasonOther ? 1 : 0,
-      };
-      filledCount = Object.values(enrollmentFields).filter(
-        (v) => v === 1,
-      ).length;
-      totalCount = enrollmentFields.reasonForEnrollment + enrollmentFields.reasonOther;
-    } else if (sectionIndex === 1) {
-      const personalFields = {
-        mobileNo: formData.mobileNo ? 1 : 0,
-        dateOfBirth: formData.dateOfBirth ? 1 : 0,
-        course: formData.course ? 1 : 0,
-      };
-      filledCount = Object.values(personalFields).filter((v) => v === 1).length;
-      totalCount = 3;
-    } else if (sectionIndex === 2) {
-      // For education: All three levels (Elementary, Junior HS, Senior HS) must be completely filled
-      let completedLevels = 0;
-      const requiredFields = ["school", "location", "public", "yearGrad"];
-
-      [
-        formData.education.elementary,
-        formData.education.juniorHS,
-        formData.education.seniorHS,
-      ].forEach((level) => {
-        const isLevelComplete = requiredFields.every(
-          (field) =>
-            level[field as keyof typeof level] &&
-            String(level[field as keyof typeof level]).trim().length > 0,
-        );
-        if (isLevelComplete) {
-          completedLevels++;
-        }
-      });
-
-      // Section is complete only if ALL 3 levels are fully filled
-      filledCount =
-        completedLevels === 3
-          ? 100
-          : completedLevels > 0
-            ? Math.round((completedLevels / 3) * 100)
-            : 0;
-      totalCount = 100;
-    } else if (sectionIndex === 3) {
-      let fatherInfo = ( 
-        formData.fatherFirstName && 
-        formData.fatherLastName &&
-        formData.fatherBirthDate &&
-        formData.fatherEducation &&
-        formData.fatherOccupation &&
-        formData.fatherCompany
-      );
-      let motherInfo = ( 
-        formData.motherFirstName && 
-        formData.motherLastName &&
-        formData.motherBirthDate &&
-        formData.motherEducation &&
-        formData.motherOccupation &&
-        formData.motherCompany 
-      );
-      const familyFields = {
-        parentsInfo: (fatherInfo && motherInfo ? 1 : 0),
-        guardiansInfo: (
-          formData.guardianFirstName &&
-          formData.guardianLastName &&
-          formData.guardianAddressMunicipality &&
-          formData.guardianAddressBarangay &&
-          formData.guardianAddressRegion && 
-          formData.guardianAddressStreet ? 1 : 0
-        ),
-        supportingFamily: (
-          formData.gainfullyEmployed && 
-          formData.supportStudies && 
-          formData.supportFamily && 
-          formData.financialSupport && 
-          formData.weeklyAllowance? 1 : 0),
-        monthlyFamilyIncome: formData.monthlyFamilyIncome || formData.monthlyFamilyIncomeOther ? 1 : 0,
-      };
-      filledCount = Object.values(familyFields).filter((v) => v === 1).length;
-      totalCount = 4;
-    } else if (sectionIndex === 4) {
-      const healthFields = {
-        vision: formData.vision ? 1 : 0,
-        hearing: formData.hearing ? 1 : 0,
-        mobility: formData.mobility ? 1 : 0,
-        speech: formData.speech ? 1 : 0,
-        generalHealth: formData.generalHealth ? 1 : 0,
-      };
-      filledCount = Object.values(healthFields).filter((v) => v === 1).length;
-      totalCount = 5;
-    }
-
-    return totalCount > 0 ? Math.round((filledCount / totalCount) * 100) : 0;
-  };
-
-  const getOverallCompletion = (): number => {
-    let totalPercentage = 0;
-    for (let i = 0; i < sections.length; i++) {
-      totalPercentage += calculateSectionCompletion(i);
-    }
-    return Math.round(totalPercentage / sections.length);
-  };
-
-  const getSectionStatus = (sectionIndex: number) => {
-    const percentage = calculateSectionCompletion(sectionIndex);
-    if (percentage === 100) return "complete";
-    if (percentage > 0) return "partial";
-    return "empty";
   };
 
   const handleInputChange = (
@@ -791,7 +486,7 @@ export default function StudentForm() {
     const incompleteSections: string[] = [];
 
     for (let i = 0; i < 5; i++) {
-      const completion = calculateSectionCompletion(i);
+      const completion = calculateSectionCompletion(i, formData);
       if (completion < 100) {
         incompleteSections.push(
           `${sections[i].title}: ${completion}% complete`,
@@ -885,7 +580,7 @@ export default function StudentForm() {
 
   const handleSubmit = () => {
     // Check completion first - if form is incomplete, show which sections are missing
-    if (overallCompletion < 100) {
+    if (getOverallCompletion(formData, sections.length) < 100) {
       const incompleteSections = buildIncompleteSection();
       setValidationError(
         `Please complete the following sections:`,
@@ -896,9 +591,9 @@ export default function StudentForm() {
     }
 
     // Only run detailed validations if form is 100% complete
-    const personalValid = validatePersonalFields();
-    const educationValid = validateEducationFields();
-    const familyValid = validateFamilyFields();
+    const personalValid = validatePersonalSection(formData, setErrors);
+    const educationValid = validateEducationSection(formData, setErrors);
+    const familyValid = validateFamilySection(formData, setErrors);
 
     if (!personalValid || !educationValid || !familyValid) {
       const errorList = buildDetailedErrorMessage(
@@ -1083,7 +778,7 @@ export default function StudentForm() {
     setShowClearSuccess(false);
   };
 
-  const overallCompletion = getOverallCompletion();
+  const overallCompletion = getOverallCompletion(formData, sections.length);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -1169,8 +864,8 @@ export default function StudentForm() {
                   Form Sections
                 </h3>
                 {sections.map((section, idx) => {
-                  const status = getSectionStatus(idx);
-                  const percentage = calculateSectionCompletion(idx);
+                  const percentage = calculateSectionCompletion(idx, formData);
+                  const status = getSectionStatus(percentage);
                   return (
                     <button
                       key={section.id}
@@ -1221,8 +916,8 @@ export default function StudentForm() {
             {isMobileNav && (
               <div className="mb-6 flex overflow-x-auto gap-2 pb-3 -mx-4 px-4">
                 {sections.map((section, idx) => {
-                  const status = getSectionStatus(idx);
-                  const percentage = calculateSectionCompletion(idx);
+                  const percentage = calculateSectionCompletion(idx, formData);
+                  const status = getSectionStatus(percentage);
                   return (
                     <div
                       key={section.id}
@@ -1262,7 +957,7 @@ export default function StudentForm() {
                     {sections[currentSection].title}
                   </CardTitle>
                   <span className="text-xs font-semibold text-gray-600 bg-gray-200 px-3 py-1.5 rounded-full w-fit">
-                    {calculateSectionCompletion(currentSection)}% Complete
+                    {calculateSectionCompletion(currentSection, formData)}% Complete
                   </span>
                 </div>
               </CardHeader>
