@@ -1,6 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useStudentForm } from "@/features/students/hooks/useStudentForm";
+import {
+  useStudentFormInit,
+  useLoadFormData,
+  useAutoCloseError,
+  useFormAutoSave,
+  useLocalStorageLoad,
+  useMobileNavigation,
+} from "@/features/students/hooks/lifecycle";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Check, AlertCircle, Save, AlertTriangle } from "lucide-react";
@@ -164,7 +172,7 @@ const sections = [
 ];
 
 export default function StudentForm() {
-  const navigate = useNavigate();2
+  const navigate = useNavigate();
   const { user, studentRecordId, isLoading, error, initializeStudentRecord, loadSavedFormData, saveSection, submitOnboarding } = useStudentForm();
   const [currentSection, setCurrentSection] = useState(0);
   const [formData, setFormData] = useState<FormData>(EMPTY_FORM);
@@ -183,35 +191,41 @@ export default function StudentForm() {
   const [validationErrorList, setValidationErrorList] = useState<string[]>([]);
   const [showValidationError, setShowValidationError] = useState(false);
 
-  useEffect(() => {
-    const init = async () => {
-      await initializeStudentRecord();
-    };
-    init();
-  }, [user?.id]);
+  // Lifecycle hooks - extracted useEffect logic
+  useStudentFormInit({
+    userId: user?.id,
+    onInit: initializeStudentRecord,
+  });
 
-  useEffect(() => {
-    const loadData = async () => {
-      if (studentRecordId) {
-        const savedData = await loadSavedFormData();
-        console.log("Loaded saved data:", savedData);
-        if (savedData) {
-          setFormData(savedData);
-        } else {
-          // Try to load from localStorage if backend data not available
-          const localData = localStorage.getItem("studentFormData");
-          if (localData) {
-            try {
-              setFormData(JSON.parse(localData));
-            } catch (e) {
-              console.error("Failed to load saved data:", e);
-            }
-          }
-        }
-      }
-    };
-    loadData();
-  }, [studentRecordId]);
+  useLoadFormData({
+    studentRecordId,
+    onLoadData: loadSavedFormData,
+    onSetFormData: setFormData,
+  });
+
+  useLocalStorageLoad({
+    userId: user?.id,
+    onSetFormData: setFormData,
+  });
+
+  useFormAutoSave({
+    formData,
+    userId: user?.id,
+    autoSaveStatus,
+    setAutoSaveStatus,
+    setLastSaved,
+    debounceMs: 500,
+  });
+
+  useMobileNavigation({
+    setIsMobileNav,
+  });
+
+  useAutoCloseError({
+    isVisible: showValidationError,
+    onClose: () => setShowValidationError(false),
+    delayMs: 3000,
+  });
 
   const handleNextSection = async () => {
     if (!studentRecordId) {
@@ -314,16 +328,6 @@ export default function StudentForm() {
       setIsSaving(false);
     }
   };
-
-  // Auto-close validation error after 3 seconds
-  useEffect(() => {
-    if (showValidationError) {
-      const timer = setTimeout(() => {
-        setShowValidationError(false);
-      }, 3000);
-      return () => clearTimeout(timer);
-    }
-  }, [showValidationError]);
 
   const validateEnrollmentReasons = () => {
     // Get all keys where the value is true
@@ -519,44 +523,6 @@ export default function StudentForm() {
     setErrors((prev) => ({ ...prev, ...errors }));
     return Object.keys(errors).length === 0;
   };
-
-  // Load from localStorage on mount
-  useEffect(() => {
-    const savedData = localStorage.getItem(`user${user?.id}FormData`);
-    if (savedData) {
-      try {
-        setFormData(JSON.parse(savedData));
-      } catch (e) {
-        console.error("Failed to load saved data:", e);
-      }
-    }
-  }, []);
-
-  // Auto-save on data change
-  useEffect(() => {
-    const saveTimer = setTimeout(() => {
-      if (Object.keys(formData).length > 0) {
-        setAutoSaveStatus("saving");
-        sessionStorage.setItem(`user${user?.id}FormData`, JSON.stringify(formData));
-        setAutoSaveStatus("saved");
-        setLastSaved(new Date().toLocaleTimeString());
-
-        setTimeout(() => setAutoSaveStatus("idle"), 2000);
-      }
-    }, 500);
-
-    return () => clearTimeout(saveTimer);
-  }, [formData]);
-
-  // Handle window resize for responsive navigation
-  useEffect(() => {
-    const handleResize = () => {
-      setIsMobileNav(window.innerWidth < 1024);
-    };
-
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
 
   // Calculate section completion
   const calculateSectionCompletion = (sectionIndex: number): number => {
