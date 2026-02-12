@@ -28,12 +28,12 @@ export const AdminCalendar = (
     touchStartX, selectedDate, 
     onDateClick, legends, occupiedDayColor }: AdminCalendarProps) => {
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
+    <div className="bg-card rounded-lg shadow border border-border p-4">
       {/* Calendar Header */}
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={previousMonth}
-          className="p-1 hover:bg-gray-100 rounded transition-colors"
+          className="p-1 hover:bg-muted rounded transition-colors"
         >
           <ChevronLeft size={16} className="text-foreground" />
         </button>
@@ -42,7 +42,7 @@ export const AdminCalendar = (
         </h2>
         <button
           onClick={nextMonth}
-          className="p-1 hover:bg-gray-100 rounded transition-colors"
+          className="p-1 hover:bg-muted rounded transition-colors"
         >
           <ChevronRight size={16} className="text-foreground" />
         </button>
@@ -53,7 +53,7 @@ export const AdminCalendar = (
         {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
           <div
             key={day}
-            className="text-center font-semibold text-gray-600 text-xs"
+            className="text-center font-semibold text-muted-foreground text-xs"
           >
             {day}
           </div>
@@ -89,10 +89,10 @@ export const AdminCalendar = (
                 pressed:scale-95
                 ${isWeekend || day < todayDate ? "opacity-50 cursor-not-allowed" : ""}
                 ${isBooked 
-                  ? `${occupiedDayColor || "bg-primary"} text-white` 
+                  ? `${occupiedDayColor || "bg-primary"} text-primary-foreground` 
                   : isSelected 
-                    ? "bg-primary/10 text-primary font-bold ring-2 ring-primary" 
-                    : "bg-gray-100 text-foreground"
+                    ? "bg-primary/10 dark:bg-primary/20 text-primary font-bold ring-2 ring-primary" 
+                    : "bg-muted text-card-foreground dark:bg-muted/50"
                 }
                 ${isToday ? "border-2 border-primary" : ""}
               `}
@@ -109,7 +109,7 @@ export const AdminCalendar = (
         <button
           onClick={previousMonth}
           aria-label="Previous month"
-          className="p-2 bg-gray-100 rounded-md"
+          className="p-2 bg-muted rounded-md dark:bg-muted/50"
         >
           <ChevronLeft size={16} />
         </button>
@@ -117,7 +117,7 @@ export const AdminCalendar = (
         <button
           onClick={nextMonth}
           aria-label="Next month"
-          className="p-2 bg-gray-100 rounded-md"
+          className="p-2 bg-muted rounded-md dark:bg-muted/50"
         >
           <ChevronRight size={16} />
         </button>
@@ -148,10 +148,10 @@ export const AdminCalendar = (
               key={`mobile-${day}`}
               className={`flex items-center justify-between p-3 rounded-lg text-sm font-medium transition-colors ${
                 isToday
-                  ? "border-2 border-primary bg-white text-foreground"
+                  ? "border-2 border-primary bg-card text-foreground"
                   : isBooked
                     ? "bg-primary text-primary-foreground"
-                    : "bg-gray-100 text-foreground"
+                    : "bg-muted text-foreground dark:bg-muted/50"
               }`}
             >
               <div>Day {day}</div>
@@ -162,15 +162,15 @@ export const AdminCalendar = (
           );
         })}
 
-        <div className="text-center text-xs text-gray-500 mt-2">
+        <div className="text-center text-xs text-muted-foreground mt-2">
           Swipe left/right to change month
         </div>
       </div>
 
       {/* legends */}
-      <div className="pt-4 border-t border-gray-200 space-y-2">
+      <div className="pt-4 border-t border-border space-y-2">
         <div className="flex items-center gap-2 text-xs">
-          <div className={`w-3 h-3 rounded bg-gray-200 border border-primary`}></div>
+          <div className={`w-3 h-3 rounded bg-muted border border-primary`}></div>
           <span className="text-foreground">Today</span>
         </div>
         {legends?.map(({ color, label }) => (

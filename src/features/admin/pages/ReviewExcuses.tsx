@@ -109,8 +109,8 @@ export default function ReviewExcuses() {
     <Layout title="Review Excuses Slip">
       <div className="space-y-6">
         {/* Info Banner */}
-        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-          <p className="text-sm text-blue-900">
+        <div className="bg-card border border-blue-200 dark:border-blue-300 rounded-lg p-4">
+          <p className="text-sm text-blue-900 dark:text-blue-300">
             <strong>Note:</strong> Students submit excuse slips through the
             student portal. This page is for reviewing and managing submitted
             slips only.
@@ -118,13 +118,13 @@ export default function ReviewExcuses() {
         </div>
 
         {/* Quick Filters */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-6 rounded-lg shadow border border-gray-200">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-card p-6 rounded-lg shadow border border-border">
           <div>
             <label className="text-sm font-medium text-foreground mb-2 block">Status</label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+              className="bg-input w-full px-4 py-2 border border-border rounded-lg text-sm"
             >
               <option value="all">All Status</option>
               <option value="pending">Pending</option>
@@ -139,7 +139,7 @@ export default function ReviewExcuses() {
               type="date"
               value={startDate}
               onChange={(e) => setStartDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+              className="bg-input w-full px-4 py-2 border border-border rounded-lg text-sm"
             />
           </div>
 
@@ -149,14 +149,14 @@ export default function ReviewExcuses() {
               type="date"
               value={endDate}
               onChange={(e) => setEndDate(e.target.value)}
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg text-sm"
+              className="bg-input w-full px-4 py-2 border border-border rounded-lg text-sm"
             />
           </div>
         </div>
 
         {/* Review Table */}
-        <div className="bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
-          <div className="p-6 border-b border-gray-200">
+        <div className="bg-card rounded-lg shadow border border-border overflow-hidden">
+          <div className="p-6 border-b border-border">
             <h2 className="text-xl font-bold text-foreground">
               Submitted Excuse Slips
             </h2>
@@ -164,36 +164,36 @@ export default function ReviewExcuses() {
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="bg-primary text-primary-foreground">
-                  <th className="px-6 py-4 text-left font-semibold">
+                <tr className="bg-primary text-primary-foreground text-sm uppercase">
+                  <th className="px-6 py-4 text-center font-semibold">
                     Student Name
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold">
+                  <th className="px-6 py-4 text-center font-semibold">
                     Absence Date
                   </th>
-                  <th className="px-6 py-4 text-left font-semibold">Reason</th>
-                  <th className="px-6 py-4 text-left font-semibold">Status</th>
-                  <th className="px-6 py-4 text-left font-semibold">Actions</th>
+                  <th className="px-6 py-4 text-center font-semibold">Reason</th>
+                  <th className="px-6 py-4 text-center font-semibold">Status</th>
+                  <th className="px-6 py-4 text-center font-semibold">Actions</th>
                 </tr>
               </thead>
               <tbody className="divide-y">
                 {filteredExcuses.map((exc, idx) => (
                   <tr
                     key={exc.id}
-                    className={`hover:bg-gray-50 transition-colors ${
-                      idx % 2 === 0 ? "bg-white" : "bg-gray-50"
+                    className={`hover:bg-muted transition-colors ${
+                      idx % 2 === 0 ? "bg-card" : "bg-muted"
                     }`}
                   >
-                    <td className="px-6 py-4 font-medium text-foreground">
+                    <td className="px-6 py-4 font-medium text-center text-foreground">
                       {exc.studentName}
                     </td>
-                    <td className="px-6 py-4 text-foreground">
+                    <td className="px-6 py-4 text-center text-foreground">
                       {formatDate(exc.date)}
                     </td>
-                    <td className="px-6 py-4 text-foreground text-sm">
+                    <td className="px-6 py-4 text-center text-foreground text-sm">
                       {exc.reason}
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-6 py-4 text-center">
                       <div
                         className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(exc.status)}`}
                       >
@@ -202,8 +202,8 @@ export default function ReviewExcuses() {
                           exc.status.slice(1)}
                       </div>
                     </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2 flex-wrap">
+                    <td className="px-6 py-4 text-center">
+                      <div className="flex items-center justify-center gap-2 flex-wrap">
                         <button className="flex items-center gap-1 px-3 py-2 bg-gray-400 text-white rounded hover:bg-gray-500 transition-colors text-sm font-medium">
                           <Download size={16} />
                           View PDF

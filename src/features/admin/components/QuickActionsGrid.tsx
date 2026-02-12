@@ -1,4 +1,3 @@
-import { Calendar, Users, FileText, TrendingUp } from "lucide-react";
 import { Link } from "react-router-dom";
 
 interface QuickAction {
@@ -19,7 +18,7 @@ export default function QuickActionsGrid({ actions }: QuickActionsGridProps) {
         <Link
           key={action.title}
           to={action.href}
-          className="bg-white rounded-lg shadow border border-gray-200 p-4 hover:shadow-md transition-shadow"
+          className="bg-card rounded-lg shadow border border-gray-200 p-4 hover:shadow-md transition-shadow"
         >
           <div className="flex gap-3">
             <div className="text-primary">

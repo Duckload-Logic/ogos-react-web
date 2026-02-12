@@ -17,10 +17,10 @@ export default function StudentSearchAndFilter({
   courses,
 }: StudentSearchAndFilterProps) {
   return (
-    <div className="bg-white rounded-lg shadow border border-gray-200 p-6 space-y-4">
+    <div className="bg-card rounded-lg shadow border border-border p-6 space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-foreground mb-2">
+          <label className="block text-sm font-medium text-card-foreground mb-2">
             Search:
           </label>
           <div className="flex gap-2">
@@ -29,12 +29,12 @@ export default function StudentSearchAndFilter({
               placeholder="Search by name, email, or ID..."
               value={searchTerm}
               onChange={(e) => onSearchChange(e.target.value)}
-              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+              className="flex-1 px-4 py-2 border border-border rounded-lg bg-input focus:outline-none focus:ring-2 focus:ring-primary"
             />
             {searchTerm && (
               <button
                 onClick={() => onSearchChange("")}
-                className="p-2 text-gray-600 hover:bg-gray-100 rounded transition-colors"
+                className="p-2 text-card-foreground hover:bg-gray-100 rounded transition-colors"
               >
                 <X size={18} />
               </button>
@@ -49,7 +49,7 @@ export default function StudentSearchAndFilter({
           <select
             value={selectedCourse}
             onChange={(e) => onCourseChange(e.target.value)}
-            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+            className="w-full px-4 py-2 border border-border bg-input rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
           >
             {courses.map((course) => (
               <option key={course.value} value={course.value}>
