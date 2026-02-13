@@ -17,7 +17,7 @@ export const useAdminAppointments = () => {
   const { user, isLoading: authLoading } = useAuth();
 
 
-  const isAdmin = user?.roleId === 1;
+  const isAdmin = user?.roleId === 2;
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
