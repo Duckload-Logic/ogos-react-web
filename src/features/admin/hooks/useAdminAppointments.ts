@@ -16,7 +16,6 @@ import {
 export const useAdminAppointments = () => {
   const { user, isLoading: authLoading } = useAuth();
 
-
   const isAdmin = user?.roleId === 2;
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
