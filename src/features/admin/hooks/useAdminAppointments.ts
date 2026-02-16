@@ -1,9 +1,10 @@
 /**
- * useAdminAppointments Hook
- * Manages appointment operations for admin panel with enhanced state management
+ * useAdminAppointments
+ * Refactored + aligned with existing AuthContext
  */
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useAuth } from "@/context";
 import * as appointmentService from "@/features/appointments/services";
 import {
   Appointment,
@@ -12,149 +13,142 @@ import {
   APPOINTMENT_STATUSES,
 } from "@/features/appointments/services";
 
-export interface UseAdminAppointmentsReturn {
-  appointments: Appointment[];
-  isLoading: boolean;
-  error: string | null;
-  success: string | null;
-  fetchAppointments: (filters?: AppointmentFilters) => Promise<void>;
-  fetchStudentAppointments: (studentId: number) => Promise<void>;
-  updateStatus: (id: number, status: string) => Promise<void>;
-  approveAppointment: (id: number) => Promise<void>;
-  rejectAppointment: (id: number) => Promise<void>;
-  completeAppointment: (id: number) => Promise<void>;
-  rescheduleAppointment: (id: number, payload: CreateAppointmentRequest) => Promise<void>;
-  clearError: () => void;
-  clearSuccess: () => void;
-  reset: () => void;
-}
+export const useAdminAppointments = () => {
+  const { user, isLoading: authLoading } = useAuth();
 
-/**
- * useAdminAppointments - Manages appointment operations for admin
- */
-export const useAdminAppointments = (): UseAdminAppointmentsReturn => {
+  const isAdmin = user?.roleId === 2;
+
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-  const clearError = useCallback(() => setError(null), []);
-  const clearSuccess = useCallback(() => setSuccess(null), []);
+/*
+ * Guard
+ */
+
+  const guardAdmin = () => {
+    if (!isAdmin) {
+      throw new Error("Unauthorized: Admin access required.");
+    }
+  };
+
+/* 
+ * Async Handler 
+ */
+
+  const handleAsync = useCallback(
+    async <T>(
+      asyncFn: () => Promise<T>,
+      options?: {
+        loading?: boolean;
+        successMessage?: string;
+        onSuccess?: (data: T) => void;
+      }
+    ) => {
+      try {
+        guardAdmin();
+
+        if (options?.loading) setIsLoading(true);
+        setError(null);
+
+        const result = await asyncFn();
+
+        if (options?.onSuccess) options.onSuccess(result);
+        if (options?.successMessage) setSuccess(options.successMessage);
+      } catch (err) {
+        const message =
+          err instanceof Error ? err.message : "Something went wrong";
+        setError(message);
+      } finally {
+        if (options?.loading) setIsLoading(false);
+      }
+    },
+    [isAdmin]
+  );
+
+/*
+ * Local State Updater 
+ */
+
+  const updateLocalAppointment = useCallback((updated: Appointment) => {
+    setAppointments((prev) =>
+      prev.map((apt) => (apt.id === updated.id ? updated : apt))
+    );
+  }, []);
+
+/* 
+ * Fetch 
+ */
 
   const fetchAppointments = useCallback(
     async (filters?: AppointmentFilters) => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const data = await appointmentService.listAllAppointments(filters);
-        setAppointments(data);
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to fetch appointments";
-        setError(errorMessage);
-        console.error(errorMessage);
-      } finally {
-        setIsLoading(false);
-      }
+      await handleAsync(
+        () => appointmentService.listAllAppointments(filters),
+        {
+          loading: true,
+          onSuccess: setAppointments,
+        }
+      );
     },
-    []
+    [handleAsync]
   );
 
-  const fetchStudentAppointments = useCallback(async (studentId: number) => {
-    setIsLoading(true);
-    setError(null);
-    try {
-      const data = await appointmentService.getStudentAppointments(studentId);
-      setAppointments(data);
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error
-          ? err.message
-          : `Failed to fetch appointments for student ${studentId}`;
-      setError(errorMessage);
-      console.error(errorMessage);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
+/*
+ * Status Updates
+ */
 
-  const updateStatus = useCallback(async (id: number, status: string) => {
-    setError(null);
-    try {
-      const updatedAppointment = await appointmentService.updateAppointmentStatus(id, status);
-      setSuccess(`Appointment ${status.toLowerCase()} successfully`);
-      // Update local state with the full updated appointment
-      setAppointments((prev) =>
-        prev.map((apt) =>
-          apt.id === id ? updatedAppointment : apt
-        )
+  const updateStatus = useCallback(
+    async (id: number, status: string) => {
+      await handleAsync(
+        () => appointmentService.updateAppointmentStatus(id, status),
+        {
+          successMessage: `Appointment ${status.toLowerCase()} successfully`,
+          onSuccess: updateLocalAppointment,
+        }
       );
-    } catch (err) {
-      const errorMessage =
-        err instanceof Error ? err.message : `Failed to update appointment status`;
-      setError(errorMessage);
-      console.error(errorMessage);
-    }
-  }, []);
+    },
+    [handleAsync, updateLocalAppointment]
+  );
 
-  const approveAppointment = useCallback(async (id: number) => {
-    await updateStatus(id, APPOINTMENT_STATUSES.APPROVED);
-  }, [updateStatus]);
+  const approveAppointment = (id: number) =>
+    updateStatus(id, APPOINTMENT_STATUSES.APPROVED);
 
-  const rejectAppointment = useCallback(async (id: number) => {
-    await updateStatus(id, APPOINTMENT_STATUSES.CANCELLED);
-  }, [updateStatus]);
+  const rejectAppointment = (id: number) =>
+    updateStatus(id, APPOINTMENT_STATUSES.CANCELLED);
 
-  const completeAppointment = useCallback(async (id: number) => {
-    await updateStatus(id, APPOINTMENT_STATUSES.COMPLETED);
-  }, [updateStatus]);
+  const completeAppointment = (id: number) =>
+    updateStatus(id, APPOINTMENT_STATUSES.COMPLETED);
+
+/* 
+ * Reschedule
+ */
 
   const rescheduleAppointment = useCallback(
     async (id: number, payload: CreateAppointmentRequest) => {
-      setError(null);
-      try {
-        const updatedAppointment = await appointmentService.rescheduleAppointment(
-          id,
-          payload
-        );
-        setSuccess("Appointment rescheduled successfully");
-        // Update local state with the updated appointment
-        setAppointments((prev) =>
-          prev.map((apt) =>
-            apt.id === id ? updatedAppointment : apt
-          )
-        );
-      } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "Failed to reschedule appointment";
-        setError(errorMessage);
-        console.error(errorMessage);
-      }
+      await handleAsync(
+        () => appointmentService.rescheduleAppointment(id, payload),
+        {
+          successMessage: "Appointment rescheduled successfully",
+          onSuccess: updateLocalAppointment,
+        }
+      );
     },
-    []
+    [handleAsync, updateLocalAppointment]
   );
-
-  const reset = useCallback(() => {
-    setAppointments([]);
-    setIsLoading(false);
-    setError(null);
-    setSuccess(null);
-  }, []);
 
   return {
     appointments,
     isLoading,
     error,
     success,
+    isAdmin,
     fetchAppointments,
-    fetchStudentAppointments,
-    updateStatus,
     approveAppointment,
     rejectAppointment,
     completeAppointment,
     rescheduleAppointment,
-    clearError,
-    clearSuccess,
-    reset,
+    clearError: () => setError(null),
+    clearSuccess: () => setSuccess(null),
   };
 };
