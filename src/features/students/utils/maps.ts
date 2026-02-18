@@ -1,4 +1,4 @@
-import type { FormData, EducationalBackgroundData, FamilyBackgroundData, GuardianData, HealthRecordData, FinanceInfoData } from '@/features/students/types';
+import type { StudentRecord, EducationalBackgroundData, FamilyBackgroundData, GuardianData, HealthRecordData, FinanceInfoData } from '@/features/students/types';
 
 export const CIVIL_STATUS_MAP: { [key: number]: string } = {
   1: "Single",
@@ -29,7 +29,7 @@ export const REASON_MAP: { [key: string]: number } = {
   "Closer Student-Faculty Relations": 9,
 };
 
-export const mapEnrollmentReasons = (formData: FormData) => {
+export const mapEnrollmentReasons = (formData: StudentRecord) => {
   const enrollmentReasonIds = Object.entries(formData.reasonForEnrollment)
     .filter(([_, checked]) => checked)
     .map(([reason]) => REASON_MAP[reason])
@@ -41,7 +41,7 @@ export const mapEnrollmentReasons = (formData: FormData) => {
   };
 };
 
-export const mapPersonalInfo = (formData: FormData, user: any) => {
+export const mapPersonalInfo = (formData: StudentRecord, user: any) => {
   return {
     genderId: parseInt(formData.gender) || 1,
     civilStatusTypeId: parseInt(formData.civilStatus) || 1,
@@ -81,7 +81,7 @@ export const mapPersonalInfo = (formData: FormData, user: any) => {
   };
 };
 
-export const mapEducationInfo = (formData: FormData): EducationalBackgroundData[] => {
+export const mapEducationInfo = (formData: StudentRecord): EducationalBackgroundData[] => {
   const educationLevels = [
     { key: 'elementary', level: "Elementary" },
     { key: 'juniorHS', level: "Junior High School" },
@@ -107,7 +107,7 @@ export const mapEducationInfo = (formData: FormData): EducationalBackgroundData[
   return educationData;
 };
 
-export const mapFamilyInfo = (formData: FormData): FamilyBackgroundData => {
+export const mapFamilyInfo = (formData: StudentRecord): FamilyBackgroundData => {
   const parents: GuardianData[] = [];
 
   parents.push({
@@ -152,7 +152,7 @@ export const mapFamilyInfo = (formData: FormData): FamilyBackgroundData => {
   };
 };
 
-export const mapHealthInfo = (formData: FormData): HealthRecordData => {
+export const mapHealthInfo = (formData: StudentRecord): HealthRecordData => {
   console.log(formData.vision)
   return {
     visionRemark: formData.vision,
@@ -168,7 +168,7 @@ export const mapHealthInfo = (formData: FormData): HealthRecordData => {
   };
 };
 
-export const mapFinanceInfo = (formData: FormData): FinanceInfoData => {
+export const mapFinanceInfo = (formData: StudentRecord): FinanceInfoData => {
   return {
     isEmployed: formData.employerName?.trim().length > 0,
     supportsStudies: formData.supportStudies === 'Yes',

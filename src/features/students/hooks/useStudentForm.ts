@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '@/context';
 import { studentService } from '@/features/students/services/service';
-import { FormData } from '../types';
+import { StudentRecord } from '../types';
 import { CIVIL_STATUS_MAP, REASON_MAP } from '../utils/maps';
 
 const formatDateForInput = (dateString: string): string => {
@@ -22,8 +22,8 @@ const formatDateForInput = (dateString: string): string => {
   }
 };
 
-// Helper functions to convert FormData to API payload formats
-const mapFormDataToBaseProfile = (formData: FormData) => {
+// Helper functions to convert StudentRecord to API payload formats
+const mapFormDataToBaseProfile = (formData: StudentRecord) => {
   return {
     firstName: formData.firstName,
     middleName: formData.middleName,
@@ -47,7 +47,7 @@ const mapFormDataToBaseProfile = (formData: FormData) => {
   };
 };
 
-const mapFormDataToAddresses = (formData: FormData) => {
+const mapFormDataToAddresses = (formData: StudentRecord) => {
   const addresses = [];
   
   // Provincial address
@@ -77,7 +77,7 @@ const mapFormDataToAddresses = (formData: FormData) => {
   return addresses;
 };
 
-const mapFormDataToEducation = (formData: FormData) => {
+const mapFormDataToEducation = (formData: StudentRecord) => {
   const education = [];
   
   if (formData.education.elementary.school) {
@@ -116,7 +116,7 @@ const mapFormDataToEducation = (formData: FormData) => {
   return education;
 };
 
-const mapFormDataToFamily = (formData: FormData) => {
+const mapFormDataToFamily = (formData: StudentRecord) => {
   const parents = [];
   
   // Father
@@ -173,7 +173,7 @@ const mapFormDataToFamily = (formData: FormData) => {
   };
 };
 
-const mapFormDataToHealth = (formData: FormData) => {
+const mapFormDataToHealth = (formData: StudentRecord) => {
   return {
     visionRemark: formData.vision,
     hearingRemark: formData.hearing,
@@ -188,7 +188,7 @@ const mapFormDataToHealth = (formData: FormData) => {
   };
 };
 
-const mapToFormData = (data: any): FormData => {
+const mapToFormData = (data: any): StudentRecord => {
   let personalInfo = data.personalInfo
   let education = data.education
   let family = data.family
@@ -322,14 +322,14 @@ const mapToFormData = (data: any): FormData => {
 export const useStudentForm = () => {
   const { user } = useAuth();
   const [studentRecordId, setStudentRecordId] = useState<number | null>(null);
-  const [formData, setFormData] = useState<FormData | null>(null);
+  const [formData, setFormData] = useState<StudentRecord | null>(null);
   const [formErrors, setFormErrors] = useState<Record<string, string>>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   // Initialize form data with empty values
   const initializeFormData = () => {
-    const emptyFormData: FormData = {
+    const emptyFormData: StudentRecord = {
       reasonForEnrollment: {},
       reasonOther: "",
       expecting_scholarship: false,
@@ -528,7 +528,7 @@ export const useStudentForm = () => {
     }
   };
 
-  const loadSavedFormData = async (): Promise<FormData | null> => {
+  const loadSavedFormData = async (): Promise<StudentRecord | null> => {
     if (!user?.id) {
       setError('User not authenticated');
       return null;
@@ -567,7 +567,7 @@ export const useStudentForm = () => {
     setError(null);
 
     try {
-      // Map FormData to appropriate API payloads and save all sections
+      // Map StudentRecord to appropriate API payloads and save all sections
       await Promise.all([
         studentService.saveBaseProfile(studentRecordId, mapFormDataToBaseProfile(formData)),
         studentService.saveAddressInfo(studentRecordId, mapFormDataToAddresses(formData)),
@@ -689,7 +689,7 @@ export const useStudentForm = () => {
     // State
     user,
     studentRecordId,
-    formData: formData || ({} as FormData),
+    formData: formData || ({} as StudentRecord),
     formErrors,
     isLoading,
     error,

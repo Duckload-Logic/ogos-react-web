@@ -1,4 +1,4 @@
-import { FormData } from "@/types";
+import { StudentRecord } from "@/types";
 import { Combobox } from "@/components/ui/combobox";
 import { User } from "@/types/user";
 import { useState } from "react";
@@ -30,7 +30,7 @@ const RELATIONSHIP_OPTIONS = [
 
 interface PersonalInformationProps {
   user: User | null;
-  formData: FormData;
+  formData: StudentRecord;
   handleInputChange: (field: string, value: string | boolean) => void;
   clearError: (field: string) => void;
   locations: {
@@ -674,7 +674,7 @@ export function PersonalInformation({
                   <div key={field.field}> {/* Wrapped in a div or fragment with a key */}
                     <input
                       type="text"
-                      value={formData[field.field as keyof FormData] as string || ''} 
+                      value={formData[field.field as keyof StudentRecord] as string || ''} 
                       onChange={(e) => {
                         handleInputChange(field.field, e.target.value);
                         clearError(field.field);
@@ -682,12 +682,12 @@ export function PersonalInformation({
                       placeholder={`Enter ${field.label}`}
                       className={`w-full px-4 py-3 border rounded-lg focus:outline-none
                         focus:ring-2 transition ${
-                          !formData[field.field as keyof FormData] && !(field.label === "Middle Name")
+                          !formData[field.field as keyof StudentRecord] && !(field.label === "Middle Name")
                             ? "border-red-400 focus:ring-red-500"
                             : "border-gray-300 focus:ring-primary"
                         }`}
                     />
-                    {!formData[field.field as keyof FormData] && !(field.label === "Middle Name") && (
+                    {!formData[field.field as keyof StudentRecord] && !(field.label === "Middle Name") && (
                       <p className="text-red-500 text-xs mt-1 font-medium">Required</p>
                     )}
                   </div>
