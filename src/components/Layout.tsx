@@ -194,7 +194,7 @@ export default function Layout({ children, title }: LayoutProps) {
     />
 
     {/* Modal */}
-    <div className="relative bg-white dark:bg-gray-900 w-[85%] max-w-3xl h-[70vh] rounded-2xl shadow-2xl border dark:border-gray-700 flex flex-col">
+    <div className="relative bg-card w-[85%] max-w-3xl h-[70vh] rounded-2xl shadow-2xl border border-border flex flex-col">
 
       {/* Header */}
       <div className="flex items-center justify-between p-5 border-b dark:border-gray-700">
@@ -206,7 +206,7 @@ export default function Layout({ children, title }: LayoutProps) {
         </div>
 
         <div className="flex items-center gap-4">
-          <button className="text-sm text-blue-500 hover:underline">
+          <button className="text-sm text-card-foreground hover:underline">
             Mark all as read
           </button>
           <button
