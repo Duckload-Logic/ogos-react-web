@@ -24,7 +24,6 @@ import {
   UserCheck,
   User,
   BookOpen,
-  Wallet,
   HeartPulse,
 } from "lucide-react";
 
@@ -545,7 +544,7 @@ function FamilyBackgroundView({ familyData, parentsData, financeData }: any) {
                 <Users className="w-3.5 h-3.5" />
                 Combined Family Income
               </p>
-              <p className="text-2xl font-black">
+              <p className="text-2xl font-bold">
                 ₱{Number(familyData?.monthlyFamilyIncome || 0).toLocaleString()}
               </p>
             </div>
@@ -697,8 +696,8 @@ function HealthInformationView({ healthData }: any) {
   // Logic to determine badge color based on remark
   const getStatusColor = (remark: string) => {
     if (!remark || remark.toLowerCase() === "no problem")
-      return "bg-green-50 text-green-700 border-green-200";
-    return "bg-amber-50 text-amber-700 border-amber-200";
+      return "text-green-700 border-green-700";
+    return "text-amber-700 border-amber-700";
   };
 
   const physicalStats = [
@@ -719,7 +718,6 @@ function HealthInformationView({ healthData }: any) {
 
   return (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
-      {/* SECTION 1: Physical Status Indicators */}
       <section>
         <SectionTitle title="Physical Remarks" />
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
@@ -737,7 +735,7 @@ function HealthInformationView({ healthData }: any) {
                 </span>
               </div>
               <div
-                className={`text-xs font-bold px-2 py-1 rounded border w-fit ${getStatusColor(stat.value)}`}
+                className={`text-xs font-bold px-2 py-1 rounded border w-fit bg-card ${getStatusColor(stat.value)}`}
               >
                 {stat.value || "No Data"}
               </div>
@@ -746,7 +744,6 @@ function HealthInformationView({ healthData }: any) {
         </div>
       </section>
 
-      {/* SECTION 2: General Health & Clinical History */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Clinical History Card */}
         <div className="lg:col-span-3 p-6 rounded-2xl border border-primary/20 bg-primary/[0.02] relative overflow-hidden">
