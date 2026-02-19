@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-export default function Sidebar({
+export default function Navigation({
   navigationItems,
   location,
   setExpanded,
@@ -10,6 +11,8 @@ export default function Sidebar({
   location: any;
   setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
+  const isMobile = useIsMobile();
+
   // 1. Lazy initializer: Read from localStorage immediately
   const [isHovered, setIsHovered] = useState(() => {
     const saved = localStorage.getItem("sidebarHovered");
@@ -22,6 +25,55 @@ export default function Sidebar({
     localStorage.setItem("sidebarHovered", JSON.stringify(isHovered));
   }, [isHovered, setExpanded]);
 
+  // Render bottom navigation for mobile
+  if (isMobile) {
+    return (
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border">
+        <div className="flex items-center justify-around h-16 px-2">
+          {navigationItems.map((item) => {
+            const activePage =
+              item.href === "/admin"
+                ? location.pathname === "/admin"
+                : location.pathname.startsWith(item.href);
+
+            return (
+              <Link
+                key={item.href}
+                to={item.href}
+                className={`
+                  group relative flex flex-col items-center justify-center
+                  p-2 transition-colors duration-200
+                  min-w-14 h-14
+                  ${
+                    activePage
+                      ? "text-primary bg-background rounded-full"
+                      : "text-muted-foreground hover:text-primary hover:bg-primary/5"
+                  }
+                `}
+              >
+                <div className="flex flex-col gap-2 items-center justify-center">
+                  <div
+                    className={`
+                    transition-transform duration-300 ease-out
+                    group-hover:scale-110
+                    text-xl
+                  `}
+                  >
+                    {item.icon}
+                  </div>
+                  {activePage && (
+                    <div className="w-1 h-1 bg-primary rounded-full"></div>
+                  )}
+                </div>
+              </Link>
+            );
+          })}
+        </div>
+      </nav>
+    );
+  }
+
+  // Render sidebar for desktop
   return (
     <>
       {/* Sidebar */}
@@ -36,7 +88,7 @@ export default function Sidebar({
         `}
       >
         {/* Navigation */}
-        <nav className="relative flex-1 py-4  text-sm font-medium overflow-visible">
+        <nav className="relative flex-1 py-4 text-sm font-medium overflow-visible">
           {navigationItems.map((item) => {
             const activePage =
               item.href === "/admin"
