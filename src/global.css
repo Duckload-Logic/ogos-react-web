@@ -89,7 +89,7 @@
     --card-foreground: 0 0% 95%;
     --card-hover-background: 0 0% 40%;
     --card-hover-foreground: 0 0% 95%;
-    
+
     --popover: 0 0% 20%;
     --popover-foreground: 0 0% 95%;
 
@@ -125,13 +125,27 @@
 @layer base {
   * {
     border-color: hsl(var(--border));
-    font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    font-family:
+      Arial,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      "Helvetica Neue",
+      sans-serif;
   }
 
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family: Arial, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    font-family:
+      Arial,
+      -apple-system,
+      BlinkMacSystemFont,
+      "Segoe UI",
+      Roboto,
+      "Helvetica Neue",
+      sans-serif;
     font-size: 16px;
     line-height: 1.6;
   }
@@ -140,33 +154,33 @@
     font-size: 2.25rem;
     font-weight: bold;
     letter-spacing: -0.02em;
-    font-family: 'Trajan Pro', Arial, sans-serif;
+    font-family: "Trajan Pro", Arial, sans-serif;
   }
 
   h2 {
     font-size: 1.875rem;
     font-weight: bold;
     letter-spacing: -0.02em;
-    font-family: 'Trajan Pro', Arial, sans-serif;
+    font-family: "Trajan Pro", Arial, sans-serif;
   }
 
   h3 {
     font-size: 1.5rem;
     font-weight: 600;
-    font-family: 'Trajan Pro', Arial, sans-serif;
+    font-family: "Trajan Pro", Arial, sans-serif;
   }
 
   h4 {
     font-size: 1.25rem;
     font-weight: 600;
-    font-family: 'Trajan Pro', Arial, sans-serif;
+    font-family: "Trajan Pro", Arial, sans-serif;
   }
 
   h5,
   h6 {
     font-size: 1.125rem;
     font-weight: 600;
-    font-family: 'Trajan Pro', Arial, sans-serif;
+    font-family: "Trajan Pro", Arial, sans-serif;
   }
 
   p {
@@ -223,7 +237,6 @@
   }
 
   .pill {
-
   }
 
   .pill:disabled {
