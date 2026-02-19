@@ -240,33 +240,37 @@ function BioCard({ userData, studentData }: any) {
 function InfoNavigation({ activeTab, setActiveTab }: any) {
   return (
     <div className="relative">
-      <nav className="flex items-end gap-1 w-full min-w-max ml-0 sm:ml-4">
+      <nav className="flex items-end gap-1 w-full sm:w-auto overflow-x-auto sm:overflow-visible no-scrollbar ml-0 sm:ml-4">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative whitespace-nowrap py-2.5 px-4 sm:py-3 sm:px-6 text-xs sm:text-sm font-medium transition-all duration-200
-                border-t-2 border-l-2 border-r-2 -mb-[2px]
-                ${
-                  isActive
-                    ? "bg-card text-card-foreground border-border rounded-t-xl z-20"
-                    : "bg-muted text-muted-foreground border-transparent hover:bg-muted/80 rounded-t-lg z-0"
-                }`}
+              // Added flex-1 on mobile to ensure they fill the screen width
+              className={`relative flex-1 sm:flex-none whitespace-nowrap py-3 px-4 sm:px-6 text-xs sm:text-sm font-medium transition-all duration-300
+          border-t-2 border-l-2 border-r-2 -mb-[2px]
+          ${
+            isActive
+              ? "bg-card text-card-foreground border-border rounded-t-xl z-20"
+              : "bg-muted text-muted-foreground border-transparent rounded-t-lg z-0 opacity-70"
+          }`}
             >
-              <div className="flex items-center gap-2">
+              <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-2">
                 <tab.icon
-                  className={`transition-all duration-300 ${isActive ? "mr-2 scale-110 text-primary" : "mr-0 scale-100 opacity-60"}`}
+                  className={`transition-all duration-300 ${isActive ? "scale-110 text-primary" : "scale-100 opacity-60"}`}
+                  size={18}
                 />
+
+                {/* Label is hidden on very small screens unless active */}
                 <div
                   className={`grid transition-all duration-300 ease-in-out ${
                     isActive
-                      ? "grid-cols-[1fr] opacity-100 ml-1"
-                      : "grid-cols-[0fr] opacity-0 ml-0"
+                      ? "grid-cols-[1fr] opacity-100"
+                      : "grid-cols-[0fr] opacity-0"
                   }`}
                 >
-                  <span className="overflow-hidden whitespace-nowrap">
+                  <span className="overflow-hidden whitespace-nowrap text-[10px] sm:text-sm hidden sm:block">
                     {tab.label}
                   </span>
                 </div>
