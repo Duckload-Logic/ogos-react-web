@@ -239,7 +239,7 @@ function BioCard({ userData, studentData }: any) {
 
 function InfoNavigation({ activeTab, setActiveTab }: any) {
   return (
-    <div className="relative">
+    <div className="relative z-20 -mb-[2px]">
       <nav className="flex items-end gap-1 w-full sm:w-auto overflow-x-auto overflow-y-hidden sm:overflow-visible no-scrollbar ml-0 sm:ml-4">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
@@ -249,7 +249,7 @@ function InfoNavigation({ activeTab, setActiveTab }: any) {
               onClick={() => setActiveTab(tab.id)}
               // Added flex-1 on mobile to ensure they fill the screen width
               className={`relative flex-1 sm:flex-none whitespace-nowrap py-3 px-4 sm:px-6 text-xs sm:text-sm font-medium transition-all duration-300
-                border-t-2 border-l-2 border-r-2 -mb-[2px] z-200
+                border-t-2 border-l-2 border-r-2
                 ${
                   isActive
                     ? "bg-card text-card-foreground border-border rounded-t-xl"
@@ -305,7 +305,7 @@ function InfoContent({ activeTab, studentData }: any) {
   };
 
   return (
-    <div className="bg-card w-full border-2 border-t-0 sm:border-t-2 border-border rounded-b-lg sm:rounded-t-lg shadow-lg p-4 sm:p-6 mb-4">
+    <div className="bg-card w-full border-2 border-border rounded-b-lg sm:rounded-t-lg shadow-lg p-4 sm:p-6 mb-4 z-10">
       {views[activeTab] || <p>Content not found.</p>}
     </div>
   );
