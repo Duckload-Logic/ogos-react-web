@@ -22,13 +22,17 @@ import {
   Activity,
   MessageSquare,
   UserCheck,
+  User,
+  BookOpen,
+  Wallet,
+  HeartPulse,
 } from "lucide-react";
 
-const tabs: { id: string; label: string }[] = [
-  { id: "general", label: "General Profile" },
-  { id: "family", label: "Family Background" },
-  { id: "education", label: "Educational Background" },
-  { id: "health", label: "Health Information" },
+const tabs: { id: string; label: string; icon: any }[] = [
+  { id: "general", label: "General Profile", icon: User },
+  { id: "family", label: "Family Background", icon: Users },
+  { id: "education", label: "Educational Background", icon: BookOpen },
+  { id: "health", label: "Health Information", icon: HeartPulse },
 ];
 
 const genderMap: Record<number, string> = {
@@ -149,7 +153,7 @@ export default function StudentProfile() {
             userData={userData}
             studentData={studentData.studentProfile}
           />
-          <div className="xl:col-span-3 h-full flex flex-col">
+          <div className="xl:col-span-3 h-full flex flex-col gap-0">
             <InfoNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
             <InfoContent activeTab={activeTab} studentData={studentData} />
           </div>
@@ -235,8 +239,7 @@ function BioCard({ userData, studentData }: any) {
 
 function InfoNavigation({ activeTab, setActiveTab }: any) {
   return (
-    <div className="overflow-x-auto md:overflow-hidden">
-      {/* Navigation Container - No padding/gap at the bottom */}
+    <div className="relative">
       <nav className="flex items-end gap-1 w-full min-w-max ml-0 sm:ml-4">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
@@ -244,13 +247,18 @@ function InfoNavigation({ activeTab, setActiveTab }: any) {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative whitespace-nowrap py-2.5 px-4 sm:py-3 sm:px-6 text-xs sm:text-sm font-medium transition-all duration-200 border-t-2 border-l-2 border-r-2 ${
-                isActive
-                  ? "bg-card text-card-foreground  border-border rounded-t-xl z-100 -mb-[2px]"
-                  : "bg-muted text-muted-foreground border-transparent hover:bg-muted/80 rounded-t-lg"
-              }`}
+              className={`relative whitespace-nowrap py-2.5 px-4 sm:py-3 sm:px-6 text-xs sm:text-sm font-medium transition-all duration-200
+                border-t-2 border-l-2 border-r-2
+                ${
+                  isActive
+                    ? "bg-card text-card-foreground border-border rounded-t-xl z-20 -mb-[2px]"
+                    : "bg-muted text-muted-foreground border-transparent hover:bg-muted/80 rounded-t-lg z-0"
+                }`}
             >
-              {tab.label}
+              <div className="flex items-center gap-2">
+                <tab.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                {isActive && tab.label}
+              </div>
             </button>
           );
         })}
