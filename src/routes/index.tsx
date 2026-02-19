@@ -25,7 +25,7 @@ import AppointmentsManagement from "@/features/admin/pages/AppointmentsManagemen
 import ReviewExcuses from "@/features/admin/pages/ReviewExcuses";
 import Reports from "@/features/admin/pages/Reports";
 import Frontdesk from "@/features/frontdesk/pages/Frontdesk";
-import StudentRecord from "@/features/admin/pages/StudentRecord";
+import StudentProfile from "@/features/admin/pages/StudentProfile";
 
 export const routes: RouteObject[] = [
   // Root route - redirect to login
@@ -109,7 +109,7 @@ export const routes: RouteObject[] = [
     path: "/admin/student-records/:studentId",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <StudentRecord />
+        <StudentProfile />
       </ProtectedRoute>
     ),
   },
