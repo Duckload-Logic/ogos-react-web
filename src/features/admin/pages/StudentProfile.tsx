@@ -696,10 +696,10 @@ function HealthInformationView({ healthData }: any) {
               className={`p-4 rounded-xl border border-border bg-card shadow-sm hover:shadow-lg transition-shadow cursor-default group `}
             >
               <div className="flex items-center gap-3 mb-3 origin-top-left scale-[0.95]">
-                <div className="p-2 rounded-lg bg-muted text-muted-foreground">
+                <div className="p-2 rounded-lg bg-muted text-muted-foreground group-hover:bg-primary/30 group-hover:text-primary transition-colors">
                   <stat.icon size={18} />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground group-hover:text-primary transition-colors">
                   {stat.label}
                 </span>
               </div>
