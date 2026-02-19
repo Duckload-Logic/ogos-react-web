@@ -248,16 +248,28 @@ function InfoNavigation({ activeTab, setActiveTab }: any) {
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`relative whitespace-nowrap py-2.5 px-4 sm:py-3 sm:px-6 text-xs sm:text-sm font-medium transition-all duration-200
-                border-t-2 border-l-2 border-r-2
+                border-t-2 border-l-2 border-r-2 -mb-[2px]
                 ${
                   isActive
-                    ? "bg-card text-card-foreground border-border rounded-t-xl z-20 -mb-[2px]"
+                    ? "bg-card text-card-foreground border-border rounded-t-xl z-20"
                     : "bg-muted text-muted-foreground border-transparent hover:bg-muted/80 rounded-t-lg z-0"
                 }`}
             >
               <div className="flex items-center gap-2">
-                <tab.icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                {isActive && tab.label}
+                <tab.icon
+                  className={`transition-all duration-300 ${isActive ? "mr-2 scale-110 text-primary" : "mr-0 scale-100 opacity-60"}`}
+                />
+                <div
+                  className={`grid transition-all duration-300 ease-in-out ${
+                    isActive
+                      ? "grid-cols-[1fr] opacity-100 ml-1"
+                      : "grid-cols-[0fr] opacity-0 ml-0"
+                  }`}
+                >
+                  <span className="overflow-hidden whitespace-nowrap">
+                    {tab.label}
+                  </span>
+                </div>
               </div>
             </button>
           );
