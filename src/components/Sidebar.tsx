@@ -38,7 +38,10 @@ export default function Sidebar({
         {/* Navigation */}
         <nav className="relative flex-1 py-4  text-sm font-medium overflow-visible">
           {navigationItems.map((item) => {
-            const active = location.pathname === item.href;
+            const activePage =
+              item.href === "/admin"
+                ? location.pathname === "/admin" // Strict match for Home
+                : location.pathname.startsWith(item.href); // Partial match for others
 
             return (
               <Link
@@ -47,7 +50,7 @@ export default function Sidebar({
                 className={`
                   group relative flex items-center px-4 py-3
                   transition-colors duration-200 mx-2 my-2
-                  ${active ? "bg-primary rounded-lg text-background" : ""}
+                  ${activePage ? "bg-primary rounded-lg text-background" : ""}
                 `}
               >
                 {/* 1. Icon Anchor: This div stays the same width regardless of sidebar state */}
@@ -57,7 +60,7 @@ export default function Sidebar({
                       transition-transform duration-300 ease-out
                       group-hover:rotate-[-10deg]
                       group-hover:scale-110
-                      ${!active ? "group-hover:text-primary" : ""}
+                      ${!activePage ? "group-hover:text-primary" : ""}
                     `}
                   >
                     {item.icon}
@@ -73,7 +76,7 @@ export default function Sidebar({
                         ? "opacity-100 translate-x-0"
                         : "opacity-0 -translate-x-4 pointer-events-none"
                     }
-                    ${!active ? "group-hover:text-primary" : ""}
+                    ${!activePage ? "group-hover:text-primary" : ""}
                   `}
                 >
                   {item.label}
