@@ -9,12 +9,13 @@ export const useStudent = () => {
         include_health: true,
         include_family: true,
         include_education: true,
-      }
+        include_parents: true,
+      },
     });
     return data;
-  }
+  };
 
   return {
     fetchStudentData,
   };
-}
+};
