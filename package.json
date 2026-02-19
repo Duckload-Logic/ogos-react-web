@@ -19,18 +19,21 @@
     "axios": "^1.6.0",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "crypto-js": "^4.2.0",
     "lucide-react": "^0.562.0",
     "react": "^18.2.0",
     "react-day-picker": "^9.13.0",
     "react-dom": "^18.2.0",
-    "react-hook-form": "^7.70.0",
+    "react-hook-form": "^7.71.1",
     "react-router-dom": "^6.18.0",
     "tailwind-merge": "^3.4.0",
+    "vite-plugin-svgr": "^4.5.0",
     "vite-tsconfig-paths": "^6.0.3",
-    "zod": "^4.3.5"
+    "zod": "^4.3.6"
   },
   "devDependencies": {
     "@eslint/js": "^8.50.0",
+    "@types/crypto-js": "^4.2.2",
     "@types/node": "^25.0.3",
     "@types/react": "^18.2.0",
     "@types/react-dom": "^18.2.0",

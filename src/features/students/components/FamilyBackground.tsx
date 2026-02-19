@@ -1,10 +1,10 @@
-import { FormData, FormErrors } from "@/types";
+import { StudentRecord, FormErrors } from "@/types";
 import { PARENTAL_STATUS_MAP } from "../utils/maps";
 import { Combobox } from "@/components/ui/combobox";
 import { useState } from "react";
 
 interface FamilyBackgroundProps {
-  formData: FormData;
+  formData: StudentRecord;
   errors: FormErrors;
   handleInputChange: (field: string, value: string | boolean) => void;
   clearError: (field: string) => void;

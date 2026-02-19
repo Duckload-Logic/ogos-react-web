@@ -1,7 +1,7 @@
-import { FormData } from "@/types";
+import { StudentRecord } from "@/types";
 
 interface HealthWellnessProps {
-  formData: FormData;
+  formData: StudentRecord;
   handleInputChange: (field: string, value: string | boolean) => void;
 }
 

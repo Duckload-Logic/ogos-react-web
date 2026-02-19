@@ -1,10 +1,11 @@
 import Layout from "@/components/Layout";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { hashId } from "@/lib/hash";
 import StudentRecordsHeader from "../components/StudentRecordsHeader";
 import StudentSearchAndFilter from "../components/StudentSearchAndFilter";
 import StudentCardsGrid from "../components/StudentCardsGrid";
 import AddStudentModal, { addStudentSchema } from "../components/AddStudentModal";
-import StudentDetailsModal from "../components/StudentDetailsModal";
 import type { AddStudentForm } from "../components/AddStudentModal";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -33,8 +34,6 @@ interface Student {
 
 export default function StudentRecords() {
   const [students, setStudents] = useState<Student[]>([]);
-  const [selectedStudent, setSelectedStudent] = useState<Student | null>(null);
-  const [activeTab, setActiveTab] = useState("personal");
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
   const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -42,6 +41,7 @@ export default function StudentRecords() {
   const [selectedCourse, setSelectedCourse] = useState("All Courses");
   const [searchTerm, setSearchTerm] = useState("");
   const [showAdd, setShowAdd] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStudents = async () => {
@@ -50,7 +50,7 @@ export default function StudentRecords() {
         let toAppend: Student[] = [];
         response.data.students.map((student: any) => {
           toAppend.push({
-            id: student.studentRecordId,
+            id: student.userId,
             studentId: `2023-${String(toAppend.length + 109).padStart(5, "0")}-TG-0`,
             name: `${student.lastName}, ${student.firstName}`,
             course: student.course,
@@ -156,8 +156,8 @@ const courses = [
         <StudentCardsGrid
           students={filteredStudents}
           onViewClick={(student) => {
-            setSelectedStudent(student);
-            setActiveTab("personal");
+            const hashedId = encodeURIComponent(hashId(student.id));
+            navigate(`/admin/student-records/${hashedId}`, { state: { student } });
           }}
           onDeleteClick={handleDeleteClick}
         />
@@ -170,12 +170,6 @@ const courses = [
         }}
         onSubmit={onSubmit}
         courses={courses}
-      />
-      <StudentDetailsModal
-        student={selectedStudent}
-        activeTab={activeTab}
-        onTabChange={setActiveTab}
-        onClose={() => setSelectedStudent(null)}
       />
 
       {/* Delete Confirmation Dialog */}
