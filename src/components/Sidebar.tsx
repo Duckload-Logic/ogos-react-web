@@ -1,24 +1,27 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import PUPLogo from "@/assets/images/PUPLogo.png";
-import { is } from "zod/v4/locales";
-import { set } from "zod";
 
-export default function Sidebar(
-  { navigationItems, location, setExpanded }: { navigationItems: any[], location: any, setExpanded: React.Dispatch<React.SetStateAction<boolean>> }
-) {
+export default function Sidebar({
+  navigationItems,
+  location,
+  setExpanded,
+}: {
+  navigationItems: any[];
+  location: any;
+  setExpanded: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   // 1. Lazy initializer: Read from localStorage immediately
   const [isHovered, setIsHovered] = useState(() => {
-    const saved = localStorage.getItem('sidebarHovered');
+    const saved = localStorage.getItem("sidebarHovered");
     return saved ? JSON.parse(saved) : false;
   });
 
   // 2. Notify parent of state changes safely
   useEffect(() => {
     setExpanded(isHovered);
-    localStorage.setItem('sidebarHovered', JSON.stringify(isHovered));
+    localStorage.setItem("sidebarHovered", JSON.stringify(isHovered));
   }, [isHovered, setExpanded]);
-  
+
   return (
     <>
       {/* Sidebar */}
@@ -32,7 +35,6 @@ export default function Sidebar(
           ${isHovered ? "w-64" : "w-16"}
         `}
       >
-
         {/* Navigation */}
         <nav className="relative flex-1 py-4  text-sm font-medium overflow-visible">
           {navigationItems.map((item) => {
@@ -54,8 +56,8 @@ export default function Sidebar(
                     className={`
                       transition-transform duration-300 ease-out
                       group-hover:rotate-[-10deg]
-                      group-hover:scale-110 
-                      ${!active ? 'group-hover:text-primary' : ''}
+                      group-hover:scale-110
+                      ${!active ? "group-hover:text-primary" : ""}
                     `}
                   >
                     {item.icon}
@@ -66,10 +68,12 @@ export default function Sidebar(
                 <span
                   className={`
                     ml-6 whitespace-nowrap transition-all duration-300 ease-in-out
-                    ${isHovered 
-                      ? "opacity-100 translate-x-0" 
-                      : "opacity-0 -translate-x-4 pointer-events-none"}
-                    ${!active ? 'group-hover:text-primary' : ''}
+                    ${
+                      isHovered
+                        ? "opacity-100 translate-x-0"
+                        : "opacity-0 -translate-x-4 pointer-events-none"
+                    }
+                    ${!active ? "group-hover:text-primary" : ""}
                   `}
                 >
                   {item.label}
@@ -80,5 +84,5 @@ export default function Sidebar(
         </nav>
       </aside>
     </>
-  ) 
+  );
 }
