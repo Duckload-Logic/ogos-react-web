@@ -144,12 +144,12 @@ export default function StudentProfile() {
           <CircleChevronLeft className="w-5 h-5" />
           <span className="text-sm font-medium">Back to Students</span>
         </a>
-        <div className="grid grid-cols-4 gap-4 h-full">
+        <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 h-full">
           <BioCard
             userData={userData}
             studentData={studentData.studentProfile}
           />
-          <div className="col-span-3 h-full flex flex-col">
+          <div className="xl:col-span-3 h-full flex flex-col">
             <InfoNavigation activeTab={activeTab} setActiveTab={setActiveTab} />
             <InfoContent activeTab={activeTab} studentData={studentData} />
           </div>
@@ -164,7 +164,7 @@ function BioCard({ userData, studentData }: any) {
     studentData?.genderId === 1 ? ProfileMale : ProfileFemale;
 
   return (
-    <div className="relative mt-12 flex flex-col items-center">
+    <div className="relative mt-10 sm:mt-12 flex flex-col items-center">
       {/* Profile Icon - Overlapping the card */}
       <div className="absolute -top-12 z-10">
         <DefaultProfileIcon className="h-24 w-24 rounded-full bg-background p-1 border-4 border-card shadow-xl text-muted-foreground" />
@@ -208,7 +208,7 @@ function BioCard({ userData, studentData }: any) {
               <p className="text-[10px] uppercase text-muted-foreground font-bold leading-none mb-1 group-hover:text-primary transition-colors">
                 Email Address
               </p>
-              <p className="text-sm font-medium text-card-foreground truncate max-w-[180px] md:max-w-full">
+              <p className="text-sm font-medium text-card-foreground truncate max-w-[200px] sm:max-w-full">
                 {userData?.email}
               </p>
             </div>
@@ -235,18 +235,18 @@ function BioCard({ userData, studentData }: any) {
 
 function InfoNavigation({ activeTab, setActiveTab }: any) {
   return (
-    <div>
+    <div className="overflow-x-auto md:overflow-hidden">
       {/* Navigation Container - No padding/gap at the bottom */}
-      <nav className="flex items-end gap-1 w-full ml-4">
+      <nav className="flex items-end gap-1 w-full min-w-max ml-0 sm:ml-4">
         {tabs.map((tab) => {
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`relative py-3 px-6 text-sm font-medium transition-all duration-200 border-t-2 border-l-2 border-r-2 ${
+              className={`relative whitespace-nowrap py-2.5 px-4 sm:py-3 sm:px-6 text-xs sm:text-sm font-medium transition-all duration-200 border-t-2 border-l-2 border-r-2 ${
                 isActive
-                  ? "bg-card text-card-foreground  border-border rounded-t-xl z-10 -mb-[2px]"
+                  ? "bg-card text-card-foreground  border-border rounded-t-xl z-100 -mb-[2px]"
                   : "bg-muted text-muted-foreground border-transparent hover:bg-muted/80 rounded-t-lg"
               }`}
             >
@@ -281,7 +281,7 @@ function InfoContent({ activeTab, studentData }: any) {
   };
 
   return (
-    <div className="bg-card w-full border-2 border-border rounded-lg shadow-lg p-6 mb-4">
+    <div className="bg-card w-full border-2 border-border rounded-lg shadow-lg p-4 sm:p-6 mb-4">
       {views[activeTab] || <p>Content not found.</p>}
     </div>
   );
@@ -337,7 +337,11 @@ function GeneralProfileView({ studentProfileData, studentAddresses }: any) {
         {/* Grid Container */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-12 px-2">
           {personalInfoFields.map((field) => (
-            <InfoItem label={field.label} value={field.value} />
+            <InfoItem
+              key={field.label}
+              label={field.label}
+              value={field.value}
+            />
           ))}
         </div>
       </section>
@@ -446,7 +450,7 @@ function FamilyBackgroundView({ familyData, parentsData, financeData }: any) {
                   : "Not Provided"}
               </h4>
 
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {parent.data?.slice(3).map((field) => (
                   <InfoItem
                     key={field.label}
@@ -591,14 +595,14 @@ function EducationBackgroundView({ educationData }: any) {
   ];
 
   return (
-    <div className="p-4 animate-in slide-in-from-bottom-4 duration-500">
+    <div className="p-2 sm:p-4 animate-in slide-in-from-bottom-4 duration-500">
       <SectionTitle title="Academic History" />
 
-      <div className="mt-10 relative left-4 border-l-2 border-dashed border-border ml-2 space-y-12">
+      <div className="mt-8 sm:mt-10 relative border-l-2 border-dashed border-border ml-1 sm:ml-2 space-y-8 sm:space-y-12">
         {levels.map((level) => (
-          <div key={level.id} className="relative pl-10">
+          <div key={level.id} className="relative pl-7 sm:pl-10">
             {/* The Timeline Node */}
-            <div className="absolute -left-[11px] top-0 w-5 h-5 rounded-full border-4 border-card bg-primary shadow-sm" />
+            <div className="absolute -left-[9px] sm:-left-[11px] top-0 w-4 h-4 sm:w-5 sm:h-5 rounded-full border-4 border-card bg-primary shadow-sm" />
 
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
               <div className="flex-1">
@@ -725,7 +729,7 @@ function HealthInformationView({ healthData }: any) {
             Professional Consultation
           </h3>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-y-6 gap-x-4">
             <InfoItem
               label="Consulted Professional"
               value={healthData?.consultedProfessional}
@@ -736,7 +740,7 @@ function HealthInformationView({ healthData }: any) {
               value={`${healthData?.numberOfSessions} Session(s)`}
             />
 
-            <div className="col-span-2 md:col-span-3 flex items-center gap-4 mt-2 p-3 bg-card rounded-lg border border-border/50">
+            <div className="sm:col-span-2 md:col-span-3 flex items-center gap-4 mt-2 p-3 bg-card rounded-lg border border-border/50">
               <div>
                 <p className="text-[9px] font-bold text-muted-foreground uppercase">
                   Period
@@ -757,7 +761,7 @@ function HealthInformationView({ healthData }: any) {
 // Sub-components for cleaner code
 function InfoItem({ label, value }: { label: string; value: string }) {
   return (
-    <div className="group flex flex-col origin-top-left scale-[0.9]">
+    <div className="group flex flex-col origin-top-left scale-100 sm:scale-[0.9]">
       <span className="text-[10px] font-bold uppercase tracking-tight text-muted-foreground group-hover:text-primary transition-colors mb-1">
         {label}
       </span>
