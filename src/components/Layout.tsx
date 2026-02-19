@@ -293,7 +293,7 @@ export default function Layout({ children, title }: LayoutProps) {
 
           {/* Page Content */}
           <main
-            className={`flex-1 overflow-auto p-4 md:p-8 z-1 bg-transparent`}
+            className={`flex-1 overflow-auto p-4 md:p-8 z-1 bg-transparent transition-colors duration-300 ${expanded ? "blur-sm" : ""}`}
           >
             {/* {title && (
               <h1 className="text-3xl font-bold text-foreground mb-6">
