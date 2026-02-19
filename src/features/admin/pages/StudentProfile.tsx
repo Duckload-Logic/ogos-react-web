@@ -464,15 +464,16 @@ function FamilyBackgroundView({ familyData, parentsData, financeData }: any) {
               key={parent.role}
               className="relative p-5 rounded-2xl border border-border bg-gradient-to-br from-card to-muted/80 shadow-sm"
             >
-              <div className="absolute top-4 right-4 text-[10px] font-semibold uppercase text-primary opacity-90">
-                {parent.role}
+              <div className="flex md:flex-row flex-col justify-between md:items-start gap-0 md:gap-2 mb-4">
+                <h4 className="text-lg font-bold text-card-foreground mb-4">
+                  {parent.data?.length > 0
+                    ? `${parent.data[0].value}, ${parent.data[1].value} ${parent.data[2]?.value ? `${parent.data[2].value[0]}.` : ""}`
+                    : "Not Provided"}
+                </h4>
+                <div className="text-[10px] font-semibold uppercase text-primary opacity-90">
+                  {parent.role}
+                </div>
               </div>
-
-              <h4 className="text-lg font-bold text-card-foreground mb-4">
-                {parent.data?.length > 0
-                  ? `${parent.data[0].value}, ${parent.data[1].value} ${parent.data[2]?.value ? `${parent.data[2].value[0]}.` : ""}`
-                  : "Not Provided"}
-              </h4>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 {parent.data?.slice(3).map((field) => (
@@ -631,17 +632,17 @@ function EducationBackgroundView({ educationData }: any) {
             <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
               <div className="flex-1">
                 {/* School Level Header */}
-                <div className="flex items-center gap-3 mb-1">
-                  <span className="text-[10px] font-black uppercase tracking-widest text-primary ">
+                <div className="flex flex-col md:flex-row items-start gap-1 md:gap-3 mb-1">
+                  <span className="text-[6px] md:text-[10px] font-black uppercase tracking-widest text-nowrap text-primary">
                     {level.label}
                   </span>
-                  <span className="text-xs font-bold text-muted-foreground">
+                  <span className="text-[6px] md:text-[10px] font-bold text-muted-foreground">
                     Class of {level.data?.yearCompleted || "----"}
                   </span>
                 </div>
 
                 {/* School Name & Type */}
-                <h4 className="text-lg font-bold text-card-foreground">
+                <h4 className="text-[10px] md:text-xs font-bold text-card-foreground">
                   {level.data?.schoolName || "School Name Not Specified"}
                 </h4>
 
@@ -658,7 +659,11 @@ function EducationBackgroundView({ educationData }: any) {
                       .map((award: string, i: number) => (
                         <span
                           key={i}
-                          className="text-[10px] font-semibold bg-muted text-card-foreground border border-border px-2 py-1 rounded-md shadow-sm"
+                          className="text-[6px] md:text-[10px] font-semibold
+                            bg-muted text-card-foreground border
+                            border-border px-2 py-1 rounded-md
+                            shadow-sm origin-left scale-[0.9]
+                            md:scale-100"
                         >
                           <Trophy className="w-3 h-3 mr-2 inline" />
                           {award.trim()}
