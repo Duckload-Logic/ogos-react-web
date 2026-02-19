@@ -191,7 +191,7 @@ function BioCard({ userData, studentData }: any) {
               <IdCard className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
             </div>
             <div className="ml-3">
-              <p className="text-[10px] uppercase text-muted-foreground font-bold leading-none mb-1">
+              <p className="text-[10px] uppercase text-muted-foreground font-bold leading-none mb-1 group-hover:text-primary transition-colors">
                 Student Number
               </p>
               <p className="text-sm font-medium text-card-foreground">
@@ -205,7 +205,7 @@ function BioCard({ userData, studentData }: any) {
               <Mail className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
             </div>
             <div className="ml-3">
-              <p className="text-[10px] uppercase text-muted-foreground font-bold leading-none mb-1">
+              <p className="text-[10px] uppercase text-muted-foreground font-bold leading-none mb-1 group-hover:text-primary transition-colors">
                 Email Address
               </p>
               <p className="text-sm font-medium text-card-foreground truncate max-w-[180px] md:max-w-full">
@@ -219,7 +219,7 @@ function BioCard({ userData, studentData }: any) {
               <Phone className="w-4 h-4 text-muted-foreground group-hover:text-primary" />
             </div>
             <div className="ml-3">
-              <p className="text-[10px] uppercase text-muted-foreground font-bold leading-none mb-1">
+              <p className="text-[10px] uppercase text-muted-foreground font-bold leading-none mb-1 group-hover:text-primary transition-colors">
                 Contact Number
               </p>
               <p className="text-sm font-medium text-card-foreground">
