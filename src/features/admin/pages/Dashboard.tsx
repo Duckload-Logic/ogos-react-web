@@ -1,11 +1,4 @@
-import Layout from "@/components/Layout";
-import {
-  Calendar,
-  Users,
-  FileText,
-  TrendingUp,
-  Eye,
-} from "lucide-react";
+import { Calendar, Users, FileText, TrendingUp, Eye } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useState, useRef, useEffect } from "react";
 import { useUser } from "@/hooks/useUser";
@@ -24,10 +17,10 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchAllAppointments = async () => {
       await fetchAppointments();
-    }
+    };
 
     fetchAllAppointments();
-  }, [fetchAppointments])
+  }, [fetchAppointments]);
 
   useEffect(() => {
     const fetchAllStudents = async () => {
@@ -35,13 +28,15 @@ export default function Dashboard() {
 
       try {
         // Get unique IDs to avoid redundant API calls
-        const uniqueStudentIds = [...new Set(appointments.map((apt) => apt.userId))];
-        
+        const uniqueStudentIds = [
+          ...new Set(appointments.map((apt) => apt.userId)),
+        ];
+
         // Fetch all user data in parallel
         const studentData = await Promise.all(
-          uniqueStudentIds.map((id) => fetchUserData(id))
+          uniqueStudentIds.map((id) => fetchUserData(id)),
         );
-        
+
         setStudents(studentData);
       } catch (err) {
         console.error("Failed to fetch students:", err);
@@ -57,11 +52,11 @@ export default function Dashboard() {
       .map((apt) => {
         const date = new Date(apt.scheduledDate);
         const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-        const d = String(date.getDate()).padStart(2, '0');
-        
-        return `${y}-${m}-${d}`; 
-      })
+        const m = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+        const d = String(date.getDate()).padStart(2, "0");
+
+        return `${y}-${m}-${d}`;
+      }),
   );
   const today = new Date();
 
@@ -107,7 +102,9 @@ export default function Dashboard() {
   const stats = [
     {
       label: "Scheduled",
-      value: appointments.filter((a) => ['Approved', 'Rescheduled'].includes(a.status)).length,
+      value: appointments.filter((a) =>
+        ["Approved", "Rescheduled"].includes(a.status),
+      ).length,
       color: "bg-blue-100/90 text-blue-600 ",
     },
     {
@@ -130,11 +127,12 @@ export default function Dashboard() {
   const appointmentActions = [
     {
       purpose: "View",
-      label: <Eye size={16}/>, 
-      color: "bg-gray-500 text-white", 
+      label: <Eye size={16} />,
+      color: "bg-gray-500 text-white",
       onClick: (appointment: any) => {
         console.log("View appointment", appointment);
-      }}
+      },
+    },
   ];
 
   const quickActions = [
@@ -165,7 +163,7 @@ export default function Dashboard() {
   ];
 
   return (
-    <Layout title="Dashboard">
+    <>
       <div className="flex flex-col gap-6 h-full">
         {/* Stats Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -194,7 +192,11 @@ export default function Dashboard() {
             touchStartX={touchStartX}
             selectedDate={selectedDate}
             onDateClick={(day) => {
-              const newDate = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), day);
+              const newDate = new Date(
+                currentMonth.getFullYear(),
+                currentMonth.getMonth(),
+                day,
+              );
               setSelectedDate(newDate);
             }}
             legends={calendarLegends}
@@ -203,13 +205,13 @@ export default function Dashboard() {
           {/* Right Side: Appointments List and Activity */}
           <div className="lg:col-span-3 space-y-6">
             {/* Appointments List */}
-            <AppointmentsList 
+            <AppointmentsList
               title="Upcoming Appointments"
-              appointments={appointments} 
-              students={students} 
+              appointments={appointments}
+              students={students}
               status="Approved"
               selectedDate={selectedDate}
-              excludeStatus={['Pending']} 
+              excludeStatus={["Pending"]}
               actions={appointmentActions}
             />
 
@@ -251,8 +253,6 @@ export default function Dashboard() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
-
-

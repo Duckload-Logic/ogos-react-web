@@ -1,15 +1,9 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import {
-  Upload,
-  Download,
-  FileText,
-  Check,
-  Clock,
-} from "lucide-react";
+import { Upload, Download, FileText, Check, Clock } from "lucide-react";
 
-interface ExcuseSlip {
+interface AdmissionSlip {
   id: string;
   date: string;
   reason: string;
@@ -18,7 +12,7 @@ interface ExcuseSlip {
   submissionDate: string;
 }
 
-const MOCK_EXCUSE_SLIPS: ExcuseSlip[] = [
+const MOCK_EXCUSE_SLIPS: AdmissionSlip[] = [
   {
     id: "1",
     date: "2025-09-23",
@@ -29,12 +23,12 @@ const MOCK_EXCUSE_SLIPS: ExcuseSlip[] = [
   },
 ];
 
-export default function ExcuseSlip() {
+export default function AdmissionSlip() {
   const [uploadDate, setUploadDate] = useState("");
   const [uploadReason, setUploadReason] = useState("");
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
-  const [excuseSlips, setExcuseSlips] =
-    useState<ExcuseSlip[]>(MOCK_EXCUSE_SLIPS);
+  const [admissionSlips, setAdmissionSlips] =
+    useState<AdmissionSlip[]>(MOCK_EXCUSE_SLIPS);
   const [isUploading, setIsUploading] = useState(false);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
 
@@ -51,7 +45,7 @@ export default function ExcuseSlip() {
     }
   };
 
-  const handleUploadExcuseSlip = async () => {
+  const handleUploadAdmissionSlip = async () => {
     if (!uploadDate || !uploadReason || !uploadedFile) {
       alert("Please fill in all fields and select a PDF file");
       return;
@@ -61,8 +55,8 @@ export default function ExcuseSlip() {
 
     // Simulate upload delay
     setTimeout(() => {
-      const newSlip: ExcuseSlip = {
-        id: String(excuseSlips.length + 1),
+      const newSlip: AdmissionSlip = {
+        id: String(admissionSlips.length + 1),
         date: uploadDate,
         reason: uploadReason,
         fileName: uploadedFile.name,
@@ -70,7 +64,7 @@ export default function ExcuseSlip() {
         submissionDate: new Date().toISOString().split("T")[0],
       };
 
-      setExcuseSlips([newSlip, ...excuseSlips]);
+      setAdmissionSlips([newSlip, ...admissionSlips]);
       setUploadDate("");
       setUploadReason("");
       setUploadedFile(null);
@@ -157,7 +151,8 @@ export default function ExcuseSlip() {
               </CardHeader>
               <CardContent className="pt-6 pb-6 px-6">
                 <p className="text-gray-600 mb-4 text-sm">
-                  Download our template to fill out your excuse slip before uploading.
+                  Download our template to fill out your excuse slip before
+                  uploading.
                 </p>
                 <Button
                   onClick={handleDownloadTemplate}
@@ -171,70 +166,85 @@ export default function ExcuseSlip() {
 
             {/* Excuse Slips List */}
             <div className="border border-gray-200 rounded-lg p-4 bg-white shadow-sm slips-list">
-              <h2 className="text-xl font-bold text-primary mb-4">Excuse Slips List</h2>
-            {excuseSlips.length === 0 ? (
-              <Card className="border-0 shadow-sm">
-                <CardContent className="pt-8 pb-8 text-center">
-                  <FileText className="w-12 h-12 mx-auto text-gray-400 mb-3" />
-                  <p className="text-gray-500 text-sm">No excuse slips submitted yet</p>
-                </CardContent>
-              </Card>
-            ) : (
-              <div className="space-y-3">
-                {excuseSlips.map((slip) => (
-                  <Card
-                    key={slip.id}
-                    className="border-0 shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    <CardHeader className="bg-blue-50 border-b pb-3">
-                      <div className="flex items-start justify-between">
-                        <CardTitle className="text-lg text-gray-900">
-                          {slip.reason}
-                        </CardTitle>
-                        {getStatusBadge(slip.status)}
-                      </div>
-                    </CardHeader>
-                    <CardContent className="pt-4 space-y-4">
-                      <div className="grid grid-cols-2 gap-4">
+              <h2 className="text-xl font-bold text-primary mb-4">
+                Excuse Slips List
+              </h2>
+              {admissionSlips.length === 0 ? (
+                <Card className="border-0 shadow-sm">
+                  <CardContent className="pt-8 pb-8 text-center">
+                    <FileText className="w-12 h-12 mx-auto text-gray-400 mb-3" />
+                    <p className="text-gray-500 text-sm">
+                      No excuse slips submitted yet
+                    </p>
+                  </CardContent>
+                </Card>
+              ) : (
+                <div className="space-y-3">
+                  {admissionSlips.map((slip) => (
+                    <Card
+                      key={slip.id}
+                      className="border-0 shadow-sm hover:shadow-md transition-shadow"
+                    >
+                      <CardHeader className="bg-blue-50 border-b pb-3">
+                        <div className="flex items-start justify-between">
+                          <CardTitle className="text-lg text-gray-900">
+                            {slip.reason}
+                          </CardTitle>
+                          {getStatusBadge(slip.status)}
+                        </div>
+                      </CardHeader>
+                      <CardContent className="pt-4 space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                          <div>
+                            <p className="text-sm font-semibold text-gray-600">
+                              Date
+                            </p>
+                            <p className="text-base font-semibold text-gray-900">
+                              {slip.date}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-semibold text-gray-600">
+                              Submitted
+                            </p>
+                            <p className="text-base font-semibold text-gray-900">
+                              {slip.submissionDate}
+                            </p>
+                          </div>
+                        </div>
+
                         <div>
-                          <p className="text-sm font-semibold text-gray-600">Date</p>
-                          <p className="text-base font-semibold text-gray-900">
-                            {slip.date}
+                          <p className="text-sm font-semibold text-gray-600">
+                            Slip ID
                           </p>
+                          <p className="text-base text-gray-900">#{slip.id}</p>
                         </div>
+
                         <div>
-                          <p className="text-sm font-semibold text-gray-600">Submitted</p>
-                          <p className="text-base font-semibold text-gray-900">
-                            {slip.submissionDate}
+                          <p className="text-sm font-semibold text-gray-600">
+                            File
+                          </p>
+                          <p className="text-base text-gray-900">
+                            {slip.fileName}
                           </p>
                         </div>
-                      </div>
 
-                      <div>
-                        <p className="text-sm font-semibold text-gray-600">Slip ID</p>
-                        <p className="text-base text-gray-900">#{slip.id}</p>
-                      </div>
-
-                      <div>
-                        <p className="text-sm font-semibold text-gray-600">File</p>
-                        <p className="text-base text-gray-900">{slip.fileName}</p>
-                      </div>
-
-                      {slip.status !== "pending" && (
-                        <div className="pt-4 p-3 bg-gray-50 rounded-lg">
-                          <p className="text-sm text-gray-600">
-                            Status:{" "}
-                            <span className="font-semibold text-gray-900">
-                              {slip.status.charAt(0).toUpperCase() + slip.status.slice(1)}
-                            </span>
-                          </p>
-                        </div>
-                      )}
-                    </CardContent>
-                  </Card>
-                ))}
-              </div>
-            )}
+                        {slip.status !== "pending" && (
+                          <div className="pt-4 p-3 bg-gray-50 rounded-lg">
+                            <p className="text-sm text-gray-600">
+                              Status:{" "}
+                              <span className="font-semibold text-gray-900">
+                                {slip.status.charAt(0).toUpperCase() +
+                                  slip.status.slice(1)}
+                              </span>
+                            </p>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
 
@@ -302,7 +312,7 @@ export default function ExcuseSlip() {
                   </div>
 
                   <Button
-                    onClick={handleUploadExcuseSlip}
+                    onClick={handleUploadAdmissionSlip}
                     disabled={isUploading}
                     className="w-full bg-primary hover:bg-secondary text-primary-foreground hover:text-gray-900 font-semibold py-3 text-base transition-all duration-300"
                   >

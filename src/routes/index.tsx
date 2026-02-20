@@ -1,9 +1,9 @@
 import { RouteObject, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PDSGate } from "@/components/PDSGate";
-import Header from "@/components/Header";
 
 // Shared
+import Layout from "@/components/Layout";
 import NotFound from "@/pages/shared/NotFound";
 
 // Auth Feature
@@ -11,11 +11,11 @@ import Login from "@/features/auth/pages/Login";
 import Register from "@/features/auth/pages/Register";
 
 // Student Features
-import GuidanceServices from "@/features/guidance-services/pages/GuidanceServices";
-import ScheduleAppointment from "@/features/appointments/pages/ScheduleAppointment";
+import GuidanceServices from "@/features/students/pages/GuidanceServices";
+import ScheduleAppointment from "@/features/students/pages/ScheduleAppointment";
 import StudentForm from "@/features/students/pages/StudentForm";
-import ExcuseSlip from "@/features/excuse-slips/pages/ExcuseSlip";
-import ViewSchedules from "@/features/schedules/pages/ViewSchedules";
+import AdmissionSlip from "@/features/students/pages/AdmissionSlip";
+import ViewSchedules from "@/features/students/pages/ViewSchedules";
 
 // Admin Feature
 import Dashboard from "@/features/admin/pages/Dashboard";
@@ -25,7 +25,7 @@ import AppointmentsManagement from "@/features/admin/pages/AppointmentsManagemen
 import ReviewExcuses from "@/features/admin/pages/ReviewExcuses";
 import Reports from "@/features/admin/pages/Reports";
 import Frontdesk from "@/features/frontdesk/pages/Frontdesk";
-import StudentProfile from "@/features/admin/pages/StudentProfile";
+import StudentProfile from "@/features/students/pages/StudentProfile";
 
 export const routes: RouteObject[] = [
   // Root route - redirect to login
@@ -37,21 +37,23 @@ export const routes: RouteObject[] = [
 
   // Student routes
   {
-    path: "/student",
+    path: "/student/home",
     element: (
       <ProtectedRoute requiredRole="student">
-        <Header />
-        <GuidanceServices />
+        <Layout title="Services">
+          <GuidanceServices />
+        </Layout>
       </ProtectedRoute>
     ),
   },
   {
-    path: "/student/schedule",
+    path: "/student/appointment",
     element: (
       <ProtectedRoute requiredRole="student">
         <PDSGate>
-          <Header />
-          <ScheduleAppointment />
+          <Layout title="Schedule Appointment">
+            <ScheduleAppointment />
+          </Layout>
         </PDSGate>
       </ProtectedRoute>
     ),
@@ -60,8 +62,9 @@ export const routes: RouteObject[] = [
     path: "/student/form",
     element: (
       <ProtectedRoute requiredRole="student">
-        <Header />
-        <StudentForm />
+        <Layout title="Individual Inventory Record">
+          <StudentForm />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -70,8 +73,9 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute requiredRole="student">
         <PDSGate>
-          <Header />
-          <ExcuseSlip />
+          <Layout title="Excuse Slip">
+            <AdmissionSlip />
+          </Layout>
         </PDSGate>
       </ProtectedRoute>
     ),
@@ -81,8 +85,9 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute requiredRole="student">
         <PDSGate>
-          <Header />
-          <ViewSchedules />
+          <Layout title="View Schedules">
+            <ViewSchedules />
+          </Layout>
         </PDSGate>
       </ProtectedRoute>
     ),
@@ -90,10 +95,12 @@ export const routes: RouteObject[] = [
 
   // Admin routes
   {
-    path: "/admin",
+    path: "/admin/home",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <Dashboard />
+        <Layout title="Dashboard">
+          <Dashboard />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -101,7 +108,9 @@ export const routes: RouteObject[] = [
     path: "/admin/student-records",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <StudentRecords />
+        <Layout title="Student Records">
+          <StudentRecords />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -109,7 +118,9 @@ export const routes: RouteObject[] = [
     path: "/admin/student-records/:studentId",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <StudentProfile />
+        <Layout title="Student Profile">
+          <StudentProfile />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -117,7 +128,9 @@ export const routes: RouteObject[] = [
     path: "/admin/appointments",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <AppointmentsManagement />
+        <Layout title="Appointments">
+          <AppointmentsManagement />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -125,7 +138,9 @@ export const routes: RouteObject[] = [
     path: "/admin/view-schedule",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <Appointments />
+        <Layout title="View Appointments">
+          <Appointments />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -133,7 +148,9 @@ export const routes: RouteObject[] = [
     path: "/admin/review-excuses",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <ReviewExcuses />
+        <Layout title="Review Excuse Slips">
+          <ReviewExcuses />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -141,7 +158,9 @@ export const routes: RouteObject[] = [
     path: "/admin/reports",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <Reports />
+        <Layout title="Reports">
+          <Reports />
+        </Layout>
       </ProtectedRoute>
     ),
   },

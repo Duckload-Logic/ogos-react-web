@@ -17,7 +17,7 @@ export type { UpcomingAppointmentsListProps } from "./UpcomingAppointmentsList";
 export { CancelledAppointmentsList } from "./CancelledAppointmentsList";
 export type { CancelledAppointmentsListProps } from "./CancelledAppointmentsList";
 
-export { ExcuseSlipsSection } from "./ExcuseSlipsSection";
+export { AdmissionSlipsSection } from "./AdmissionSlipsSection";
 
 export { CancelAppointmentModal } from "./CancelAppointmentModal";
 export type { CancelAppointmentModalProps } from "./CancelAppointmentModal";

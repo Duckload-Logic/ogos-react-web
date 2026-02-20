@@ -1,11 +1,12 @@
-import Layout from "@/components/Layout";
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { hashId } from "@/lib/hash";
 import StudentRecordsHeader from "../components/StudentRecordsHeader";
 import StudentSearchAndFilter from "../components/StudentSearchAndFilter";
 import StudentCardsGrid from "../components/StudentCardsGrid";
-import AddStudentModal, { addStudentSchema } from "../components/AddStudentModal";
+import AddStudentModal, {
+  addStudentSchema,
+} from "../components/AddStudentModal";
 import type { AddStudentForm } from "../components/AddStudentModal";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -66,22 +67,57 @@ export default function StudentRecords() {
     fetchStudents();
   }, []);
 
-const courses = [
-  { value: "All Courses", label: "All Courses" },
-  { value: "BSECE", label: "Bachelor of Science in Electronics Engineering (BSECE)" },
-  { value: "BSME", label: "Bachelor of Science in Mechanical Engineering (BSME)" },
-  { value: "BSA", label: "Bachelor of Science in Accountancy (BSA)" },
-  { value: "BSBA-HRDM", label: "Bachelor of Science in Business Administration - Human Resource Development Management (BSBA-HRDM)" },
-  { value: "BSBA-MM", label: "Bachelor of Science in Business Administration - Marketing Management (BSBA-MM)" },
-  { value: "BSAM", label: "Bachelor of Science in Applied Mathematics (BSAM)" },
-  { value: "BSIT", label: "Bachelor of Science in Information Technology (BSIT)" },
-  { value: "BSENTREP", label: "Bachelor of Science in Entrepreneurship (BSENTREP)" },
-  { value: "BSED-EN", label: "Bachelor in Secondary Education - English (BSED-EN)" },
-  { value: "BSED-MATH", label: "Bachelor in Secondary Education - Mathematics (BSED-MATH)" },
-  { value: "BSOA", label: "Bachelor of Science in Office Administration (BSOA)" },
-  { value: "DICT", label: "Diploma in Information Communication Technology (DICT)" },
-  { value: "DOMT", label: "Diploma in Office Management Technology (DOMT)" },
-];
+  const courses = [
+    { value: "All Courses", label: "All Courses" },
+    {
+      value: "BSECE",
+      label: "Bachelor of Science in Electronics Engineering (BSECE)",
+    },
+    {
+      value: "BSME",
+      label: "Bachelor of Science in Mechanical Engineering (BSME)",
+    },
+    { value: "BSA", label: "Bachelor of Science in Accountancy (BSA)" },
+    {
+      value: "BSBA-HRDM",
+      label:
+        "Bachelor of Science in Business Administration - Human Resource Development Management (BSBA-HRDM)",
+    },
+    {
+      value: "BSBA-MM",
+      label:
+        "Bachelor of Science in Business Administration - Marketing Management (BSBA-MM)",
+    },
+    {
+      value: "BSAM",
+      label: "Bachelor of Science in Applied Mathematics (BSAM)",
+    },
+    {
+      value: "BSIT",
+      label: "Bachelor of Science in Information Technology (BSIT)",
+    },
+    {
+      value: "BSENTREP",
+      label: "Bachelor of Science in Entrepreneurship (BSENTREP)",
+    },
+    {
+      value: "BSED-EN",
+      label: "Bachelor in Secondary Education - English (BSED-EN)",
+    },
+    {
+      value: "BSED-MATH",
+      label: "Bachelor in Secondary Education - Mathematics (BSED-MATH)",
+    },
+    {
+      value: "BSOA",
+      label: "Bachelor of Science in Office Administration (BSOA)",
+    },
+    {
+      value: "DICT",
+      label: "Diploma in Information Communication Technology (DICT)",
+    },
+    { value: "DOMT", label: "Diploma in Office Management Technology (DOMT)" },
+  ];
 
   const form = useForm<AddStudentForm>({
     resolver: zodResolver(addStudentSchema),
@@ -108,20 +144,23 @@ const courses = [
 
   const handleConfirmDelete = async () => {
     if (!studentToDelete) return;
-    
+
     setIsDeleting(true);
     setDeleteError(null);
-    
+
     try {
       // Attempt to delete from backend
       await apiClient.delete(API_ENDPOINTS.PDS.DELETE(studentToDelete.id));
-      
+
       // Remove from local state on success
-      setStudents(students.filter(s => s.id !== studentToDelete.id));
-      setDeleteConfirmOpen( false);
+      setStudents(students.filter((s) => s.id !== studentToDelete.id));
+      setDeleteConfirmOpen(false);
       setStudentToDelete(null);
     } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : "Failed to delete student record";
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : "Failed to delete student record";
       setDeleteError(errorMessage);
       console.error("Error deleting student:", error);
     } finally {
@@ -143,7 +182,7 @@ const courses = [
   });
 
   return (
-    <Layout title="Student Records">
+    <>
       <div className="space-y-6">
         <StudentRecordsHeader onAddClick={() => setShowAdd(true)} />
         <StudentSearchAndFilter
@@ -157,7 +196,9 @@ const courses = [
           students={filteredStudents}
           onViewClick={(student) => {
             const hashedId = encodeURIComponent(hashId(student.id));
-            navigate(`/admin/student-records/${hashedId}`, { state: { student } });
+            navigate(`/admin/student-records/${hashedId}`, {
+              state: { student },
+            });
           }}
           onDeleteClick={handleDeleteClick}
         />
@@ -178,7 +219,8 @@ const courses = [
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Student Record</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to delete the student record for {studentToDelete?.name}? This action cannot be undone.
+              Are you sure you want to delete the student record for{" "}
+              {studentToDelete?.name}? This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -190,9 +232,7 @@ const courses = [
           )}
 
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>
-              Cancel
-            </AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleConfirmDelete}
               disabled={isDeleting}
@@ -203,6 +243,6 @@ const courses = [
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Layout>
+    </>
   );
 }

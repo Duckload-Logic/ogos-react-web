@@ -1,5 +1,5 @@
 /**
- * ExcuseSlipsSection Component
+ * AdmissionSlipsSection Component
  * Displays the excuse slips section with empty state
  */
 
@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { FileText } from "lucide-react";
 
-export function ExcuseSlipsSection() {
+export function AdmissionSlipsSection() {
   return (
     <section>
       <h2 className="text-2xl font-bold text-primary mb-6 flex items-center gap-2">

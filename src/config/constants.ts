@@ -5,9 +5,9 @@
 
 // Role to route mapping
 export const ROLE_ROUTES = {
-  1: "/student", // Student role
-  2: "/admin", // Admin role
-  3: "/frontdesk", // Frontdesk role
+  1: "/student/home", // Student role
+  2: "/admin/home", // Admin role
+  3: "/frontdesk/home", // Frontdesk role
 } as const;
 
 // Course options

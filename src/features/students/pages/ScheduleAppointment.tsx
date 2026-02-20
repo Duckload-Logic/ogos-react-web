@@ -50,7 +50,11 @@ export default function ScheduleAppointment() {
 
   // Handle appointment submission
   const handleSchedule = async () => {
-    const validationError = validateAppointmentForm(selectedDate, selectedTime, reason);
+    const validationError = validateAppointmentForm(
+      selectedDate,
+      selectedTime,
+      reason,
+    );
     if (validationError) {
       alert(validationError);
       return;
@@ -69,7 +73,7 @@ export default function ScheduleAppointment() {
         reason: reason,
         scheduledDate: mapDateToString(selectedDate!),
         scheduledTime: selectedTime,
-        concernCategory: '',
+        concernCategory: "",
       });
 
       if (appointment) {
@@ -134,10 +138,7 @@ export default function ScheduleAppointment() {
       />
 
       {/* Messages */}
-      <AppointmentMessages
-        error={error}
-        successMessage={successMessage}
-      />
+      <AppointmentMessages error={error} successMessage={successMessage} />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-12">
