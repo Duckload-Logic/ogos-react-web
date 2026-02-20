@@ -2,7 +2,7 @@ import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Download, CheckCircle, Clock, X } from "lucide-react";
 
-interface ExcuseSlip {
+interface AdmissionSlip {
   id: string;
   studentName: string;
   date: string;
@@ -12,7 +12,7 @@ interface ExcuseSlip {
 }
 
 export default function ReviewExcuses() {
-  const [excuses, setExcuses] = useState<ExcuseSlip[]>([
+  const [excuses, setExcuses] = useState<AdmissionSlip[]>([
     {
       id: "001",
       studentName: "Juan Dela Cruz",
@@ -47,7 +47,9 @@ export default function ReviewExcuses() {
     },
   ]);
 
-  const [statusFilter, setStatusFilter] = useState<"all" | "pending" | "approved" | "rejected">("all");
+  const [statusFilter, setStatusFilter] = useState<
+    "all" | "pending" | "approved" | "rejected"
+  >("all");
   const [startDate, setStartDate] = useState("");
   const [endDate, setEndDate] = useState("");
 
@@ -120,7 +122,9 @@ export default function ReviewExcuses() {
         {/* Quick Filters */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-card p-6 rounded-lg shadow border border-border">
           <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">Status</label>
+            <label className="text-sm font-medium text-foreground mb-2 block">
+              Status
+            </label>
             <select
               value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value as any)}
@@ -134,7 +138,9 @@ export default function ReviewExcuses() {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">From Date</label>
+            <label className="text-sm font-medium text-foreground mb-2 block">
+              From Date
+            </label>
             <input
               type="date"
               value={startDate}
@@ -144,7 +150,9 @@ export default function ReviewExcuses() {
           </div>
 
           <div>
-            <label className="text-sm font-medium text-foreground mb-2 block">To Date</label>
+            <label className="text-sm font-medium text-foreground mb-2 block">
+              To Date
+            </label>
             <input
               type="date"
               value={endDate}
@@ -171,9 +179,15 @@ export default function ReviewExcuses() {
                   <th className="px-6 py-4 text-center font-semibold">
                     Absence Date
                   </th>
-                  <th className="px-6 py-4 text-center font-semibold">Reason</th>
-                  <th className="px-6 py-4 text-center font-semibold">Status</th>
-                  <th className="px-6 py-4 text-center font-semibold">Actions</th>
+                  <th className="px-6 py-4 text-center font-semibold">
+                    Reason
+                  </th>
+                  <th className="px-6 py-4 text-center font-semibold">
+                    Status
+                  </th>
+                  <th className="px-6 py-4 text-center font-semibold">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody className="divide-y">
@@ -248,5 +262,3 @@ export default function ReviewExcuses() {
     </Layout>
   );
 }
-
-
