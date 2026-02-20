@@ -10,12 +10,11 @@ import {
   UserCircle,
   Moon,
   Sun,
-  Settings,
   Bell,
 } from "lucide-react";
 import { useAuth } from "@/context";
 import PUPLogo from "@/assets/images/PUPLogo.png";
-import Sidebar from "./Sidebar";
+import Navigation from "./Navigation";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -278,7 +277,7 @@ export default function Layout({ children, title }: LayoutProps) {
       )}
 
       <div className="flex flex-1 overflow-hidden relative">
-        <Sidebar
+        <Navigation
           navigationItems={navigationItems}
           location={location}
           setExpanded={setIsHovered}
@@ -293,7 +292,7 @@ export default function Layout({ children, title }: LayoutProps) {
 
           {/* Page Content */}
           <main
-            className={`flex-1 overflow-auto p-4 md:p-8 z-1 bg-transparent transition-colors duration-300 ${expanded ? "blur-sm" : ""}`}
+            className={`flex-1 overflow-auto p-4 md:p-8 pb-20 md:pb-8 z-1 bg-transparent transition-colors duration-300 ${expanded ? "blur-sm" : ""}`}
           >
             {/* {title && (
               <h1 className="text-3xl font-bold text-foreground mb-6">
