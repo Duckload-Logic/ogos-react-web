@@ -1,4 +1,5 @@
 import { Eye, Trash2 } from "lucide-react";
+import Duck from "@/assets/icons/Duck.svg";
 
 interface Student {
   id: string;
@@ -21,8 +22,9 @@ export default function StudentCardsGrid({
 }: StudentCardsGridProps) {
   if (students.length === 0) {
     return (
-      <div className="bg-card rounded-lg shadow border border-border p-12 text-center">
-        <p className="text-card-foreground">No students found.</p>
+      <div className="w-full h-full bg-transparent p-12 text-center items-center justify-center flex flex-col gap-4">
+        <img src={Duck} alt="Duck Icon" className="w-32 h-32  " />
+        <p className="text-card-foreground font-medium">No students found.</p>
       </div>
     );
   }

@@ -16,7 +16,8 @@ export const APPOINTMENT_STATUSES = {
   RESCHEDULED: "Rescheduled",
 } as const;
 
-export type AppointmentStatus = typeof APPOINTMENT_STATUSES[keyof typeof APPOINTMENT_STATUSES];
+export type AppointmentStatus =
+  (typeof APPOINTMENT_STATUSES)[keyof typeof APPOINTMENT_STATUSES];
 
 export interface Appointment {
   id: number;
@@ -54,7 +55,7 @@ export interface AppointmentFilters {
  * @returns List of appointments
  */
 export const listAllAppointments = async (
-  filters?: AppointmentFilters
+  filters?: AppointmentFilters,
 ): Promise<Appointment[]> => {
   try {
     const params = new URLSearchParams();
@@ -64,8 +65,8 @@ export const listAllAppointments = async (
 
     const url =
       params.toString() && params.toString().length > 0
-        ? `${API_ENDPOINTS.APPOINTMENTS.LIST}/all?${params.toString()}`
-        : `${API_ENDPOINTS.APPOINTMENTS.LIST}/all`;
+        ? `${API_ENDPOINTS.APPOINTMENTS.LIST}?${params.toString()}`
+        : `${API_ENDPOINTS.APPOINTMENTS.LIST}`;
 
     const response = await apiClient.get<Appointment[]>(url);
     return Array.isArray(response.data) ? response.data : [];
@@ -83,7 +84,7 @@ export const listAllAppointments = async (
 export const getAppointmentById = async (id: number): Promise<Appointment> => {
   try {
     const response = await apiClient.get<Appointment>(
-      `${API_ENDPOINTS.APPOINTMENTS.GET(id.toString())}`
+      `${API_ENDPOINTS.APPOINTMENTS.GET(id.toString())}`,
     );
     return response.data;
   } catch (error) {
@@ -99,7 +100,7 @@ export const getAppointmentById = async (id: number): Promise<Appointment> => {
 export const listUserAppointments = async (): Promise<Appointment[]> => {
   try {
     const response = await apiClient.get<{ data: Appointment[] }>(
-      API_ENDPOINTS.APPOINTMENTS.LIST
+      API_ENDPOINTS.APPOINTMENTS.LIST,
     );
     return response.data?.data || [];
   } catch (error) {
@@ -114,15 +115,18 @@ export const listUserAppointments = async (): Promise<Appointment[]> => {
  * @returns List of student's appointments
  */
 export const getStudentAppointments = async (
-  studentId: number
+  studentId: number,
 ): Promise<Appointment[]> => {
   try {
     const response = await apiClient.get<Appointment[]>(
-      `${API_ENDPOINTS.APPOINTMENTS.LIST}/student/${studentId}`
+      `${API_ENDPOINTS.APPOINTMENTS.LIST}/student/${studentId}`,
     );
     return Array.isArray(response.data) ? response.data : [];
   } catch (error) {
-    console.error(`Error fetching appointments for student ${studentId}:`, error);
+    console.error(
+      `Error fetching appointments for student ${studentId}:`,
+      error,
+    );
     throw error;
   }
 };
@@ -133,7 +137,7 @@ export const getStudentAppointments = async (
  * @returns Created appointment
  */
 export const scheduleAppointment = async (
-  payload: CreateAppointmentRequest
+  payload: CreateAppointmentRequest,
 ): Promise<Appointment> => {
   try {
     const response = await apiClient.post<{
@@ -157,19 +161,18 @@ export const createAppointment = scheduleAppointment;
  */
 export const updateAppointmentStatus = async (
   id: number,
-  status: string
+  status: string,
 ): Promise<Appointment> => {
   try {
-    const response = await apiClient.put<Appointment | { message: string; data: Appointment }>(
-      `${API_ENDPOINTS.APPOINTMENTS.UPDATE(id.toString())}`,
-      { status }
-    );
-    
+    const response = await apiClient.put<
+      Appointment | { message: string; data: Appointment }
+    >(`${API_ENDPOINTS.APPOINTMENTS.UPDATE(id.toString())}`, { status });
+
     // Handle both response formats: direct Appointment or wrapped { message, data }
-    if (response.data && 'data' in response.data) {
+    if (response.data && "data" in response.data) {
       return (response.data as { message: string; data: Appointment }).data;
     }
-    
+
     return response.data as Appointment;
   } catch (error) {
     console.error(`Error updating appointment ${id} status:`, error);
@@ -212,19 +215,18 @@ export const completeAppointment = async (id: number): Promise<Appointment> => {
  */
 export const rescheduleAppointment = async (
   id: number,
-  payload: CreateAppointmentRequest
+  payload: CreateAppointmentRequest,
 ): Promise<Appointment> => {
   try {
-    const response = await apiClient.put<Appointment | { message: string; data: Appointment }>(
-      `${API_ENDPOINTS.APPOINTMENTS.UPDATE(id.toString())}`,
-      payload
-    );
-    
+    const response = await apiClient.put<
+      Appointment | { message: string; data: Appointment }
+    >(`${API_ENDPOINTS.APPOINTMENTS.UPDATE(id.toString())}`, payload);
+
     // Handle both response formats: direct Appointment or wrapped { message, data }
-    if (response.data && 'data' in response.data) {
+    if (response.data && "data" in response.data) {
       return (response.data as { message: string; data: Appointment }).data;
     }
-    
+
     return response.data as Appointment;
   } catch (error) {
     console.error(`Error rescheduling appointment ${id}:`, error);
@@ -250,7 +252,7 @@ export const getAllAppointments = async (): Promise<Appointment[]> => {
 export const getAllAppointmentsAdmin = async (
   status?: string,
   startDate?: string,
-  endDate?: string
+  endDate?: string,
 ): Promise<Appointment[]> => {
   const filters: AppointmentFilters = {};
   if (status) filters.status = status;
@@ -267,13 +269,13 @@ export const getAllAppointmentsAdmin = async (
 export const getAvailableSlots = async (date?: string): Promise<TimeSlot[]> => {
   try {
     const params = date ? { date } : {};
-    const response = await apiClient.get<TimeSlot[]>('/appointments/slots', { params });
-    
+    const response = await apiClient.get<TimeSlot[]>("/appointments/slots", {
+      params,
+    });
+
     return response.data;
   } catch (error) {
-    console.error('Error fetching available slots:', error);
+    console.error("Error fetching available slots:", error);
     throw error;
   }
 };
-
-

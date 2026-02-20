@@ -1,7 +1,7 @@
-import { FormData } from "@/types";
+import { StudentRecord } from "@/types";
 
 interface EducationalBackgroundProps {
-  formData: FormData;
+  formData: StudentRecord;
   handleInputChange: (field: string, value: string | boolean, section?: string) => void;
   clearError: (field: string) => void;
 }

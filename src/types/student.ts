@@ -143,7 +143,7 @@ export interface SignificantNotesData {
 }
 
 // Complete Form Data (aggregated)
-export interface FormData
+export interface StudentRecord
   extends PersonalInformationData,
     AddressInformationData,
     EmergencyContactData,

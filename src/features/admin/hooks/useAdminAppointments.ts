@@ -137,6 +137,16 @@ export const useAdminAppointments = () => {
     [handleAsync, updateLocalAppointment]
   );
 
+/* 
+ * Auto Fetch After Auth Ready 
+ */
+
+  useEffect(() => {
+    if (!authLoading && isAdmin) {
+      fetchAppointments();
+    }
+  }, [authLoading, isAdmin, fetchAppointments]);
+
   return {
     appointments,
     isLoading,
