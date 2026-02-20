@@ -1,6 +1,6 @@
 /**
  * Appointments Feature
- * 
+ *
  * Public API for the appointments feature module.
  * Use this file to export public components, hooks, and services.
  */
@@ -12,10 +12,10 @@ export type {
   CreateAppointmentRequest,
   TimeSlot,
   UseAppointmentsReturn,
-} from './types';
+} from "./types";
 
 // Hooks
-export { useAppointments } from './hooks/useAppointments';
+export { useAppointments } from "./hooks/useAppointments";
 
 // Constants
 export {
@@ -24,7 +24,7 @@ export {
   APPOINTMENT_ERROR_MESSAGES,
   APPOINTMENT_SUCCESS_MESSAGES,
   APPOINTMENT_FORM_CONSTRAINTS,
-} from './constants';
+} from "./constants";
 
 // Utilities
 export {
@@ -32,10 +32,10 @@ export {
   formatAvailableSlots,
   extractErrorMessage,
   validateAppointmentForm,
-} from './utils';
+} from "./utils";
 
 // Page components
-export { default as ScheduleAppointment } from './pages/ScheduleAppointment';
+export { default as ScheduleAppointment } from "../students/pages/ScheduleAppointment";
 
 // UI Components
 export {
@@ -44,4 +44,4 @@ export {
   DatePickerCalendar,
   TimeSlotSelector,
   AppointmentDetailsForm,
-} from './components';
+} from "./components";
