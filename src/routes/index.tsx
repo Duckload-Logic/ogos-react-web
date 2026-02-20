@@ -1,7 +1,6 @@
 import { RouteObject, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PDSGate } from "@/components/PDSGate";
-import Header from "@/components/Header";
 
 // Shared
 import Layout from "@/components/Layout";
