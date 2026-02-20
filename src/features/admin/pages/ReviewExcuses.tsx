@@ -1,4 +1,3 @@
-import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Download, CheckCircle, Clock, X } from "lucide-react";
 
@@ -108,7 +107,7 @@ export default function ReviewExcuses() {
   });
 
   return (
-    <Layout title="Review Excuses Slip">
+    <>
       <div className="space-y-6">
         {/* Info Banner */}
         <div className="bg-card border border-blue-200 dark:border-blue-300 rounded-lg p-4">
@@ -259,6 +258,6 @@ export default function ReviewExcuses() {
           )}
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
