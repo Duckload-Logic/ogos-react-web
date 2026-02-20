@@ -7,7 +7,7 @@ import {
   ScheduleErrorAlert,
   UpcomingAppointmentsList,
   CancelledAppointmentsList,
-  ExcuseSlipsSection,
+  AdmissionSlipsSection,
   CancelAppointmentModal,
   SuccessModal,
   HelpSection,
@@ -35,9 +35,8 @@ export default function ViewSchedules() {
 
   // Modal and state management
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
-  const [appointmentToDelete, setAppointmentToDelete] = useState<Appointment | null>(
-    null,
-  );
+  const [appointmentToDelete, setAppointmentToDelete] =
+    useState<Appointment | null>(null);
   const [successModalOpen, setSuccessModalOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [isPageLoaded, setIsPageLoaded] = useState(false);
@@ -65,7 +64,7 @@ export default function ViewSchedules() {
       clearError();
       try {
         const success = await cancelAppointment(appointmentToDelete);
-        console.log('Cancel appointment success:', success);
+        console.log("Cancel appointment success:", success);
         if (success) {
           setDeleteModalOpen(false);
           setSuccessModalOpen(true);
@@ -97,7 +96,6 @@ export default function ViewSchedules() {
       </div>
     );
   }
-
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -173,7 +171,7 @@ export default function ViewSchedules() {
 
         {/* Excuse Slips Section */}
         <div className="excuse-section">
-          <ExcuseSlipsSection />
+          <AdmissionSlipsSection />
         </div>
 
         {/* Help Section */}

@@ -1,4 +1,3 @@
-import Layout from "@/components/Layout";
 import { useState } from "react";
 import { Download, Eye } from "lucide-react";
 import { useForm } from "react-hook-form";
@@ -81,7 +80,7 @@ export default function Reports() {
   };
 
   return (
-    <Layout title="Reports">
+    <>
       <div className="space-y-6">
         {/* Filters */}
         <div className="bg-card rounded-lg shadow border border-border p-6">
@@ -132,7 +131,9 @@ export default function Reports() {
 
               <div className="space-y-2 mb-6">
                 <p className="text-sm">
-                  <span className="font-medium text-card-foreground">Course:</span>{" "}
+                  <span className="font-medium text-card-foreground">
+                    Course:
+                  </span>{" "}
                   <span className="text-muted-foreground">{report.course}</span>
                 </p>
                 <p className="text-sm">
@@ -170,17 +171,24 @@ export default function Reports() {
           <h2 className="text-xl font-bold text-card-foreground mb-4">
             Generate New Report
           </h2>
-          <ReportForm onGenerate={(type) => alert(`Generating ${type} report`)} />
+          <ReportForm
+            onGenerate={(type) => alert(`Generating ${type} report`)}
+          />
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
 
 function ReportForm({ onGenerate }: { onGenerate: (type: string) => void }) {
   const schema = z.object({
     reportType: z
-      .enum(["Student Enrollment", "Appointment Statistics", "Excuse Slip Summary", "System Audit Trail"])
+      .enum([
+        "Student Enrollment",
+        "Appointment Statistics",
+        "Excuse Slip Summary",
+        "System Audit Trail",
+      ])
       .describe("Report Type is required"),
     dateRange: z.string().min(1, "Date range is required"),
   });
@@ -198,8 +206,13 @@ function ReportForm({ onGenerate }: { onGenerate: (type: string) => void }) {
     <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium text-card-foreground mb-2">Report Type *</label>
-          <select {...form.register("reportType")} className="bg-input w-full px-4 py-2 border border-border rounded-lg">
+          <label className="block text-sm font-medium text-card-foreground mb-2">
+            Report Type *
+          </label>
+          <select
+            {...form.register("reportType")}
+            className="bg-input w-full px-4 py-2 border border-border rounded-lg"
+          >
             <option value="">Select Report Type</option>
             <option>Student Enrollment</option>
             <option>Appointment Statistics</option>
@@ -207,25 +220,37 @@ function ReportForm({ onGenerate }: { onGenerate: (type: string) => void }) {
             <option>System Audit Trail</option>
           </select>
           {form.formState.errors.reportType && (
-            <p className="text-sm text-destructive">{String(form.formState.errors.reportType.message)}</p>
+            <p className="text-sm text-destructive">
+              {String(form.formState.errors.reportType.message)}
+            </p>
           )}
         </div>
         <div>
-          <label className="block text-sm font-medium text-card-foreground mb-2">Date Range</label>
-          <select {...form.register("dateRange")} className="bg-input w-full px-4 py-2 border border-border rounded-lg">
+          <label className="block text-sm font-medium text-card-foreground mb-2">
+            Date Range
+          </label>
+          <select
+            {...form.register("dateRange")}
+            className="bg-input w-full px-4 py-2 border border-border rounded-lg"
+          >
             <option value="This Month">This Month</option>
             <option value="Last Month">Last Month</option>
             <option value="Last 3 Months">Last 3 Months</option>
             <option value="Custom Range">Custom Range</option>
           </select>
           {form.formState.errors.dateRange && (
-            <p className="text-sm text-destructive">{String(form.formState.errors.dateRange.message)}</p>
+            <p className="text-sm text-destructive">
+              {String(form.formState.errors.dateRange.message)}
+            </p>
           )}
         </div>
       </div>
-      <button type="submit" className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium">Generate Report</button>
+      <button
+        type="submit"
+        className="px-6 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
+      >
+        Generate Report
+      </button>
     </form>
   );
 }
-
-

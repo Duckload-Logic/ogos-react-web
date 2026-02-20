@@ -1,8 +1,12 @@
+import Layout from "@/components/Layout";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
-import { checkStudentOnboardingStatus, studentService } from "@/features/students/services/service";
+import {
+  checkStudentOnboardingStatus,
+  studentService,
+} from "@/features/students/services/service";
 import { useAuth } from "@/context";
 
 const PROGRAMS = [
@@ -24,13 +28,13 @@ export default function GuidanceServices() {
 
   useEffect(() => {
     if (!user?.id) return;
-    
+
     const fetchProfile = async () => {
       try {
         const data = await studentService.getStudentProfile(user.id);
         setAdditionalInfo(data);
       } catch (err) {
-        console.error('Error fetching profile:', err);
+        console.error("Error fetching profile:", err);
         // Continue without additional info if fetch fails
       }
     };
@@ -42,13 +46,13 @@ export default function GuidanceServices() {
     const checkFormStatus = async () => {
       try {
         if (!user?.id) {
-          console.warn('User not authenticated or user ID missing');
+          console.warn("User not authenticated or user ID missing");
           return;
         }
         const completed = await checkStudentOnboardingStatus(user.id);
         setShowForm(!completed);
       } catch (err) {
-        console.error('Error checking onboarding status:', err);
+        console.error("Error checking onboarding status:", err);
       } finally {
       }
     };
@@ -57,7 +61,7 @@ export default function GuidanceServices() {
   }, [user?.id]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <>
       <style>{`
         @keyframes slideUp {
           from {
@@ -114,7 +118,9 @@ export default function GuidanceServices() {
                   Important: Complete Your Personal Data Sheet
                 </h3>
                 <p className="text-yellow-700 text-xs sm:text-sm mb-2">
-                  You must complete this form to access all guidance services. Your information helps us provide better support and counseling.
+                  You must complete this form to access all guidance services.
+                  Your information helps us provide better support and
+                  counseling.
                 </p>
                 <Link to="/student/form">
                   <Button className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold text-xs py-1 px-3 h-auto">
@@ -133,7 +139,10 @@ export default function GuidanceServices() {
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {PROGRAMS.map((program, index) => (
-              <div key={index} className="border-l-4 border-primary pl-3 py-3 transition-all duration-300 hover:bg-gray-50 hover:pl-4 rounded cursor-pointer program-card">
+              <div
+                key={index}
+                className="border-l-4 border-primary pl-3 py-3 transition-all duration-300 hover:bg-gray-50 hover:pl-4 rounded cursor-pointer program-card"
+              >
                 <h3 className="font-semibold text-sm md:text-base text-gray-900 transition-colors duration-300 hover:text-primary">
                   {program.title}
                 </h3>
@@ -143,44 +152,63 @@ export default function GuidanceServices() {
         </section>
 
         {/* Student Dashboard Section */}
-        <section className="bg-white rounded-lg shadow-sm p-5 md:p-6 mb-8 programs-section" style={{ animationDelay: '0.25s' }}>
+        <section
+          className="bg-white rounded-lg shadow-sm p-5 md:p-6 mb-8 programs-section"
+          style={{ animationDelay: "0.25s" }}
+        >
           <h2 className="text-lg md:text-xl font-bold mb-4 text-primary">
             Student Dashboard
           </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {/* Name Card */}
             <div className="pb-4 border-b border-gray-200">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Name</label>
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Name
+              </label>
               <p className="text-gray-900 font-bold text-sm mt-1">
-                {user?.lastName}, {user?.firstName} {user?.middleName ? user.middleName.charAt(0) + '.' : ''}
+                {user?.lastName}, {user?.firstName}{" "}
+                {user?.middleName ? user.middleName.charAt(0) + "." : ""}
               </p>
             </div>
 
-            
-
             {/* Contact Card */}
             <div className="pb-4">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Contact</label>
-              <p className="text-gray-900 font-bold text-sm mt-1">{additionalInfo?.studentProfile?.contactNo || '-'}</p>
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Contact
+              </label>
+              <p className="text-gray-900 font-bold text-sm mt-1">
+                {additionalInfo?.studentProfile?.contactNo || "-"}
+              </p>
             </div>
 
             {/* Email Card */}
             <div className="pb-4">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">Email</label>
-              <p className="text-gray-900 font-bold text-sm mt-1">{user?.email || '-'}</p>
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Email
+              </label>
+              <p className="text-gray-900 font-bold text-sm mt-1">
+                {user?.email || "-"}
+              </p>
             </div>
           </div>
         </section>
 
         {/* I Hereby Statement Section */}
         {!showForm && (
-          <section className="bg-green-50 border-l-4 border-green-500 rounded-lg p-5 md:p-6 mb-8 programs-section" style={{ animationDelay: '0.3s' }}>
+          <section
+            className="bg-green-50 border-l-4 border-green-500 rounded-lg p-5 md:p-6 mb-8 programs-section"
+            style={{ animationDelay: "0.3s" }}
+          >
             <p className="text-sm md:text-base text-gray-700 leading-relaxed">
-              <span className="font-semibold text-green-700">I hereby declare</span> that all the information stated in this document is true and correct to the best of my knowledge and belief.
+              <span className="font-semibold text-green-700">
+                I hereby declare
+              </span>{" "}
+              that all the information stated in this document is true and
+              correct to the best of my knowledge and belief.
             </p>
           </section>
         )}
       </div>
-    </div>
+    </>
   );
 }

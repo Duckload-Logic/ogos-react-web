@@ -1,4 +1,3 @@
-import Layout from "@/components/Layout";
 import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Eye, Clock } from "lucide-react";
 import { useAppointments } from "@/features/appointments/hooks/useAppointments";
@@ -6,9 +5,10 @@ import { useUser } from "@/hooks/useUser";
 import { User } from "@/types/user";
 
 export default function Appointments() {
-  const { fetchAppointments, appointments: hookAppointments } = useAppointments();
+  const { fetchAppointments, appointments: hookAppointments } =
+    useAppointments();
   const { fetchUserData } = useUser();
-  const [ students, setStudents ] = useState<User[]>([]);
+  const [students, setStudents] = useState<User[]>([]);
 
   useEffect(() => {
     const loadAppointments = async () => {
@@ -24,13 +24,15 @@ export default function Appointments() {
 
       try {
         // Get unique IDs to avoid redundant API calls
-        const uniqueStudentIds = [...new Set(hookAppointments.map((apt) => apt.userId))];
-        
+        const uniqueStudentIds = [
+          ...new Set(hookAppointments.map((apt) => apt.userId)),
+        ];
+
         // Fetch all user data in parallel
         const studentData = await Promise.all(
-          uniqueStudentIds.map((id) => fetchUserData(id))
+          uniqueStudentIds.map((id) => fetchUserData(id)),
         );
-        
+
         setStudents(studentData);
       } catch (err) {
         console.error("Failed to fetch students:", err);
@@ -40,7 +42,7 @@ export default function Appointments() {
     fetchAllStudents();
   }, [hookAppointments]);
 
-  const [currentMonth, setCurrentMonth] = useState(new Date()); 
+  const [currentMonth, setCurrentMonth] = useState(new Date());
   const touchStartX = useRef<number | null>(null);
 
   const bookedDates = new Set(
@@ -97,7 +99,7 @@ export default function Appointments() {
   };
 
   return (
-    <Layout title="View Schedule">
+    <>
       <div className="space-y-6">
         {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
@@ -312,7 +314,6 @@ export default function Appointments() {
                   </thead>
                   <tbody className="divide-y">
                     {hookAppointments.map((apt, idx) => (
-                      
                       <tr
                         key={apt.id}
                         className={`hover:bg-gray-50 transition-colors ${
@@ -320,7 +321,11 @@ export default function Appointments() {
                         }`}
                       >
                         <td className="px-4 py-3 font-medium text-foreground text-xs">
-                          {students.find((s) => s.id === apt.userId)?.lastName  || '-'}, {students.find((s) => s.id === apt.userId)?.firstName || '-'}
+                          {students.find((s) => s.id === apt.userId)
+                            ?.lastName || "-"}
+                          ,{" "}
+                          {students.find((s) => s.id === apt.userId)
+                            ?.firstName || "-"}
                         </td>
                         <td className="px-4 py-3 text-foreground text-xs">
                           {apt.scheduledDate}
@@ -360,8 +365,6 @@ export default function Appointments() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
-
-

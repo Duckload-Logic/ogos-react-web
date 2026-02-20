@@ -10,6 +10,7 @@ import {
   UserCircle,
   Moon,
   Sun,
+  Timer,
   Bell,
 } from "lucide-react";
 import { useAuth } from "@/context";
@@ -28,6 +29,64 @@ interface NavItem {
 }
 
 const ICON_SIZE = 20;
+
+const roleMap: Record<number, string> = {
+  1: "student",
+  2: "admin",
+  3: "frontdesk",
+};
+
+const NAV_CONFIG: Record<string, NavItem[]>[] = [
+  {
+    admin: [
+      {
+        label: "Dashboard",
+        href: "/admin/home",
+        icon: <Home size={ICON_SIZE} />,
+      },
+      {
+        label: "Student Records",
+        href: "/admin/student-records",
+        icon: <Users size={ICON_SIZE} />,
+      },
+      {
+        label: "Appointments",
+        href: "/admin/appointments",
+        icon: <Calendar size={ICON_SIZE} />,
+      },
+      {
+        label: "Review Excuses",
+        href: "/admin/review-excuses",
+        icon: <FileText size={ICON_SIZE} />,
+      },
+      {
+        label: "Reports",
+        href: "/admin/reports",
+        icon: <BarChart3 size={ICON_SIZE} />,
+      },
+    ],
+  },
+  {
+    student: [
+      { label: "Home", href: "/student/home", icon: <Home size={ICON_SIZE} /> },
+      {
+        label: "Schedule Appointment",
+        href: "/student/appointment",
+        icon: <Timer size={ICON_SIZE} />,
+      },
+      {
+        label: "View Schedules",
+        href: "/student/schedules",
+        icon: <Calendar size={ICON_SIZE} />,
+      },
+      {
+        label: "Excuse Slip",
+        href: "/student/excuse-slip",
+        icon: <FileText size={ICON_SIZE} />,
+      },
+    ],
+  },
+];
 
 export default function Layout({ children, title }: LayoutProps) {
   const [darkMode, setDarkMode] = useState(() => {
@@ -67,51 +126,16 @@ export default function Layout({ children, title }: LayoutProps) {
     navigate("/login");
   };
 
-  const navigationItems: NavItem[] = useMemo(() => {
-    if (!user) return [];
+  const navigationItems = useMemo(() => {
+    if (!user || !user.roleId) return [];
 
-    if (user.roleId === 3) {
-      return [
-        {
-          label: "Dashboard",
-          href: "/frontdesk",
-          icon: <Home size={ICON_SIZE} />,
-        },
-        {
-          label: "Review Excuses",
-          href: "/frontdesk/review-excuses",
-          icon: <FileText size={ICON_SIZE} />,
-        },
-      ];
-    }
+    const roleKey = roleMap[user.roleId];
+    if (!roleKey) return [];
 
-    if (user.roleId === 2) {
-      return [
-        { label: "Dashboard", href: "/admin", icon: <Home size={ICON_SIZE} /> },
-        {
-          label: "Student Records",
-          href: "/admin/student-records",
-          icon: <Users size={ICON_SIZE} />,
-        },
-        {
-          label: "Appointments",
-          href: "/admin/appointments",
-          icon: <Calendar size={ICON_SIZE} />,
-        },
-        {
-          label: "Review Excuses",
-          href: "/admin/review-excuses",
-          icon: <FileText size={ICON_SIZE} />,
-        },
-        {
-          label: "Reports",
-          href: "/admin/reports",
-          icon: <BarChart3 size={ICON_SIZE} />,
-        },
-      ];
-    }
+    // Find the object in the array that contains the key for the current role
+    const roleData = NAV_CONFIG.find((config) => !!config[roleKey]);
 
-    return [];
+    return roleData ? roleData[roleKey] : [];
   }, [user]);
 
   const getRoleLabel = () => {

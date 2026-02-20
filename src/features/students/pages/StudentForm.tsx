@@ -17,8 +17,8 @@ import {
   mapEducationInfo,
   mapFamilyInfo,
   mapHealthInfo,
-} from '@/features/students/utils/maps';
-import locations from '@/config/ph_locations.json'
+} from "@/features/students/utils/maps";
+import locations from "@/config/ph_locations.json";
 
 type PHLocations = {
   [regionName: string]: {
@@ -66,7 +66,7 @@ const EMPTY_FORM: StudentRecord = {
   provincialAddressMunicipality: "",
   provincialAddressBarangay: "",
   provincialAddressRegion: "",
-  provincialAddressStreet: "", 
+  provincialAddressStreet: "",
   residentialAddressProvince: "",
   residentialAddressMunicipality: "",
   residentialAddressBarangay: "",
@@ -164,8 +164,18 @@ const sections = [
 ];
 
 export default function StudentForm() {
-  const navigate = useNavigate();2
-  const { user, studentRecordId, isLoading, error, initializeStudentRecord, loadSavedFormData, saveSection, submitOnboarding } = useStudentForm();
+  const navigate = useNavigate();
+  2;
+  const {
+    user,
+    studentRecordId,
+    isLoading,
+    error,
+    initializeStudentRecord,
+    loadSavedFormData,
+    saveSection,
+    submitOnboarding,
+  } = useStudentForm();
   const [currentSection, setCurrentSection] = useState(0);
   const [formData, setFormData] = useState<StudentRecord>(EMPTY_FORM);
   const [isSaving, setIsSaving] = useState(false);
@@ -215,7 +225,7 @@ export default function StudentForm() {
 
   const handleNextSection = async () => {
     if (!studentRecordId) {
-      alert('Student record not initialized');
+      alert("Student record not initialized");
       return;
     }
 
@@ -235,27 +245,27 @@ export default function StudentForm() {
     try {
       switch (currentSection) {
         case 0: // Enrollment Reasons
-          sectionName = 'enrollment';
+          sectionName = "enrollment";
           sectionData = mapEnrollmentReasons(formData);
           break;
 
         case 1: // Personal Information
-          sectionName = 'personal';
+          sectionName = "personal";
           sectionData = mapPersonalInfo(formData, user);
           break;
 
         case 2: // Educational Background
-          sectionName = 'education';
+          sectionName = "education";
           sectionData = mapEducationInfo(formData);
           break;
 
         case 3: // Family Background
-          sectionName = 'family';
+          sectionName = "family";
           sectionData = mapFamilyInfo(formData);
           break;
 
         case 4: // Health
-          sectionName = 'health';
+          sectionName = "health";
           sectionData = mapHealthInfo(formData);
           break;
 
@@ -268,14 +278,14 @@ export default function StudentForm() {
 
       if (success) {
         setCurrentSection(Math.min(sections.length - 1, currentSection + 1));
-        setAutoSaveStatus('saved');
-        setTimeout(() => setAutoSaveStatus('idle'), 2000);
+        setAutoSaveStatus("saved");
+        setTimeout(() => setAutoSaveStatus("idle"), 2000);
       } else {
-        alert(error || 'Failed to save section');
+        alert(error || "Failed to save section");
       }
     } catch (err: any) {
-      console.error('Error saving section:', err);
-      alert('An error occurred while saving. Please try again.');
+      console.error("Error saving section:", err);
+      alert("An error occurred while saving. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -287,29 +297,29 @@ export default function StudentForm() {
 
     try {
       // Save enrollment reasons
-      await saveSection('enrollment', mapEnrollmentReasons(formData));
-      
+      await saveSection("enrollment", mapEnrollmentReasons(formData));
+
       // Save personal information
-      await saveSection('personal', mapPersonalInfo(formData, user));
-      
+      await saveSection("personal", mapPersonalInfo(formData, user));
+
       // Save educational background
-      await saveSection('education', mapEducationInfo(formData));
-      
+      await saveSection("education", mapEducationInfo(formData));
+
       // Save family background
-      await saveSection('family', mapFamilyInfo(formData));
-      
+      await saveSection("family", mapFamilyInfo(formData));
+
       // Save health information
-      await saveSection('health', mapHealthInfo(formData));
+      await saveSection("health", mapHealthInfo(formData));
 
       await submitOnboarding();
 
       localStorage.removeItem(`user${user?.id}StudentRecord`);
       setShowSuccessPopup(true);
 
-      navigate('/student'); 
+      navigate("/student");
     } catch (err: any) {
-      console.error('Error submitting form:', err);
-      alert(error || 'Failed to submit form. Please try again.');
+      console.error("Error submitting form:", err);
+      alert(error || "Failed to submit form. Please try again.");
     } finally {
       setIsSaving(false);
     }
@@ -327,14 +337,16 @@ export default function StudentForm() {
 
   const validateEnrollmentReasons = () => {
     // Get all keys where the value is true
-    const selectedReasons = Object.entries(formData.reasonForEnrollment || {})
-      .filter(([_, value]) => value === true);
+    const selectedReasons = Object.entries(
+      formData.reasonForEnrollment || {},
+    ).filter(([_, value]) => value === true);
 
     // If no checkboxes are checked AND the 'other' text field is empty
     if (selectedReasons.length === 0 && !formData.reasonOther?.trim()) {
       setErrors((prev) => ({
         ...prev,
-        reasonForEnrollment: "Please select at least one reason for enrollment."
+        reasonForEnrollment:
+          "Please select at least one reason for enrollment.",
       }));
       return false;
     }
@@ -440,7 +452,7 @@ export default function StudentForm() {
     ].forEach((level) => {
       const levelData =
         formData.education[level.key as keyof typeof formData.education];
-      if (typeof levelData === 'object' && levelData !== null) {
+      if (typeof levelData === "object" && levelData !== null) {
         if (
           (levelData as any).school ||
           (levelData as any).location ||
@@ -455,7 +467,10 @@ export default function StudentForm() {
             errors[`${level.key}_public`] = "Public/Private is required";
           if (!(levelData as any).yearGrad)
             errors[`${level.key}_yearGrad`] = "Year graduated is required";
-          if ((levelData as any).yearGrad && !validateYear((levelData as any).yearGrad)) {
+          if (
+            (levelData as any).yearGrad &&
+            !validateYear((levelData as any).yearGrad)
+          ) {
             errors[`${level.key}_yearGrad`] = "Invalid year";
           }
         }
@@ -537,7 +552,10 @@ export default function StudentForm() {
     const saveTimer = setTimeout(() => {
       if (Object.keys(formData).length > 0) {
         setAutoSaveStatus("saving");
-        sessionStorage.setItem(`user${user?.id}StudentRecord`, JSON.stringify(formData));
+        sessionStorage.setItem(
+          `user${user?.id}StudentRecord`,
+          JSON.stringify(formData),
+        );
         setAutoSaveStatus("saved");
         setLastSaved(new Date().toLocaleTimeString());
 
@@ -574,12 +592,15 @@ export default function StudentForm() {
 
     const getTotalFields = (obj: any): number => {
       if (!obj) return 1;
-      return Object.values(obj).reduce((count: number, val: unknown): number => {
-        if (typeof val === "object" && val !== null) {
-          return count + getTotalFields(val);
-        }
-        return count + 1;
-      }, 0) as number;
+      return Object.values(obj).reduce(
+        (count: number, val: unknown): number => {
+          if (typeof val === "object" && val !== null) {
+            return count + getTotalFields(val);
+          }
+          return count + 1;
+        },
+        0,
+      ) as number;
     };
 
     let filledCount: number = 0;
@@ -597,7 +618,8 @@ export default function StudentForm() {
       filledCount = Object.values(enrollmentFields).filter(
         (v) => v === 1,
       ).length;
-      totalCount = enrollmentFields.reasonForEnrollment + enrollmentFields.reasonOther;
+      totalCount =
+        enrollmentFields.reasonForEnrollment + enrollmentFields.reasonOther;
     } else if (sectionIndex === 1) {
       const personalFields = {
         mobileNo: formData.mobileNo ? 1 : 0,
@@ -635,39 +657,43 @@ export default function StudentForm() {
             : 0;
       totalCount = 100;
     } else if (sectionIndex === 3) {
-      let fatherInfo = ( 
-        formData.fatherFirstName && 
+      let fatherInfo =
+        formData.fatherFirstName &&
         formData.fatherLastName &&
         formData.fatherBirthDate &&
         formData.fatherEducation &&
         formData.fatherOccupation &&
-        formData.fatherCompany
-      );
-      let motherInfo = ( 
-        formData.motherFirstName && 
+        formData.fatherCompany;
+      let motherInfo =
+        formData.motherFirstName &&
         formData.motherLastName &&
         formData.motherBirthDate &&
         formData.motherEducation &&
         formData.motherOccupation &&
-        formData.motherCompany 
-      );
+        formData.motherCompany;
       const familyFields = {
-        parentsInfo: (fatherInfo && motherInfo ? 1 : 0),
-        guardiansInfo: (
+        parentsInfo: fatherInfo && motherInfo ? 1 : 0,
+        guardiansInfo:
           formData.guardianFirstName &&
           formData.guardianLastName &&
           formData.guardianAddressMunicipality &&
           formData.guardianAddressBarangay &&
-          formData.guardianAddressRegion && 
-          formData.guardianAddressStreet ? 1 : 0
-        ),
-        supportingFamily: (
-          formData.gainfullyEmployed && 
-          formData.supportStudies && 
-          formData.supportFamily && 
-          formData.financialSupport && 
-          formData.weeklyAllowance? 1 : 0),
-        monthlyFamilyIncome: formData.monthlyFamilyIncome || formData.monthlyFamilyIncomeOther ? 1 : 0,
+          formData.guardianAddressRegion &&
+          formData.guardianAddressStreet
+            ? 1
+            : 0,
+        supportingFamily:
+          formData.gainfullyEmployed &&
+          formData.supportStudies &&
+          formData.supportFamily &&
+          formData.financialSupport &&
+          formData.weeklyAllowance
+            ? 1
+            : 0,
+        monthlyFamilyIncome:
+          formData.monthlyFamilyIncome || formData.monthlyFamilyIncomeOther
+            ? 1
+            : 0,
       };
       filledCount = Object.values(familyFields).filter((v) => v === 1).length;
       totalCount = 4;
@@ -708,8 +734,8 @@ export default function StudentForm() {
   ) => {
     if (section && section !== "others") {
       // Handle nested education fields (elementary, juniorHS, seniorHS)
-      const validSections = ['elementary', 'juniorHS', 'seniorHS'] as const;
-      
+      const validSections = ["elementary", "juniorHS", "seniorHS"] as const;
+
       if (validSections.includes(section as any)) {
         setFormData((prev) => ({
           ...prev,
@@ -717,10 +743,11 @@ export default function StudentForm() {
             ...prev.education,
             [section]: {
               // Get the current education level, ensuring it's an object
-              ...(typeof prev.education[section as keyof typeof prev.education] === 'object' 
-                ? prev.education[section as keyof typeof prev.education] 
-                : {}
-              ) as Record<string, string>,
+              ...((typeof prev.education[
+                section as keyof typeof prev.education
+              ] === "object"
+                ? prev.education[section as keyof typeof prev.education]
+                : {}) as Record<string, string>),
               [field]: value as string, // Education fields are always strings
             },
           },
@@ -790,7 +817,9 @@ export default function StudentForm() {
             (levelData as any).yearGrad
           ) {
             if (!(levelData as any).school)
-              errorList.push(`Education: ${level.label} - School name required`);
+              errorList.push(
+                `Education: ${level.label} - School name required`,
+              );
             if (!(levelData as any).location)
               errorList.push(`Education: ${level.label} - Location required`);
             if (!(levelData as any).public)
@@ -840,9 +869,13 @@ export default function StudentForm() {
     const missingList: string[] = [];
 
     // Section 0: Reason for Enrollment
-    const hasReason = Object.values(formData.reasonForEnrollment).some((v) => v);
+    const hasReason = Object.values(formData.reasonForEnrollment).some(
+      (v) => v,
+    );
     if (!hasReason) {
-      missingList.push("Reason for Enrollment: Please select at least one reason");
+      missingList.push(
+        "Reason for Enrollment: Please select at least one reason",
+      );
     }
 
     // Section 1: Personal Information
@@ -888,17 +921,25 @@ export default function StudentForm() {
       }
     });
     if (!hasAnyEducation) {
-      missingList.push("Educational Background: Please fill in at least one education level");
+      missingList.push(
+        "Educational Background: Please fill in at least one education level",
+      );
     } else if (educationMissing.length > 0) {
-      missingList.push(`Educational Background: ${educationMissing.join(", ")}`);
+      missingList.push(
+        `Educational Background: ${educationMissing.join(", ")}`,
+      );
     }
 
     // Section 3: Family Background
     const familyMissing: string[] = [];
-    if (!formData.fatherFirstName.trim()) familyMissing.push("Father's First Name");
-    if (!formData.fatherLastName.trim()) familyMissing.push("Father's Last Name");
-    if (!formData.motherFirstName.trim()) familyMissing.push("Mother's First Name");
-    if (!formData.motherLastName.trim()) familyMissing.push("Mother's Last Name");
+    if (!formData.fatherFirstName.trim())
+      familyMissing.push("Father's First Name");
+    if (!formData.fatherLastName.trim())
+      familyMissing.push("Father's Last Name");
+    if (!formData.motherFirstName.trim())
+      familyMissing.push("Mother's First Name");
+    if (!formData.motherLastName.trim())
+      familyMissing.push("Mother's Last Name");
     if (familyMissing.length > 0) {
       missingList.push(`Family Background: ${familyMissing.join(", ")}`);
     }
@@ -921,9 +962,7 @@ export default function StudentForm() {
     // Check completion first - if form is incomplete, show which sections are missing
     if (overallCompletion < 100) {
       const incompleteSections = buildIncompleteSection();
-      setValidationError(
-        `Please complete the following sections:`,
-      );
+      setValidationError(`Please complete the following sections:`);
       setValidationErrorList(incompleteSections);
       setShowValidationError(true);
       return;
@@ -963,31 +1002,70 @@ export default function StudentForm() {
 
   const isSectionEmpty = (): boolean => {
     if (currentSection === 0) {
-      return Object.values(formData.reasonForEnrollment).every(v => !v) && !formData.reasonOther;
+      return (
+        Object.values(formData.reasonForEnrollment).every((v) => !v) &&
+        !formData.reasonOther
+      );
     } else if (currentSection === 1) {
-      return !formData.lastName && !formData.firstName && !formData.middleName && 
-             !formData.civilStatus && !formData.religion && !formData.highSchoolAverage &&
-             !formData.course && !formData.email && !formData.dateOfBirth && !formData.placeOfBirth &&
-             !formData.mobileNo && !formData.height && !formData.weight && !formData.gender;
+      return (
+        !formData.lastName &&
+        !formData.firstName &&
+        !formData.middleName &&
+        !formData.civilStatus &&
+        !formData.religion &&
+        !formData.highSchoolAverage &&
+        !formData.course &&
+        !formData.email &&
+        !formData.dateOfBirth &&
+        !formData.placeOfBirth &&
+        !formData.mobileNo &&
+        !formData.height &&
+        !formData.weight &&
+        !formData.gender
+      );
     } else if (currentSection === 2) {
       const education = formData.education;
-      return !education.elementary.school && !education.elementary.location &&
-             !education.juniorHS.school && !education.juniorHS.location &&
-             !education.seniorHS.school && !education.seniorHS.location && !education.others;
+      return (
+        !education.elementary.school &&
+        !education.elementary.location &&
+        !education.juniorHS.school &&
+        !education.juniorHS.location &&
+        !education.seniorHS.school &&
+        !education.seniorHS.location &&
+        !education.others
+      );
     } else if (currentSection === 3) {
-      return !formData.fatherFirstName && !formData.fatherLastName && 
-      !formData.motherFirstName && !formData.motherLastName && !formData.guardianFirstName && !formData.guardianLastName &&
-             !formData.monthlyFamilyIncome && !formData.financialSupport;
+      return (
+        !formData.fatherFirstName &&
+        !formData.fatherLastName &&
+        !formData.motherFirstName &&
+        !formData.motherLastName &&
+        !formData.guardianFirstName &&
+        !formData.guardianLastName &&
+        !formData.monthlyFamilyIncome &&
+        !formData.financialSupport
+      );
     } else if (currentSection === 4) {
-      return !formData.vision && !formData.hearing && !formData.mobility && !formData.speech &&
-             !formData.generalHealth && !formData.consultedWith && !formData.dateTest && !formData.rs && !formData.pr;
+      return (
+        !formData.vision &&
+        !formData.hearing &&
+        !formData.mobility &&
+        !formData.speech &&
+        !formData.generalHealth &&
+        !formData.consultedWith &&
+        !formData.dateTest &&
+        !formData.rs &&
+        !formData.pr
+      );
     }
     return true;
   };
 
   const handleClearForm = () => {
     if (isSectionEmpty()) {
-      setValidationError("Nothing to Clear - There is no data in this section to clear.");
+      setValidationError(
+        "Nothing to Clear - There is no data in this section to clear.",
+      );
       setShowValidationError(true);
       return;
     }
@@ -996,12 +1074,12 @@ export default function StudentForm() {
 
   const confirmClearForm = () => {
     setShowClearConfirm(false);
-    
+
     // Clear only current section data
-    
+
     if (currentSection === 0) {
       // Clear Reason for Enrollment section
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         reasonForEnrollment: {},
         reasonOther: "",
@@ -1010,7 +1088,7 @@ export default function StudentForm() {
       }));
     } else if (currentSection === 1) {
       // Clear Personal Information section
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         lastName: "",
         firstName: "",
@@ -1043,18 +1121,36 @@ export default function StudentForm() {
       }));
     } else if (currentSection === 2) {
       // Clear Educational Background section
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         education: {
-          elementary: { school: "", location: "", public: "", yearGrad: "", awards: "" },
-          juniorHS: { school: "", location: "", public: "", yearGrad: "", awards: "" },
-          seniorHS: { school: "", location: "", public: "", yearGrad: "", awards: "" },
+          elementary: {
+            school: "",
+            location: "",
+            public: "",
+            yearGrad: "",
+            awards: "",
+          },
+          juniorHS: {
+            school: "",
+            location: "",
+            public: "",
+            yearGrad: "",
+            awards: "",
+          },
+          seniorHS: {
+            school: "",
+            location: "",
+            public: "",
+            yearGrad: "",
+            awards: "",
+          },
           others: "",
         },
       }));
     } else if (currentSection === 3) {
       // Clear Family Background section
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         fatherName: "",
         fatherAge: "",
@@ -1086,7 +1182,7 @@ export default function StudentForm() {
       }));
     } else if (currentSection === 4) {
       // Clear Health & Wellness section
-      setFormData(prev => ({
+      setFormData((prev) => ({
         ...prev,
         vision: "",
         hearing: "",
@@ -1108,7 +1204,7 @@ export default function StudentForm() {
         remarks: "",
       }));
     }
-    
+
     // Show success popup
     setShowClearSuccess(true);
   };
@@ -1144,7 +1240,8 @@ export default function StudentForm() {
                 Important: Complete Your Personal Data Sheet
               </h3>
               <p className="text-yellow-700 text-sm sm:text-base">
-                You must complete this form to access all guidance services. Your information helps us provide better support and counseling.
+                You must complete this form to access all guidance services.
+                Your information helps us provide better support and counseling.
               </p>
             </div>
           </div>
@@ -1199,7 +1296,7 @@ export default function StudentForm() {
           {!isMobileNav && (
             <div className="lg:col-span-1">
               <div className="sticky top-24 space-y-2">
-                <h3 className="font-semibold text-gray-900 text-sm uppercase text-gray-600 px-2 mb-3">
+                <h3 className="font-semiboldtext-sm uppercase text-gray-600 px-2 mb-3">
                   Form Sections
                 </h3>
                 {sections.map((section, idx) => {
@@ -1213,11 +1310,7 @@ export default function StudentForm() {
                         currentSection === idx
                           ? "bg-primary text-primary-foreground shadow-md"
                           : "bg-white text-gray-900 border border-gray-200"
-                      } ${
-                        status !== "complete"
-                          ? "bg-gray-50"
-                          : ""
-                      }`}
+                      } ${status !== "complete" ? "bg-gray-50" : ""}`}
                     >
                       <div className="flex-1">
                         <p className="text-sm">{section.title}</p>
@@ -1317,7 +1410,8 @@ export default function StudentForm() {
                             <input
                               type="checkbox"
                               checked={
-                                formData.reasonForEnrollment[reason] == true || false
+                                formData.reasonForEnrollment[reason] == true ||
+                                false
                               }
                               onChange={() => handleReasonChange(reason)}
                               className="w-5 h-5 rounded border-gray-300 text-primary"
@@ -1449,7 +1543,7 @@ export default function StudentForm() {
                   disabled={isLoading}
                   className="flex-1 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold px-6 py-3"
                 >
-                  {isLoading ? 'Submitting...' : 'Submit Form'}
+                  {isLoading ? "Submitting..." : "Submit Form"}
                 </Button>
               )}
             </div>
@@ -1466,7 +1560,8 @@ export default function StudentForm() {
             </CardHeader>
             <CardContent className="pt-6">
               <p className="text-gray-700 mb-6">
-                Are you sure you want to clear all data in this section ({sections[currentSection].title})?
+                Are you sure you want to clear all data in this section (
+                {sections[currentSection].title})?
               </p>
               <div className="flex gap-3">
                 <Button
@@ -1500,7 +1595,8 @@ export default function StudentForm() {
             </CardHeader>
             <CardContent className="pt-6">
               <p className="text-gray-700 mb-6">
-                All data in the "{sections[currentSection].title}" section has been cleared.
+                All data in the "{sections[currentSection].title}" section has
+                been cleared.
               </p>
               <Button
                 onClick={handleClearSuccessClose}
@@ -1522,7 +1618,8 @@ export default function StudentForm() {
             </CardHeader>
             <CardContent className="pt-6">
               <p className="text-gray-700 mb-6">
-                Are you sure you want to submit this form? Once submitted, your data will be saved and you can view it in your profile.
+                Are you sure you want to submit this form? Once submitted, your
+                data will be saved and you can view it in your profile.
               </p>
               <div className="flex gap-3">
                 <Button
@@ -1559,7 +1656,8 @@ export default function StudentForm() {
                 Your Personal Data Sheet has been successfully submitted.
               </p>
               <p className="text-gray-600 text-sm mb-6">
-                Your data is now saved in your profile and can be viewed at any time. Thank you for completing the form.
+                Your data is now saved in your profile and can be viewed at any
+                time. Thank you for completing the form.
               </p>
               <Button
                 onClick={handleSuccessClose}
@@ -1580,26 +1678,28 @@ export default function StudentForm() {
             <div className="bg-red-600 text-white px-6 py-4">
               <h3 className="text-lg font-bold">Unable to Submit</h3>
             </div>
-            
+
             {/* Modal Body */}
             <div className="px-6 py-4">
               <p className="text-gray-700 font mb-4">
                 {validationError || "Please fix the following errors:"}
               </p>
-              
+
               {/* Error List */}
               {validationErrorList.length > 0 ? (
                 <ul className="space-y-2 mb-4">
                   {validationErrorList.map((error, index) => (
                     <li key={index} className="flex items-start gap-3">
-                      <span className="text-red-600 text-lg flex-shrink-0 mt-0.5">•</span>
+                      <span className="text-red-600 text-lg flex-shrink-0 mt-0.5">
+                        •
+                      </span>
                       <span className="text-gray-700 text-sm">{error}</span>
                     </li>
                   ))}
                 </ul>
               ) : null}
             </div>
-            
+
             {/* Modal Footer */}
             <div className="bg-gray-100 px-6 py-3 flex justify-end">
               <button

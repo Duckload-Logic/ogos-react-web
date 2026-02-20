@@ -31,10 +31,7 @@ export default function Navigation({
       <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t border-border">
         <div className="flex items-center justify-around h-16 px-2">
           {navigationItems.map((item) => {
-            const activePage =
-              item.href === "/admin"
-                ? location.pathname === "/admin"
-                : location.pathname.startsWith(item.href);
+            const activePage = location.pathname.startsWith(item.href);
 
             return (
               <Link

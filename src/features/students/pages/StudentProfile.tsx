@@ -126,19 +126,19 @@ export default function StudentProfile() {
 
   if (loading)
     return (
-      <Layout title={`${userData?.lastName || "---"}'s Profile`}>
+      <div className="p-4">
         <p>Loading...</p>
-      </Layout>
+      </div>
     );
   if (error)
     return (
-      <Layout title={`${userData?.lastName || "---"}'s Profile`}>
+      <div className="p-4">
         <p className="text-red-500">{error}</p>
-      </Layout>
+      </div>
     );
 
   return (
-    <Layout title={`${userData?.lastName || "---"}'s Profile`}>
+    <>
       <div className="flex flex-col gap-8">
         <a
           className="flex gap-2 group items-center text-sm text-foreground/70 font-medium hover:text-primary transition-colors w-max"
@@ -158,7 +158,7 @@ export default function StudentProfile() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
 
