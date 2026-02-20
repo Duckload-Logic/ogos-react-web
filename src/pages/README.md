@@ -11,7 +11,7 @@ Route components that map to URLs in the application.
 
 - **`Index.tsx`** - Home/landing page
 - **`StudentForm.tsx`** - Student enrollment form
-- **`ExcuseSlip.tsx`** - Excuse slip request form
+- **`AdmissionSlip.tsx`** - Excuse slip request form
 - **`GuidanceServices.tsx`** - Guidance services information/request
 - **`ScheduleAppointment.tsx`** - Appointment scheduling
 - **`ViewSchedules.tsx`** - View scheduled appointments
@@ -21,6 +21,7 @@ Route components that map to URLs in the application.
 ## Architecture
 
 Pages are thin containers that:
+
 1. Handle route-level state
 2. Orchestrate feature components
 3. Manage page-specific logic
