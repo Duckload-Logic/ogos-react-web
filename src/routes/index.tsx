@@ -4,6 +4,7 @@ import { PDSGate } from "@/components/PDSGate";
 import Header from "@/components/Header";
 
 // Shared
+import Layout from "@/components/Layout";
 import NotFound from "@/pages/shared/NotFound";
 
 // Auth Feature
@@ -11,10 +12,10 @@ import Login from "@/features/auth/pages/Login";
 import Register from "@/features/auth/pages/Register";
 
 // Student Features
-import GuidanceServices from "@/features/guidance-services/pages/GuidanceServices";
-import ScheduleAppointment from "@/features/appointments/pages/ScheduleAppointment";
+import GuidanceServices from "@/features/students/pages/GuidanceServices";
+import ScheduleAppointment from "@/features/students/pages/ScheduleAppointment";
 import StudentForm from "@/features/students/pages/StudentForm";
-import ExcuseSlip from "@/features/excuse-slips/pages/ExcuseSlip";
+import AdmissionSlip from "@/features/students/pages/AdmissionSlip";
 import ViewSchedules from "@/features/schedules/pages/ViewSchedules";
 
 // Admin Feature
@@ -37,31 +38,34 @@ export const routes: RouteObject[] = [
 
   // Student routes
   {
-    path: "/student",
+    path: "/student/home",
     element: (
       <ProtectedRoute requiredRole="student">
-        <Header />
-        <GuidanceServices />
+        <Layout title="Services">
+          <GuidanceServices />
+        </Layout>
       </ProtectedRoute>
     ),
   },
   {
-    path: "/student/schedule",
+    path: "/student/appointment",
     element: (
       <ProtectedRoute requiredRole="student">
         <PDSGate>
-          <Header />
-          <ScheduleAppointment />
+          <Layout title="Schedule Appointment">
+            <ScheduleAppointment />
+          </Layout>
         </PDSGate>
       </ProtectedRoute>
     ),
   },
   {
-    path: "/student/form",
+    path: "/student/individual-inventory",
     element: (
       <ProtectedRoute requiredRole="student">
-        <Header />
-        <StudentForm />
+        <Layout title="Individual Inventory Record">
+          <StudentForm />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -70,8 +74,9 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute requiredRole="student">
         <PDSGate>
-          <Header />
-          <ExcuseSlip />
+          <Layout title="Excuse Slip">
+            <AdmissionSlip />
+          </Layout>
         </PDSGate>
       </ProtectedRoute>
     ),
@@ -81,8 +86,9 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute requiredRole="student">
         <PDSGate>
-          <Header />
-          <ViewSchedules />
+          <Layout title="View Schedules">
+            <ViewSchedules />
+          </Layout>
         </PDSGate>
       </ProtectedRoute>
     ),
@@ -90,7 +96,7 @@ export const routes: RouteObject[] = [
 
   // Admin routes
   {
-    path: "/admin",
+    path: "/admin/home",
     element: (
       <ProtectedRoute requiredRole="admin">
         <Dashboard />
