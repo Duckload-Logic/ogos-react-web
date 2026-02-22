@@ -16,6 +16,7 @@ import {
 import { useAuth } from "@/context";
 import PUPLogo from "@/assets/images/PUPLogo.png";
 import Navigation from "./Navigation";
+import ProfileDropdown from "@/components/ProfileDropdown";
 
 interface LayoutProps {
   children: React.ReactNode;
@@ -191,20 +192,23 @@ export default function Layout({ children, title }: LayoutProps) {
           </button>
 
           {/* Profile */}
-          <div className="flex items-center gap-2">
-            <UserCircle size={28} />
-            <span className="text-sm hidden md:block">{getRoleLabel()}</span>
-          </div>
-
-          {/* Logout */}
-          <button
-            onClick={handleLogout}
-            className="p-2 hover:bg-primary-foreground/10 rounded transition"
-          >
-            <LogOut size={18} />
-          </button>
-        </div>
-      </header>
+          <ProfileDropdown 
+            firstName={user?.firstName} 
+            lastName={user?.lastName} 
+            roleLabel={getRoleLabel()} 
+            /* section={user?.section} 
+            studentNumber={user?.studentNumber} */ 
+            profilePath={ 
+              user?.roleId === 2 
+                ? "/admin/profile" 
+                : user?.roleId === 3 
+                ? "/frontdesk/profile" 
+                : "/student/profile" 
+              } 
+              onLogout={handleLogout} 
+              /> 
+            </div> 
+          </header>
 
       {/* Notification Modal */}
       {showNotifications && (
