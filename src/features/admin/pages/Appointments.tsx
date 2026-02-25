@@ -2,7 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { ChevronLeft, ChevronRight, Eye, Clock } from "lucide-react";
 import { useAppointments } from "@/features/appointments/hooks/useAppointments";
 import { useUser } from "@/hooks/useUser";
-import { User } from "@/types/user";
+import { User } from "@/features/users/types/user";
 
 export default function Appointments() {
   const { fetchAppointments, appointments: hookAppointments } =
