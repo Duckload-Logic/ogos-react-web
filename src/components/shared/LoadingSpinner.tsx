@@ -3,6 +3,7 @@
  * Reusable loading indicator
  */
 
+import { Label } from "@radix-ui/react-label";
 import React from "react";
 
 interface LoadingSpinnerProps {
@@ -15,15 +16,19 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   text,
 }) => {
   const sizeClasses = {
-    sm: "w-4 h-4",
-    md: "w-8 h-8",
-    lg: "w-12 h-12",
+    sm: "w-12 h-12",
+    md: "w-32 h-32",
+    lg: "w-38 h-38",
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-2">
-      <div className={`${sizeClasses[size]} border-4 border-gray-200 border-t-blue-500 rounded-full animate-spin`} />
-      {text && <p className="text-sm text-gray-600">{text}</p>}
+    <div className="flex flex-col items-center justify-center gap-2 h-full w-full">
+      <div
+        className={`${sizeClasses[size]} border-8 aspect-square border-border border-t-primary rounded-full animate-spin`}
+      />
+      <Label className="text-sm font-semibold text-muted-foreground">
+        Loading...
+      </Label>
     </div>
   );
 };

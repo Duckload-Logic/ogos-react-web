@@ -1,79 +1,46 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
-import { apiClient } from "@/lib/api";
-import { User } from "@/types/user";
+import React, { createContext, useContext } from "react";
+import { useMe } from "@/features/users/hooks/useMe";
+import { useLogout as useLogoutMutation } from "@/features/auth/hooks";
+import { authService } from "@/features/auth/services";
+import { User } from "@/features/users/types/user";
 
 interface AuthContextType {
   isAuthenticated: boolean;
-  login: (email: string, password: string) => Promise<{ success: boolean; roleId?: number; error?: string }>;
   logout: () => void;
   isLoading: boolean;
-  user: User | null; 
+  user: User | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState<User | null>(null); // Use the User type
-  const [isLoading, setIsLoading] = useState(true);
-
-  // Define fetch function inside or outside useEffect
-  const fetchUserData = async () => {
-    try {
-      const { data } = await apiClient.get('/users/me');
-      setUser(data);
-      setIsAuthenticated(true);
-      return data;
-    } catch (error) {
-      console.error('Session invalid', error);
-      logout(); // Clear storage if token is expired/invalid
-      return null
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    const fetchData = async () => {
-      const token = localStorage.getItem('accessToken');
-      if (token) {
-        await fetchUserData();
-      } else {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  const login = async (email: string, password: string) => {
-    try {
-      const { data } = await apiClient.post('/auth/login', { email, password });
-
-      localStorage.setItem('accessToken', data.token);
-      localStorage.setItem('refreshToken', data.refreshToken);
-
-      // After login, fetch the full user profile
-      const userData = await fetchUserData();
-
-      return { success: true, roleId: userData?.roleId };
-    } catch (error: any) {
-      return {
-        success: false,
-        error: error.response?.data?.error || 'Login failed. Please try again.',
-      };
-    }
-  };
+/**
+ * Modern AuthContext using TanStack Query
+ * This is a thin wrapper around useMe hook to maintain backwards compatibility
+ */
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
+  // Use TanStack Query hooks for data fetching
+  const { data: user, isLoading, isError } = useMe();
+  const { logout: logoutMutation } = useLogoutMutation();
 
   const logout = () => {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
-    setIsAuthenticated(false);
-    setUser(null);
+    logoutMutation();
   };
 
+  const hasToken = authService.isAuthenticated();
+  const isAuthenticated = hasToken && !!user;
+  const isAuthLoading = isLoading || (hasToken && !user && !isError);
+
   return (
-    <AuthContext.Provider value={{ isAuthenticated, user, login, logout, isLoading }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated,
+        user: user || null,
+        logout,
+        isLoading: isAuthLoading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

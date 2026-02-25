@@ -1,101 +1,95 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context";
-import { AuthHeader, AuthMessages, LoginForm } from "@/features/auth/components";
-import { isValidEmail, isValidPassword, isValidUsername } from "@/utils/validation";
+import {
+  AuthHeader,
+  AuthMessages,
+  LoginForm,
+} from "@/features/auth/components";
+import {
+  isValidEmail,
+  isValidPassword,
+  isValidUsername,
+} from "@/utils/validation";
 import { ROLE_ROUTES } from "@/config/constants";
+import { useLogin } from "../hooks";
+import { useMe } from "@/features/users/hooks/useMe";
 
 export default function Login() {
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, isLoggingIn, loginError } = useLogin();
+  const { data: me, isLoading: isLoadingMe, refetch } = useMe();
+
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [isLoading, setIsLoading] = useState(false);
+  const [localError, setLocalError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
-    setIsLoading(true);
+    setLocalError("");
 
+    // Client-side validation
     try {
-      // Validation
-      if (!username || !password) {
-        throw new Error("Please enter both email/username and password");
-      }
+      if (!username || !password) throw new Error("Credentials required");
 
       const isEmail = username.includes("@");
-      
-      if (isEmail && !isValidEmail(username)) {
-        throw new Error("Please enter a valid email address");
-      }
+      if (isEmail && !isValidEmail(username)) throw new Error("Invalid email");
+      if (!isEmail && !isValidUsername(username))
+        throw new Error("Invalid username");
+      if (!isValidPassword(password)) throw new Error("Password too short");
 
-      if (!isEmail && !isValidUsername(username)) {
-        throw new Error("Username must be 3-50 characters");
-      }
+      // Login - tokens are automatically saved by authService
+      console.log("🔐 Starting login...");
+      await login({
+        email: username,
+        password,
+      });
+      console.log("✅ Login successful, tokens saved");
 
-      if (!isValidPassword(password)) {
-        throw new Error("Password must be at least 6 characters");
-      }
+      // Fetch user data after successful login
+      console.log("👤 Fetching user data...");
+      const result = await refetch();
+      console.log("📊 Refetch result:", result.data);
 
-      // Call API
-      const result = await login(username, password);
-   
-      if (result.success) {
-        const roleId = result?.roleId;
-        if (!roleId) {
-          throw new Error("User role not found");
-        }
-
+      // Navigate immediately after we have user data
+      if (result.data) {
+        const roleId = result.data.role?.id;
         const route = ROLE_ROUTES[roleId as keyof typeof ROLE_ROUTES];
-        if (!route) {
-          throw new Error("Unknown user role");
-        }
 
-        navigate(route, { replace: true });
+        if (route) {
+          console.log("✈️ Navigating to:", route);
+          navigate(route, { replace: true });
+        } else {
+          console.error("❌ No route found for role:", roleId);
+          setLocalError("Unauthorized role.");
+        }
       } else {
-        throw new Error(result.error || "Invalid credentials");
+        console.error("❌ No user data in result:", result);
+        setLocalError("Failed to load user data.");
       }
     } catch (err) {
-      const message = err instanceof Error ? err.message : "An error occurred";
-      setError(message);
-    } finally {
-      setIsLoading(false);
+      setLocalError(err instanceof Error ? err.message : "Login failed");
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-3 sm:px-4 py-6 sm:py-8">
+    <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
-        {/* Card Container */}
-        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-          {/* Header */}
-          <AuthHeader
-            title="PUPT OGOS"
-            subtitle="Login to Your Account"
-          />
+        <div className="bg-card rounded-lg shadow-xl overflow-hidden">
+          <AuthHeader title="PUPT OGOS" subtitle="Login to Your Account" />
+          <div className="p-6 sm:p-8">
+            {/* Combine local validation errors and server errors from the hook */}
+            <AuthMessages error={localError || loginError?.message} />
 
-          {/* Form Content */}
-          <div className="px-4 sm:px-6 py-6 sm:py-8">
-            {/* Messages */}
-            <AuthMessages error={error} />
-
-            {/* Form */}
             <LoginForm
               username={username}
               password={password}
               onUsernameChange={setUsername}
               onPasswordChange={setPassword}
               onSubmit={handleSubmit}
-              isLoading={isLoading}
+              isLoading={isLoggingIn} // Controlled by hook
             />
           </div>
         </div>
-
-        {/* Support Text */}
-        <p className="text-center text-xs sm:text-sm text-muted-foreground mt-6">
-          Need help? Contact the guidance office
-        </p>
       </div>
     </div>
   );

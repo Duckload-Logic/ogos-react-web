@@ -1,10 +1,15 @@
-export interface User {
+export interface UserRole {
   id: number;
-  roleId: number;
+  name: string;
+}
+
+export interface User {
+  id?: number;
+  role: UserRole;
   firstName: string;
   middleName?: string;
   lastName: string;
   email: string;
   createdAt?: string;
   updatedAt?: string;
-} 
+}
