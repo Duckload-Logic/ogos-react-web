@@ -1,0 +1,9 @@
+export { SectionContainer } from "./SectionContainer";
+export { HealthAreaSection } from "./HealthAreaSection";
+export { AddressCard } from "./AddressCard";
+export { PersonalInformationSection } from "./PersonalInformationSection";
+export { EducationBackgroundSection } from "./EducationBackgroundSection";
+export { FamilyBackgroundSection } from "./FamilyBackgroundSection";
+export { HealthInformationSection } from "./HealthInformationSection";
+export { InterestsSection } from "./InterestsSection";
+export { TestResultsSection } from "./TestResultsSection";
