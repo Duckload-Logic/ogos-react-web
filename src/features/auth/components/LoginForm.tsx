@@ -8,6 +8,7 @@ interface LoginFormProps {
   onUsernameChange: (value: string) => void;
   onPasswordChange: (value: string) => void;
   onSubmit: (e: React.FormEvent) => void;
+  onPUPTIDPClick: () => void;
   isLoading: boolean;
 }
 
@@ -17,6 +18,7 @@ export default function LoginForm({
   onUsernameChange,
   onPasswordChange,
   onSubmit,
+  onPUPTIDPClick,
   isLoading,
 }: LoginFormProps) {
   return (
@@ -59,6 +61,15 @@ export default function LoginForm({
           className="w-full h-10 sm:h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold text-sm sm:text-base flex items-center justify-center"
         >
           {isLoading ? <LoadingSpinner size="sm" /> : "Login"}
+        </Button>
+
+        <Button
+          type="button"
+          onClick={onPUPTIDPClick}
+          disabled={isLoading}
+          className="w-full h-10 sm:h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold text-sm sm:text-base flex items-center justify-center"
+        >
+          Login with PUPT-IDP
         </Button>
       </form>
 
