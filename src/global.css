@@ -40,45 +40,49 @@
    * A different format will require also updating the theme in tailwind.config.ts.
   */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 13%;
+    /* Softer, warmer light mode for eye comfort */
+    --background: 210 10% 96%;
+    --foreground: 224 12% 20%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 13%;
-    --card-hover-background: 0 0% 90%;
-    --card-hover-foreground: 0 0% 13%;
+    /* Off-white cards instead of pure white */
+    --card: 0 0% 99%;
+    --card-foreground: 224 12% 20%;
+    --card-hover-background: 210 10% 93%;
+    --card-hover-foreground: 224 12% 20%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 13%;
+    --popover: 0 0% 99%;
+    --popover-foreground: 224 12% 20%;
 
-    --primary: 0 64% 33%;
+    --primary: 0 72% 45%;
     --primary-foreground: 0 0% 100%;
-    --primary-dark: 0 64% 28%;
+    --primary-dark: 0 72% 35%;
 
-    --secondary: 45 93% 56%;
+    --secondary: 45 93% 47%;
     --secondary-foreground: 0 0% 13%;
 
-    --muted: 0 0% 90%;
-    --muted-foreground: 0 0% 45%;
+    /* Softer muted tones */
+    --muted: 210 12% 90%;
+    --muted-foreground: 215 8% 55%;
 
-    --accent: 0 64% 33%;
-    --accent-foreground: 0 0% 100%;
+    --accent: 210 12% 90%;
+    --accent-foreground: 224 12% 20%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 0 0% 90%;
-    --input: 0 0% 96%;
-    --ring: 0 64% 33%;
+    --border: 210 10% 88%;
+    --input: 210 10% 92%;
+    --ring: 0 72% 45%;
     --radius: 0.5rem;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 0 0% 13%;
-    --sidebar-primary: 0 64% 33%;
+
+    --sidebar-background: 210 10% 94%;
+    --sidebar-foreground: 224 12% 20%;
+    --sidebar-primary: 0 72% 45%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 45 93% 56%;
-    --sidebar-accent-foreground: 0 0% 13%;
-    --sidebar-border: 0 0% 85%;
-    --sidebar-ring: 0 64% 33%;
+    --sidebar-accent: 210 12% 88%;
+    --sidebar-accent-foreground: 224 12% 20%;
+    --sidebar-border: 210 10% 86%;
+    --sidebar-ring: 0 72% 45%;
   }
 
   .dark {
@@ -127,60 +131,51 @@
     border-color: hsl(var(--border));
     font-family:
       Arial,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      Roboto,
       "Helvetica Neue",
-      sans-serif;
+      sans-serif,
+      -apple-system,
+      Roboto,
+      BlinkMacSystemFont;
   }
 
   body {
     background-color: hsl(var(--background));
     color: hsl(var(--foreground));
-    font-family:
-      Arial,
-      -apple-system,
-      BlinkMacSystemFont,
-      "Segoe UI",
-      Roboto,
-      "Helvetica Neue",
-      sans-serif;
     font-size: 16px;
     line-height: 1.6;
+    scrollbar-gutter: stable;
+  }
+
+  html {
+    scrollbar-gutter: stable;
   }
 
   h1 {
     font-size: 2.25rem;
     font-weight: bold;
     letter-spacing: -0.02em;
-    font-family: "Trajan Pro", Arial, sans-serif;
   }
 
   h2 {
     font-size: 1.875rem;
     font-weight: bold;
     letter-spacing: -0.02em;
-    font-family: "Trajan Pro", Arial, sans-serif;
   }
 
   h3 {
     font-size: 1.5rem;
     font-weight: 600;
-    font-family: "Trajan Pro", Arial, sans-serif;
   }
 
   h4 {
     font-size: 1.25rem;
     font-weight: 600;
-    font-family: "Trajan Pro", Arial, sans-serif;
   }
 
   h5,
   h6 {
     font-size: 1.125rem;
     font-weight: 600;
-    font-family: "Trajan Pro", Arial, sans-serif;
   }
 
   p {
@@ -204,14 +199,88 @@
     font-size: 16px;
   }
 
-  input[type="date"]::-webkit-calendar-picker-indicator {
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"],
+  input[type="month"] {
+    color-scheme: light;
+  }
+
+  .dark input[type="date"],
+  .dark input[type="time"],
+  .dark input[type="datetime-local"],
+  .dark input[type="month"] {
+    color-scheme: dark;
+  }
+
+  input[type="date"]::-webkit-calendar-picker-indicator,
+  input[type="time"]::-webkit-calendar-picker-indicator,
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  input[type="month"]::-webkit-calendar-picker-indicator {
+    cursor: pointer;
+    opacity: 0.9;
+    border-radius: 0.375rem;
+    padding: 0.125rem;
+    transition:
+      opacity 0.2s ease,
+      background-color 0.2s ease,
+      filter 0.2s ease;
     filter: invert(0%) sepia(0%) grayscale(0%) brightness(100%);
   }
 
-  .dark input[type="date"]::-webkit-calendar-picker-indicator {
-    filter: invert(100%) sepia(100%) grayscale(100%) brightness(200%);
+  input[type="date"]::-webkit-calendar-picker-indicator:hover,
+  input[type="time"]::-webkit-calendar-picker-indicator:hover,
+  input[type="datetime-local"]::-webkit-calendar-picker-indicator:hover,
+  input[type="month"]::-webkit-calendar-picker-indicator:hover {
+    opacity: 1;
+    background-color: hsl(var(--muted-foreground) / 30%);
   }
 
+  .dark input[type="date"]::-webkit-calendar-picker-indicator,
+  .dark input[type="time"]::-webkit-calendar-picker-indicator,
+  .dark input[type="datetime-local"]::-webkit-calendar-picker-indicator,
+  .dark input[type="month"]::-webkit-calendar-picker-indicator {
+    filter: invert(100%) sepia(100%) grayscale(100%) brightness(180%);
+  }
+
+  input[type="number"] {
+    /* This ensures the field behaves like a number input */
+    appearance: textfield;
+    -moz-appearance: textfield;
+    background-color: transparent !important;
+  }
+
+  /* For Chrome, Safari, Edge, and Opera */
+  input[type="number"]::-webkit-outer-spin-button,
+  input[type="number"]::-webkit-inner-spin-button {
+    /* 1. Remove the default system styling */
+    -webkit-appearance: none;
+    margin: 0;
+
+    /* 2. Forces transparency */
+    background-color: transparent !important;
+    background-image: none !important;
+
+    /* 3. Re-enable visibility (since appearance: none might hide them) */
+    cursor: pointer;
+    display: block;
+    width: 1.5rem; /* Give them a clickable area */
+    height: 100%;
+
+    /* Keep your existing transitions */
+    opacity: 0.6;
+    transition: opacity 0.2s ease;
+  }
+
+  /* Show them clearly on hover */
+  input[type="number"]:hover::-webkit-inner-spin-button {
+    opacity: 1;
+  }
+
+  /* For the Dark Mode icons */
+  .dark input[type="number"]::-webkit-inner-spin-button {
+    filter: invert(100%) brightness(200%);
+  }
   /* PDS Form Standardization */
   .students-label {
     display: block;
@@ -237,6 +306,11 @@
   }
 
   .pill {
+    background-color: #e5e7eb;
+    color: #374151;
+    border-radius: 9999px;
+    padding: 0.25rem 0.5rem;
+    font-size: 0.875rem;
   }
 
   .pill:disabled {
@@ -249,5 +323,52 @@
   code {
     overflow-x: auto;
     white-space: pre;
+  }
+}
+
+@layer utilities {
+  /* Custom Scrollbar - Webkit (Chrome, Safari, Edge) */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 6px;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--primary));
+    border-radius: 6px;
+    border: 2px solid hsl(var(--muted));
+    transition: background 0.3s ease;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--primary-dark));
+  }
+
+  /* Firefox Scrollbar */
+  * {
+    scrollbar-color: hsl(var(--primary)) transparent;
+    scrollbar-width: thin;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  textarea:-webkit-autofill,
+  textarea:-webkit-autofill:hover,
+  textarea:-webkit-autofill:focus,
+  select:-webkit-autofill,
+  select:-webkit-autofill:hover,
+  select:-webkit-autofill:focus {
+    -webkit-box-shadow: 0 0 0px 1000px hsl(var(--muted)) inset !important; /* Use theme input color */
+    box-shadow: 0 0 0px 1000px hsl(var(--muted)) inset !important;
+    -webkit-text-fill-color: hsl(
+      var(--foreground)
+    ) !important; /* Use theme foreground */
+    transition: background-color 5000s ease-in-out 0s; /* Prevent flash */
   }
 }

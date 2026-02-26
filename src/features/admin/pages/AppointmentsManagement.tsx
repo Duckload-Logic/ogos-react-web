@@ -1,4 +1,3 @@
-import Layout from "@/components/Layout";
 import { useEffect, useRef, useState } from "react";
 import { Eye, Check, X, AlertCircle, Clock } from "lucide-react";
 import { useAdminAppointments } from "../hooks/useAdminAppointments";
@@ -7,12 +6,21 @@ import { AdminCalendar } from "../components/AdminCalendar";
 import { AppointmentsList } from "../components/AppointmentsList";
 import { AppointmentActionModal } from "../components/AppointmentActionModal";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Appointment, APPOINTMENT_STATUSES } from "@/features/appointments/services";
+import {
+  Appointment,
+  APPOINTMENT_STATUSES,
+} from "@/features/appointments/services";
 import { formatDate } from "@/features/schedules/utils/formatters";
 
 type StatusFilterType = "Pending" | "Approved" | "Completed" | "Cancelled";
 type StatusTypes = StatusFilterType | "Rescheduled";
-type ModalActionType = "view" | "reschedule" | "approve" | "reject" | "complete" | null;
+type ModalActionType =
+  | "view"
+  | "reschedule"
+  | "approve"
+  | "reject"
+  | "complete"
+  | null;
 
 export default function AppointmentsManagement() {
   const { fetchUserData } = useUser();
@@ -32,20 +40,27 @@ export default function AppointmentsManagement() {
   } = useAdminAppointments();
 
   const [refreshTrigger, setRefreshTrigger] = useState(0);
-  const [statusFilter, setStatusFilter] = useState<StatusFilterType>(APPOINTMENT_STATUSES.PENDING);
-  const [startDate, setStartDate] = useState(new Date().toISOString().slice(0, 10));
+  const [statusFilter, setStatusFilter] = useState<StatusFilterType>(
+    APPOINTMENT_STATUSES.PENDING,
+  );
+  const [startDate, setStartDate] = useState(
+    new Date().toISOString().slice(0, 10),
+  );
   const [endDate, setEndDate] = useState(
     new Date(new Date().setMonth(currentMonth.getMonth() + 1))
       .toISOString()
-      .slice(0, 10)
+      .slice(0, 10),
   );
   const [students, setStudents] = useState<any[]>([]);
   const touchStartX = useRef<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(startDate ? new Date(startDate) : undefined);
-  
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
+    startDate ? new Date(startDate) : undefined,
+  );
+
   // Modal state
   const [modalOpen, setModalOpen] = useState(false);
-  const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
   const [modalAction, setModalAction] = useState<ModalActionType>(null);
 
   // Fetch appointments on mount and when filters change
@@ -98,15 +113,14 @@ export default function AppointmentsManagement() {
   }, [success, clearSuccess]);
 
   const bookedDates = new Set(
-    appointments
-      .map((apt) => {
-        const date = new Date(apt.scheduledDate);
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, '0'); // Months are 0-indexed
-        const d = String(date.getDate()).padStart(2, '0');
-        
-        return `${y}-${m}-${d}`;
-      })
+    appointments.map((apt) => {
+      const date = new Date(apt.scheduledDate);
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
+      const d = String(date.getDate()).padStart(2, "0");
+
+      return `${y}-${m}-${d}`;
+    }),
   );
 
   const getDaysInMonth = (date: Date) => {
@@ -119,13 +133,13 @@ export default function AppointmentsManagement() {
 
   const previousMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1)
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1),
     );
   };
 
   const nextMonth = () => {
     setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1)
+      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1),
     );
   };
 
@@ -140,12 +154,18 @@ export default function AppointmentsManagement() {
   const emptyDays = Array.from({ length: firstDay }, (_, i) => i);
 
   const calendarLegends: Record<StatusFilterType, any[]> = {
-    Pending: [{ color: "bg-amber-400 border border-primary", label: "Pending" }],
+    Pending: [
+      { color: "bg-amber-400 border border-primary", label: "Pending" },
+    ],
     Approved: [
       { color: "bg-blue-600 border border-primary", label: "Scheduled" },
     ],
-    Completed: [{ color: "bg-green-600 border border-primary", label: "Completed" }],
-    Cancelled: [{ color: "bg-rose-500 border border-primary", label: "Cancelled" }],
+    Completed: [
+      { color: "bg-green-600 border border-primary", label: "Completed" },
+    ],
+    Cancelled: [
+      { color: "bg-rose-500 border border-primary", label: "Cancelled" },
+    ],
   };
 
   const statusColors: Record<StatusTypes, string> = {
@@ -159,7 +179,14 @@ export default function AppointmentsManagement() {
   // Action handlers
   const handleApprove = async (appointmentId: number) => {
     const apt = appointments.find((apt) => {
-      console.log('Comparing:', apt.id, 'Type:', typeof apt.id, 'Match:', apt.id === appointmentId);
+      console.log(
+        "Comparing:",
+        apt.id,
+        "Type:",
+        typeof apt.id,
+        "Match:",
+        apt.id === appointmentId,
+      );
       return apt.id === appointmentId;
     });
     setSelectedAppointment(apt || null);
@@ -176,7 +203,14 @@ export default function AppointmentsManagement() {
 
   const handleComplete = async (appointmentId: number) => {
     const apt = appointments.find((apt) => {
-      console.log('Comparing:', apt.id, 'Type:', typeof apt.id, 'Match:', apt.id === appointmentId);
+      console.log(
+        "Comparing:",
+        apt.id,
+        "Type:",
+        typeof apt.id,
+        "Match:",
+        apt.id === appointmentId,
+      );
       return apt.id === appointmentId;
     });
     setSelectedAppointment(apt || null);
@@ -217,7 +251,7 @@ export default function AppointmentsManagement() {
         await rescheduleAppointment(selectedAppointment.id, data);
       }
 
-      setRefreshTrigger((prev) => prev + 1)
+      setRefreshTrigger((prev) => prev + 1);
     } catch (err) {
       console.error("Modal action error:", err);
     }
@@ -307,7 +341,7 @@ export default function AppointmentsManagement() {
   };
 
   return (
-    <Layout title="Appointments">
+    <>
       <div className="space-y-6">
         {/* Error Alert */}
         {error && (
@@ -327,7 +361,9 @@ export default function AppointmentsManagement() {
         {success && (
           <Alert className="flex items-center gap-3 bg-green-50 border-green-200">
             <Check className="h-4 w-4 text-green-600" />
-            <AlertDescription className="text-green-800">{success}</AlertDescription>
+            <AlertDescription className="text-green-800">
+              {success}
+            </AlertDescription>
           </Alert>
         )}
 
@@ -348,7 +384,9 @@ export default function AppointmentsManagement() {
             </label>
             <select
               value={statusFilter}
-              onChange={(e) => setStatusFilter(e.target.value as StatusFilterType)}
+              onChange={(e) =>
+                setStatusFilter(e.target.value as StatusFilterType)
+              }
               className="bg-input w-full px-4 py-2 border border-border rounded-lg text-sm"
             >
               <option value="Pending">Pending</option>
@@ -403,7 +441,7 @@ export default function AppointmentsManagement() {
               const newDate = new Date(
                 currentMonth.getFullYear(),
                 currentMonth.getMonth(),
-                day
+                day,
               );
               setSelectedDate(newDate);
             }}
@@ -435,8 +473,6 @@ export default function AppointmentsManagement() {
           isLoading={isLoading}
         />
       </div>
-    </Layout>
+    </>
   );
 }
-
-

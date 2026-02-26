@@ -11,7 +11,7 @@ Custom React hooks for shared logic across components, organized by concern.
 ## Feature Hooks
 
 - **`useAppointments.ts`** - Manages appointment operations (list, schedule, cancel)
-- **`useExcuseSlips.ts`** - Manages excuse slip operations (list, submit, update status, delete)
+- **`useAdmissionSlips.ts`** - Manages excuse slip operations (list, submit, update status, delete)
 - **`useRegister.ts`** - Registration logic and form handling
 
 ## UI Hooks
@@ -22,21 +22,27 @@ Custom React hooks for shared logic across components, organized by concern.
 ## Patterns & Best Practices
 
 ### Form Operations
+
 Use composable hooks for form management:
+
 ```tsx
 const { formState, setFieldValue, resetForm } = useFormState(initialData);
 const { errors, validateFields } = useFormValidation(requiredFields);
 ```
 
 ### Async Operations
+
 Use the base hook for async operations:
+
 ```tsx
 const { data, isLoading, error, execute } = useAsyncOperation();
 await execute(() => apiCall());
 ```
 
 ### Feature-Specific Hooks
+
 Feature hooks are built on top of base hooks and services:
+
 ```tsx
 const { appointments, isLoading, fetchAppointments } = useAppointments();
 ```

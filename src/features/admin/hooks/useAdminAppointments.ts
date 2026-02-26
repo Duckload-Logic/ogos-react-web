@@ -16,16 +16,16 @@ import {
 export const useAdminAppointments = () => {
   const { user, isLoading: authLoading } = useAuth();
 
-  const isAdmin = user?.roleId === 2;
+  const isAdmin = user?.role?.id === 2;
 
   const [appointments, setAppointments] = useState<Appointment[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
-/*
- * Guard
- */
+  /*
+   * Guard
+   */
 
   const guardAdmin = () => {
     if (!isAdmin) {
@@ -33,9 +33,9 @@ export const useAdminAppointments = () => {
     }
   };
 
-/* 
- * Async Handler 
- */
+  /*
+   * Async Handler
+   */
 
   const handleAsync = useCallback(
     async <T>(
@@ -44,7 +44,7 @@ export const useAdminAppointments = () => {
         loading?: boolean;
         successMessage?: string;
         onSuccess?: (data: T) => void;
-      }
+      },
     ) => {
       try {
         guardAdmin();
@@ -64,39 +64,36 @@ export const useAdminAppointments = () => {
         if (options?.loading) setIsLoading(false);
       }
     },
-    [isAdmin]
+    [isAdmin],
   );
 
-/*
- * Local State Updater 
- */
+  /*
+   * Local State Updater
+   */
 
   const updateLocalAppointment = useCallback((updated: Appointment) => {
     setAppointments((prev) =>
-      prev.map((apt) => (apt.id === updated.id ? updated : apt))
+      prev.map((apt) => (apt.id === updated.id ? updated : apt)),
     );
   }, []);
 
-/* 
- * Fetch 
- */
+  /*
+   * Fetch
+   */
 
   const fetchAppointments = useCallback(
     async (filters?: AppointmentFilters) => {
-      await handleAsync(
-        () => appointmentService.listAllAppointments(filters),
-        {
-          loading: true,
-          onSuccess: setAppointments,
-        }
-      );
+      await handleAsync(() => appointmentService.listAllAppointments(filters), {
+        loading: true,
+        onSuccess: setAppointments,
+      });
     },
-    [handleAsync]
+    [handleAsync],
   );
 
-/*
- * Status Updates
- */
+  /*
+   * Status Updates
+   */
 
   const updateStatus = useCallback(
     async (id: number, status: string) => {
@@ -105,10 +102,10 @@ export const useAdminAppointments = () => {
         {
           successMessage: `Appointment ${status.toLowerCase()} successfully`,
           onSuccess: updateLocalAppointment,
-        }
+        },
       );
     },
-    [handleAsync, updateLocalAppointment]
+    [handleAsync, updateLocalAppointment],
   );
 
   const approveAppointment = (id: number) =>
@@ -120,9 +117,9 @@ export const useAdminAppointments = () => {
   const completeAppointment = (id: number) =>
     updateStatus(id, APPOINTMENT_STATUSES.COMPLETED);
 
-/* 
- * Reschedule
- */
+  /*
+   * Reschedule
+   */
 
   const rescheduleAppointment = useCallback(
     async (id: number, payload: CreateAppointmentRequest) => {
@@ -131,15 +128,15 @@ export const useAdminAppointments = () => {
         {
           successMessage: "Appointment rescheduled successfully",
           onSuccess: updateLocalAppointment,
-        }
+        },
       );
     },
-    [handleAsync, updateLocalAppointment]
+    [handleAsync, updateLocalAppointment],
   );
 
-/* 
- * Auto Fetch After Auth Ready 
- */
+  /*
+   * Auto Fetch After Auth Ready
+   */
 
   useEffect(() => {
     if (!authLoading && isAdmin) {
