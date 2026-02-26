@@ -38,52 +38,53 @@ export default function RegisterForm({
   return (
     <>
       <form onSubmit={onSubmit} className="space-y-4">
-        {/* First Name */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            First Name
-          </label>
-          <Input
-            type="text"
-            placeholder="Enter your first name"
-            value={firstName}
-            onChange={(e) => onFirstNameChange(e.target.value)}
-            disabled={isLoading}
-            className="w-full"
-          />
-        </div>
+        {/* Name Fields - Responsive Grid */}
+        <div className="grid grid-cols-3 gap-2 sm:gap-3">
+          {/* First Name */}
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              First Name
+            </label>
+            <Input
+              type="text"
+              placeholder="John"
+              value={firstName}
+              onChange={(e) => onFirstNameChange(e.target.value)}
+              disabled={isLoading}
+              className="w-full text-sm"
+            />
+          </div>
 
-        {/* Middle Initial */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Middle Initial
-          </label>
-          <Input
-            type="text"
-            placeholder="M"
-            maxLength={1}
-            value={middleInitial}
-            onChange={(e) =>
-              onMiddleInitialChange(e.target.value.toUpperCase())
-            }
-            disabled={isLoading}
-            className="w-full"
-          />
-        </div>
+          {/* Middle Initial */}
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              Middle Initial
+            </label>
+            <Input
+              type="text"
+              placeholder="Q"
+              maxLength={1}
+              value={middleInitial}
+              onChange={(e) => onMiddleInitialChange(e.target.value.toUpperCase())}
+              disabled={isLoading}
+              className="w-full text-sm"
+            />
+          </div>
 
-        {/* Surname */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Surname
-          </label>
-          <Input
-            type="text"
-            placeholder="Enter your surname"
-            value={surname}
-            onChange={(e) => onSurnameChange(e.target.value)}
-            disabled={isLoading}
-            className="w-full"
-          />
+          {/* Surname */}
+          <div>
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+              Surname
+            </label>
+            <Input
+              type="text"
+              placeholder="Doe"
+              value={surname}
+              onChange={(e) => onSurnameChange(e.target.value)}
+              disabled={isLoading}
+              className="w-full text-sm"
+            />
+          </div>
         </div>
 
         {/* Email Address */}

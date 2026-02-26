@@ -68,7 +68,9 @@ export default function Register() {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Combine name parts for registration
-    const fullName = `${firstName.trim()} ${middleInitial.trim()} ${surname.trim()}`.trim();
+    const fullName = [firstName.trim(), middleInitial.trim(), surname.trim()]
+      .filter(Boolean)
+      .join(" ");
 
     // Register user
     // const result = register(fullName, email, password);
