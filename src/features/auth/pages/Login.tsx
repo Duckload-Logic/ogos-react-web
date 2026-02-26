@@ -74,7 +74,7 @@ export default function Login() {
   const handlePUPTIDPLogin = () => {
     // TODO: Implement PUPT-IDP SSO integration
     // This will redirect to PUPT's identity provider for OAuth/SAML authentication
-    setError("PUPT-IDP login is not yet available.");
+    setLocalError("PUPT-IDP login is not yet available.");
   };
 
   return (
@@ -93,7 +93,7 @@ export default function Login() {
               onPasswordChange={setPassword}
               onSubmit={handleSubmit}
               onPUPTIDPClick={handlePUPTIDPLogin}
-              isLoading={isLoading}
+              isLoading={isLoggingIn || isLoadingMe}
             />
           </div>
         </div>
