@@ -355,28 +355,15 @@ export default function IIRForm() {
 
   // Calculate section completion percentage
   const calculateSectionCompletion = (sectionIndex: number): number => {
-    const getFilledFields = (obj: any): number => {
-      if (!obj) return 0;
-      return Object.values(obj).filter((val) => {
-        if (val === null || val === undefined || val === "") return false;
-        if (typeof val === "object" && Array.isArray(val))
-          return val.length > 0;
-        if (typeof val === "object") return Object.keys(val).length > 0;
-        return true;
-      }).length;
-    };
-
-    const getTotalFields = (obj: any): number => {
-      if (!obj) return 0;
-      return Object.values(obj).reduce(
-        (count: number, val: unknown): number => {
-          if (typeof val === "object" && !Array.isArray(val) && val !== null) {
-            return count + getTotalFields(val);
-          }
-          return count + 1;
-        },
-        0,
-      ) as number;
+    // Only count these specific leaf fields, not nested object structures
+    const countFilledField = (val: any): boolean => {
+      if (val === null || val === undefined || val === "") return false;
+      if (typeof val === "object") {
+        if (Array.isArray(val)) return val.length > 0;
+        // For objects, check if they have an id (indicating it's been selected)
+        return val?.id !== undefined && val?.id !== null && val?.id !== "";
+      }
+      return true;
     };
 
     let filledCount = 0;
@@ -384,48 +371,89 @@ export default function IIRForm() {
 
     switch (sectionIndex) {
       case 1: // Personal Information
-        if (localFormData?.student?.basicInfo) {
-          filledCount += getFilledFields(localFormData.student.basicInfo);
-          totalCount += getTotalFields(localFormData.student.basicInfo);
-        }
-        if (localFormData?.student?.personalInfo) {
-          filledCount += getFilledFields(localFormData.student.personalInfo);
-          totalCount += getTotalFields(localFormData.student.personalInfo);
-        }
+        // BasicInfo fields (auto-filled but still count)
+        const basicFields = ["firstName", "lastName", "email"];
+        basicFields.forEach((field) => {
+          totalCount++;
+          if (countFilledField((localFormData?.student?.basicInfo as any)?.[field])) {
+            filledCount++;
+          }
+        });
+
+        // Key PersonalInfo fields to track
+        const personalFields = [
+          "dateOfBirth",
+          "placeOfBirth",
+          "gender",
+          "heightFt",
+          "weightKg",
+          "civilStatus",
+          "course",
+          "highSchoolGWA",
+          "mobileNumber",
+        ];
+        personalFields.forEach((field) => {
+          totalCount++;
+          if (countFilledField((localFormData?.student?.personalInfo as any)?.[field])) {
+            filledCount++;
+          }
+        });
+
+        // Emergency contact fields
+        const emergencyFields = ["firstName", "lastName", "contactNumber", "relationship"];
+        emergencyFields.forEach((field) => {
+          totalCount++;
+          if (countFilledField((localFormData?.student?.personalInfo?.emergencyContact as any)?.[field])) {
+            filledCount++;
+          }
+        });
+
+        // Address fields (Provincial and Residential)
+        const addressTypes = ["provincial", "residential"];
+        addressTypes.forEach((addrType) => {
+          const addressFields = ["region", "city", "barangay", "streetDetail"];
+          addressFields.forEach((field) => {
+            totalCount++;
+            const val = (localFormData?.student?.addresses as any)?.[addrType]?.address?.[field];
+            if (countFilledField(val)) {
+              filledCount++;
+            }
+          });
+        });
         break;
+
       case 2: // Education
-        if (localFormData?.education?.schools) {
-          filledCount += localFormData.education.schools.length > 0 ? 1 : 0;
-          totalCount += 1;
-        }
+        totalCount = 1;
+        filledCount = (localFormData?.education?.schools?.length ?? 0) > 0 ? 1 : 0;
         break;
+
       case 3: // Family Background
-        if (localFormData?.family?.background) {
-          filledCount += getFilledFields(localFormData.family.background);
-          totalCount += getTotalFields(localFormData.family.background);
+        totalCount = 2;
+        if (localFormData?.family?.background && Object.keys(localFormData.family.background).length > 0) {
+          filledCount++;
         }
-        if (localFormData?.family?.relatedPersons) {
-          filledCount += localFormData.family.relatedPersons.length > 0 ? 1 : 0;
-          totalCount += 1;
+        if ((localFormData?.family?.relatedPersons?.length ?? 0) > 0) {
+          filledCount++;
         }
         break;
+
       case 4: // Health
-        if (localFormData?.health?.healthRecord) {
-          filledCount += getFilledFields(localFormData.health.healthRecord);
-          totalCount += getTotalFields(localFormData.health.healthRecord);
+        totalCount = 1;
+        if (localFormData?.health?.healthRecord && Object.keys(localFormData.health.healthRecord).length > 0) {
+          filledCount++;
         }
         break;
+
       case 5: // Interests
-        if (localFormData?.interests) {
-          filledCount += getFilledFields(localFormData.interests);
-          totalCount += getTotalFields(localFormData.interests);
+        totalCount = 1;
+        if (localFormData?.interests && Object.keys(localFormData.interests).length > 0) {
+          filledCount++;
         }
         break;
+
       case 6: // Test Results
-        if (localFormData?.testResults) {
-          filledCount += localFormData.testResults.length > 0 ? 1 : 0;
-          totalCount += 1;
-        }
+        totalCount = 1;
+        filledCount = (localFormData?.testResults?.length ?? 0) > 0 ? 1 : 0;
         break;
     }
 
@@ -451,64 +479,42 @@ export default function IIRForm() {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Hero Section */}
-      <div className="text-primary-foreground py-8 md:py-12 flex flex-col gap-4 items-center justify-center text-center">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold text-foreground">
+      {/* Red Hero Section */}
+      <div className="bg-destructive text-white py-8 md:py-12 px-4 md:px-8">
+        <div className="max-w-7xl mx-auto">
+          <h1 className="text-3xl md:text-4xl font-bold">
             Individual Inventory Record Form
           </h1>
-          <p className="text-base md:text-lg mt-2 opacity-90 text-foreground">
+          <p className="text-base md:text-lg mt-2">
             Complete your student profile information
           </p>
         </div>
       </div>
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-12">
-        {/* Progress Bar Card */}
-        <Card className="mb-6 sm:mb-8 bg-card border-2 border-border shadow-md">
-          <CardContent className="pt-6">
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <h3 className="font-semibold text-card-foreground">
-                  Overall Completion
-                </h3>
-                <span className="text-lg font-bold text-primary">
-                  {getOverallCompletion()}%
-                </span>
-              </div>
-              <div className="w-full bg-muted-foreground/30 rounded-full h-3 overflow-hidden">
-                <div
-                  className="bg-primary h-full rounded-full transition-all duration-300"
-                  style={{ width: `${getOverallCompletion()}%` }}
-                />
-              </div>
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
+        {/* Simple Progress Card */}
+        <div className="mb-8 space-y-2">
+          <div className="flex items-center justify-between">
+            <h3 className="font-semibold text-foreground text-sm">
+              Overall Completion
+            </h3>
+            <span className="text-lg font-bold text-destructive">
+              {getOverallCompletion()}%
+            </span>
+          </div>
+          <div className="w-full bg-gray-300 rounded-sm h-2.5 overflow-hidden">
+            <div
+              className="bg-destructive h-full transition-all duration-300"
+              style={{ width: `${getOverallCompletion()}%` }}
+            />
+          </div>
+          {lastSaved && (
+            <div className="text-sm text-muted-foreground">
+              Last saved: {lastSaved}
             </div>
-
-            {/* Auto-save Status */}
-            <div className="mt-4 flex items-center justify-between text-sm">
-              <div className="flex items-center gap-2">
-                {autoSaveStatus === "saving" && (
-                  <div className="flex items-center gap-2 text-amber-600">
-                    <div className="w-2 h-2 bg-amber-600 rounded-full animate-pulse" />
-                    <span>Saving...</span>
-                  </div>
-                )}
-                {autoSaveStatus === "saved" && (
-                  <div className="flex items-center gap-2 text-green-600">
-                    <Save className="w-4 h-4" />
-                    <span>Saved</span>
-                  </div>
-                )}
-                {lastSaved && (
-                  <span className="text-muted-foreground">
-                    Last saved: {lastSaved}
-                  </span>
-                )}
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+          )}
+        </div>
 
         {/* Validation Errors */}
         {showValidationError && validationErrorList.length > 0 && (
@@ -532,8 +538,8 @@ export default function IIRForm() {
           {/* Desktop Side Navigation */}
           {!isMobileNav && (
             <div className="lg:col-span-1">
-              <div className="top-24 space-y-2">
-                <h3 className="font-semibold text-sm uppercase text-foreground px-2 mb-3">
+              <div className="space-y-2">
+                <h3 className="font-semibold text-xs uppercase text-foreground px-2 mb-3">
                   Form Sections
                 </h3>
                 {FORM_SECTIONS.map((section, idx) => {
@@ -682,7 +688,7 @@ export default function IIRForm() {
             </div>
 
             {/* Form Navigation Buttons */}
-            <div className="flex justify-between gap-4 bg-card p-6 rounded-lg border border-border bottom-0 shadow-lg">
+            <div className="flex justify-between gap-3 bg-card p-4 rounded-lg border border-border bottom-0 shadow-lg flex-wrap">
               <Button
                 variant="outline"
                 onClick={handlePreviousSection}
@@ -693,12 +699,39 @@ export default function IIRForm() {
                 Previous
               </Button>
 
-              <div className="flex gap-3">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  // Reset form but preserve autofilled fields
+                  const resetData = {
+                    ...EMPTY_IIR_FORM,
+                    student: {
+                      ...EMPTY_IIR_FORM.student,
+                      basicInfo: {
+                        firstName: me?.firstName || "",
+                        middleName:
+                          me?.middleName && typeof me?.middleName === "string"
+                            ? me?.middleName
+                            : "" as any,
+                        lastName: me?.lastName || "",
+                        email: me?.email || "",
+                      },
+                    },
+                  };
+                  setLocalFormData(resetData);
+                  setCurrentSection(1);
+                }}
+                className="text-destructive border-destructive hover:bg-destructive/10"
+              >
+                Reset Form
+              </Button>
+
+              <div className="flex gap-2 ml-auto">
                 {currentSection < FORM_SECTIONS.length && (
                   <Button
                     onClick={handleNextSection}
                     disabled={isSaving}
-                    className="flex items-center gap-2"
+                    className="flex items-center gap-2 bg-destructive hover:bg-destructive/90"
                   >
                     {isSaving ? (
                       <>
@@ -717,7 +750,7 @@ export default function IIRForm() {
                   <Button
                     onClick={handleSubmit}
                     disabled={isSaving}
-                    className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+                    className="flex items-center gap-2 bg-destructive hover:bg-destructive/90"
                   >
                     {isSubmitting ? (
                       <>
