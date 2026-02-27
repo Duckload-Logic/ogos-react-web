@@ -5,6 +5,7 @@ import {
   AuthMessages,
   LoginForm,
 } from "@/features/auth/components";
+import { Button } from "@/components/ui/button";
 import {
   isValidEmail,
   isValidPassword,
@@ -22,10 +23,14 @@ export default function Login() {
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [localError, setLocalError] = useState("");
+  const [idpError, setIdpError] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    // TODO: Future refactor - consolidate error state management into a single error handler
+    // instead of managing localError and idpError separately
     setLocalError("");
+    setIdpError(false);
 
     // Client-side validation
     try {
@@ -71,6 +76,11 @@ export default function Login() {
     }
   };
 
+  const handleIdpLogin = () => {
+    setLocalError("");
+    setIdpError(true);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background px-4">
       <div className="w-full max-w-md">
@@ -86,7 +96,9 @@ export default function Login() {
               onUsernameChange={setUsername}
               onPasswordChange={setPassword}
               onSubmit={handleSubmit}
-              isLoading={isLoggingIn} // Controlled by hook
+              isLoading={isLoggingIn}
+              onIdpClick={handleIdpLogin}
+              idpError={idpError}
             />
           </div>
         </div>
