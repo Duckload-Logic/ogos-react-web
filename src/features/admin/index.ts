@@ -17,5 +17,4 @@ export * from "./excuse-slips";
 export * from "./reports";
 
 // Shared admin resources
-export { useAdminAppointments } from "./hooks/useAdminAppointments";
 export type { Appointment } from "@/features/appointments/services";
