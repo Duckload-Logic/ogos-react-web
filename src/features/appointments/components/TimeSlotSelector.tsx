@@ -1,12 +1,13 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import type { TimeSlot } from "@/types";
+import { AvailableTimeSlotView, TimeSlot } from "../types";
+import { Sun, Moon } from "lucide-react";
 
 interface TimeSlotselectorProps {
   selectedDate: Date | undefined;
-  selectedTime: string;
-  availableSlots: TimeSlot[];
+  selectedTime: TimeSlot | undefined;
+  availableSlots: AvailableTimeSlotView[];
   loading: boolean;
-  onTimeSelect: (time: string) => void;
+  onTimeSelect: (slot: AvailableTimeSlotView) => void;
 }
 
 export default function TimeSlotSelector({
@@ -16,51 +17,105 @@ export default function TimeSlotSelector({
   loading,
   onTimeSelect,
 }: TimeSlotselectorProps) {
+  const formatTime12hr = (time24: string) => {
+    const [hours, minutes] = time24.split(":").map(Number);
+    const period = hours >= 12 ? "PM" : "AM";
+    const hours12 = hours % 12 || 12;
+    return `${hours12}:${minutes.toString().padStart(2, "0")} ${period}`;
+  };
+
+  const getHour = (time24: string) => {
+    return Number(time24.split(":")[0]);
+  };
+
+  const amSlots = availableSlots.filter((slot) => getHour(slot.time) < 12);
+  const pmSlots = availableSlots.filter((slot) => getHour(slot.time) >= 12);
+
+  const renderSlotButton = (slot: AvailableTimeSlotView) => (
+    <button
+      key={slot.id}
+      onClick={() => onTimeSelect(slot)}
+      disabled={!slot.isAvailable}
+      className={`py-2 px-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
+        selectedTime?.id === slot.id
+          ? "bg-primary text-primary-foreground ring-2 ring-primary"
+          : slot.isAvailable
+            ? "bg-muted hover:bg-muted/80 text-foreground hover:ring-2 hover:ring-primary/50"
+            : "bg-muted/50 text-muted-foreground cursor-not-allowed"
+      }`}
+      aria-label={`Select ${slot.time}`}
+      aria-pressed={selectedTime?.id === slot.id}
+    >
+      {formatTime12hr(slot.time)}
+    </button>
+  );
+
   return (
-    <div className="lg:w-72 lg:flex-shrink-0">
-      <Card className="border-0 shadow-sm h-full">
-        <CardHeader className="bg-gradient-to-r from-gray-50 to-gray-100 border-b">
-          <CardTitle className="text-lg">Select Time</CardTitle>
+    <div className="w-full">
+      <Card className="border border-border shadow-sm h-full bg-card">
+        <CardHeader className="bg-gradient-to-r from-muted/50 to-muted border-b border-border rounded-t-md">
+          <CardTitle className="text-lg text-foreground">Select Time</CardTitle>
         </CardHeader>
         <CardContent className="pt-4">
           {selectedDate ? (
             <>
-              <p className="text-sm font-semibold text-gray-600 mb-4">
+              <p className="text-sm font-semibold text-muted-foreground mb-4">
                 {selectedDate.toDateString()}
               </p>
               {loading ? (
-                <p className="text-gray-500 text-center py-8 text-sm">
+                <p className="text-muted-foreground text-center py-8 text-sm">
                   Loading available times...
                 </p>
               ) : availableSlots.length > 0 ? (
-                <div className="grid grid-cols-2 gap-2 max-h-96 overflow-y-auto">
-                  {availableSlots.map((slot) => (
-                    <button
-                      key={slot.slotId}
-                      onClick={() => onTimeSelect(slot.startTime)}
-                      disabled={!slot.isNotTaken}
-                      className={`py-2 px-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
-                        selectedTime === slot.startTime
-                          ? "bg-primary text-primary-foreground"
-                          : slot.isNotTaken
-                            ? "bg-gray-100 hover:bg-gray-200 text-gray-900"
-                            : "bg-gray-100 text-gray-400 cursor-not-allowed"
-                      }`}
-                      aria-label={`Select ${slot.startTime}`}
-                      aria-pressed={selectedTime === slot.startTime}
-                    >
-                      {slot.startTime.slice(0, 5)}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  {/* AM Column */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-amber-600 dark:text-amber-400">
+                      <Sun className="w-4 h-4" />
+                      <span>Morning</span>
+                      <span className="text-xs font-normal text-muted-foreground">
+                        ({amSlots.length} slots)
+                      </span>
+                    </div>
+                    {amSlots.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto p-2">
+                        {amSlots.map(renderSlotButton)}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-center py-4 text-sm bg-muted/30 rounded-lg">
+                        No morning slots
+                      </p>
+                    )}
+                  </div>
+
+                  {/* PM Column */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
+                      <Moon className="w-4 h-4" />
+                      <span>Afternoon</span>
+                      <span className="text-xs font-normal text-muted-foreground">
+                        ({pmSlots.length} slots)
+                      </span>
+                    </div>
+                    {pmSlots.length > 0 ? (
+                      <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto p-2">
+                        {pmSlots.map(renderSlotButton)}
+                      </div>
+                    ) : (
+                      <p className="text-muted-foreground text-center py-4 text-sm bg-muted/30 rounded-lg">
+                        No afternoon slots
+                      </p>
+                    )}
+                  </div>
                 </div>
               ) : (
-                <p className="text-gray-500 text-center py-8 text-sm">
+                <p className="text-muted-foreground text-center py-8 text-sm">
                   No available slots for this date
                 </p>
               )}
             </>
           ) : (
-            <p className="text-gray-500 text-center py-8 text-sm">
+            <p className="text-muted-foreground text-center py-8 text-sm">
               Select a date to see available times
             </p>
           )}
