@@ -13,7 +13,7 @@ import { Textarea } from "@/components/ui/textarea"; // adjust import
 interface ActionConfirmModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onConfirm: (message?: string) => void;
+  onConfirm: (message?: string) => Promise<boolean>;
   action: string;
   requiresMessage: boolean;
 }
@@ -27,9 +27,11 @@ export default function ActionConfirmModal({
 }: ActionConfirmModalProps) {
   const [message, setMessage] = useState("");
 
-  const handleConfirm = () => {
-    onConfirm(requiresMessage ? message : undefined);
-    setMessage("");
+  const handleConfirm = async () => {
+    const success = await onConfirm(requiresMessage ? message : undefined);
+    if (success) {
+      setMessage("");
+    }
   };
 
   return (
