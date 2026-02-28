@@ -82,15 +82,15 @@ export default function DropdownField({
             disabled={!enabled}
             onMouseEnter={() => !enabled && lockedReason && setShowTooltip(true)}
             onMouseLeave={() => setShowTooltip(false)}
-            className={`flex w-full items-center justify-between px-3 py-2 h-10 text-left font-normal border rounded-md transition-all duration-200 ${
+            className={`flex w-full items-center justify-between px-3 py-2 h-10 text-sm text-left font-normal border rounded-md transition-all duration-200 ${
               !enabled
-                ? "bg-gray-150 border-gray-300 text-gray-500 cursor-not-allowed opacity-60"
+                ? "bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed opacity-60"
                 : isFilled
-                ? "bg-white border-blue-400 text-gray-900 font-medium hover:border-blue-500"
+                ? "bg-white border-blue-400 text-gray-900 font-medium hover:border-blue-500 focus:border-blue-500 focus:ring-blue-500/20"
                 : required && !isFilled
-                ? "bg-gray-100 border-red-400 text-gray-700 hover:bg-gray-150 hover:border-red-500"
-                : "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-150 hover:border-gray-400"
-            } ${error && enabled ? "border-red-500 hover:border-red-500" : ""}`}
+                ? "bg-white border-red-400 text-gray-700 hover:border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                : "bg-white border-gray-300 text-gray-700 hover:border-gray-400 focus:border-gray-400 focus:ring-gray-500/20"
+            } ${error && enabled ? "border-red-500 hover:border-red-500" : ""} focus:outline-none focus:ring-2 focus:ring-offset-0`}
             onClick={toggleDropdown}
           >
             <span

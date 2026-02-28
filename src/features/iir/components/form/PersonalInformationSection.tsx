@@ -112,51 +112,49 @@ export const PersonalInformationSection = forwardRef<
   return (
     <Card className="bg-white border border-gray-200">
       <CardContent className="pt-6">
-        {/* Name Section with Light Gray Background */}
-        <div className="bg-gray-100 rounded-md p-4 mb-4">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {/* Last Name */}
-            <InputField
-              label="Last Name"
-              value={studentInfo?.basicInfo?.lastName || ""}
-              onChange={(val) =>
-                handleInputChange("student.basicInfo.lastName", val)
-              }
-              error={errors["student.basicInfo.lastName"]}
-              placeholder="e.g., Doe"
-              required
-              disabled
-            />
+        {/* Name Section */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          {/* Last Name */}
+          <InputField
+            label="Last Name"
+            value={studentInfo?.basicInfo?.lastName || ""}
+            onChange={(val) =>
+              handleInputChange("student.basicInfo.lastName", val)
+            }
+            error={errors["student.basicInfo.lastName"]}
+            placeholder="e.g., Doe"
+            required
+            disabled
+          />
 
-            {/* First Name */}
-            <InputField
-              label="First Name"
-              value={studentInfo?.basicInfo?.firstName || ""}
-              onChange={(val) =>
-                handleInputChange("student.basicInfo.firstName", val)
-              }
-              error={errors["student.basicInfo.firstName"]}
-              placeholder="e.g., John"
-              required
-              disabled
-            />
+          {/* First Name */}
+          <InputField
+            label="First Name"
+            value={studentInfo?.basicInfo?.firstName || ""}
+            onChange={(val) =>
+              handleInputChange("student.basicInfo.firstName", val)
+            }
+            error={errors["student.basicInfo.firstName"]}
+            placeholder="e.g., John"
+            required
+            disabled
+          />
 
-            {/* Middle Name */}
-            <InputField
-              label="Middle Name"
-              value={
-                studentInfo?.basicInfo?.middleName == null ||
-                typeof studentInfo.basicInfo.middleName === "object"
-                  ? ""
-                  : studentInfo.basicInfo.middleName
-              }
-              onChange={(val) =>
-                handleInputChange("student.basicInfo.middleName", val)
-              }
-              placeholder="e.g., Joe"
-              disabled
-            />
-          </div>
+          {/* Middle Name */}
+          <InputField
+            label="Middle Name"
+            value={
+              studentInfo?.basicInfo?.middleName == null ||
+              typeof studentInfo.basicInfo.middleName === "object"
+                ? ""
+                : studentInfo.basicInfo.middleName
+            }
+            onChange={(val) =>
+              handleInputChange("student.basicInfo.middleName", val)
+            }
+            placeholder="e.g., Joe"
+            disabled
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
