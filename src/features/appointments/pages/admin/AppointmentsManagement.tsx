@@ -115,7 +115,7 @@ export default function AppointmentsManagement() {
     apt: Appointment,
     action: string,
     message?: string,
-  ) => {
+  ): Promise<boolean> => {
     const statusId = getStatusIdByAction(action);
     if (!statusId) {
       toast({
@@ -123,7 +123,7 @@ export default function AppointmentsManagement() {
         description: "Target status not found",
         variant: "destructive",
       });
-      return;
+      return false;
     }
 
     const payload: any = {
@@ -138,14 +138,32 @@ export default function AppointmentsManagement() {
       data: payload,
     });
 
-    updateAppointment({ id: apt.id!, data: payload });
+    try {
+      await updateAppointment({ id: apt.id!, data: payload });
+
+      setIsViewOpen(false);
+      return true;
+    } catch (error) {
+      console.error(`${action} failed:`, error);
+      return false;
+    }
+  };
+
+  const isWeekend = (date: Date) => {
+    const day = date.getDay();
+    return day === 0 || day === 6;
   };
 
   const handleReschedule = async (
     apt: Appointment,
     newDate: string,
     newTimeSlotId: number,
-  ) => {
+  ): Promise<boolean> => {
+    if (isWeekend(new Date(newDate))) {
+      alert("Selected date falls on a weekend. Please choose a weekday.");
+      return false;
+    }
+
     const payload = {
       whenDate: newDate,
       timeSlot: { id: newTimeSlotId },
@@ -161,8 +179,18 @@ export default function AppointmentsManagement() {
       data: payload,
     });
 
-    // @ts-expect-error - Partial update with only date and timeSlot
-    updateAppointment({ id: apt.id!, data: payload });
+    try {
+      await updateAppointment({
+        id: apt.id!,
+        // @ts-ignore
+        data: payload,
+      });
+      setIsViewOpen(false);
+      return true;
+    } catch (error) {
+      console.error("Reschedule failed:", error);
+      return false;
+    }
   };
 
   return (
