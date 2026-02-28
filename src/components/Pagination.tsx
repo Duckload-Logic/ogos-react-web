@@ -99,7 +99,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   return (
     <nav
       className={cn(
-        "flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between",
+        "flex flex-col-reverse gap-4 sm:flex-row sm:items-center sm:justify-between p-6 border-t-2 mt-auto border-border",
         className,
       )}
       aria-label="Pagination navigation"
