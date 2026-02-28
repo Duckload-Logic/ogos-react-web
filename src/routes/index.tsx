@@ -77,6 +77,7 @@ export const routes: RouteObject[] = [
       <ProtectedRoute requiredRole="student">
         <Layout title="Individual Inventory Record">
           <IIRForm />
+          <IIRForm />
         </Layout>
       </ProtectedRoute>
     ),
@@ -131,6 +132,8 @@ export const routes: RouteObject[] = [
     path: "/admin/student-records/:studentId",
     element: (
       <ProtectedRoute requiredRole="admin">
+        <Layout title="Individual Inventory Record">
+          <IIRProfile />
         <Layout title="Individual Inventory Record">
           <IIRProfile />
         </Layout>

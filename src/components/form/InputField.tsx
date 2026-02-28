@@ -58,17 +58,7 @@ export default function InputField({
         <input
           type={type}
           value={value}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
-            const date = new Date(e.target.value);
-            const day = date.getUTCDay(); // 0 is Sunday, 6 is Saturday
-
-            if (day === 0 || day === 6) {
-              alert("Weekends are not available for appointments.");
-              e.target.value = ""; // Clear the input
-            } else {
-              onChange(e.target.value);
-            }
-          }}
+          onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           inputMode={inputMode}
           disabled={disabled}
