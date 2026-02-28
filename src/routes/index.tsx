@@ -134,8 +134,6 @@ export const routes: RouteObject[] = [
       <ProtectedRoute requiredRole="admin">
         <Layout title="Individual Inventory Record">
           <IIRProfile />
-        <Layout title="Individual Inventory Record">
-          <IIRProfile />
         </Layout>
       </ProtectedRoute>
     ),
