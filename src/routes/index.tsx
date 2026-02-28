@@ -12,21 +12,21 @@ import Register from "@/features/auth/pages/Register";
 
 // Student Features
 import GuidanceServices from "@/features/students/pages/GuidanceServices";
-import ScheduleAppointment from "@/features/students/pages/ScheduleAppointment";
+import StudentAppointments from "@/features/appointments/pages/student/StudentAppointments";
 import AdmissionSlip from "@/features/students/pages/AdmissionSlip";
 import ViewSchedules from "@/features/students/pages/ViewSchedules";
 
 // Admin Feature
 import Dashboard from "@/features/admin/pages/Dashboard";
 import StudentRecords from "@/features/admin/pages/StudentRecords";
-import Appointments from "@/features/admin/pages/Appointments";
-import AppointmentsManagement from "@/features/admin/pages/AppointmentsManagement";
+import AppointmentsManagement from "@/features/appointments/pages/admin/AppointmentsManagement";
 import ReviewExcuses from "@/features/admin/pages/ReviewExcuses";
 import Reports from "@/features/admin/pages/Reports";
 import Frontdesk from "@/features/frontdesk/pages/Frontdesk";
 import IIRProfile from "@/features/iir/pages/IIRProfile";
 import IIRForm from "@/features/iir/pages/IIRForm";
 import { ErrorBoundary } from "@/components/shared";
+import { CreateAppointment } from "@/features/appointments";
 
 export const routes: RouteObject[] = [
   // Root route - redirect to login
@@ -48,12 +48,24 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/student/appointment",
+    path: "/student/appointments",
+    element: (
+      <ProtectedRoute requiredRole="student">
+        <PDSGate>
+          <Layout title="View Appointments">
+            <StudentAppointments />
+          </Layout>
+        </PDSGate>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/student/appointments/schedule",
     element: (
       <ProtectedRoute requiredRole="student">
         <PDSGate>
           <Layout title="Schedule Appointment">
-            <ScheduleAppointment />
+            <CreateAppointment />
           </Layout>
         </PDSGate>
       </ProtectedRoute>
@@ -136,16 +148,6 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/admin/view-schedule",
-    element: (
-      <ProtectedRoute requiredRole="admin">
-        <Layout title="View Appointments">
-          <Appointments />
-        </Layout>
-      </ProtectedRoute>
-    ),
-  },
-  {
     path: "/admin/review-excuses",
     element: (
       <ProtectedRoute requiredRole="admin">
@@ -172,14 +174,6 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute requiredRole="frontdesk">
         <Frontdesk />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/frontdesk/appointments",
-    element: (
-      <ProtectedRoute requiredRole="frontdesk">
-        <Appointments />
       </ProtectedRoute>
     ),
   },
