@@ -37,18 +37,12 @@ export default function Login() {
         throw new Error("Invalid username");
       if (!isValidPassword(password)) throw new Error("Password too short");
 
-      // Login - tokens are automatically saved by authService
-      console.log("🔐 Starting login...");
       await login({
         email: username,
         password,
       });
-      console.log("✅ Login successful, tokens saved");
 
-      // Fetch user data after successful login
-      console.log("👤 Fetching user data...");
       const result = await refetch();
-      console.log("📊 Refetch result:", result.data);
 
       // Navigate immediately after we have user data
       if (result.data) {
@@ -56,14 +50,11 @@ export default function Login() {
         const route = ROLE_ROUTES[roleId as keyof typeof ROLE_ROUTES];
 
         if (route) {
-          console.log("✈️ Navigating to:", route);
           navigate(route, { replace: true });
         } else {
-          console.error("❌ No route found for role:", roleId);
           setLocalError("Unauthorized role.");
         }
       } else {
-        console.error("❌ No user data in result:", result);
         setLocalError("Failed to load user data.");
       }
     } catch (err) {
