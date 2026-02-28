@@ -1,18 +1,12 @@
 import { useState, useEffect } from "react";
 import { Loader, Calendar } from "lucide-react";
-import { useAppointments } from "@/features/appointments/hooks/useAppointments";
-import { useAuth } from "@/context";
 import {
   ScheduleHeader,
-  ScheduleErrorAlert,
-  UpcomingAppointmentsList,
-  CancelledAppointmentsList,
   AdmissionSlipsSection,
-  CancelAppointmentModal,
   SuccessModal,
   HelpSection,
 } from "@/features/schedules/components";
-import { Appointment } from "@/features/appointments";
+import { Appointment, useAppointments } from "@/features/appointments";
 
 /**
  * ViewSchedules - Main page for viewing user's schedules and appointments
@@ -23,15 +17,11 @@ import { Appointment } from "@/features/appointments";
  * - Action modals (cancel, success)
  */
 export default function ViewSchedules() {
-  const { user } = useAuth();
   const {
-    appointments,
-    loading,
+    data: appointments,
+    isLoading: loading,
     error,
-    fetchAppointments,
-    cancelAppointment,
-    clearError,
-  } = useAppointments();
+  } = useAppointments({ isMe: true });
 
   // Modal and state management
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
@@ -45,13 +35,6 @@ export default function ViewSchedules() {
     setIsPageLoaded(true);
   }, []);
 
-  // Load appointments on component mount
-  useEffect(() => {
-    if (user?.id) {
-      fetchAppointments();
-    }
-  }, [user?.id, fetchAppointments]);
-
   // Event handlers
   const handleDeleteClick = (appointment: Appointment) => {
     setAppointmentToDelete(appointment);
@@ -61,15 +44,15 @@ export default function ViewSchedules() {
   const handleConfirmDelete = async () => {
     if (appointmentToDelete) {
       setIsDeleting(true);
-      clearError();
+      // clearError();
       try {
-        const success = await cancelAppointment(appointmentToDelete);
-        console.log("Cancel appointment success:", success);
-        if (success) {
-          setDeleteModalOpen(false);
-          setSuccessModalOpen(true);
-          setAppointmentToDelete(null);
-        }
+        // const success = await cancelAppointment(appointmentToDelete);
+        // console.log("Cancel appointment success:", success);
+        // if (success) {
+        //   setDeleteModalOpen(false);
+        //   setSuccessModalOpen(true);
+        //   setAppointmentToDelete(null);
+        // }
       } finally {
         setIsDeleting(false);
       }
@@ -86,7 +69,7 @@ export default function ViewSchedules() {
   };
 
   // Loading state
-  if (loading && appointments.length === 0) {
+  if (loading && (appointments?.length === 0 || !appointments)) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="flex flex-col items-center gap-3">
@@ -145,7 +128,7 @@ export default function ViewSchedules() {
       {/* Error Alert */}
       {error && (
         <div className="error-alert">
-          <ScheduleErrorAlert error={error} onClose={clearError} />
+          {/* <ScheduleErrorAlert error={error} onClose={clearError} /> */}
         </div>
       )}
 
@@ -157,16 +140,16 @@ export default function ViewSchedules() {
             <Calendar className="w-6 h-6" />
             Your Upcoming Appointments
           </h2>
-          <UpcomingAppointmentsList
-            appointments={appointments}
+          {/* <UpcomingAppointmentsList
+            appointments={appointments || []}
             onDeleteClick={handleDeleteClick}
             isDeleting={isDeleting}
-          />
+          /> */}
         </section>
 
         {/* Cancelled Appointments Section */}
         <div className="cancelled-section">
-          <CancelledAppointmentsList appointments={appointments} />
+          {/* <CancelledAppointmentsList appointments={appointments} /> */}
         </div>
 
         {/* Excuse Slips Section */}
