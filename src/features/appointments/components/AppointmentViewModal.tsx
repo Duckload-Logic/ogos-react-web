@@ -26,6 +26,7 @@ import {
 import { STATUS_COLORS } from "@/config/constants";
 import ActionConfirmModal from "./ActionConfirmationModal";
 import RescheduleModal from "./RescheduleModal";
+import { set } from "zod";
 
 interface AppointmentViewModalProps {
   appointment: Appointment | null;
@@ -36,12 +37,12 @@ interface AppointmentViewModalProps {
     appointment: Appointment,
     action: string,
     message?: string,
-  ) => Promise<void>;
+  ) => Promise<boolean>;
   onReschedule: (
     appointment: Appointment,
     newDate: string,
     newTimeSlotId: number,
-  ) => Promise<void>;
+  ) => Promise<boolean>;
   hasActions?: boolean; // whether to show action buttons
 }
 
@@ -159,20 +160,29 @@ export default function AppointmentViewModal({
     setPendingAction({ type: action, requiresMessage });
   };
 
-  const handleConfirmAction = async (message?: string) => {
-    if (!pendingAction) return;
-    await onStatusAction(appointment, pendingAction.type, message);
-    setPendingAction(null);
-    onClose(); // close the view modal after action (optional, can stay open)
+  const handleConfirmAction = async (message?: string): Promise<boolean> => {
+    if (!pendingAction) return false;
+
+    try {
+      const success = await onStatusAction(
+        appointment,
+        pendingAction.type,
+        message,
+      );
+      setPendingAction(null);
+      return success;
+    } catch (error) {
+      console.error("Action failed:", error);
+      return false;
+    }
   };
 
   const handleRescheduleConfirm = async (
     newDate: string,
     newTimeSlotId: number,
   ) => {
-    await onReschedule(appointment, newDate, newTimeSlotId);
-    setShowReschedule(false);
-    onClose();
+    const isSuccess = await onReschedule(appointment, newDate, newTimeSlotId);
+    setShowReschedule(!isSuccess);
   };
 
   return (
