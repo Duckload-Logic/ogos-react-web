@@ -4,6 +4,8 @@ import { is } from "zod/v4/locales";
 
 export default function InputField({
   label,
+  min,
+  max,
   type = "text",
   value,
   onChange,
@@ -16,6 +18,8 @@ export default function InputField({
   prefix,
 }: {
   label: string;
+  min?: string;
+  max?: string;
   type?: string;
   value: any;
   onChange: (val: string) => void;
@@ -54,21 +58,33 @@ export default function InputField({
         <input
           type={type}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+            const date = new Date(e.target.value);
+            const day = date.getUTCDay(); // 0 is Sunday, 6 is Saturday
+
+            if (day === 0 || day === 6) {
+              alert("Weekends are not available for appointments.");
+              e.target.value = ""; // Clear the input
+            } else {
+              onChange(e.target.value);
+            }
+          }}
           placeholder={placeholder}
           inputMode={inputMode}
           disabled={disabled}
           className="
-          w-full bg-muted hover:bg-muted-foreground/30 rounded-md border
-          border-border px-3 py-2 focus:ring-2
-          outline-none disabled:cursor-not-allowed
-          disabled:opacity-50 disabled:pointer-events-none
-          transition-colors duration-200
-          placeholder:text-muted-foreground
-          focus:border-primary
-          focus:ring-primary
-          focus:ring-offset-0
-        "
+            w-full bg-muted hover:bg-muted-foreground/30 rounded-md border
+            border-border px-3 py-2 focus:ring-2
+            outline-none disabled:cursor-not-allowed
+            disabled:opacity-50 disabled:pointer-events-none
+            transition-colors duration-200
+            placeholder:text-muted-foreground
+            focus:border-primary
+            focus:ring-primary
+            focus:ring-offset-0
+          "
+          min={min}
+          max={max}
         />
       </div>
       {info && <p className="text-xs text-muted-foreground">{info}</p>}
