@@ -83,6 +83,25 @@
     --sidebar-accent-foreground: 224 12% 20%;
     --sidebar-border: 210 10% 86%;
     --sidebar-ring: 0 72% 45%;
+
+    /* Status Colors */
+    --warning-background: 45 100% 90%;
+    --warning-foreground: 40 100% 38%; /* Rich Amber/Gold */
+
+    --success-background: 142 100% 90%;
+    --success-foreground: 142 100% 30%; /* Deep Emerald */
+
+    --danger-background: 0 100% 92%;
+    --danger-foreground: 0 100% 45%; /* Pure Fire-Engine Red */
+
+    --info-background: 210 100% 90%;
+    --info-foreground: 210 100% 45%; /* Electric Blue */
+
+    --notice-background: 280 100% 92%; /* Vibrant Lavender Back */
+    --notice-foreground: 280 100% 45%; /* Electric Purple */
+
+    --stale-background: 215 15% 90%;
+    --stale-foreground: 215 20% 40%;
   }
 
   .dark {
@@ -123,6 +142,32 @@
     --sidebar-accent-foreground: 0 0% 13%;
     --sidebar-border: 0 0% 30%;
     --sidebar-ring: 0 64% 40%;
+
+    /* --- Bright but Soft Palette --- */
+
+    /* Warning (Gold/Amber) */
+    --warning-background: 45 40% 20%; /* Desaturated, lighter amber */
+    --warning-foreground: 45 90% 65%; /* Softened gold */
+
+    /* Success (Emerald) */
+    --success-background: 142 35% 18%; /* Forest moss tone */
+    --success-foreground: 142 60% 60%; /* Sage/Emerald mix */
+
+    /* Danger (Red) */
+    --danger-background: 0 40% 22%; /* Muted wine/brick */
+    --danger-foreground: 0 80% 70%; /* Soft coral/salmon red */
+
+    /* Info (Sky Blue) */
+    --info-background: 210 35% 22%; /* Dusty slate blue */
+    --info-foreground: 210 75% 70%; /* Serene sky blue */
+
+    /* Notice (Purple) */
+    --notice-background: 280 30% 22%; /* Deep lavender shadow */
+    --notice-foreground: 280 60% 72%; /* Pastel electric purple */
+
+    /* Stale (Gray/Slate) */
+    --stale-background: 215 15% 25%; /* Neutral dark slate */
+    --stale-foreground: 215 20% 65%; /* Soft muted gray */
   }
 }
 
@@ -275,6 +320,17 @@
   /* Show them clearly on hover */
   input[type="number"]:hover::-webkit-inner-spin-button {
     opacity: 1;
+  }
+
+  table {
+    table-layout: fixed;
+    width: 100%;
+  }
+  th,
+  td {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   /* For the Dark Mode icons */

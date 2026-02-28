@@ -37,6 +37,30 @@ export default {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
+        warning: {
+          background: "hsl(var(--warning-background))",
+          foreground: "hsl(var(--warning-foreground))",
+        },
+        danger: {
+          background: "hsl(var(--danger-background))",
+          foreground: "hsl(var(--danger-foreground))",
+        },
+        success: {
+          background: "hsl(var(--success-background))",
+          foreground: "hsl(var(--success-foreground))",
+        },
+        info: {
+          background: "hsl(var(--info-background))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+        stale: {
+          background: "hsl(var(--stale-background))",
+          foreground: "hsl(var(--stale-foreground))",
+        },
+        notice: {
+          background: "hsl(var(--notice-background))",
+          foreground: "hsl(var(--notice-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",

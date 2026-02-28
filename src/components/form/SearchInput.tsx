@@ -7,12 +7,15 @@ export default function SearchInput({
   searchTerm,
   onSearchChange,
   placeholder = "Search...",
+  hasHeader = true,
 }: any) {
   return (
     <div className={className}>
-      <label className="block text-sm font-medium text-card-foreground mb-2">
-        Search:
-      </label>
+      {hasHeader && (
+        <label className="block text-sm font-medium text-card-foreground mb-2">
+          Search:
+        </label>
+      )}
       <div className="flex gap-2 items-center">
         <input
           type="text"
