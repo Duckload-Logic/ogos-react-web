@@ -11,6 +11,7 @@ export default function DropdownField({
   enabled = true,
   get = "id",
   loading = false,
+  lockedReason = "Locked",
 }: {
   label: string;
   options: any[];
@@ -21,6 +22,7 @@ export default function DropdownField({
   enabled?: boolean;
   get?: string;
   loading?: boolean;
+  lockedReason?: string;
 }) {
   const selectedOption = options.find((opt) => opt.id == value);
   const [isOpen, setIsOpen] = useState(false);
