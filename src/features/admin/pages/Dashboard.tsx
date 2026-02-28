@@ -1,258 +1,345 @@
-import { Calendar, Users, FileText, TrendingUp, Eye } from "lucide-react";
+import {
+  Calendar,
+  Users,
+  FileText,
+  TrendingUp,
+  Eye,
+  Clock,
+  ChevronRight,
+  Tag,
+} from "lucide-react";
 import { Link } from "react-router-dom";
-import { useState, useRef, useEffect } from "react";
-import { useUser } from "@/hooks/useUser";
-import { AdminCalendar } from "../components/AdminCalendar";
-import { AppointmentsList } from "../components/AppointmentsList";
-import { useAdminAppointments } from "../hooks/useAdminAppointments";
+import { useState } from "react";
+import { useAppointments } from "@/features/appointments/hooks/useAppointments";
+import { Appointment } from "@/features/appointments/types";
+import AppointmentViewModal from "@/features/appointments/components/AppointmentViewModal";
+import { STATUS_COLORS } from "@/config/constants";
+import { Card, CardContent, Button } from "@/components";
+import { useStatuses } from "@/features/appointments/hooks/useLookups";
+import { toISODateString } from "@/features/appointments/utils";
 
 export default function Dashboard() {
-  const { appointments, fetchAppointments } = useAdminAppointments();
-  const { fetchUserData } = useUser();
-  const [students, setStudents] = useState<any[]>([]);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
-  const touchStartX = useRef<number | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date>(new Date());
-
-  useEffect(() => {
-    const fetchAllAppointments = async () => {
-      await fetchAppointments();
-    };
-
-    fetchAllAppointments();
-  }, [fetchAppointments]);
-
-  useEffect(() => {
-    const fetchAllStudents = async () => {
-      if (appointments.length === 0) return;
-
-      try {
-        // Get unique IDs to avoid redundant API calls
-        const uniqueStudentIds = [
-          ...new Set(appointments.map((apt) => apt.userId)),
-        ];
-
-        // Fetch all user data in parallel
-        const studentData = await Promise.all(
-          uniqueStudentIds.map((id) => fetchUserData(id)),
-        );
-
-        setStudents(studentData);
-      } catch (err) {
-        console.error("Failed to fetch students:", err);
-      }
-    };
-
-    fetchAllStudents();
-  }, [appointments]);
-
-  const bookedDates = new Set(
-    appointments
-      .filter((apt) => ["Approved", "Rescheduled"].includes(apt.status))
-      .map((apt) => {
-        const date = new Date(apt.scheduledDate);
-        const y = date.getFullYear();
-        const m = String(date.getMonth() + 1).padStart(2, "0"); // Months are 0-indexed
-        const d = String(date.getDate()).padStart(2, "0");
-
-        return `${y}-${m}-${d}`;
-      }),
-  );
   const today = new Date();
+  const todayStr = toISODateString(today);
+  const { data: statuses } = useStatuses();
 
-  const isCurrentMonth =
-    today.getFullYear() === currentMonth.getFullYear() &&
-    today.getMonth() === currentMonth.getMonth();
-  const todayDate = today.getDate();
-
-  const getDaysInMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate();
-  };
-
-  const getFirstDayOfMonth = (date: Date) => {
-    return new Date(date.getFullYear(), date.getMonth(), 1).getDay();
-  };
-
-  const previousMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1),
-    );
-  };
-
-  const nextMonth = () => {
-    setCurrentMonth(
-      new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1),
-    );
-  };
-
-  const monthName = currentMonth.toLocaleString("en-US", {
-    month: "long",
-    year: "numeric",
+  const { data, isLoading } = useAppointments({
+    params: {
+      startDate: todayStr,
+      endDate: todayStr,
+    },
   });
 
-  const daysInMonth = getDaysInMonth(currentMonth);
-  const firstDay = getFirstDayOfMonth(currentMonth);
-  const days = Array.from({ length: daysInMonth }, (_, i) => i + 1);
-  const emptyDays = Array.from({ length: firstDay }, (_, i) => i);
+  // Use real data if available, fallback to mock for preview
+  const upcomingAppointments = data?.appointments || [];
+  const nextAppointment = upcomingAppointments[0] || null;
 
-  const calendarLegends = [
-    { color: "bg-primary", label: "Scheduled Appointments" },
-  ];
+  const [selectedAppointment, setSelectedAppointment] =
+    useState<Appointment | null>(null);
+  const [isViewOpen, setIsViewOpen] = useState(false);
 
-  const stats = [
-    {
-      label: "Scheduled",
-      value: appointments.filter((a) =>
-        ["Approved", "Rescheduled"].includes(a.status),
-      ).length,
-      color: "bg-blue-100/90 text-blue-600 ",
-    },
-    {
-      label: "Pending Requests",
-      value: appointments.filter((a) => a.status === "Pending").length,
-      color: "bg-yellow-100/90 text-yellow-600",
-    },
-    {
-      label: "Completed",
-      value: appointments.filter((a) => a.status === "Completed").length,
-      color: "bg-green-100/90 text-green-600",
-    },
-    {
-      label: "Cancelled",
-      value: appointments.filter((a) => a.status === "Cancelled").length,
-      color: "bg-red-100/90 text-red-600",
-    },
-  ];
+  const handleView = (apt: Appointment) => {
+    setSelectedAppointment(apt);
+    setIsViewOpen(true);
+  };
 
-  const appointmentActions = [
-    {
-      purpose: "View",
-      label: <Eye size={16} />,
-      color: "bg-gray-500 text-white",
-      onClick: (appointment: any) => {
-        console.log("View appointment", appointment);
-      },
-    },
-  ];
+  const formatTime = (time: string) => {
+    const [hourStr, minute] = time.split(":");
+    let hour = parseInt(hourStr, 10);
+    const ampm = hour >= 12 ? "PM" : "AM";
+    hour = hour % 12 || 12;
+    return `${hour}:${minute} ${ampm}`;
+  };
 
   const quickActions = [
     {
       title: "View Appointments",
-      description: "Manage appointment requests from students",
+      description: "Manage requests",
       icon: Calendar,
       href: "/admin/appointments",
+      border: "border-info-foreground/50",
     },
     {
       title: "Student Records",
-      description: "View and manage student information",
+      description: "Manage info",
       icon: Users,
       href: "/admin/student-records",
+      border: "border-success-foreground/50",
     },
     {
       title: "Review Excuses",
-      description: "Review and approve student excuse slips",
+      description: "Approve slips",
       icon: FileText,
       href: "/admin/review-excuses",
+      border: "border-warning-foreground/50",
     },
     {
       title: "Reports",
-      description: "Generate and analyze guidance reports",
+      description: "Analyze data",
       icon: TrendingUp,
       href: "/admin/reports",
+      border: "border-notice-foreground/50",
     },
   ];
 
   return (
-    <>
-      <div className="flex flex-col gap-6 h-full">
-        {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {stats.map((stat) => (
-            <div key={stat.label} className={`${stat.color} p-4 rounded-lg`}>
-              <p className="text-sm font-medium opacity-75">{stat.label}</p>
-              <p className="text-3xl font-bold mt-1">{stat.value}</p>
-            </div>
-          ))}
+    <div className="max-w-[1600px] mx-auto space-y-8">
+      {/* HEADER SECTION */}
+      <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight text-foreground">
+            Guidance Dashboard
+          </h1>
+          <p className="text-sm text-muted-foreground">
+            {today.toLocaleDateString("en-US", {
+              weekday: "long",
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            })}
+          </p>
         </div>
+      </header>
 
-        {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full">
-          {/* Calendar */}
-          <AdminCalendar
-            currentYear={currentMonth.getFullYear()}
-            currentMonth={currentMonth.getMonth()}
-            previousMonth={previousMonth}
-            nextMonth={nextMonth}
-            monthName={monthName}
-            emptyDays={emptyDays}
-            days={days}
-            bookedDates={bookedDates}
-            isCurrentMonth={isCurrentMonth}
-            todayDate={todayDate}
-            touchStartX={touchStartX}
-            selectedDate={selectedDate}
-            onDateClick={(day) => {
-              const newDate = new Date(
-                currentMonth.getFullYear(),
-                currentMonth.getMonth(),
-                day,
-              );
-              setSelectedDate(newDate);
-            }}
-            legends={calendarLegends}
-          />
-
-          {/* Right Side: Appointments List and Activity */}
-          <div className="lg:col-span-3 space-y-6">
-            {/* Appointments List */}
-            <AppointmentsList
-              title="Upcoming Appointments"
-              appointments={appointments}
-              students={students}
-              status="Approved"
-              selectedDate={selectedDate}
-              excludeStatus={["Pending"]}
-              actions={appointmentActions}
-            />
-
-            {/* Quick Actions */}
-            <div>
-              <h2 className="text-lg font-bold text-foreground mb-4">
-                Quick Actions
-              </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {quickActions.map((action) => {
-                  const IconComponent = action.icon;
-                  return (
-                    <Link
-                      key={action.title}
-                      to={action.href}
-                      className="bg-card rounded-lg shadow p-4 hover:shadow-lg transition-all hover:border-primary border border-border group"
-                    >
-                      <div className="flex items-start gap-3">
-                        <div className="p-2 bg-primary/20 rounded-lg group-hover:bg-primary group-hover:text-white transition-colors">
-                          <IconComponent
-                            size={20}
-                            className="text-primary group-hover:text-white"
-                          />
-                        </div>
-                        <div>
-                          <h3 className="font-semibold text-sm text-foreground">
-                            {action.title}
-                          </h3>
-                          <p className="text-xs text-muted-foreground mt-1">
-                            {action.description}
-                          </p>
-                        </div>
-                      </div>
-                    </Link>
-                  );
-                })}
+      {/* METRICS & NEXT APPOINTMENT */}
+      <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <Card className="rounded-md border-border shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-start justify-between">
+              <div className="space-y-1">
+                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+                  Today's Load
+                </p>
+                <p className="text-4xl font-black">
+                  {upcomingAppointments.length}
+                </p>
+              </div>
+              <div className="p-2 bg-primary/10 rounded-md">
+                <Calendar className="size-5 text-primary" />
               </div>
             </div>
-          </div>
-        </div>
+            <div className="mt-4 flex items-center gap-1 text-[11px] text-muted-foreground">
+              <span className="text-success-foreground font-bold">
+                Scheduled
+              </span>
+              <span>sessions for processing</span>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="lg:col-span-3 rounded-md border-border shadow-sm bg-gradient-to-r from-card to-muted/20">
+          <CardContent className="p-6 h-full flex flex-col justify-center">
+            {nextAppointment ? (
+              <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <div className="size-4 rounded-full bg-primary animate-pulse" />
+                    <span className="text-sm font-medium text-primary flex items-center gap-1">
+                      <Clock className="size-3" />
+                      {formatTime(nextAppointment.timeSlot.time)}
+                    </span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold tracking-tight">
+                      {nextAppointment.user?.firstName}{" "}
+                      {nextAppointment.user?.lastName}
+                    </h3>
+                    <div className="flex gap-2 items-center">
+                      <Tag className="size-3 text-muted-foreground" />
+                      <p className="text-sm text-muted-foreground">
+                        {nextAppointment.appointmentCategory.name}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+                <Button
+                  onClick={() => handleView(nextAppointment)}
+                  className="rounded-md shadow-sm px-6"
+                >
+                  View Details
+                </Button>
+              </div>
+            ) : (
+              <div className="text-center md:text-left">
+                <p className="text-muted-foreground italic font-medium">
+                  No upcoming appointments recorded for the current timeframe.
+                </p>
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
-    </>
+
+      {/* QUICK ACTIONS GRID */}
+      <section>
+        <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground mb-4">
+          Management Actions
+        </h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+          {quickActions.map((action) => {
+            const Icon = action.icon;
+            return (
+              <Link
+                key={action.title}
+                to={action.href}
+                className={`bg-card rounded-md border-2 ${action.border} p-4 hover:bg-primary/5 hover:border-primary transition-all group flex items-center justify-between duration-300`}
+              >
+                <div className="flex items-center gap-4">
+                  <div className="p-2.5 bg-background border border-border rounded-md text-muted-foreground group-hover:text-primary group-hover:bg-primary/10 transition-colors">
+                    <Icon size={18} />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-sm tracking-tight">
+                      {action.title}
+                    </h3>
+                    <p className="text-[11px] text-muted-foreground leading-tight">
+                      {action.description}
+                    </p>
+                  </div>
+                </div>
+                <ChevronRight
+                  size={14}
+                  className="text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity"
+                />
+              </Link>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* SCHEDULE TABLE-LIKE LIST */}
+      <section>
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
+            Daily Queue
+          </h2>
+          <Badge variant="outline" className="rounded-md text-[10px]">
+            {upcomingAppointments.length} Entries
+          </Badge>
+        </div>
+
+        <Card className="rounded-md border-border overflow-hidden shadow-sm">
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr className="bg-muted/50 border-b border-border">
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Student Name
+                  </th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Schedule
+                  </th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Category
+                  </th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    Status
+                  </th>
+                  <th className="p-4 text-[11px] font-bold uppercase tracking-wider text-muted-foreground">
+                    View
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-border">
+                {isLoading ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="p-8 text-center text-sm text-muted-foreground"
+                    >
+                      Loading data...
+                    </td>
+                  </tr>
+                ) : upcomingAppointments.length === 0 ? (
+                  <tr>
+                    <td
+                      colSpan={5}
+                      className="p-12 text-center text-sm text-muted-foreground italic"
+                    >
+                      Queue is currently empty.
+                    </td>
+                  </tr>
+                ) : (
+                  upcomingAppointments.map((apt) => (
+                    <tr
+                      key={apt.id}
+                      className="hover:bg-muted/20 transition-colors group"
+                    >
+                      <td className="p-4">
+                        <span className="font-bold text-sm tracking-tight">
+                          {apt.user?.firstName} {apt.user?.lastName}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2 text-sm">
+                          <Clock className="size-3.5 text-muted-foreground" />
+                          <span className="font-medium">
+                            {formatTime(apt.timeSlot.time)}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <div className="flex items-center gap-2">
+                          <Tag className="size-3 text-muted-foreground" />
+                          <span className="text-xs text-muted-foreground">
+                            {apt.appointmentCategory.name}
+                          </span>
+                        </div>
+                      </td>
+                      <td className="p-4">
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${STATUS_COLORS[apt.status?.colorKey || "info"]}`}
+                        >
+                          {apt.status?.name}
+                        </span>
+                      </td>
+                      <td className="p-4">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => handleView(apt)}
+                          className="rounded-md h-8 text-xs font-bold border border-transparent hover:border-border"
+                        >
+                          <Eye className="size-3" />
+                        </Button>
+                      </td>
+                    </tr>
+                  ))
+                )}
+              </tbody>
+            </table>
+          </div>
+        </Card>
+      </section>
+
+      <AppointmentViewModal
+        appointment={selectedAppointment}
+        isOpen={isViewOpen}
+        onClose={() => setIsViewOpen(false)}
+        statuses={statuses || []}
+        onStatusAction={async () => {}}
+        onReschedule={async () => {}}
+        hasActions={false} // Disable actions in this modal since it's just a preview
+      />
+    </div>
+  );
+}
+
+// Minimal Badge for the header
+function Badge({
+  children,
+  variant,
+  className,
+}: {
+  children: React.ReactNode;
+  variant?: string;
+  className?: string;
+}) {
+  return (
+    <span
+      className={`inline-flex items-center px-2 py-0.5 text-xs font-medium border border-border ${className}`}
+    >
+      {children}
+    </span>
   );
 }

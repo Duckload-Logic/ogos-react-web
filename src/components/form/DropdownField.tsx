@@ -10,7 +10,7 @@ export default function DropdownField({
   required = false,
   enabled = true,
   get = "id",
-  lockedReason = "",
+  loading = false,
 }: {
   label: string;
   options: any[];
@@ -20,7 +20,7 @@ export default function DropdownField({
   required?: boolean;
   enabled?: boolean;
   get?: string;
-  lockedReason?: string;
+  loading?: boolean;
 }) {
   const selectedOption = options.find((opt) => opt.id == value);
   const [isOpen, setIsOpen] = useState(false);
@@ -79,18 +79,10 @@ export default function DropdownField({
       <div ref={dropdownRef} className="relative rounded">
         <div className="w-full">
           <button
-            disabled={!enabled}
-            onMouseEnter={() => !enabled && lockedReason && setShowTooltip(true)}
-            onMouseLeave={() => setShowTooltip(false)}
-            className={`flex w-full items-center justify-between px-3 py-2 h-10 text-sm text-left font-normal border rounded-md transition-all duration-200 ${
-              !enabled
-                ? "bg-gray-100 border-gray-300 text-gray-500 cursor-not-allowed opacity-60"
-                : isFilled
-                ? "bg-white border-blue-400 text-gray-900 font-medium hover:border-blue-500 focus:border-blue-500 focus:ring-blue-500/20"
-                : required && !isFilled
-                ? "bg-white border-red-400 text-gray-700 hover:border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                : "bg-white border-gray-300 text-gray-700 hover:border-gray-400 focus:border-gray-400 focus:ring-gray-500/20"
-            } ${error && enabled ? "border-red-500 hover:border-red-500" : ""} focus:outline-none focus:ring-2 focus:ring-offset-0`}
+            disabled={!enabled || loading}
+            className={`flex w-full items-center justify-between px-3 py-2 h-10 bg-muted hover:bg-muted-foreground/30 text-left font-normal border rounded-md disabled:opacity-50 disabled:pointer-events-none ${
+              error ? "border-red-500" : "border-input"
+            }`}
             onClick={toggleDropdown}
           >
             <span
@@ -116,29 +108,33 @@ export default function DropdownField({
           </button>
         </div>
         {isOpen && (
-          <div className="w-full min-w-[200px] max-h-[250px] overflow-y-auto absolute mt-1 bg-popover border border-border rounded-md shadow-lg z-50 p-2">
+          <div className="w-full min-w-[200px] max-h-[200px] overflow-y-auto absolute mt-1 bg-popover border border-border rounded-md shadow-lg z-50 p-2">
             {options.length === 0 ? (
               <div className="px-2 py-1.5 text-sm text-muted-foreground">
                 No options available
               </div>
             ) : (
-              options.map((option) => (
-                <button
-                  key={option.id}
-                  onClick={() => {
-                    onChange(option[get]);
-                    setIsOpen(false);
-                  }}
-                  disabled={!enabled}
-                  className={`w-full text-left px-3 py-2 text-sm hover:text-primary hover:bg-muted-foreground/30 rounded ${
-                    option.id === value
-                      ? "bg-blue-100 text-blue-700 font-medium"
-                      : ""
-                  } ${!enabled && "text-muted-foreground cursor-not-allowed"}`}
-                >
-                  {getLabel(option)}
-                </button>
-              ))
+              options.map((option) => {
+                const isOptionDisabled = option.isEnabled === false || !enabled;
+
+                return (
+                  <button
+                    key={option.id}
+                    onClick={() => {
+                      onChange(option[get]);
+                      setIsOpen(false);
+                    }}
+                    disabled={isOptionDisabled}
+                    className={`w-full text-left px-3 py-2 text-sm hover:text-primary hover:bg-muted-foreground/30 rounded ${
+                      option.id === value
+                        ? "bg-muted-foreground/10 text-primary font-medium"
+                        : ""
+                    } ${isOptionDisabled && "text-muted-foreground cursor-not-allowed"}`}
+                  >
+                    {getLabel(option)}
+                  </button>
+                );
+              })
             )}
           </div>
         )}
