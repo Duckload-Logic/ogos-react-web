@@ -14,7 +14,7 @@ appointments/
 │   ├── AppointmentDetailsForm.tsx   # Form for appointment details
 │   └── index.ts                     # Component exports
 ├── pages/                   # Page-level components (route entry points)
-│   └── ScheduleAppointment.tsx      # Main scheduling page
+│   └── CreateAppointment.tsx      # Main scheduling page
 ├── hooks/                   # Feature-specific React hooks
 │   └── useAppointments.ts           # Appointments state and operations
 ├── services/                # API and business logic layer
@@ -37,7 +37,9 @@ appointments/
 ### Key Files Overview
 
 #### Types (`types/index.ts`)
+
 Central location for all TypeScript interfaces:
+
 - `Appointment` - Core appointment data model
 - `TimeSlot` - Available appointment time slot
 - `AppointmentStatus` - Appointment status enum
@@ -45,7 +47,9 @@ Central location for all TypeScript interfaces:
 - `UseAppointmentsReturn` - Hook return type interface
 
 #### Constants (`constants/index.ts`)
+
 Static values used throughout the feature:
+
 - `APPOINTMENT_STATUS` - Status codes and values
 - `APPOINTMENT_API_ENDPOINTS` - API endpoint definitions
 - `APPOINTMENT_ERROR_MESSAGES` - Standardized error messages
@@ -53,21 +57,27 @@ Static values used throughout the feature:
 - `APPOINTMENT_FORM_CONSTRAINTS` - Form validation constraints
 
 #### Utils (`utils/index.ts`)
+
 Helper functions scoped to this feature:
+
 - `mapDateToString()` - Convert Date to YYYY-MM-DD format
 - `formatAvailableSlots()` - Normalize API slot response data
 - `extractErrorMessage()` - Consistent error message extraction
 - `validateAppointmentForm()` - Client-side form validation
 
 #### Hook (`hooks/useAppointments.ts`)
+
 Main custom hook for appointment operations:
+
 - State management for appointments and available slots
 - Async operations: fetch, create, update, cancel
 - Error handling with extracted utility functions
 - Returns: `UseAppointmentsReturn` interface
 
 #### Services (`services/service.ts`)
+
 API communication layer:
+
 - `AppointmentService` class with methods:
   - `getAvailableSlots(date?)` - Fetch available time slots
   - `getAllAppointments()` - Get user's appointments
@@ -77,8 +87,10 @@ API communication layer:
   - `updateAppointmentStatus(id, status)` - Update appointment status
   - `cancelAppointment(id)` - Cancel an appointment
 
-#### Page Component (`pages/ScheduleAppointment.tsx`)
+#### Page Component (`pages/CreateAppointment.tsx`)
+
 Main entry point for appointment scheduling:
+
 - Routes: `/student/schedule`
 - Uses `useAppointments` hook for state and operations
 - Uses utility functions: `mapDateToString()`, `validateAppointmentForm()`
@@ -91,19 +103,25 @@ Main entry point for appointment scheduling:
 
 ```typescript
 // Import types
-import type { Appointment, TimeSlot } from '@/features/appointments';
+import type { Appointment, TimeSlot } from "@/features/appointments";
 
 // Import hook
-import { useAppointments } from '@/features/appointments';
+import { useAppointments } from "@/features/appointments";
 
 // Import utilities
-import { mapDateToString, validateAppointmentForm } from '@/features/appointments';
+import {
+  mapDateToString,
+  validateAppointmentForm,
+} from "@/features/appointments";
 
 // Import constants
-import { APPOINTMENT_STATUS, APPOINTMENT_ERROR_MESSAGES } from '@/features/appointments';
+import {
+  APPOINTMENT_STATUS,
+  APPOINTMENT_ERROR_MESSAGES,
+} from "@/features/appointments";
 
 // Import components
-import ScheduleAppointment from '@/features/appointments';
+import CreateAppointment from "@/features/appointments";
 ```
 
 #### Using the hook
@@ -153,6 +171,7 @@ export default function MyComponent() {
 ### Testing
 
 Test utilities and mocks are available in `tests/appointmentTest.ts`. This file contains:
+
 - Mock appointment data
 - Test database simulation
 - Service function mocks for testing
