@@ -6,22 +6,10 @@ const USER_GET_ROUTES = {
   user: (userID: number) => `/users/${userID}`,
 };
 
-const ROLE_NAMES: Record<number, string> = {
-  1: "student",
-  2: "admin",
-};
-
 export const userService = {
   async getCurrentUser(): Promise<User> {
     const { data } = await apiClient.get(USER_GET_ROUTES.me);
-    // Transform backend response: { roleId } → { role: { id, name } }
-    return {
-      ...data,
-      role: {
-        id: data.roleId,
-        name: ROLE_NAMES[data.roleId] || "unknown",
-      },
-    };
+    return data;
   },
 
   async getUserByID(userID: number) {
