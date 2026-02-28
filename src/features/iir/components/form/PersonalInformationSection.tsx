@@ -186,13 +186,14 @@ export const PersonalInformationSection = forwardRef<
           />
 
           {/* Religion */}
-          <InputField
+          <DropdownField
             label="Religion"
+            options={religions}
             value={studentInfo?.personalInfo?.religion?.id || ""}
             onChange={(val) =>
               handleInputChange("student.personalInfo.religion", { id: val })
             }
-            placeholder="e.g., Catholic"
+            required
           />
 
           {/* High School GWA */}
