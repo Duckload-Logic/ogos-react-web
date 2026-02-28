@@ -82,8 +82,14 @@ export default function DropdownField({
         <div className="w-full">
           <button
             disabled={!enabled || loading}
-            className={`flex w-full items-center justify-between px-3 py-2 h-10 bg-muted hover:bg-muted-foreground/30 text-left font-normal border rounded-md disabled:opacity-50 disabled:pointer-events-none ${
-              error ? "border-red-500" : "border-input"
+            className={`flex w-full items-center justify-between px-3 py-2 h-10 text-left font-normal border rounded-md focus:ring-2 focus:ring-offset-0 outline-none transition-colors duration-200 ${
+              !enabled || loading
+                ? 'bg-gray-100 border-gray-300 text-gray-600 cursor-not-allowed pointer-events-none'
+                : isFilled
+                  ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
+                  : 'bg-white border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-200'
+            } ${
+              error ? "border-red-500" : ""
             }`}
             onClick={toggleDropdown}
           >

@@ -1,4 +1,4 @@
-import { Info } from "lucide-react";
+import { Info, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { is } from "zod/v4/locales";
 
@@ -55,27 +55,34 @@ export default function InputField({
             </span>
           </div>
         )}
-        <input
-          type={type}
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder}
-          inputMode={inputMode}
-          disabled={disabled}
-          className="
-            w-full bg-muted hover:bg-muted-foreground/30 rounded-md border
-            border-border px-3 py-2 focus:ring-2
-            outline-none disabled:cursor-not-allowed
-            disabled:opacity-50 disabled:pointer-events-none
-            transition-colors duration-200
-            placeholder:text-muted-foreground
-            focus:border-primary
-            focus:ring-primary
-            focus:ring-offset-0
-          "
-          min={min}
-          max={max}
-        />
+        <div className="relative w-full">
+          <input
+            type={type}
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={placeholder}
+            inputMode={inputMode}
+            disabled={disabled}
+            className={`
+              w-full h-10 rounded-md border px-3 py-2 focus:ring-2 font-normal text-left
+              outline-none transition-colors duration-200
+              placeholder:text-muted-foreground
+              focus:ring-offset-0
+              ${
+                disabled 
+                  ? 'bg-gray-100 border-gray-300 text-gray-600 cursor-not-allowed pointer-events-none' 
+                  : value 
+                    ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
+                    : 'bg-white border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-200'
+              }
+            `}
+            min={min}
+            max={max}
+          />
+          {!disabled && value && (
+            <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
+          )}
+        </div>
       </div>
       {info && <p className="text-xs text-muted-foreground">{info}</p>}
       {error && <p className="text-sm text-red-500">{error}</p>}
