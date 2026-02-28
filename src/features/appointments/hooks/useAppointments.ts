@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { appointmentService } from "@/services";
+import { appointmentService } from "@/features/appointments/services";
 import {
   Appointment,
   AppointmentStatus,
@@ -8,7 +8,6 @@ import {
 } from "../types";
 import { QueryParam } from "../types/reqParams";
 import { useMe } from "@/features/users/hooks/useMe";
-import { apiClient } from "@/lib/api";
 
 const APPOINTMENTS_QUERY_KEY = "appointments";
 const APPOINTMENT_STALE_TIME = 5 * 60 * 1000; // 5 minutes

@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { appointmentService } from "@/services";
+import { appointmentService } from "@/features/appointments/services";
 
 const APPOINTMENT_LOOKUPS_QUERY_KEY = "appointment-lookups";
 const APPOINTMENT_LOOKUPS_STALE_TIME = 60 * 60 * 1000; // 1 hour

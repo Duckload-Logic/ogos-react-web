@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { appointmentService } from "@/services";
+import { appointmentService } from "@/features/appointments/services";
 import { QueryParam } from "../types/reqParams";
 import { DailyStatusCount } from "../types/calendar";
 
