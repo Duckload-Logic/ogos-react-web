@@ -3,6 +3,6 @@
  * Central location for all cross-feature types
  */
 
-export * from './user';
-export * from './appointment';
-export * from './student';
+export * from "../features/users/types/user";
+export * from "./appointment";
+export * from "./student";

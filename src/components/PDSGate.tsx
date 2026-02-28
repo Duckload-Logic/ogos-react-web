@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context";
-import { checkStudentOnboardingStatus } from "@/features/students/services/service";
+import { checkStudentOnboardingStatus } from "@/features/iir/services/service";
 import { AlertTriangle } from "lucide-react";
 
 interface PDSGateProps {
@@ -66,7 +66,8 @@ export const PDSGate = ({
             Access Restricted
           </h2>
           <p className="text-gray-600 text-center mb-6">
-            You must complete your Personal Data Sheet (PDS) form first to access this service.
+            You must complete your Personal Data Sheet (PDS) form first to
+            access this service.
           </p>
           <a
             href="/student/form"

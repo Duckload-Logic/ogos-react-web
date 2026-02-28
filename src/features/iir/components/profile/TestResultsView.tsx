@@ -1,0 +1,57 @@
+import { asText } from "@/features/iir/utils";
+import { formatDate } from "@/features/schedules/utils/formatters";
+import { CardBlock, EmptyState, InfoItem, SectionTitle } from ".";
+import { TestResult } from "../../types/IIRForm";
+import { Clipboard } from "lucide-react";
+import { NOT_SPECIFIED } from "../../constants";
+
+export default function TestResultsView({
+  data,
+}: {
+  data: TestResult[] | undefined;
+}) {
+  return (
+    <div className="space-y-6 animate-in fade-in duration-500">
+      <SectionTitle title="Psychological / Guidance Test Results" />
+      <div className="grid grid-cols-1 gap-4">
+        {(data?.length ?? 0) > 0 ? (
+          data!.map((result: TestResult) => (
+            <CardBlock
+              key={result.id}
+              title={asText(result.testName)}
+              icon={Clipboard}
+            >
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                <InfoItem
+                  label="Date"
+                  value={
+                    result.testDate
+                      ? formatDate(result.testDate)
+                      : NOT_SPECIFIED
+                  }
+                />
+                <InfoItem
+                  label="Test Administered"
+                  value={asText(result.testName)}
+                />
+                <InfoItem label="Raw Score" value={asText(result.rawScore)} />
+                <InfoItem
+                  label="Percentile Rank"
+                  value={asText(result.percentile)}
+                />
+              </div>
+              <div className="mt-3 border-t border-border pt-3">
+                <InfoItem
+                  label="Description"
+                  value={asText(result.description)}
+                />
+              </div>
+            </CardBlock>
+          ))
+        ) : (
+          <EmptyState label="No test results recorded" />
+        )}
+      </div>
+    </div>
+  );
+}

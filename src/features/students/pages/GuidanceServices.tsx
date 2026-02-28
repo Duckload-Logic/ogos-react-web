@@ -1,13 +1,10 @@
-import Layout from "@/components/Layout";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useEffect, useState } from "react";
 import { AlertTriangle } from "lucide-react";
-import {
-  checkStudentOnboardingStatus,
-  studentService,
-} from "@/features/students/services/service";
-import { useAuth } from "@/context";
+import { useMe } from "@/features/users/hooks/useMe";
+import { LoadingSpinner } from "@/components/shared";
+import { useUserIIR } from "@/features/iir/hooks/useUserIIR";
 
 const PROGRAMS = [
   { title: "Counseling" },
@@ -17,48 +14,27 @@ const PROGRAMS = [
 ];
 
 export default function GuidanceServices() {
-  const { user } = useAuth();
-  const [showForm, setShowForm] = useState(false);
+  const { data: me, isLoading: isUserLoading } = useMe();
+  const { data: iir, isLoading: isIIRLoading } = useUserIIR(
+    me?.id || undefined,
+  );
+
+  const showForm = !!me && iir && !iir.isSubmitted;
+
   const [isPageLoaded, setIsPageLoaded] = useState(false);
-  const [additionalInfo, setAdditionalInfo] = useState<any>(null);
+  useEffect(() => setIsPageLoaded(true), []);
 
-  useEffect(() => {
-    setIsPageLoaded(true);
-  }, []);
+  if (isUserLoading || isIIRLoading || !isPageLoaded) {
+    return <LoadingSpinner />;
+  }
 
-  useEffect(() => {
-    if (!user?.id) return;
-
-    const fetchProfile = async () => {
-      try {
-        const data = await studentService.getStudentProfile(user.id);
-        setAdditionalInfo(data);
-      } catch (err) {
-        console.error("Error fetching profile:", err);
-        // Continue without additional info if fetch fails
-      }
-    };
-
-    fetchProfile();
-  }, [user?.id]);
-
-  useEffect(() => {
-    const checkFormStatus = async () => {
-      try {
-        if (!user?.id) {
-          console.warn("User not authenticated or user ID missing");
-          return;
-        }
-        const completed = await checkStudentOnboardingStatus(user.id);
-        setShowForm(!completed);
-      } catch (err) {
-        console.error("Error checking onboarding status:", err);
-      } finally {
-      }
-    };
-
-    checkFormStatus();
-  }, [user?.id]);
+  if (!me) {
+    return (
+      <div className="text-center py-12">
+        <p className="text-red-600">Unable to load user information</p>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -166,20 +142,22 @@ export default function GuidanceServices() {
                 Name
               </label>
               <p className="text-gray-900 font-bold text-sm mt-1">
-                {user?.lastName}, {user?.firstName}{" "}
-                {user?.middleName ? user.middleName.charAt(0) + "." : ""}
+                {me?.lastName}, {me?.firstName}{" "}
+                {me.middleName && typeof me?.middleName === "string"
+                  ? me?.middleName.charAt(0) + "."
+                  : ""}
               </p>
             </div>
 
             {/* Contact Card */}
-            <div className="pb-4">
+            {/* <div className="pb-4">
               <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
                 Contact
               </label>
               <p className="text-gray-900 font-bold text-sm mt-1">
-                {additionalInfo?.studentProfile?.contactNo || "-"}
+                {additionalInfo?.IIRProfile?.contactNo || "-"}
               </p>
-            </div>
+            </div> */}
 
             {/* Email Card */}
             <div className="pb-4">
@@ -187,7 +165,7 @@ export default function GuidanceServices() {
                 Email
               </label>
               <p className="text-gray-900 font-bold text-sm mt-1">
-                {user?.email || "-"}
+                {me?.email || "-"}
               </p>
             </div>
           </div>

@@ -1,17 +1,9 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { hashId } from "@/lib/hash";
 import StudentRecordsHeader from "../components/StudentRecordsHeader";
 import StudentSearchAndFilter from "../components/StudentSearchAndFilter";
 import StudentCardsGrid from "../components/StudentCardsGrid";
-import AddStudentModal, {
-  addStudentSchema,
-} from "../components/AddStudentModal";
-import type { AddStudentForm } from "../components/AddStudentModal";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { apiClient } from "@/lib/api";
-import { API_ENDPOINTS } from "@/config/api";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -24,186 +16,135 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle } from "lucide-react";
-
-interface Student {
-  id: string;
-  studentId: string;
-  name: string;
-  course: string;
-  email: string;
-}
+import { useCourses, useGenders, useIIRPagination } from "@/features/iir/hooks";
+import { IIRProfileView } from "@/features/iir/types/studentProfileView";
+import { useDebounce } from "@/hooks/useDebounce";
+import { LoadingSpinner } from "@/components/shared";
+import { Pagination } from "@/components/Pagination";
 
 export default function StudentRecords() {
-  const [students, setStudents] = useState<Student[]>([]);
+  const {
+    data: courses,
+    isLoading: isCoursesLoading,
+    isError: isCoursesError,
+  } = useCourses();
+  const {
+    data: genders,
+    isLoading: isGendersLoading,
+    isError: isGendersError,
+  } = useGenders();
+  const yearLevels = [
+    { id: 1, name: "1st Year" },
+    { id: 2, name: "2nd Year" },
+    { id: 3, name: "3rd Year" },
+    { id: 4, name: "4th Year" },
+  ];
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
+  const [selectedCourseId, setSelectedCourseId] = useState(0);
+  const [selectedGenderId, setSelectedGenderId] = useState(0);
+  const [selectedYearLevelId, setSelectedYearLevelId] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 500);
+
+  const {
+    data,
+    isLoading: isStudentsLoading,
+    isError: isStudentsError,
+    error: studentsError,
+  } = useIIRPagination({
+    page,
+    pageSize,
+    search: debouncedSearch,
+    courseId: selectedCourseId,
+    genderId: selectedGenderId,
+    yearLevel: selectedYearLevelId,
+  });
+
+  const allStudents = data?.students || [];
+  const totalRecords = data?.total || 0;
+
   const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
-  const [studentToDelete, setStudentToDelete] = useState<Student | null>(null);
+  const [studentToDelete, setStudentToDelete] = useState<IIRProfileView | null>(
+    null,
+  );
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
-  const [selectedCourse, setSelectedCourse] = useState("All Courses");
-  const [searchTerm, setSearchTerm] = useState("");
   const [showAdd, setShowAdd] = useState(false);
   const navigate = useNavigate();
 
-  useEffect(() => {
-    const fetchStudents = async () => {
-      try {
-        const response = await apiClient.get("/students/records");
-        let toAppend: Student[] = [];
-        response.data.students.map((student: any) => {
-          toAppend.push({
-            id: student.userId,
-            studentId: `2023-${String(toAppend.length + 109).padStart(5, "0")}-TG-0`,
-            name: `${student.lastName}, ${student.firstName}`,
-            course: student.course,
-            email: student.email,
-          });
-        });
-        setStudents(toAppend);
-      } catch (error) {
-        console.error("Error fetching students:", error);
-      }
-    };
-
-    fetchStudents();
-  }, []);
-
-  const courses = [
-    { value: "All Courses", label: "All Courses" },
-    {
-      value: "BSECE",
-      label: "Bachelor of Science in Electronics Engineering (BSECE)",
-    },
-    {
-      value: "BSME",
-      label: "Bachelor of Science in Mechanical Engineering (BSME)",
-    },
-    { value: "BSA", label: "Bachelor of Science in Accountancy (BSA)" },
-    {
-      value: "BSBA-HRDM",
-      label:
-        "Bachelor of Science in Business Administration - Human Resource Development Management (BSBA-HRDM)",
-    },
-    {
-      value: "BSBA-MM",
-      label:
-        "Bachelor of Science in Business Administration - Marketing Management (BSBA-MM)",
-    },
-    {
-      value: "BSAM",
-      label: "Bachelor of Science in Applied Mathematics (BSAM)",
-    },
-    {
-      value: "BSIT",
-      label: "Bachelor of Science in Information Technology (BSIT)",
-    },
-    {
-      value: "BSENTREP",
-      label: "Bachelor of Science in Entrepreneurship (BSENTREP)",
-    },
-    {
-      value: "BSED-EN",
-      label: "Bachelor in Secondary Education - English (BSED-EN)",
-    },
-    {
-      value: "BSED-MATH",
-      label: "Bachelor in Secondary Education - Mathematics (BSED-MATH)",
-    },
-    {
-      value: "BSOA",
-      label: "Bachelor of Science in Office Administration (BSOA)",
-    },
-    {
-      value: "DICT",
-      label: "Diploma in Information Communication Technology (DICT)",
-    },
-    { value: "DOMT", label: "Diploma in Office Management Technology (DOMT)" },
-  ];
-
-  const form = useForm<AddStudentForm>({
-    resolver: zodResolver(addStudentSchema),
-  });
-
-  const onSubmit = (data: AddStudentForm) => {
-    const newStudent: Student = {
-      id: String(students.length + 1).padStart(3, "0"),
-      studentId: `2023-${String(students.length + 109).padStart(5, "0")}-TG-0`,
-      name: data.name,
-      course: data.course,
-      email: data.email,
-    };
-    setStudents([...students, newStudent]);
-    setShowAdd(false);
-    form.reset();
-  };
-
-  const handleDeleteClick = (student: Student) => {
-    setStudentToDelete(student);
-    setDeleteError(null);
-    setDeleteConfirmOpen(true);
-  };
-
-  const handleConfirmDelete = async () => {
-    if (!studentToDelete) return;
-
-    setIsDeleting(true);
-    setDeleteError(null);
-
-    try {
-      // Attempt to delete from backend
-      await apiClient.delete(API_ENDPOINTS.PDS.DELETE(studentToDelete.id));
-
-      // Remove from local state on success
-      setStudents(students.filter((s) => s.id !== studentToDelete.id));
-      setDeleteConfirmOpen(false);
-      setStudentToDelete(null);
-    } catch (error) {
-      const errorMessage =
-        error instanceof Error
-          ? error.message
-          : "Failed to delete student record";
-      setDeleteError(errorMessage);
-      console.error("Error deleting student:", error);
-    } finally {
-      setIsDeleting(false);
-    }
-  };
-
-  const filteredStudents = students.filter((s) => {
-    const courseMatch =
-      selectedCourse === "All Courses" || s.course === selectedCourse;
-
-    const searchMatch =
-      searchTerm.trim() === "" ||
-      s.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      s.studentId.toLowerCase().includes(searchTerm.toLowerCase());
-
-    return courseMatch && searchMatch;
-  });
+  if (isCoursesLoading || isGendersLoading) {
+    return <LoadingSpinner />;
+  }
 
   return (
     <>
       <div className="space-y-6">
-        <StudentRecordsHeader onAddClick={() => setShowAdd(true)} />
+        <StudentRecordsHeader
+          onAddClick={() => setShowAdd(true)}
+          showRecords={allStudents.length}
+          totalRecords={totalRecords}
+        />
         <StudentSearchAndFilter
           searchTerm={searchTerm}
-          onSearchChange={setSearchTerm}
-          selectedCourse={selectedCourse}
-          onCourseChange={setSelectedCourse}
-          courses={courses}
-        />
-        <StudentCardsGrid
-          students={filteredStudents}
-          onViewClick={(student) => {
-            const hashedId = encodeURIComponent(hashId(student.id));
-            navigate(`/admin/student-records/${hashedId}`, {
-              state: { student },
-            });
+          onSearchChange={(value) => {
+            if (value === searchTerm) return;
+            setSearchTerm(value);
+            setPage(1);
           }}
-          onDeleteClick={handleDeleteClick}
+          courses={courses}
+          selectedCourseId={selectedCourseId}
+          onCourseChange={(id) => {
+            if (id === selectedCourseId) return;
+            setSelectedCourseId(id);
+            setPage(1);
+          }}
+          genders={genders}
+          selectedGenderId={selectedGenderId}
+          onGenderChange={(id) => {
+            if (id === selectedGenderId) return;
+            setSelectedGenderId(id);
+            setPage(1);
+          }}
+          yearLevels={yearLevels}
+          selectedYearLevelId={selectedYearLevelId}
+          onYearLevelChange={(level) => {
+            if (level === selectedYearLevelId) return;
+            setSelectedYearLevelId(level);
+            setPage(1);
+          }}
         />
+        {isStudentsLoading ? (
+          <LoadingSpinner />
+        ) : (
+          <>
+            <StudentCardsGrid
+              students={allStudents}
+              isStudentsLoading={isStudentsLoading}
+              onViewClick={(student) => {
+                const hashedId = encodeURIComponent(
+                  hashId(String(student.iirId)),
+                );
+                navigate(`/admin/student-records/${hashedId}`, {
+                  state: { student },
+                });
+              }}
+              onDeleteClick={(student) => {
+                setStudentToDelete(student);
+                setDeleteConfirmOpen(true);
+              }}
+              yearLevels={yearLevels}
+            />
+            <Pagination
+              currentPage={page}
+              totalPages={data?.totalPages || 1}
+              onPageChange={setPage}
+            />
+          </>
+        )}
       </div>
-      <AddStudentModal
+      {/* <AddStudentModal
         isOpen={showAdd}
         onClose={() => {
           setShowAdd(false);
@@ -211,7 +152,7 @@ export default function StudentRecords() {
         }}
         onSubmit={onSubmit}
         courses={courses}
-      />
+      /> */}
 
       {/* Delete Confirmation Dialog */}
       <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
@@ -220,7 +161,8 @@ export default function StudentRecords() {
             <AlertDialogTitle>Delete Student Record</AlertDialogTitle>
             <AlertDialogDescription>
               Are you sure you want to delete the student record for{" "}
-              {studentToDelete?.name}? This action cannot be undone.
+              {studentToDelete?.firstName} {studentToDelete?.lastName}? This
+              action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
@@ -234,7 +176,7 @@ export default function StudentRecords() {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleConfirmDelete}
+              // onClick={handleConfirmDelete}
               disabled={isDeleting}
               className="bg-red-600 hover:bg-red-700 text-white"
             >

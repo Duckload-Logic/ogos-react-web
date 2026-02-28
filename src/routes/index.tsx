@@ -13,7 +13,6 @@ import Register from "@/features/auth/pages/Register";
 // Student Features
 import GuidanceServices from "@/features/students/pages/GuidanceServices";
 import ScheduleAppointment from "@/features/students/pages/ScheduleAppointment";
-import StudentForm from "@/features/students/pages/StudentForm";
 import AdmissionSlip from "@/features/students/pages/AdmissionSlip";
 import ViewSchedules from "@/features/students/pages/ViewSchedules";
 
@@ -25,7 +24,9 @@ import AppointmentsManagement from "@/features/admin/pages/AppointmentsManagemen
 import ReviewExcuses from "@/features/admin/pages/ReviewExcuses";
 import Reports from "@/features/admin/pages/Reports";
 import Frontdesk from "@/features/frontdesk/pages/Frontdesk";
-import StudentProfile from "@/features/students/pages/StudentProfile";
+import IIRProfile from "@/features/iir/pages/IIRProfile";
+import IIRForm from "@/features/iir/pages/IIRForm";
+import { ErrorBoundary } from "@/components/shared";
 
 export const routes: RouteObject[] = [
   // Root route - redirect to login
@@ -63,7 +64,7 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute requiredRole="student">
         <Layout title="Individual Inventory Record">
-          <StudentForm />
+          <IIRForm />
         </Layout>
       </ProtectedRoute>
     ),
@@ -118,8 +119,8 @@ export const routes: RouteObject[] = [
     path: "/admin/student-records/:studentId",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <Layout title="Student Profile">
-          <StudentProfile />
+        <Layout title="Individual Inventory Record">
+          <IIRProfile />
         </Layout>
       </ProtectedRoute>
     ),
