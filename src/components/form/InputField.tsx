@@ -72,26 +72,19 @@ export default function InputField({
           inputMode={inputMode}
           disabled={disabled}
           className={`
-            w-full rounded-md border px-3 py-2 focus:ring-2
+            w-full px-3 py-2 border rounded-md bg-white text-sm
             outline-none disabled:cursor-not-allowed
             disabled:opacity-50 disabled:pointer-events-none
             transition-all duration-200
-            focus:ring-offset-0
+            focus:outline-none focus:ring-2 focus:ring-offset-0
             ${
               isFilled
-                ? "bg-white border-blue-400 text-gray-900 font-medium hover:border-blue-500"
+                ? "border-blue-400 text-gray-900 font-medium hover:border-blue-500 focus:border-blue-500 focus:ring-blue-500/20"
                 : required && !isFilled
-                ? "bg-gray-100 border-red-400 text-gray-700 hover:bg-gray-150 hover:border-red-500"
-                : "bg-gray-100 border-gray-300 text-gray-700 hover:bg-gray-150 hover:border-gray-400"
+                ? "border-red-400 text-gray-700 hover:border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                : "border-gray-300 text-gray-700 hover:border-gray-400 focus:border-gray-400 focus:ring-gray-500/20"
             }
             ${error ? "border-red-500 focus:border-red-600 focus:ring-red-500/20" : ""}
-            ${
-              isFilled && !error
-                ? "focus:border-blue-500 focus:ring-blue-500/20"
-                : ""
-            }
-            ${!isFilled && !error && !required ? "focus:border-gray-400 focus:ring-gray-500/20" : ""}
-            ${!isFilled && required && !error ? "focus:border-red-500 focus:ring-red-500/20" : ""}
             placeholder:text-gray-500 placeholder:italic placeholder:font-normal
           `}
         />
