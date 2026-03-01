@@ -110,7 +110,7 @@ export const PersonalInformationSection = forwardRef<
   };
 
   return (
-    <Card className="bg-white border border-gray-200">
+    <Card className="bg-card border border-border">
       <CardContent className="pt-6">
         {/* Name Section */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
@@ -306,8 +306,8 @@ export const PersonalInformationSection = forwardRef<
         </div>
 
         {/* Emergency Contact Section */}
-        <div className="mt-8 pt-6 border-t border-gray-300">
-          <h3 className="text-sm font-semibold text-gray-700 mb-5">Emergency Contact Information</h3>
+        <div className="mt-8 pt-6 border-t border-border">
+          <h3 className="text-sm font-semibold text-foreground mb-5">Emergency Contact Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Emergency Contact First Name */}
             <InputField
@@ -376,7 +376,7 @@ export const PersonalInformationSection = forwardRef<
         </div>
 
         {/* Employment Status Section */}
-        <div className="mt-8 pt-6 border-t border-gray-300">
+        <div className="mt-8 pt-6 border-t border-border">
           <Checkbox
             id="isEmployed"
             label="Currently Employed"
@@ -398,7 +398,7 @@ export const PersonalInformationSection = forwardRef<
           />
 
           {studentInfo?.personalInfo?.isEmployed && (
-            <div className="bg-green-50 border-l-4 border-green-400 rounded-r-md p-6 mt-6">
+            <div className="bg-success-background/20 dark:bg-success-background/10 border-l-4 border-green-500 rounded-r-md p-6 mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <InputField
                   label="Employer Name"
@@ -422,8 +422,8 @@ export const PersonalInformationSection = forwardRef<
         </div>
 
         {/* Residential Addresses Section */}
-        <div className="mt-8 pt-6 border-t border-gray-300">
-          <h3 className="text-sm font-semibold text-gray-700 mb-5">Residential Addresses</h3>
+        <div className="mt-8 pt-6 border-t border-border">
+          <h3 className="text-sm font-semibold text-foreground mb-5">Residential Addresses</h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Provincial Region */}
             <DropdownField

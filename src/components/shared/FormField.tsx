@@ -34,7 +34,7 @@ export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
         </div>
       )}
       {helperText && !error && (
-        <p className="text-xs text-gray-500 mt-1">{helperText}</p>
+        <p className="text-xs text-muted-foreground mt-1">{helperText}</p>
       )}
     </div>
   ),

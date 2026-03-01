@@ -75,7 +75,7 @@ export const EducationBackgroundSection = forwardRef<
     ];
     const filled = requiredFields.filter((field) => !!school[field]).length;
 
-    if (filled === 0) return { color: "bg-gray-300", text: "Empty" };
+    if (filled === 0) return { color: "bg-muted", text: "Empty" };
     if (filled < requiredFields.length)
       return { color: "bg-yellow-500", text: "Incomplete" };
 
@@ -83,11 +83,11 @@ export const EducationBackgroundSection = forwardRef<
   };
 
   return (
-    <Card className="bg-white border border-gray-200 overflow-hidden">
+    <Card className="bg-card border border-border overflow-hidden">
       <CardContent className="p-6">
         {/* Part A: Nature of Schooling - Checkboxes */}
-        <div className="mb-8 pb-8 border-b border-gray-200">
-          <label className="text-sm font-semibold text-gray-700 mb-4 block">
+        <div className="mb-8 pb-8 border-b border-border">
+          <label className="text-sm font-semibold text-foreground mb-4 block">
             Nature of Schooling
           </label>
           <div className="flex items-center gap-6">
@@ -157,20 +157,20 @@ export const EducationBackgroundSection = forwardRef<
             return (
               <div
                 key={idx}
-                className="bg-gray-50 border border-gray-200 rounded-lg overflow-hidden"
+                className="bg-muted border border-border rounded-lg overflow-hidden"
               >
-                <CardHeader className="pb-4 pt-4 px-5 bg-gray-50">
+                <CardHeader className="pb-4 pt-4 px-5 bg-muted">
                   <div className="flex items-center gap-3">
-                    <span className="text-base font-semibold text-gray-900">{level.name}</span>
+                    <span className="text-base font-semibold text-foreground">{level.name}</span>
                     <div
                       className={`w-2 h-2 rounded-full ${getCompletionLevel(idx).color}`}
                     />
-                    <span className="text-xs text-gray-500">
+                    <span className="text-xs text-muted-foreground">
                       {getCompletionLevel(idx).text}
                     </span>
                   </div>
                 </CardHeader>
-                <CardContent className="space-y-5 px-5 py-6 bg-white border-t border-gray-200">
+                <CardContent className="space-y-5 px-5 py-6 bg-card border-t border-border">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <InputField
                       label="School Name"
@@ -198,7 +198,7 @@ export const EducationBackgroundSection = forwardRef<
                       placeholder="School location"
                     />
                     <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                      <label className="block text-sm font-medium text-foreground mb-2">
                         School Type
                         <span className="text-red-500"> *</span>
                       </label>
@@ -212,13 +212,13 @@ export const EducationBackgroundSection = forwardRef<
                             )
                           }
                           className={`
-                            w-full px-3 py-2 border rounded-md bg-white text-sm
+                            w-full px-3 py-2 border rounded-md bg-input text-sm
                             appearance-none cursor-pointer transition-all duration-200
                             focus:outline-none focus:ring-2 focus:ring-offset-0
                             ${
                               school.schoolType
-                                ? "border-blue-400 text-gray-900 font-medium hover:border-blue-500 focus:border-blue-500 focus:ring-blue-500/20"
-                                : "border-red-400 text-gray-700 hover:border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                ? "border-blue-400 text-foreground font-medium hover:border-blue-500 focus:border-blue-500 focus:ring-blue-500/20"
+                                : "border-red-400 text-foreground hover:border-red-500 focus:border-red-500 focus:ring-red-500/20"
                             }
                           `}
                         >

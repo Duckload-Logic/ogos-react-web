@@ -35,15 +35,19 @@ export default function RadioField({
             key={option.id}
             className="flex items-center gap-3 group cursor-pointer"
           >
-            <input
-              type="radio"
-              name={label}
-              value={option.id}
-              checked={String(value) === String(option.id)}
-              onChange={(e) => onChange(e.target.value)}
-              disabled={disabled}
-              className="w-4 h-4 cursor-pointer accent-red-600 disabled:opacity-50 disabled:cursor-not-allowed"
-            />
+            <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+              <input
+                type="radio"
+                name={label}
+                value={option.id}
+                checked={String(value) === String(option.id)}
+                onChange={(e) => onChange(e.target.value)}
+                disabled={disabled}
+                className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+              />
+              <div className="h-full w-full rounded-full border border-card-foreground bg-white transition-all duration-200 peer-checked:border-red-600 peer-hover:border-red-600" />
+              <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+            </div>
             <span className="text-sm text-foreground group-hover:text-primary transition-colors duration-200">
               {option.name || option.text || option.code}
             </span>

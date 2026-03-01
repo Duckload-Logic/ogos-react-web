@@ -72,7 +72,7 @@ export default function DropdownField({
 
   return (
     <div className="space-y-2 relative">
-      <div className={`text-sm font-medium text-gray-700`}>
+      <div className={`text-sm font-medium text-foreground`}>
         <span className="truncate">{label}</span>
 
         {/* The asterisk stays fixed to the right of the truncated text */}
@@ -84,10 +84,10 @@ export default function DropdownField({
             disabled={!enabled || loading}
             className={`flex w-full items-center justify-between px-3 py-2 h-10 text-left font-normal border rounded-md focus:ring-2 focus:ring-offset-0 outline-none transition-colors duration-200 ${
               !enabled || loading
-                ? 'bg-gray-100 border-gray-300 text-gray-600 cursor-not-allowed pointer-events-none'
+                ? 'bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none'
                 : isFilled
-                  ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
-                  : 'bg-white border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-200'
+                  ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                  : 'bg-input border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
             } ${
               error ? "border-red-500" : ""
             }`}
@@ -95,14 +95,14 @@ export default function DropdownField({
           >
             <span
               className={`truncate ${
-                selectedOption ? "text-gray-900 font-medium" : "text-gray-500 italic"
+                selectedOption ? "text-foreground font-medium" : "text-muted-foreground italic"
               }`}
             >
               {getLabel(selectedOption)}
             </span>
             <div className="flex items-center gap-2 flex-shrink-0">
               {!enabled && (
-                <Lock size={16} className="text-gray-400" strokeWidth={2} />
+                <Lock size={16} className="text-muted-foreground" strokeWidth={2} />
               )}
               {enabled && isFilled && !error && (
                 <Check size={16} className="text-green-500" strokeWidth={2.5} />
@@ -151,7 +151,7 @@ export default function DropdownField({
       {showTooltip && !enabled && lockedReason && (
         <div
           ref={tooltipRef}
-          className="absolute z-50 px-3 py-2 text-xs bg-gray-800 text-white rounded-md whitespace-nowrap shadow-lg"
+          className="absolute z-50 px-3 py-2 text-xs bg-card text-foreground rounded-md whitespace-nowrap shadow-lg border border-border"
           style={{
             bottom: "100%",
             left: "50%",
@@ -161,7 +161,7 @@ export default function DropdownField({
         >
           {lockedReason}
           <div
-            className="absolute w-2 h-2 bg-gray-800 transform rotate-45"
+            className="absolute w-2 h-2 bg-card border-r border-b border-border transform rotate-45"
             style={{
               bottom: "-4px",
               left: "50%",

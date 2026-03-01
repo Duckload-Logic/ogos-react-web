@@ -48,7 +48,7 @@ export const InterestsSection = forwardRef<
   };
 
   return (
-    <Card className="bg-white border border-gray-200">
+    <Card className="bg-card border border-border">
       <CardContent className="pt-6">
         {/* A. Academic */}
         <div className="mb-8">
@@ -92,7 +92,7 @@ export const InterestsSection = forwardRef<
                     }}
                     className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
                   />
-                  <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
+                  <div className="h-full w-full rounded-full border border-card-foreground bg-white transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
                   <Check className="absolute h-3 w-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
                 </div>
                 <span className="text-sm text-foreground flex-shrink-0">Others:</span>
@@ -103,7 +103,7 @@ export const InterestsSection = forwardRef<
                     handleInputChange("interests.academic.othersSpecify", e.target.value)
                   }
                   placeholder="specify"
-                  className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-gray-300 focus:ring-gray-200 text-sm w-32 flex-shrink-0"
+                  className="px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm w-32 flex-shrink-0"
                   disabled={!interests?.academic?.othersChecked}
                 />
               </div>
@@ -154,7 +154,7 @@ export const InterestsSection = forwardRef<
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-300 my-8"></div>
+        <div className="border-t border-border my-8"></div>
 
         {/* B. Extra-Curricular */}
         <div className="mb-8">
@@ -182,8 +182,8 @@ export const InterestsSection = forwardRef<
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       interests?.extraCurricular?.hobbies?.[0]
-                        ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
-                        : 'bg-white border-red-500 focus:border-red-500 focus:ring-red-200'
+                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {interests?.extraCurricular?.hobbies?.[0] && (
@@ -205,8 +205,8 @@ export const InterestsSection = forwardRef<
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       interests?.extraCurricular?.hobbies?.[2]
-                        ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
-                        : 'bg-white border-red-500 focus:border-red-500 focus:ring-red-200'
+                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {interests?.extraCurricular?.hobbies?.[2] && (
@@ -228,8 +228,8 @@ export const InterestsSection = forwardRef<
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       interests?.extraCurricular?.hobbies?.[1]
-                        ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
-                        : 'bg-white border-red-500 focus:border-red-500 focus:ring-red-200'
+                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {interests?.extraCurricular?.hobbies?.[1] && (
@@ -251,8 +251,8 @@ export const InterestsSection = forwardRef<
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       interests?.extraCurricular?.hobbies?.[3]
-                        ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
-                        : 'bg-white border-red-500 focus:border-red-500 focus:ring-red-200'
+                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {interests?.extraCurricular?.hobbies?.[3] && (
@@ -344,7 +344,7 @@ export const InterestsSection = forwardRef<
                   }}
                   className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
                 />
-                <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
+                <div className="h-full w-full rounded-full border border-card-foreground bg-white transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
                 <Check className="absolute h-3 w-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
               </div>
               <span className="text-sm text-foreground flex-shrink-0">Others:</span>
@@ -355,7 +355,7 @@ export const InterestsSection = forwardRef<
                   handleInputChange("interests.extraCurricular.organizationOthers", e.target.value)
                 }
                 placeholder="specify"
-                className="px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-gray-300 focus:ring-gray-200 text-sm w-32 flex-shrink-0"
+                className="px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm w-32 flex-shrink-0"
                 disabled={!interests?.extraCurricular?.organizationOthersChecked}
               />
             </div>
@@ -418,8 +418,8 @@ export const InterestsSection = forwardRef<
                     disabled={interests?.extraCurricular?.occupationalPosition !== "others"}
                     className={`px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                       interests?.extraCurricular?.occupationalPosition === "others"
-                        ? "border-gray-300 bg-white focus:border-gray-300 focus:ring-gray-200"
-                        : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                        ? "border-border bg-input focus:border-border focus:ring-ring/20"
+                        : "border-border bg-input opacity-50 text-foreground cursor-not-allowed"
                     }`}
                   />
                 </div>

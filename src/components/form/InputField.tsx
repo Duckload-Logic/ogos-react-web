@@ -70,10 +70,10 @@ export default function InputField({
               focus:ring-offset-0
               ${
                 disabled 
-                  ? 'bg-gray-100 border-gray-300 text-gray-600 cursor-not-allowed pointer-events-none' 
+                  ? 'bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none' 
                   : value 
-                    ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
-                    : 'bg-white border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-200'
+                    ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                    : 'bg-input border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
               }
             `}
             min={min}

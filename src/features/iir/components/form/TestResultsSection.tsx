@@ -54,12 +54,12 @@ export const TestResultsSection = forwardRef<
   }
 
   return (
-    <Card className="bg-white border border-gray-200">
+    <Card className="bg-card border border-border">
       <CardContent className="pt-6">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="bg-gray-100 border-b border-gray-300">
+              <tr className="bg-muted border-b border-border">
                 <th className="px-4 py-3 text-left text-sm font-bold text-foreground w-48">
                   Date
                 </th>
@@ -79,7 +79,7 @@ export const TestResultsSection = forwardRef<
             </thead>
             <tbody>
               {preparedRows.map((row: any, idx: number) => (
-                <tr key={idx} className="border-b border-gray-200 hover:bg-gray-50">
+                <tr key={idx} className="border-b border-border hover:bg-muted/50 dark:hover:bg-muted/30">
                   {/* Date Column */}
                   <td className="px-4 py-3">
                     <div className="relative">
@@ -94,8 +94,8 @@ export const TestResultsSection = forwardRef<
                         }
                         className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 text-sm ${
                           row?.date
-                            ? "bg-white border-green-500 focus:border-green-500 focus:ring-green-200"
-                            : "bg-white border-red-500 focus:border-red-500 focus:ring-red-200"
+                            ? "bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20"
+                            : "bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20"
                         }`}
                       />
                       {row?.date && (
@@ -123,8 +123,8 @@ export const TestResultsSection = forwardRef<
                         placeholder="e.g., SAT"
                         className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 text-sm ${
                           row?.nameOfTest
-                            ? "bg-white border-green-500 focus:border-green-500 focus:ring-green-200"
-                            : "bg-white border-red-500 focus:border-red-500 focus:ring-red-200"
+                            ? "bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20"
+                            : "bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20"
                         }`}
                       />
                       {row?.nameOfTest && (
@@ -148,8 +148,8 @@ export const TestResultsSection = forwardRef<
                         }
                         className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 text-sm ${
                           row?.rs !== undefined && row?.rs !== ""
-                            ? "bg-white border-green-500 focus:border-green-500 focus:ring-green-200"
-                            : "bg-white border-red-500 focus:border-red-500 focus:ring-red-200"
+                            ? "bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20"
+                            : "bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20"
                         }`}
                       />
                       {row?.rs !== undefined && row?.rs !== "" && (
@@ -173,8 +173,8 @@ export const TestResultsSection = forwardRef<
                         }
                         className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 text-sm ${
                           row?.pr !== undefined && row?.pr !== ""
-                            ? "bg-white border-green-500 focus:border-green-500 focus:ring-green-200"
-                            : "bg-white border-red-500 focus:border-red-500 focus:ring-red-200"
+                            ? "bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20"
+                            : "bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20"
                         }`}
                       />
                       {row?.pr !== undefined && row?.pr !== "" && (
@@ -202,8 +202,8 @@ export const TestResultsSection = forwardRef<
                         placeholder="Notes"
                         className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 text-sm ${
                           row?.description
-                            ? "bg-white border-green-500 focus:border-green-500 focus:ring-green-200"
-                            : "bg-white border-red-500 focus:border-red-500 focus:ring-red-200"
+                            ? "bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20"
+                            : "bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20"
                         }`}
                       />
                       {row?.description && (

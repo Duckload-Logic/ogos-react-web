@@ -113,7 +113,7 @@ export const HealthInformationSection = forwardRef<
   ];
 
   return (
-    <Card className="bg-white border border-gray-200">
+    <Card className="bg-card border border-border">
       <CardContent className="pt-6">
         {/* A. Physical */}
         <div className="mb-8">
@@ -127,7 +127,7 @@ export const HealthInformationSection = forwardRef<
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="border-b-2 border-gray-400">
+                <tr className="border-b-2 border-border">
                   <th className="text-left text-sm font-medium text-card-foreground py-2 px-3 min-w-24">Item</th>
                   <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">YES</th>
                   <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">NO</th>
@@ -136,7 +136,7 @@ export const HealthInformationSection = forwardRef<
               </thead>
               <tbody>
                   {physicalItems.map((item, idx) => (
-                  <tr key={idx} className="border-b border-gray-300">
+                  <tr key={idx} className="border-b border-border">
                     <td className="py-2 px-3 text-sm text-foreground">{item.label}</td>
                     <td className="py-2 px-3 text-center">
                       <input
@@ -169,8 +169,8 @@ export const HealthInformationSection = forwardRef<
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           item.yesValue === true
-                            ? "border-gray-300 bg-white focus:border-gray-300 focus:ring-gray-200"
-                            : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                            ? "border-border bg-input focus:border-border focus:ring-ring/20"
+                            : "border-border bg-input opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
                     </td>
@@ -182,7 +182,7 @@ export const HealthInformationSection = forwardRef<
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-300 my-8"></div>
+        <div className="border-t border-border my-8"></div>
 
         {/* B. Psychological */}
         <div className="mb-8">
@@ -196,7 +196,7 @@ export const HealthInformationSection = forwardRef<
           <div className="overflow-x-auto">
             <table className="w-full border-collapse">
               <thead>
-                <tr className="border-b-2 border-gray-400">
+                <tr className="border-b-2 border-border">
                   <th className="text-left text-sm font-medium text-card-foreground py-2 px-3">Consulted</th>
                   <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">YES</th>
                   <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">NO</th>
@@ -206,7 +206,7 @@ export const HealthInformationSection = forwardRef<
               </thead>
               <tbody>
                 {consultationTypes.map((type, idx) => (
-                  <tr key={idx} className="border-b border-gray-300">
+                  <tr key={idx} className="border-b border-border">
                     <td className="py-2 px-3 text-sm text-foreground">{type.label}</td>
                     <td className="py-2 px-3 text-center">
                       <input
@@ -239,24 +239,8 @@ export const HealthInformationSection = forwardRef<
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           type.consulted === true
-                            ? "border-gray-300 bg-white focus:border-gray-300 focus:ring-gray-200"
-                            : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
-                        }`}
-                      />
-                    </td>
-                    <td className="py-2 px-3">
-                      <input
-                        type="text"
-                        placeholder="e.g., Depression, Anxiety"
-                        disabled={type.consulted !== true}
-                        value={type.forWhat}
-                        onChange={(e) =>
-                          handleInputChange(type.forWhatKey, e.target.value)
-                        }
-                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
-                          type.consulted === true
-                            ? "border-gray-300 bg-white focus:border-gray-300 focus:ring-gray-200"
-                            : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                            ? "border-border bg-input focus:border-border focus:ring-ring/20"
+                            : "border-border bg-input opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
                     </td>

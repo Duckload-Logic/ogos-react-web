@@ -69,7 +69,7 @@ export const FamilyBackgroundSection = forwardRef<
   };
 
   return (
-    <Card className="bg-white border border-gray-200">
+    <Card className="bg-card border border-border">
       <CardContent className="pt-6">
         {/* I. Parental Status */}
         <div className="mb-8">
@@ -107,7 +107,7 @@ export const FamilyBackgroundSection = forwardRef<
                         onChange={(e) =>
                           handleInputChange("family.background.parentalStatusOther", e.target.value)
                         }
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:border-gray-300 focus:ring-gray-200 text-sm"
+                        className="flex-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm"
                       />
                     </div>
                   );
@@ -154,7 +154,7 @@ export const FamilyBackgroundSection = forwardRef<
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-300 my-8"></div>
+        <div className="border-t border-border my-8"></div>
 
         {/* II. Living Situation */}
         <div className="mb-8">
@@ -162,8 +162,8 @@ export const FamilyBackgroundSection = forwardRef<
             II. Living Situation
           </h3>
           <div className="space-y-6">
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="font-medium text-gray-900 mb-3">
+            <div className="p-4 bg-muted rounded-lg border border-border">
+              <p className="font-medium text-foreground mb-3">
                 Do you have a quiet place to study at home?
               </p>
               <RadioField
@@ -180,8 +180,8 @@ export const FamilyBackgroundSection = forwardRef<
               />
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <p className="font-medium text-gray-900 mb-3">
+            <div className="p-4 bg-muted rounded-lg border border-border">
+              <p className="font-medium text-foreground mb-3">
                 Do you share your room with anyone?
               </p>
               <RadioField
@@ -210,8 +210,8 @@ export const FamilyBackgroundSection = forwardRef<
               )}
             </div>
 
-            <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
-              <h4 className="font-semibold text-gray-900 mb-4">
+            <div className="p-4 bg-muted rounded-lg border border-border">
+              <h4 className="font-semibold text-foreground mb-4">
                 Nature of Residence
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -323,7 +323,7 @@ export const FamilyBackgroundSection = forwardRef<
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-300 my-8"></div>
+        <div className="border-t border-border my-8"></div>
 
         {/* III. Family Members Information */}
         <div className="mb-8">
@@ -331,10 +331,10 @@ export const FamilyBackgroundSection = forwardRef<
             III. Family Members Information
           </h3>
 
-          <div className="p-4 bg-gray-50 rounded-lg border border-gray-200">
+          <div className="p-4 bg-muted rounded-lg border border-border">
             {/* Father Sub-section */}
             <div className="mb-6">
-            <h4 className="font-semibold text-gray-900 mb-4">Father</h4>
+            <h4 className="font-semibold text-foreground mb-4">Father</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <InputField
                 label="Name"
@@ -419,11 +419,11 @@ export const FamilyBackgroundSection = forwardRef<
             </div>
             </div>
 
-            <div className="border-t border-gray-300 my-6"></div>
+            <div className="border-t border-border my-6"></div>
 
             {/* Mother Sub-section */}
             <div className="mb-6">
-            <h4 className="font-semibold text-gray-900 mb-4">Mother</h4>
+            <h4 className="font-semibold text-foreground mb-4">Mother</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <InputField
                 label="Name"
@@ -508,11 +508,11 @@ export const FamilyBackgroundSection = forwardRef<
             </div>
             </div>
 
-            <div className="border-t border-gray-300 my-6"></div>
+            <div className="border-t border-border my-6"></div>
 
             {/* Guardian Sub-section */}
             <div className="mb-6">
-            <h4 className="font-semibold text-gray-900 mb-4">Guardian</h4>
+            <h4 className="font-semibold text-foreground mb-4">Guardian</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
               <InputField
                 label="Name"
@@ -597,11 +597,11 @@ export const FamilyBackgroundSection = forwardRef<
             </div>
             </div>
 
-            <div className="border-t border-gray-300 my-6"></div>
+            <div className="border-t border-border my-6"></div>
 
             {/* Family Information Fields */}
             <div className="mb-6">
-            <h4 className="font-semibold text-gray-900 mb-4">Sibling Information</h4>
+            <h4 className="font-semibold text-foreground mb-4">Sibling Information</h4>
             {/* Row 1: 3 columns */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
               <div className="flex flex-col">
@@ -616,8 +616,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.numberOfChildren
-                        ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
-                        : 'bg-white border-red-500 focus:border-red-500 focus:ring-red-200'
+                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.numberOfChildren && (
@@ -637,8 +637,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.brothers
-                        ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
-                        : 'bg-white border-red-500 focus:border-red-500 focus:ring-red-200'
+                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.brothers && (
@@ -658,8 +658,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.sisters
-                        ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
-                        : 'bg-white border-red-500 focus:border-red-500 focus:ring-red-200'
+                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.sisters && (
@@ -682,8 +682,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.employedSiblings
-                        ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
-                        : 'bg-white border-red-500 focus:border-red-500 focus:ring-red-200'
+                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.employedSiblings && (
@@ -703,8 +703,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.ordinalPosition
-                        ? 'bg-white border-green-500 focus:border-green-500 focus:ring-green-200'
-                        : 'bg-white border-red-500 focus:border-red-500 focus:ring-red-200'
+                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.ordinalPosition && (
@@ -716,11 +716,11 @@ export const FamilyBackgroundSection = forwardRef<
             </div>
             </div>
 
-            <div className="border-t border-gray-300 my-6"></div>
+            <div className="border-t border-border my-6"></div>
 
             {/* Sibling Support Section */}
             <div className="mb-4">
-            <h4 className="text-gray-900 mb-3">
+            <h4 className="text-foreground mb-3">
               Is your brother/sister who is gainfully employed providing support to your:
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
@@ -769,11 +769,11 @@ export const FamilyBackgroundSection = forwardRef<
             </div>
             </div>
 
-            <div className="border-t border-gray-300 my-6"></div>
+            <div className="border-t border-border my-6"></div>
 
             {/* Who Finances Your Schooling Section */}
             <div className="mb-6">
-            <h4 className="font-semibold text-gray-900 mb-4">
+            <h4 className="font-semibold text-foreground mb-4">
               Who finances your schooling?
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -866,7 +866,7 @@ export const FamilyBackgroundSection = forwardRef<
         </div>
 
         {/* Divider */}
-        <div className="border-t border-gray-300 my-8"></div>
+        <div className="border-t border-border my-8"></div>
 
         {/* IV. Financial Information */}
         <div>
@@ -875,7 +875,7 @@ export const FamilyBackgroundSection = forwardRef<
           </h3>
 
           <div className="mb-8">
-            <h4 className="font-semibold text-gray-900 mb-4">
+            <h4 className="font-semibold text-foreground mb-4">
               Parents' Combined Total Monthly Income
             </h4>
             <RadioField
@@ -915,7 +915,7 @@ export const FamilyBackgroundSection = forwardRef<
                       e.target.value
                     )
                   }
-                  className="flex-1 ml-2 px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-1 focus:ring-red-600"
+                  className="flex-1 ml-2 px-3 py-2 border border-border rounded-md text-sm bg-input focus:outline-none focus:ring-2 focus:ring-red-600/20"
                 />
               )}
             </label>
