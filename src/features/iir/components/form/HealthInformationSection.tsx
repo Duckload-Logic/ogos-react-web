@@ -1,12 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2 } from "lucide-react";
-import { InputField, Checkbox } from "@/components/form";
-import { SectionContainer } from "./SectionContainer";
-import { HealthAreaSection } from "./HealthAreaSection";
 
 interface FormErrors {
   [key: string]: string;
@@ -55,180 +48,225 @@ export const HealthInformationSection = forwardRef<
     onChange(fieldPath, value);
     clearError(fieldPath);
   };
+
+  // Array of physical health items for A. Physical
+  const physicalItems = [
+    {
+      label: "Your Vision",
+      yesKey: "health.healthRecord.visionHasProblem",
+      detailsKey: "health.healthRecord.visionDetails",
+      yesValue: health?.healthRecord?.visionHasProblem === true,
+      detailsValue: health?.healthRecord?.visionDetails || "",
+    },
+    {
+      label: "Your Hearing",
+      yesKey: "health.healthRecord.hearingHasProblem",
+      detailsKey: "health.healthRecord.hearingDetails",
+      yesValue: health?.healthRecord?.hearingHasProblem === true,
+      detailsValue: health?.healthRecord?.hearingDetails || "",
+    },
+    {
+      label: "Your Speech",
+      yesKey: "health.healthRecord.speechHasProblem",
+      detailsKey: "health.healthRecord.speechDetails",
+      yesValue: health?.healthRecord?.speechHasProblem === true,
+      detailsValue: health?.healthRecord?.speechDetails || "",
+    },
+    {
+      label: "Your General Health",
+      yesKey: "health.healthRecord.generalHealthHasProblem",
+      detailsKey: "health.healthRecord.generalHealthDetails",
+      yesValue: health?.healthRecord?.generalHealthHasProblem === true,
+      detailsValue: health?.healthRecord?.generalHealthDetails || "",
+    },
+  ];
+
+  // Array of psychological consultation types
+  const consultationTypes = [
+    {
+      label: "Psychiatrist",
+      yesKey: "health.consultations.psychiatrist.consulted",
+      whenKey: "health.consultations.psychiatrist.when",
+      forWhatKey: "health.consultations.psychiatrist.forWhat",
+      consulted: health?.consultations?.psychiatrist?.consulted,
+      when: health?.consultations?.psychiatrist?.when || "",
+      forWhat: health?.consultations?.psychiatrist?.forWhat || "",
+    },
+    {
+      label: "Psychologist",
+      yesKey: "health.consultations.psychologist.consulted",
+      whenKey: "health.consultations.psychologist.when",
+      forWhatKey: "health.consultations.psychologist.forWhat",
+      consulted: health?.consultations?.psychologist?.consulted,
+      when: health?.consultations?.psychologist?.when || "",
+      forWhat: health?.consultations?.psychologist?.forWhat || "",
+    },
+    {
+      label: "Counselor",
+      yesKey: "health.consultations.counselor.consulted",
+      whenKey: "health.consultations.counselor.when",
+      forWhatKey: "health.consultations.counselor.forWhat",
+      consulted: health?.consultations?.counselor?.consulted,
+      when: health?.consultations?.counselor?.when || "",
+      forWhat: health?.consultations?.counselor?.forWhat || "",
+    },
+  ];
+
   return (
-    <div className="space-y-6">
-      <SectionContainer title="A. Health Status">
-        <div className="space-y-6">
-          <HealthAreaSection
-            title="Vision"
-            fieldPrefix="health.healthRecord.vision"
-            hasData={health?.healthRecord?.visionHasProblem || false}
-            details={health?.healthRecord?.visionDetails || ""}
-            onChange={handleInputChange}
-          />
-          <HealthAreaSection
-            title="Hearing"
-            fieldPrefix="health.healthRecord.hearing"
-            hasData={health?.healthRecord?.hearingHasProblem || false}
-            details={health?.healthRecord?.hearingDetails || ""}
-            onChange={handleInputChange}
-          />
-          <HealthAreaSection
-            title="Speech"
-            fieldPrefix="health.healthRecord.speech"
-            hasData={health?.healthRecord?.speechHasProblem || false}
-            details={health?.healthRecord?.speechDetails || ""}
-            onChange={handleInputChange}
-          />
-          <HealthAreaSection
-            title="General Health"
-            fieldPrefix="health.healthRecord.generalHealth"
-            hasData={health?.healthRecord?.generalHealthHasProblem || false}
-            details={health?.healthRecord?.generalHealthDetails || ""}
-            onChange={handleInputChange}
-          />
-        </div>
-      </SectionContainer>
+    <Card className="bg-white border border-gray-200">
+      <CardContent className="pt-6">
+        {/* A. Physical */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-card-foreground mb-2">
+            A. Physical
+          </h3>
+          <p className="text-sm text-foreground mb-6">
+            Do you have problems with: (Please Check)
+          </p>
 
-      <SectionContainer title="B. Professional Consultations">
-        <div className="space-y-3">
-          {health?.consultations?.map((consultation: any, idx: number) => (
-            <Card
-              key={idx}
-              className="border-l-4 border-l-primary hover:shadow-md transition-shadow"
-            >
-              <CardContent className="pt-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Professional Type Dropdown */}
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor={`prof-type-${idx}`}
-                      className="text-sm font-medium"
-                    >
-                      Professional Type <span className="text-red-500">*</span>
-                    </Label>
-                    <select
-                      id={`prof-type-${idx}`}
-                      value={consultation.professionalType || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          `health.consultations.${idx}.professionalType`,
-                          e.target.value,
-                        )
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    >
-                      <option value="">Select Professional Type</option>
-                      <option value="Counselor">Counselor</option>
-                      <option value="Psychologist">Psychologist</option>
-                      <option value="Psychiatrist">Psychiatrist</option>
-                    </select>
-                  </div>
-
-                  {/* Date Field */}
-                  <InputField
-                    label="Date of Consultation"
-                    type="date"
-                    value={consultation.whenDate || ""}
-                    onChange={(val) =>
-                      handleInputChange(
-                        `health.consultations.${idx}.whenDate`,
-                        val,
-                      )
-                    }
-                  />
-
-                  {/* Consulted Checkbox */}
-                  <div className="flex items-end">
-                    <div className="flex items-center gap-2 h-10">
-                      <Checkbox
-                        id={`consulted-${idx}`}
-                        label="Has Consulted"
-                        name="hasConsulted"
-                        checked={consultation.hasConsulted || false}
-                        onCheckedChange={(checked: boolean | "indeterminate") =>
-                          handleInputChange(
-                            `health.consultations.${idx}.hasConsulted`,
-                            checked === true,
-                          )
-                        }
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b-2 border-gray-400">
+                  <th className="text-left text-sm font-medium text-card-foreground py-2 px-3 min-w-24">Item</th>
+                  <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">YES</th>
+                  <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">NO</th>
+                  <th className="text-left text-sm font-medium text-card-foreground py-2 px-3">If Yes, please specify</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {physicalItems.map((item, idx) => (
+                  <tr key={idx} className="border-b border-gray-300">
+                    <td className="py-2 px-3 text-sm text-foreground">{item.label}</td>
+                    <td className="py-2 px-3 text-center">
+                      <input
+                        type="radio"
+                        name={`physical-${idx}`}
+                        value="yes"
+                        checked={item.yesValue === true}
+                        onChange={() => handleInputChange(item.yesKey, true)}
+                        className="w-4 h-4 cursor-pointer accent-red-600"
                       />
-                      <Label
-                        htmlFor={`consulted-${idx}`}
-                        className="text-sm cursor-pointer"
-                      >
-                        Consulted
-                      </Label>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Reason Field */}
-                <div className="space-y-2">
-                  <Label
-                    htmlFor={`reason-${idx}`}
-                    className="text-sm font-medium"
-                  >
-                    Reason for Consultation
-                  </Label>
-                  <Textarea
-                    id={`reason-${idx}`}
-                    value={consultation.forWhat || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        `health.consultations.${idx}.forWhat`,
-                        e.target.value,
-                      )
-                    }
-                    placeholder="Describe the reason for consultation..."
-                    className="min-h-20 text-sm"
-                  />
-                </div>
-
-                {/* Remove Button */}
-                <div className="flex justify-end pt-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                    onClick={() => {
-                      const updated = health.consultations.filter(
-                        (_: any, i: number) => i !== idx,
-                      );
-                      handleInputChange("health.consultations", updated);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Remove Consultation
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-
-          {/* Add Consultation Button */}
-          <div>
-            <Button
-              variant="outline"
-              className="w-full border-primary text-primary hover:bg-primary hover:text-white transition-colors"
-              onClick={() =>
-                handleInputChange("health.consultations", [
-                  ...(health?.consultations || []),
-                  {
-                    professionalType: "",
-                    hasConsulted: false,
-                    whenDate: "",
-                    forWhat: "",
-                  },
-                ])
-              }
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Consultation Record
-            </Button>
+                    </td>
+                    <td className="py-2 px-3 text-center">
+                      <input
+                        type="radio"
+                        name={`physical-${idx}`}
+                        value="no"
+                        checked={item.yesValue === false}
+                        onChange={() => handleInputChange(item.yesKey, false)}
+                        className="w-4 h-4 cursor-pointer accent-red-600"
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="text"
+                        placeholder="Specify"
+                        disabled={item.yesValue !== true}
+                        value={item.yesValue === true ? item.detailsValue : ""}
+                        onChange={(e) =>
+                          handleInputChange(item.detailsKey, e.target.value)
+                        }
+                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
+                          item.yesValue === true
+                            ? "border-gray-300 bg-white focus:border-gray-300 focus:ring-gray-200"
+                            : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                        }`}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-      </SectionContainer>
-    </div>
+
+        {/* Divider */}
+        <div className="border-t border-gray-300 my-8"></div>
+
+        {/* B. Psychological */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-card-foreground mb-2">
+            B. Psychological
+          </h3>
+          <p className="text-sm text-foreground mb-6">
+            Previous Consultations
+          </p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b-2 border-gray-400">
+                  <th className="text-left text-sm font-medium text-card-foreground py-2 px-3">Consulted</th>
+                  <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">YES</th>
+                  <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">NO</th>
+                  <th className="text-left text-sm font-medium text-card-foreground py-2 px-3">When</th>
+                  <th className="text-left text-sm font-medium text-card-foreground py-2 px-3">If Yes, please specify</th>
+                </tr>
+              </thead>
+              <tbody>
+                {consultationTypes.map((type, idx) => (
+                  <tr key={idx} className="border-b border-gray-300">
+                    <td className="py-2 px-3 text-sm text-foreground">{type.label}</td>
+                    <td className="py-2 px-3 text-center">
+                      <input
+                        type="radio"
+                        name={`consultation-${idx}`}
+                        value="yes"
+                        checked={type.consulted === true}
+                        onChange={() => handleInputChange(type.yesKey, true)}
+                        className="w-4 h-4 cursor-pointer accent-red-600"
+                      />
+                    </td>
+                    <td className="py-2 px-3 text-center">
+                      <input
+                        type="radio"
+                        name={`consultation-${idx}`}
+                        value="no"
+                        checked={type.consulted === false}
+                        onChange={() => handleInputChange(type.yesKey, false)}
+                        className="w-4 h-4 cursor-pointer accent-red-600"
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="text"
+                        placeholder="Date/When"
+                        disabled={type.consulted !== true}
+                        value={type.when}
+                        onChange={(e) =>
+                          handleInputChange(type.whenKey, e.target.value)
+                        }
+                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
+                          type.consulted === true
+                            ? "border-gray-300 bg-white focus:border-gray-300 focus:ring-gray-200"
+                            : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                        }`}
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="text"
+                        placeholder="e.g., Depression, Anxiety"
+                        disabled={type.consulted !== true}
+                        value={type.forWhat}
+                        onChange={(e) =>
+                          handleInputChange(type.forWhatKey, e.target.value)
+                        }
+                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
+                          type.consulted === true
+                            ? "border-gray-300 bg-white focus:border-gray-300 focus:ring-gray-200"
+                            : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+                        }`}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 });
