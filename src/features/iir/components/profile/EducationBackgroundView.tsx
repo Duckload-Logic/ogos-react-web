@@ -56,7 +56,7 @@ export default function EducationBackgroundView({
                       {asText(school.schoolName)}
                     </h4>
                     <span
-                      className={`text-[10px] font-semibold uppercase px-2 py-1 rounded-full border border-border ${school.schoolType === "Private" ? "bg-blue-100 text-blue-800" : "bg-green-100 text-green-800"}`}
+                      className={`text-[10px] font-semibold uppercase px-2 py-1 rounded-full border border-border bg-green-100 text-green-800`}
                     >
                       {asText(school.schoolType)}
                     </span>
