@@ -690,17 +690,6 @@ export default function IIRForm() {
             {/* Form Navigation Buttons */}
             <div className="flex justify-between gap-3 bg-card p-4 rounded-lg border border-border bottom-0 shadow-lg flex-wrap">
               <Button
-                variant="outline"
-                onClick={handlePreviousSection}
-                disabled={currentSection === 1 || isSaving}
-                className="flex items-center gap-2"
-              >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
-              </Button>
-
-              <Button
-                variant="outline"
                 onClick={() => {
                   // Reset form but preserve autofilled fields
                   const resetData = {
@@ -721,12 +710,22 @@ export default function IIRForm() {
                   setLocalFormData(resetData);
                   setCurrentSection(1);
                 }}
-                className="text-destructive border-destructive hover:bg-destructive/10"
+                className="bg-destructive hover:bg-destructive/90 text-white"
               >
                 Reset Form
               </Button>
 
               <div className="flex gap-2 ml-auto">
+                <Button
+                  variant="outline"
+                  onClick={handlePreviousSection}
+                  disabled={currentSection === 1 || isSaving}
+                  className="flex items-center gap-2"
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                  Previous
+                </Button>
+
                 {currentSection < FORM_SECTIONS.length && (
                   <Button
                     onClick={handleNextSection}
