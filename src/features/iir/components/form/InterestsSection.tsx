@@ -175,18 +175,18 @@ export const InterestsSection = forwardRef<
                 <div className="relative">
                   <input
                     type="text"
-                    value={interests?.extraCurricular?.hobbies?.[0] || ""}
+                    value={interests?.hobbies?.[0]?.hobbyName || ""}
                     onChange={(e) =>
-                      handleInputChange("interests.extraCurricular.hobbies.0", e.target.value)
+                      handleInputChange("interests.hobbies.0.hobbyName", e.target.value)
                     }
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                      interests?.extraCurricular?.hobbies?.[0]
+                      interests?.hobbies?.[0]?.hobbyName
                         ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
                         : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {interests?.extraCurricular?.hobbies?.[0] && (
+                  {interests?.hobbies?.[0]?.hobbyName && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -198,18 +198,18 @@ export const InterestsSection = forwardRef<
                 <div className="relative">
                   <input
                     type="text"
-                    value={interests?.extraCurricular?.hobbies?.[2] || ""}
+                    value={interests?.hobbies?.[2]?.hobbyName || ""}
                     onChange={(e) =>
-                      handleInputChange("interests.extraCurricular.hobbies.2", e.target.value)
+                      handleInputChange("interests.hobbies.2.hobbyName", e.target.value)
                     }
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                      interests?.extraCurricular?.hobbies?.[2]
+                      interests?.hobbies?.[2]?.hobbyName
                         ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
                         : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {interests?.extraCurricular?.hobbies?.[2] && (
+                  {interests?.hobbies?.[2]?.hobbyName && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -221,18 +221,18 @@ export const InterestsSection = forwardRef<
                 <div className="relative">
                   <input
                     type="text"
-                    value={interests?.extraCurricular?.hobbies?.[1] || ""}
+                    value={interests?.hobbies?.[1]?.hobbyName || ""}
                     onChange={(e) =>
-                      handleInputChange("interests.extraCurricular.hobbies.1", e.target.value)
+                      handleInputChange("interests.hobbies.1.hobbyName", e.target.value)
                     }
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                      interests?.extraCurricular?.hobbies?.[1]
+                      interests?.hobbies?.[1]?.hobbyName
                         ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
                         : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {interests?.extraCurricular?.hobbies?.[1] && (
+                  {interests?.hobbies?.[1]?.hobbyName && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -244,18 +244,18 @@ export const InterestsSection = forwardRef<
                 <div className="relative">
                   <input
                     type="text"
-                    value={interests?.extraCurricular?.hobbies?.[3] || ""}
+                    value={interests?.hobbies?.[3]?.hobbyName || ""}
                     onChange={(e) =>
-                      handleInputChange("interests.extraCurricular.hobbies.3", e.target.value)
+                      handleInputChange("interests.hobbies.3.hobbyName", e.target.value)
                     }
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                      interests?.extraCurricular?.hobbies?.[3]
+                      interests?.hobbies?.[3]?.hobbyName
                         ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
                         : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {interests?.extraCurricular?.hobbies?.[3] && (
+                  {interests?.hobbies?.[3]?.hobbyName && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
