@@ -616,8 +616,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.numberOfChildren
-                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.numberOfChildren && (
@@ -637,8 +637,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.brothers
-                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.brothers && (
@@ -658,8 +658,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.sisters
-                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.sisters && (
@@ -682,8 +682,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.employedSiblings
-                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.employedSiblings && (
@@ -703,8 +703,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.ordinalPosition
-                        ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.ordinalPosition && (
@@ -915,7 +915,7 @@ export const FamilyBackgroundSection = forwardRef<
                       e.target.value
                     )
                   }
-                  className="flex-1 ml-2 px-3 py-2 border border-border rounded-md text-sm bg-input focus:outline-none focus:ring-2 focus:ring-red-600/20"
+                  className="flex-1 ml-2 px-3 py-2 border border-border rounded-md text-sm bg-white dark:!bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-red-600/20"
                 />
               )}
             </label>

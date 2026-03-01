@@ -169,8 +169,8 @@ export const HealthInformationSection = forwardRef<
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           item.yesValue === true
-                            ? "border-border bg-input focus:border-border focus:ring-ring/20"
-                            : "border-border bg-input opacity-50 text-foreground cursor-not-allowed"
+                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
+                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
                     </td>
@@ -239,8 +239,24 @@ export const HealthInformationSection = forwardRef<
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           type.consulted === true
-                            ? "border-border bg-input focus:border-border focus:ring-ring/20"
-                            : "border-border bg-input opacity-50 text-foreground cursor-not-allowed"
+                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
+                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
+                        }`}
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="text"
+                        placeholder="Specify"
+                        disabled={type.consulted !== true}
+                        value={type.consulted === true ? type.forWhat : ""}
+                        onChange={(e) =>
+                          handleInputChange(type.forWhatKey, e.target.value)
+                        }
+                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
+                          type.consulted === true
+                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
+                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
                     </td>

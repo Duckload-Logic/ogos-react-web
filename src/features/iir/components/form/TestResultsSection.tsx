@@ -1,6 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { Check } from "lucide-react";
-import { Card, CardContent } from "@/components/ui/card";
 
 interface FormErrors {
   [key: string]: string;
@@ -46,181 +45,153 @@ export const TestResultsSection = forwardRef<
     clearError(fieldPath);
   };
 
-  // Ensure testResults is an array with at least 3 rows
-  const rows = testResults || [{}, {}, {}];
-  const preparedRows = [...rows];
-  while (preparedRows.length < 3) {
-    preparedRows.push({});
-  }
+  // Pre-populate exactly 3 empty rows
+  const preparedRows = (testResults || []).length > 0 
+    ? testResults 
+    : [{}, {}, {}];
 
   return (
-    <Card className="bg-card border border-border">
-      <CardContent className="pt-6">
-        <div className="overflow-x-auto">
-          <table className="w-full">
-            <thead>
-              <tr className="bg-muted border-b border-border">
-                <th className="px-4 py-3 text-left text-sm font-bold text-foreground w-48">
-                  Date
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-bold text-foreground min-w-44">
-                  Name of Test
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-bold text-foreground w-20">
-                  RS
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-bold text-foreground w-20">
-                  PR
-                </th>
-                <th className="px-4 py-3 text-left text-sm font-bold text-foreground">
-                  Description
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              {preparedRows.map((row: any, idx: number) => (
-                <tr key={idx} className="border-b border-border hover:bg-muted/50 dark:hover:bg-muted/30">
-                  {/* Date Column */}
-                  <td className="px-4 py-3">
-                    <div className="relative">
-                      <input
-                        type="date"
-                        value={row?.date || ""}
-                        onChange={(e) =>
-                          handleInputChange(
-                            `testResults.${idx}.date`,
-                            e.target.value
-                          )
-                        }
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 text-sm ${
-                          row?.date
-                            ? "bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20"
-                            : "bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                        }`}
-                      />
-                      {row?.date && (
-                        <Check
-                          size={16}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500"
-                          strokeWidth={2.5}
-                        />
-                      )}
-                    </div>
-                  </td>
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse border border-black dark:border-foreground">
+        {/* Header Row */}
+        <thead>
+          <tr>
+            <th className="w-32 border border-black dark:border-foreground bg-gray-300 dark:bg-gray-700 px-3 py-2 text-left text-xs font-bold text-black dark:text-white uppercase">
+              DATE
+            </th>
+            <th className="w-48 border border-black dark:border-foreground bg-gray-300 dark:bg-gray-700 px-3 py-2 text-left text-xs font-bold text-black dark:text-white uppercase">
+              NAME OF TEST
+            </th>
+            <th className="w-16 border border-black dark:border-foreground bg-gray-300 dark:bg-gray-700 px-3 py-2 text-left text-xs font-bold text-black dark:text-white uppercase">
+              RS
+            </th>
+            <th className="w-16 border border-black dark:border-foreground bg-gray-300 dark:bg-gray-700 px-3 py-2 text-left text-xs font-bold text-black dark:text-white uppercase">
+              PR
+            </th>
+            <th className="flex-1 border border-black dark:border-foreground bg-gray-300 dark:bg-gray-700 px-3 py-2 text-left text-xs font-bold text-black dark:text-white uppercase">
+              DESCRIPTION
+            </th>
+          </tr>
+        </thead>
 
-                  {/* Name of Test Column */}
-                  <td className="px-4 py-3">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={row?.nameOfTest || ""}
-                        onChange={(e) =>
-                          handleInputChange(
-                            `testResults.${idx}.nameOfTest`,
-                            e.target.value
-                          )
-                        }
-                        placeholder="e.g., SAT"
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 text-sm ${
-                          row?.nameOfTest
-                            ? "bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20"
-                            : "bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                        }`}
-                      />
-                      {row?.nameOfTest && (
-                        <Check
-                          size={16}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500"
-                          strokeWidth={2.5}
-                        />
-                      )}
-                    </div>
-                  </td>
+        {/* Data Rows */}
+        <tbody>
+          {preparedRows.map((row: any, idx: number) => (
+            <tr key={idx}>
+              {/* Date Cell */}
+              <td className="border border-black dark:border-foreground p-0 h-12">
+                <div className="relative h-full">
+                  <input
+                    type="date"
+                    value={row?.date || ""}
+                    onChange={(e) =>
+                      handleInputChange(`testResults.${idx}.date`, e.target.value)
+                    }
+                    className="w-full h-full px-2 py-1 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+                  />
+                  {row?.date && (
+                    <Check
+                      size={14}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-teal-600 dark:text-teal-400 pointer-events-none"
+                      strokeWidth={3}
+                    />
+                  )}
+                </div>
+              </td>
 
-                  {/* RS (Raw Score) Column */}
-                  <td className="px-4 py-3">
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={row?.rs ?? ""}
-                        onChange={(e) =>
-                          handleInputChange(`testResults.${idx}.rs`, e.target.value)
-                        }
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 text-sm ${
-                          row?.rs !== undefined && row?.rs !== ""
-                            ? "bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20"
-                            : "bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                        }`}
-                      />
-                      {row?.rs !== undefined && row?.rs !== "" && (
-                        <Check
-                          size={16}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500"
-                          strokeWidth={2.5}
-                        />
-                      )}
-                    </div>
-                  </td>
+              {/* Name of Test Cell */}
+              <td className="border border-black dark:border-foreground p-0 h-12">
+                <div className="relative h-full">
+                  <input
+                    type="text"
+                    value={row?.nameOfTest || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        `testResults.${idx}.nameOfTest`,
+                        e.target.value
+                      )
+                    }
+                    className="w-full h-full px-2 py-1 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+                  />
+                  {row?.nameOfTest && (
+                    <Check
+                      size={14}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-teal-600 dark:text-teal-400 pointer-events-none"
+                      strokeWidth={3}
+                    />
+                  )}
+                </div>
+              </td>
 
-                  {/* PR (Percentile Rank) Column */}
-                  <td className="px-4 py-3">
-                    <div className="relative">
-                      <input
-                        type="number"
-                        value={row?.pr ?? ""}
-                        onChange={(e) =>
-                          handleInputChange(`testResults.${idx}.pr`, e.target.value)
-                        }
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 text-sm ${
-                          row?.pr !== undefined && row?.pr !== ""
-                            ? "bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20"
-                            : "bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                        }`}
-                      />
-                      {row?.pr !== undefined && row?.pr !== "" && (
-                        <Check
-                          size={16}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500"
-                          strokeWidth={2.5}
-                        />
-                      )}
-                    </div>
-                  </td>
+              {/* RS Cell */}
+              <td className="border border-black dark:border-foreground p-0 h-12">
+                <div className="relative h-full">
+                  <input
+                    type="number"
+                    value={row?.rs ?? ""}
+                    onChange={(e) =>
+                      handleInputChange(`testResults.${idx}.rs`, e.target.value)
+                    }
+                    className="w-full h-full px-2 py-1 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+                  />
+                  {row?.rs !== undefined && row?.rs !== "" && (
+                    <Check
+                      size={14}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-teal-600 dark:text-teal-400 pointer-events-none"
+                      strokeWidth={3}
+                    />
+                  )}
+                </div>
+              </td>
 
-                  {/* Description Column */}
-                  <td className="px-4 py-3">
-                    <div className="relative">
-                      <input
-                        type="text"
-                        value={row?.description || ""}
-                        onChange={(e) =>
-                          handleInputChange(
-                            `testResults.${idx}.description`,
-                            e.target.value
-                          )
-                        }
-                        placeholder="Notes"
-                        className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 text-sm ${
-                          row?.description
-                            ? "bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20"
-                            : "bg-input border-red-500 focus:border-red-500 focus:ring-red-500/20"
-                        }`}
-                      />
-                      {row?.description && (
-                        <Check
-                          size={16}
-                          className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500"
-                          strokeWidth={2.5}
-                        />
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </CardContent>
-    </Card>
+              {/* PR Cell */}
+              <td className="border border-black dark:border-foreground p-0 h-12">
+                <div className="relative h-full">
+                  <input
+                    type="number"
+                    value={row?.pr ?? ""}
+                    onChange={(e) =>
+                      handleInputChange(`testResults.${idx}.pr`, e.target.value)
+                    }
+                    className="w-full h-full px-2 py-1 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+                  />
+                  {row?.pr !== undefined && row?.pr !== "" && (
+                    <Check
+                      size={14}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-teal-600 dark:text-teal-400 pointer-events-none"
+                      strokeWidth={3}
+                    />
+                  )}
+                </div>
+              </td>
+
+              {/* Description Cell */}
+              <td className="border border-black dark:border-foreground p-0 h-12">
+                <div className="relative h-full">
+                  <input
+                    type="text"
+                    value={row?.description || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        `testResults.${idx}.description`,
+                        e.target.value
+                      )
+                    }
+                    className="w-full h-full px-2 py-1 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+                  />
+                  {row?.description && (
+                    <Check
+                      size={14}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-teal-600 dark:text-teal-400 pointer-events-none"
+                      strokeWidth={3}
+                    />
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+    </div>
   );
 });

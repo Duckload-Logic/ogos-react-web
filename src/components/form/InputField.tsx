@@ -67,13 +67,13 @@ export default function InputField({
               w-full h-10 rounded-md border px-3 py-2 focus:ring-2 font-normal text-left
               outline-none transition-colors duration-200
               placeholder:text-muted-foreground
-              focus:ring-offset-0
+              focus:ring-offset-0 text-foreground
               ${
                 disabled 
                   ? 'bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none' 
                   : value 
-                    ? 'bg-input border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                    : 'bg-input border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
+                    ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                    : 'bg-white dark:!bg-neutral-800 border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
               }
             `}
             min={min}

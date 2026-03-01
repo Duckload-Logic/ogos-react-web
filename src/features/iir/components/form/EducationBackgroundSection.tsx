@@ -212,9 +212,9 @@ export const EducationBackgroundSection = forwardRef<
                             )
                           }
                           className={`
-                            w-full px-3 py-2 border rounded-md bg-input text-sm
+                            w-full px-3 py-2 border rounded-md bg-white dark:!bg-neutral-800 text-sm
                             appearance-none cursor-pointer transition-all duration-200
-                            focus:outline-none focus:ring-2 focus:ring-offset-0
+                            focus:outline-none focus:ring-2 focus:ring-offset-0 text-foreground
                             ${
                               school.schoolType
                                 ? "border-green-400 text-foreground font-medium hover:border-green-500 focus:border-green-500 focus:ring-green-500/20"
