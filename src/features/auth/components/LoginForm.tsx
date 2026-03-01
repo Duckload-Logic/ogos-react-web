@@ -67,6 +67,14 @@ export default function LoginForm({
         >
           {isLoading ? <LoadingSpinner size="sm" /> : "Login"}
         </Button>
+
+        <Button
+          type="button"
+          disabled={isLoading}
+          className="w-full h-10 sm:h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold text-sm sm:text-base flex items-center justify-center"
+        >
+          Login with PUPT-IDP
+        </Button>
       </form>
 
       <p className="text-center text-xs sm:text-sm text-muted-foreground mt-6">
