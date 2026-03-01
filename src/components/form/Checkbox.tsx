@@ -38,7 +38,7 @@ export default function Checkbox({
             className={`peer absolute h-full w-full opacity-0 cursor-pointer z-10  ${className}`}
           />
           <div
-            className="h-full w-full rounded-sm border border-card-foreground bg-card transition-all duration-200
+            className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200
             peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600"
           />
           <Check className="absolute h-3 w-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
