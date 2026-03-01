@@ -22,6 +22,7 @@ import StudentRecords from "@/features/admin/pages/StudentRecords";
 import AppointmentsManagement from "@/features/appointments/pages/admin/AppointmentsManagement";
 import ReviewExcuses from "@/features/admin/pages/ReviewExcuses";
 import Reports from "@/features/admin/pages/Reports";
+import Analytics from "@/features/admin/pages/Analytics";
 import Frontdesk from "@/features/frontdesk/pages/Frontdesk";
 import IIRProfile from "@/features/iir/pages/IIRProfile";
 import IIRForm from "@/features/iir/pages/IIRForm";
@@ -164,6 +165,16 @@ export const routes: RouteObject[] = [
       <ProtectedRoute requiredRole="admin">
         <Layout title="Reports">
           <Reports />
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/analytics",
+    element: (
+      <ProtectedRoute requiredRole="admin">
+        <Layout title="Analytics">
+          <Analytics />
         </Layout>
       </ProtectedRoute>
     ),
