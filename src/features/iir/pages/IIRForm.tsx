@@ -666,7 +666,7 @@ export default function IIRForm() {
             </div>
 
             {/* Form Navigation Buttons */}
-            <div className="sticky bottom-0 flex justify-between gap-3 bg-white p-4 border-t border-gray-300 shadow-lg flex-wrap z-20 rounded-2xl">
+            <div className="sticky bottom-0 flex justify-between gap-3 bg-white dark:bg-slate-900 p-4 border-t border-gray-300 dark:border-gray-700 shadow-lg flex-wrap z-20 rounded-2xl">
               <Button
                 onClick={() => {
                   // Reset form but preserve autofilled fields
