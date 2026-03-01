@@ -210,7 +210,18 @@ export default function IIRForm() {
       if (!prev) return prev;
       let current = prev as any;
       for (let i = 0; i < path.length - 1; i++) {
-        current = current[path[i]] = { ...current[path[i]] };
+        const key = path[i];
+        const nextKey = path[i + 1];
+        
+        // Check if next key is a numeric string (array index)
+        if (!isNaN(Number(nextKey))) {
+          // Keep arrays as arrays
+          current[key] = Array.isArray(current[key]) ? [...current[key]] : current[key];
+        } else {
+          // Spread objects
+          current[key] = Array.isArray(current[key]) ? [...current[key]] : { ...current[key] };
+        }
+        current = current[key];
       }
       current[path[path.length - 1]] = value;
       return { ...prev };
