@@ -651,7 +651,7 @@ export default function IIRForm() {
                     </span>
                   </div>
                 </CardHeader>
-                <CardContent className="p-4 sm:p-6 md:p-8">
+                <CardContent className="p-4 sm:p-6 md:p-8 pb-24">
                   {currentSection === 1 && localFormData?.student && (
                     <PersonalInformationSection
                       ref={personalSectionRef}
@@ -699,7 +699,7 @@ export default function IIRForm() {
             </div>
 
             {/* Form Navigation Buttons */}
-            <div className="flex justify-between gap-3 bg-card p-4 rounded-lg border border-border bottom-0 shadow-lg flex-wrap">
+            <div className="sticky bottom-0 flex justify-between gap-3 bg-white p-4 border-t border-gray-300 shadow-lg flex-wrap z-20">
               <Button
                 onClick={() => {
                   // Reset form but preserve autofilled fields
