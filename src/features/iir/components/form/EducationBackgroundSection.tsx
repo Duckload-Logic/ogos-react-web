@@ -217,8 +217,8 @@ export const EducationBackgroundSection = forwardRef<
                             focus:outline-none focus:ring-2 focus:ring-offset-0 text-foreground
                             ${
                               school.schoolType
-                                ? "border-green-400 text-foreground font-medium hover:border-green-500 focus:border-green-500 focus:ring-green-500/20"
-                                : "border-red-400 text-foreground hover:border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                                ? "border-green-500 text-foreground font-medium hover:border-green-600 focus:border-green-500 focus:ring-green-500/20"
+                                : "border-red-500 text-foreground hover:border-red-600 focus:border-red-500 focus:ring-red-500/20"
                             }
                           `}
                         >
