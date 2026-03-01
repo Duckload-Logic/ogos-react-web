@@ -9,6 +9,7 @@ import {
   useGetIIRDraft,
 } from "@/features/iir/hooks";
 import { IIRForm as IIRFormType } from "@/features/iir/types/IIRForm";
+import { EMPTY_IIR_FORM } from "@/features/iir/constants";
 import { LoadingSpinner } from "@/components/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -38,40 +39,6 @@ const FORM_SECTIONS = [
   { title: "V. Interests and Hobbies", id: 5, key: "interests" },
   { title: "VI. Test Results", id: 6, key: "testResults" },
 ];
-
-const EMPTY_IIR_FORM: IIRFormType = {
-  student: {
-    basicInfo: {
-      firstName: "",
-      middleName: {} as any,
-      lastName: "",
-      email: "",
-    },
-    personalInfo: {} as any,
-    addresses: [],
-  },
-  education: {
-    natureOfSchooling: "",
-    interruptedDetails: {} as any,
-    schools: [],
-  },
-  family: {
-    background: {} as any,
-    relatedPersons: [],
-    finance: {} as any,
-  },
-  health: {
-    healthRecord: {} as any,
-    consultations: [],
-  },
-  interests: {
-    activities: [],
-    subjectPreferences: [],
-    hobbies: [],
-  },
-  testResults: [],
-  significantNotes: [],
-};
 
 export default function IIRForm() {
   const navigate = useNavigate();
