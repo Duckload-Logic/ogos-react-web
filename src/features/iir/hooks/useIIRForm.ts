@@ -11,7 +11,7 @@ export function useIIRForm(userID: number) {
   return useQuery({
     queryKey: [IIR_FORM_QUERY_KEY, userID],
     queryFn: async () => {
-      return;
+      return iirService.getIIRByUserID(userID) as Promise<IIRForm>;
     },
     enabled: !!userID,
     staleTime: IIR_FORM_STALE_TIME,
