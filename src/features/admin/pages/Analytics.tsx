@@ -1,9 +1,8 @@
 import { useState, useEffect } from "react";
 import { LoadingSpinner } from "@/components/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, TrendingUp, Users, Percent, RefreshCw } from "lucide-react";
+import { AlertCircle, TrendingUp, Users, Percent } from "lucide-react";
 import { apiClient } from "@/lib/api";
-import { generateMockStudents } from "../utils/mockAnalyticsData";
 import { Button } from "@/components/ui/button";
 import {
   BarChart,
@@ -47,28 +46,13 @@ export default function Analytics() {
   const [students, setStudents] = useState<StudentAnalytics[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
-  const [isTestData, setIsTestData] = useState(false);
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [religionPage, setReligionPage] = useState(0);
   const [cityPage, setCityPage] = useState(0);
   const [educationPage, setEducationPage] = useState(0);
   const [statusPage, setStatusPage] = useState(0);
 
-  const loadTestData = () => {
-    try {
-      setLoading(true);
-      setErrorMsg(null);
-      const mockStudents = generateMockStudents(250);
-      setStudents(mockStudents);
-      setIsTestData(true);
-    } catch (error) {
-      const message =
-        error instanceof Error ? error.message : "Failed to generate test data";
-      setErrorMsg(message);
-    } finally {
-      setLoading(false);
-    }
-  };
+
 
   useEffect(() => {
     const fetchAllStudents = async () => {
@@ -107,7 +91,6 @@ export default function Analytics() {
         }
 
         setStudents(allStudents);
-        setIsTestData(false);
       } catch (error) {
         const message =
           error instanceof Error ? error.message : "Unknown error occurred";
@@ -140,17 +123,7 @@ export default function Analytics() {
             <li>Verify you are logged in as an admin</li>
             <li>Try refreshing the page</li>
           </ul>
-          <div className="border-t border-border pt-3">
-            <p className="mb-2 font-semibold">Or test the dashboard:</p>
-            <Button
-              onClick={loadTestData}
-              className="gap-2"
-              variant="outline"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Load Test Data (250 Students)
-            </Button>
-          </div>
+
         </div>
       </div>
     );
@@ -446,11 +419,6 @@ export default function Analytics() {
           <p className="text-sm text-muted-foreground">
             Comprehensive overview of student demographics and educational data
           </p>
-          {isTestData && (
-            <span className="text-xs bg-yellow-100 dark:bg-yellow-900 text-yellow-800 dark:text-yellow-200 px-2 py-1 rounded w-fit mt-1">
-              Test Data (250 Students)
-            </span>
-          )}
         </div>
         <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
           {/* Year Filter */}
@@ -475,16 +443,6 @@ export default function Analytics() {
               ))}
             </select>
           </div>
-          {!isTestData && (
-            <Button
-              onClick={loadTestData}
-              variant="outline"
-              className="gap-2 self-start md:self-auto"
-            >
-              <RefreshCw className="w-4 h-4" />
-              Load Test Data
-            </Button>
-          )}
         </div>
       </div>
 
