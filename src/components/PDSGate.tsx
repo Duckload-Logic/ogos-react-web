@@ -3,6 +3,9 @@ import { useEffect, useState } from "react";
 import { useAuth } from "@/context";
 import { checkStudentOnboardingStatus } from "@/features/iir/services/service";
 import { AlertTriangle } from "lucide-react";
+import { useMe } from "@/features/users/hooks/useMe";
+import { useIIRForm } from "@/features/iir/hooks";
+import { useIIRStatus } from "@/features/iir/hooks";
 
 interface PDSGateProps {
   children: React.ReactNode;
@@ -19,29 +22,8 @@ export const PDSGate = ({
   children,
   allowOnGuidancePage = false,
 }: PDSGateProps) => {
-  const { user } = useAuth();
-  const [pdsCompleted, setPdsCompleted] = useState<boolean | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    const checkPDSStatus = async () => {
-      try {
-        if (!user?.id) {
-          setIsLoading(false);
-          return;
-        }
-        const completed = await checkStudentOnboardingStatus(user.id);
-        setPdsCompleted(completed);
-      } catch (err) {
-        console.error("Error checking PDS status:", err);
-        setPdsCompleted(false);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    checkPDSStatus();
-  }, [user?.id]);
+  const { data: me } = useMe();
+  const { data: iirRecord, isLoading } = useIIRStatus(me?.id || 0);
 
   if (isLoading) {
     return (
@@ -55,7 +37,7 @@ export const PDSGate = ({
   }
 
   // If PDS is not completed and this is not the form page
-  if (!pdsCompleted && !allowOnGuidancePage) {
+  if (!iirRecord?.isSubmitted && !allowOnGuidancePage) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center p-4">
         <div className="bg-white rounded-lg shadow-lg max-w-md w-full p-8">
