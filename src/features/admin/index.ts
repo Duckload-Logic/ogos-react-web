@@ -1,7 +1,7 @@
 /**
  * Admin Feature - Public API
  * Multi-subdomain admin feature organized by domain:
- * dashboard, appointments, students, excuse-slips, reports
+ * dashboard, appointments, students, slips, reports
  */
 
 // Subdomains
@@ -12,7 +12,7 @@ export * from "./appointments";
 // @ts-expect-error
 export * from "./students";
 // @ts-expect-error
-export * from "./excuse-slips";
+export * from "./slips";
 // @ts-expect-error
 export * from "./reports";
 
