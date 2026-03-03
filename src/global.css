@@ -292,7 +292,6 @@
     /* This ensures the field behaves like a number input */
     appearance: textfield;
     -moz-appearance: textfield;
-    background-color: transparent !important;
   }
 
   /* For Chrome, Safari, Edge, and Opera */

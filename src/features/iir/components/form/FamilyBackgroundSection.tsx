@@ -162,7 +162,7 @@ export const FamilyBackgroundSection = forwardRef<
             II. Living Situation
           </h3>
           <div className="space-y-6">
-            <div className="p-4 bg-muted rounded-lg border border-border">
+            <div className="p-4 bg-background dark:bg-muted rounded-lg border border-border">
               <p className="font-medium text-foreground mb-3">
                 Do you have a quiet place to study at home?
               </p>
@@ -180,7 +180,7 @@ export const FamilyBackgroundSection = forwardRef<
               />
             </div>
 
-            <div className="p-4 bg-muted rounded-lg border border-border">
+            <div className="p-4 bg-background dark:bg-muted rounded-lg border border-border">
               <p className="font-medium text-foreground mb-3">
                 Do you share your room with anyone?
               </p>
@@ -210,7 +210,7 @@ export const FamilyBackgroundSection = forwardRef<
               )}
             </div>
 
-            <div className="p-4 bg-muted rounded-lg border border-border">
+            <div className="p-4 bg-background dark:bg-muted rounded-lg border border-border">
               <h4 className="font-semibold text-foreground mb-4">
                 Nature of Residence
               </h4>
@@ -331,7 +331,7 @@ export const FamilyBackgroundSection = forwardRef<
             III. Family Members Information
           </h3>
 
-          <div className="p-4 bg-muted rounded-lg border border-border">
+          <div className="p-4 bg-background dark:bg-muted rounded-lg border border-border">
             {/* Father Sub-section */}
             <div className="mb-6">
             <h4 className="font-semibold text-foreground mb-4">Father</h4>
