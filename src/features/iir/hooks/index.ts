@@ -1,4 +1,4 @@
-export { useStudentOnboardingStatus } from "./useIIRStatus";
+export { useIIRStatus } from "./useIIRStatus";
 export {
   useCourses,
   useGenders,

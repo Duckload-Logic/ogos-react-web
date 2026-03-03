@@ -78,18 +78,13 @@ const NAV_CONFIG: Record<string, NavItem[]>[] = [
     student: [
       { label: "Home", href: "/student/home", icon: <Home size={ICON_SIZE} /> },
       {
-        label: "Schedule Appointment",
+        label: "Appointments",
         href: "/student/appointments",
         icon: <Timer size={ICON_SIZE} />,
       },
       {
-        label: "View Schedules",
-        href: "/student/schedules",
-        icon: <Calendar size={ICON_SIZE} />,
-      },
-      {
-        label: "Excuse Slip",
-        href: "/student/excuse-slip",
+        label: "Admission Slips",
+        href: "/student/slips",
         icon: <FileText size={ICON_SIZE} />,
       },
     ],
