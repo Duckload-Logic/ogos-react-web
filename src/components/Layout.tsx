@@ -12,6 +12,7 @@ import {
   Sun,
   Timer,
   Bell,
+  TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/context";
 import PUPLogo from "@/assets/images/PUPLogo.png";
@@ -65,6 +66,11 @@ const NAV_CONFIG: Record<string, NavItem[]>[] = [
         label: "Reports",
         href: "/admin/reports",
         icon: <BarChart3 size={ICON_SIZE} />,
+      },
+      {
+        label: "Analytics",
+        href: "/admin/analytics",
+        icon: <TrendingUp size={ICON_SIZE} />,
       },
     ],
   },
