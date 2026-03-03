@@ -28,7 +28,7 @@ export default function DropdownField({
 
   const getLabel = (option: any) => {
     if (!option) return `Select ${label}`;
-    return option.code || option.name || option.text || "";
+    return option.code || option.name || option.text || option || "";
   };
 
   useEffect(() => {
