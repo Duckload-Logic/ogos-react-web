@@ -98,6 +98,9 @@ export const authService = {
   async logout(): Promise<void> {
     try {
       await apiClient.post("/auth/logout");
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("sidebarHovered");
     } finally {
       // Always clear tokens even if API call fails
       tokenManager.clearTokens();
