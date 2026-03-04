@@ -214,11 +214,11 @@ export const EducationBackgroundSection = forwardRef<
                           className={`
                             w-full px-3 py-2 border rounded-md bg-white dark:!bg-neutral-800 text-sm
                             appearance-none cursor-pointer transition-all duration-200
-                            focus:outline-none focus:ring-2 focus:ring-offset-0 text-foreground
+                            focus:outline-none focus:ring-2 focus:ring-offset-0 text-muted-foreground dark:text-muted-foreground
                             ${
                               school.schoolType
-                                ? "border-green-500 text-foreground font-medium hover:border-green-600 focus:border-green-500 focus:ring-green-500/20"
-                                : "border-red-500 text-foreground hover:border-red-600 focus:border-red-500 focus:ring-red-500/20"
+                                ? "border-green-500 text-muted-foreground dark:text-muted-foreground font-medium hover:border-green-600 focus:border-green-500 focus:ring-green-500/20"
+                                : "border-red-500 text-muted-foreground dark:text-muted-foreground hover:border-red-600 focus:border-red-500 focus:ring-red-500/20"
                             }
                           `}
                         >
