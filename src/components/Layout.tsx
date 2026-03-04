@@ -58,8 +58,8 @@ const NAV_CONFIG: Record<string, NavItem[]>[] = [
         icon: <Calendar size={ICON_SIZE} />,
       },
       {
-        label: "Review Excuses",
-        href: "/admin/review-excuses",
+        label: "Admission Slips",
+        href: "/admin/admission-slips",
         icon: <FileText size={ICON_SIZE} />,
       },
       {

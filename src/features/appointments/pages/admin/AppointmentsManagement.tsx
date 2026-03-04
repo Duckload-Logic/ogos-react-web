@@ -14,7 +14,6 @@ import { useStatuses } from "../../hooks/useLookups";
 import { STATUS_COLORS } from "@/config/constants";
 import { Card, CardContent } from "@/components/ui/card";
 import { useDebounce } from "@/hooks/useDebounce";
-import { toast } from "@/components/ui/use-toast";
 import { toISODateString } from "../../utils";
 
 export default function AppointmentsManagement() {
@@ -118,11 +117,6 @@ export default function AppointmentsManagement() {
   ): Promise<boolean> => {
     const statusId = getStatusIdByAction(action);
     if (!statusId) {
-      toast({
-        title: "Error",
-        description: "Target status not found",
-        variant: "destructive",
-      });
       return false;
     }
 

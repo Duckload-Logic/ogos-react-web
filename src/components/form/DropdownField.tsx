@@ -27,8 +27,6 @@ export default function DropdownField({
   const selectedOption = options.find((opt) => opt.id == value);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const [showTooltip, setShowTooltip] = useState(false);
-  const tooltipRef = useRef<HTMLDivElement>(null);
   const isFilled = selectedOption !== undefined;
 
   const getLabel = (option: any) => {
@@ -146,28 +144,7 @@ export default function DropdownField({
         )}
       </div>
       {error && <p className="text-xs text-red-500">{error}</p>}
-      {showTooltip && !enabled && lockedReason && (
-        <div
-          ref={tooltipRef}
-          className="absolute z-50 px-3 py-2 text-xs bg-card text-foreground rounded-md whitespace-nowrap shadow-lg border border-border"
-          style={{
-            bottom: "100%",
-            left: "50%",
-            transform: "translateX(-50%)",
-            marginBottom: "8px",
-          }}
-        >
-          {lockedReason}
-          <div
-            className="absolute w-2 h-2 bg-card border-r border-b border-border transform rotate-45"
-            style={{
-              bottom: "-4px",
-              left: "50%",
-              marginLeft: "-4px",
-            }}
-          />
-        </div>
-      )}
+      {/* tooltip removed: showTooltip/tooltipRef were unused */}
     </div>
   );
 }
