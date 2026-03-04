@@ -1,21 +1,12 @@
 import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useDebounce } from "@/hooks/useDebounce";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ArrowLeft, Calendar, CircleChevronLeft } from "lucide-react";
-import { useSlipLogs, useGetSlipStatuses, useGetSlipStats } from "../../hooks";
+import { Calendar, CircleChevronLeft } from "lucide-react";
+import { useSlipLogs, useGetSlipStats } from "../../hooks";
 import type { Slip, SlipStats } from "../../types/slip";
 import { SlipViewModal, SlipsList } from "../../components";
-import { toast } from "@/components/ui/use-toast";
 import { STATUS_COLORS } from "@/config/constants";
 import {
   getMonthsList,

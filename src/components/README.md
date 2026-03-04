@@ -15,9 +15,10 @@ The `ui/` subdirectory contains a comprehensive library of accessible, reusable 
 - Layout components (Card, Sheet, Dialog, Drawer, etc.)
 - Navigation (Tabs, Breadcrumb, Pagination, Sidebar, etc.)
 - Display (Badge, Avatar, Skeleton, Progress, etc.)
-- Specialized (Calendar, Carousel, OTP Input, Toast, etc.)
+- Specialized (Calendar, Carousel, OTP Input, etc.)
 
 These components are:
+
 - Built with Radix UI for accessibility
 - Styled with TailwindCSS
 - Fully typed with TypeScript
@@ -26,12 +27,14 @@ These components are:
 ## Usage
 
 Import directly from `ui/`:
+
 ```tsx
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 ```
 
 Or use the `cn()` utility for conditional styling:
+
 ```tsx
 import { cn } from "@/lib/utils";
 
