@@ -1,4 +1,4 @@
-import { ChevronDownIcon, ChevronUpIcon } from "lucide-react";
+import { ChevronDownIcon, ChevronUpIcon, Check, Lock } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export default function DropdownField({
@@ -11,6 +11,7 @@ export default function DropdownField({
   enabled = true,
   get = "id",
   loading = false,
+  lockedReason = "Locked",
 }: {
   label: string;
   options: any[];
@@ -21,10 +22,14 @@ export default function DropdownField({
   enabled?: boolean;
   get?: string;
   loading?: boolean;
+  lockedReason?: string;
 }) {
   const selectedOption = options.find((opt) => opt.id == value);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+  const isFilled = selectedOption !== undefined;
 
   const getLabel = (option: any) => {
     if (!option) return `Select ${label}`;
@@ -64,8 +69,8 @@ export default function DropdownField({
   };
 
   return (
-    <div className="space-y-2">
-      <div className={`text-sm font-medium text-card-foreground`}>
+    <div className="space-y-2 relative">
+      <div className={`text-sm font-medium text-foreground`}>
         <span className="truncate">{label}</span>
 
         {/* The asterisk stays fixed to the right of the truncated text */}
@@ -75,25 +80,41 @@ export default function DropdownField({
         <div className="w-full">
           <button
             disabled={!enabled || loading}
-            className={`flex w-full items-center justify-between px-3 py-2 h-10 bg-muted hover:bg-muted-foreground/30 text-left font-normal border rounded-md disabled:opacity-50 disabled:pointer-events-none ${
-              error ? "border-red-500" : "border-input"
+            className={`flex w-full items-center justify-between px-3 py-2 h-10 text-left font-normal border rounded-md focus:ring-2 focus:ring-offset-0 outline-none transition-colors duration-200 text-foreground ${
+              !enabled || loading
+                ? 'bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none'
+                : isFilled
+                  ? 'bg-white dark:bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                  : 'bg-white dark:bg-neutral-800 border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
+            } ${
+              error ? "border-red-500" : ""
             }`}
             onClick={toggleDropdown}
           >
             <span
               className={`truncate ${
-                selectedOption ? "text-foreground" : "text-muted-foreground"
+                selectedOption ? "text-foreground font-medium" : "text-muted-foreground italic"
               }`}
             >
               {getLabel(selectedOption)}
             </span>
-            <ChevronDownIcon
-              className={`ml-2 size-4 opacity-50 ${isOpen ? "transition-transform rotate-180 duration-300" : "rotate-0 transition-transform duration-300"}`}
-            />
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {!enabled && (
+                <Lock size={16} className="text-muted-foreground" strokeWidth={2} />
+              )}
+              {enabled && isFilled && !error && (
+                <Check size={16} className="text-green-500" strokeWidth={2.5} />
+              )}
+              {enabled && (
+                <ChevronDownIcon
+                  className={`ml-2 size-4 opacity-50 ${isOpen ? "transition-transform rotate-180 duration-300" : "rotate-0 transition-transform duration-300"}`}
+                />
+              )}
+            </div>
           </button>
         </div>
         {isOpen && (
-          <div className="w-full min-w-[200px] max-h-[200px] overflow-y-auto absolute mt-1 bg-popover border border-border rounded-md shadow-lg z-50 p-2">
+          <div className="w-full min-w-[200px] max-h-[200px] overflow-y-auto absolute mt-1 bg-white dark:bg-neutral-800 border border-border rounded-md shadow-lg z-50 p-2">
             {options.length === 0 ? (
               <div className="px-2 py-1.5 text-sm text-muted-foreground">
                 No options available
@@ -125,6 +146,28 @@ export default function DropdownField({
         )}
       </div>
       {error && <p className="text-xs text-red-500">{error}</p>}
+      {showTooltip && !enabled && lockedReason && (
+        <div
+          ref={tooltipRef}
+          className="absolute z-50 px-3 py-2 text-xs bg-card text-foreground rounded-md whitespace-nowrap shadow-lg border border-border"
+          style={{
+            bottom: "100%",
+            left: "50%",
+            transform: "translateX(-50%)",
+            marginBottom: "8px",
+          }}
+        >
+          {lockedReason}
+          <div
+            className="absolute w-2 h-2 bg-card border-r border-b border-border transform rotate-45"
+            style={{
+              bottom: "-4px",
+              left: "50%",
+              marginLeft: "-4px",
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }

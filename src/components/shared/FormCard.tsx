@@ -28,7 +28,7 @@ export const FormCard: React.FC<FormCardProps> = ({
       {children}
     </CardContent>
     {footer && (
-      <div className="px-6 py-4 border-t bg-gray-50">
+      <div className="px-6 py-4 border-t border-border bg-muted">
         {footer}
       </div>
     )}

@@ -1,12 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
-import { Plus, Trash2 } from "lucide-react";
-import { InputField, Checkbox } from "@/components/form";
-import { SectionContainer } from "./SectionContainer";
-import { HealthAreaSection } from "./HealthAreaSection";
 
 interface FormErrors {
   [key: string]: string;
@@ -55,180 +48,265 @@ export const HealthInformationSection = forwardRef<
     onChange(fieldPath, value);
     clearError(fieldPath);
   };
+
+  const handleConsultationChange = (
+    professionalType: string,
+    field: "consulted" | "whenDate" | "forWhat",
+    value: any
+  ) => {
+    const consultations = Array.isArray(health?.consultations)
+      ? [...health.consultations]
+      : [];
+
+    const existingIndex = consultations.findIndex(
+      (c: any) => c.professionalType === professionalType
+    );
+
+    if (existingIndex >= 0) {
+      // Update existing consultation
+      consultations[existingIndex] = {
+        ...consultations[existingIndex],
+        [field === "consulted" ? "hasConsulted" : field]: value,
+      };
+    } else if (
+      value !== false &&
+      value !== "" &&
+      (field === "consulted" || field === "whenDate" || field === "forWhat")
+    ) {
+      // Create new consultation only if setting to true or non-empty string
+      consultations.push({
+        professionalType,
+        hasConsulted: field === "consulted" ? value : false,
+        whenDate: field === "whenDate" ? value : null,
+        forWhat: field === "forWhat" ? value : null,
+      });
+    } else if (existingIndex >= 0 && value === false) {
+      // If setting consulted to false, we might want to keep the record
+      consultations[existingIndex] = {
+        ...consultations[existingIndex],
+        hasConsulted: false,
+      };
+    }
+
+    onChange("health.consultations", consultations);
+  };
+
+  // Array of physical health items for A. Physical
+  const physicalItems = [
+    {
+      label: "Your Vision",
+      yesKey: "health.healthRecord.visionHasProblem",
+      detailsKey: "health.healthRecord.visionDetails",
+      yesValue: health?.healthRecord?.visionHasProblem,
+      detailsValue: health?.healthRecord?.visionDetails || "",
+    },
+    {
+      label: "Your Hearing",
+      yesKey: "health.healthRecord.hearingHasProblem",
+      detailsKey: "health.healthRecord.hearingDetails",
+      yesValue: health?.healthRecord?.hearingHasProblem,
+      detailsValue: health?.healthRecord?.hearingDetails || "",
+    },
+    {
+      label: "Your Speech",
+      yesKey: "health.healthRecord.speechHasProblem",
+      detailsKey: "health.healthRecord.speechDetails",
+      yesValue: health?.healthRecord?.speechHasProblem,
+      detailsValue: health?.healthRecord?.speechDetails || "",
+    },
+    {
+      label: "Your General Health",
+      yesKey: "health.healthRecord.generalHealthHasProblem",
+      detailsKey: "health.healthRecord.generalHealthDetails",
+      yesValue: health?.healthRecord?.generalHealthHasProblem,
+      detailsValue: health?.healthRecord?.generalHealthDetails || "",
+    },
+  ];
+
+  // Array of psychological consultation types
+  const professionalTypes = ["Psychiatrist", "Psychologist", "Counselor"];
+  
+  const consultationTypes = professionalTypes.map((type) => {
+    const consultation = Array.isArray(health?.consultations)
+      ? health.consultations.find((c: any) => c.professionalType === type)
+      : null;
+    
+    return {
+      label: type,
+      type: type,
+      consulted: consultation?.hasConsulted,
+      when: consultation?.whenDate || "",
+      forWhat: consultation?.forWhat || "",
+    };
+  });
+
   return (
-    <div className="space-y-6">
-      <SectionContainer title="A. Health Status">
-        <div className="space-y-6">
-          <HealthAreaSection
-            title="Vision"
-            fieldPrefix="health.healthRecord.vision"
-            hasData={health?.healthRecord?.visionHasProblem || false}
-            details={health?.healthRecord?.visionDetails || ""}
-            onChange={handleInputChange}
-          />
-          <HealthAreaSection
-            title="Hearing"
-            fieldPrefix="health.healthRecord.hearing"
-            hasData={health?.healthRecord?.hearingHasProblem || false}
-            details={health?.healthRecord?.hearingDetails || ""}
-            onChange={handleInputChange}
-          />
-          <HealthAreaSection
-            title="Speech"
-            fieldPrefix="health.healthRecord.speech"
-            hasData={health?.healthRecord?.speechHasProblem || false}
-            details={health?.healthRecord?.speechDetails || ""}
-            onChange={handleInputChange}
-          />
-          <HealthAreaSection
-            title="General Health"
-            fieldPrefix="health.healthRecord.generalHealth"
-            hasData={health?.healthRecord?.generalHealthHasProblem || false}
-            details={health?.healthRecord?.generalHealthDetails || ""}
-            onChange={handleInputChange}
-          />
-        </div>
-      </SectionContainer>
+    <Card className="bg-card border border-border">
+      <CardContent className="pt-6">
+        {/* A. Physical */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-card-foreground mb-2">
+            A. Physical
+          </h3>
+          <p className="text-sm text-foreground mb-6">
+            Do you have problems with: (Please Check)
+          </p>
 
-      <SectionContainer title="B. Professional Consultations">
-        <div className="space-y-3">
-          {health?.consultations?.map((consultation: any, idx: number) => (
-            <Card
-              key={idx}
-              className="border-l-4 border-l-primary hover:shadow-md transition-shadow"
-            >
-              <CardContent className="pt-6 space-y-4">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Professional Type Dropdown */}
-                  <div className="space-y-2">
-                    <Label
-                      htmlFor={`prof-type-${idx}`}
-                      className="text-sm font-medium"
-                    >
-                      Professional Type <span className="text-red-500">*</span>
-                    </Label>
-                    <select
-                      id={`prof-type-${idx}`}
-                      value={consultation.professionalType || ""}
-                      onChange={(e) =>
-                        handleInputChange(
-                          `health.consultations.${idx}.professionalType`,
-                          e.target.value,
-                        )
-                      }
-                      className="w-full px-3 py-2 border border-gray-300 rounded-md bg-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                    >
-                      <option value="">Select Professional Type</option>
-                      <option value="Counselor">Counselor</option>
-                      <option value="Psychologist">Psychologist</option>
-                      <option value="Psychiatrist">Psychiatrist</option>
-                    </select>
-                  </div>
-
-                  {/* Date Field */}
-                  <InputField
-                    label="Date of Consultation"
-                    type="date"
-                    value={consultation.whenDate || ""}
-                    onChange={(val) =>
-                      handleInputChange(
-                        `health.consultations.${idx}.whenDate`,
-                        val,
-                      )
-                    }
-                  />
-
-                  {/* Consulted Checkbox */}
-                  <div className="flex items-end">
-                    <div className="flex items-center gap-2 h-10">
-                      <Checkbox
-                        id={`consulted-${idx}`}
-                        label="Has Consulted"
-                        name="hasConsulted"
-                        checked={consultation.hasConsulted || false}
-                        onCheckedChange={(checked: boolean | "indeterminate") =>
-                          handleInputChange(
-                            `health.consultations.${idx}.hasConsulted`,
-                            checked === true,
-                          )
-                        }
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b-2 border-border">
+                  <th className="text-left text-sm font-medium text-card-foreground py-2 px-3 min-w-24">Item</th>
+                  <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">YES</th>
+                  <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">NO</th>
+                  <th className="text-left text-sm font-medium text-card-foreground py-2 px-3">If Yes, please specify</th>
+                </tr>
+              </thead>
+              <tbody>
+                  {physicalItems.map((item, idx) => (
+                  <tr key={idx} className="border-b border-border">
+                    <td className="py-2 px-3 text-sm text-foreground">{item.label}</td>
+                    <td className="py-2 px-3 text-center">
+                      <input
+                        type="radio"
+                        name={`physical-${idx}`}
+                        value="yes"
+                        checked={item.yesValue === true}
+                        onChange={() => handleInputChange(item.yesKey, true)}
+                        className="w-4 h-4 cursor-pointer accent-red-600"
                       />
-                      <Label
-                        htmlFor={`consulted-${idx}`}
-                        className="text-sm cursor-pointer"
-                      >
-                        Consulted
-                      </Label>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Reason Field */}
-                <div className="space-y-2">
-                  <Label
-                    htmlFor={`reason-${idx}`}
-                    className="text-sm font-medium"
-                  >
-                    Reason for Consultation
-                  </Label>
-                  <Textarea
-                    id={`reason-${idx}`}
-                    value={consultation.forWhat || ""}
-                    onChange={(e) =>
-                      handleInputChange(
-                        `health.consultations.${idx}.forWhat`,
-                        e.target.value,
-                      )
-                    }
-                    placeholder="Describe the reason for consultation..."
-                    className="min-h-20 text-sm"
-                  />
-                </div>
-
-                {/* Remove Button */}
-                <div className="flex justify-end pt-2">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    className="text-red-600 hover:bg-red-50 hover:text-red-700"
-                    onClick={() => {
-                      const updated = health.consultations.filter(
-                        (_: any, i: number) => i !== idx,
-                      );
-                      handleInputChange("health.consultations", updated);
-                    }}
-                  >
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Remove Consultation
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-
-          {/* Add Consultation Button */}
-          <div>
-            <Button
-              variant="outline"
-              className="w-full border-primary text-primary hover:bg-primary hover:text-white transition-colors"
-              onClick={() =>
-                handleInputChange("health.consultations", [
-                  ...(health?.consultations || []),
-                  {
-                    professionalType: "",
-                    hasConsulted: false,
-                    whenDate: "",
-                    forWhat: "",
-                  },
-                ])
-              }
-            >
-              <Plus className="h-4 w-4 mr-2" />
-              Add Consultation Record
-            </Button>
+                    </td>
+                    <td className="py-2 px-3 text-center">
+                      <input
+                        type="radio"
+                        name={`physical-${idx}`}
+                        value="no"
+                        checked={item.yesValue === false}
+                        onChange={() => handleInputChange(item.yesKey, false)}
+                        className="w-4 h-4 cursor-pointer accent-red-600"
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="text"
+                        placeholder="Specify"
+                        disabled={item.yesValue !== true}
+                        value={item.yesValue === true ? item.detailsValue : ""}
+                        onChange={(e) =>
+                          handleInputChange(item.detailsKey, e.target.value)
+                        }
+                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
+                          item.yesValue === true
+                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
+                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
+                        }`}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
         </div>
-      </SectionContainer>
-    </div>
+
+        {/* Divider */}
+        <div className="border-t border-border my-8"></div>
+
+        {/* B. Psychological */}
+        <div className="mb-8">
+          <h3 className="text-lg font-semibold text-card-foreground mb-2">
+            B. Psychological
+          </h3>
+          <p className="text-sm text-foreground mb-6">
+            Previous Consultations
+          </p>
+
+          <div className="overflow-x-auto">
+            <table className="w-full border-collapse">
+              <thead>
+                <tr className="border-b-2 border-border">
+                  <th className="text-left text-sm font-medium text-card-foreground py-2 px-3">Consulted</th>
+                  <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">YES</th>
+                  <th className="text-center text-sm font-medium text-card-foreground py-2 px-3 w-16">NO</th>
+                  <th className="text-left text-sm font-medium text-card-foreground py-2 px-3">When</th>
+                  <th className="text-left text-sm font-medium text-card-foreground py-2 px-3">If Yes, please specify</th>
+                </tr>
+              </thead>
+              <tbody>
+                {consultationTypes.map((type, idx) => (
+                  <tr key={idx} className="border-b border-border">
+                    <td className="py-2 px-3 text-sm text-foreground">{type.label}</td>
+                    <td className="py-2 px-3 text-center">
+                      <input
+                        type="radio"
+                        name={`consultation-${idx}`}
+                        value="yes"
+                        checked={type.consulted === true}
+                        onChange={() =>
+                          handleConsultationChange(type.type, "consulted", true)
+                        }
+                        className="w-4 h-4 cursor-pointer accent-red-600"
+                      />
+                    </td>
+                    <td className="py-2 px-3 text-center">
+                      <input
+                        type="radio"
+                        name={`consultation-${idx}`}
+                        value="no"
+                        checked={type.consulted === false}
+                        onChange={() =>
+                          handleConsultationChange(type.type, "consulted", false)
+                        }
+                        className="w-4 h-4 cursor-pointer accent-red-600"
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="text"
+                        placeholder="Date/When"
+                        disabled={type.consulted !== true}
+                        value={type.when}
+                        onChange={(e) =>
+                          handleConsultationChange(
+                            type.type,
+                            "whenDate",
+                            e.target.value
+                          )
+                        }
+                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
+                          type.consulted === true
+                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
+                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
+                        }`}
+                      />
+                    </td>
+                    <td className="py-2 px-3">
+                      <input
+                        type="text"
+                        placeholder="Specify"
+                        disabled={type.consulted !== true}
+                        value={type.consulted === true ? type.forWhat : ""}
+                        onChange={(e) =>
+                          handleConsultationChange(
+                            type.type,
+                            "forWhat",
+                            e.target.value
+                          )
+                        }
+                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
+                          type.consulted === true
+                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
+                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
+                        }`}
+                      />
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 });

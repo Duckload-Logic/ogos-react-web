@@ -90,7 +90,6 @@ export const routes: RouteObject[] = [
       <ProtectedRoute requiredRole="student">
         <Layout title="Individual Inventory Record">
           <IIRForm />
-          <IIRForm />
         </Layout>
       </ProtectedRoute>
     ),

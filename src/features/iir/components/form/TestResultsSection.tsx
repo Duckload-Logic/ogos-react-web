@@ -1,8 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Plus, Trash2 } from "lucide-react";
-import { InputField } from "@/components/form";
+import { Check } from "lucide-react";
 
 interface FormErrors {
   [key: string]: string;
@@ -15,7 +12,7 @@ interface TestResultsSectionRef {
 export const TestResultsSection = forwardRef<
   TestResultsSectionRef,
   {
-    testResults: any[];
+    testResults: any;
     onChange: (path: string, value: any) => void;
   }
 >(function TestResultsSection({ testResults, onChange }, ref) {
@@ -47,91 +44,154 @@ export const TestResultsSection = forwardRef<
     onChange(fieldPath, value);
     clearError(fieldPath);
   };
-  return (
-    <div className="space-y-4">
-      {testResults?.map((test: any, idx: number) => (
-        <Card key={idx} className="bg-gray-50 border-l-4 border-l-indigo-500">
-          <CardContent className="pt-6 space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <InputField
-                label="Test Name"
-                value={test.testName || ""}
-                onChange={(val) =>
-                  handleInputChange(`testResults.${idx}.testName`, val)
-                }
-                placeholder="e.g., SAT, ACE"
-              />
-              <InputField
-                label="Test Date"
-                type="date"
-                value={test.testDate || ""}
-                onChange={(val) =>
-                  handleInputChange(`testResults.${idx}.testDate`, val)
-                }
-              />
-              <InputField
-                label="Raw Score"
-                value={test.rawScore || ""}
-                onChange={(val) =>
-                  handleInputChange(`testResults.${idx}.rawScore`, val)
-                }
-                placeholder="Score"
-              />
-              <InputField
-                label="Percentile"
-                value={test.percentile || ""}
-                onChange={(val) =>
-                  handleInputChange(`testResults.${idx}.percentile`, val)
-                }
-                placeholder="Percentile"
-              />
-              <InputField
-                label="Description"
-                isTextarea
-                value={test.description || ""}
-                onChange={(val) =>
-                  handleInputChange(`testResults.${idx}.description`, val)
-                }
-                placeholder="Test description or notes"
-              />
-            </div>
 
-            <Button
-              variant="ghost"
-              size="sm"
-              className="text-red-600 hover:bg-red-50"
-              onClick={() => {
-                const updated = testResults.filter(
-                  (_: any, i: number) => i !== idx,
-                );
-                handleInputChange("testResults", updated);
-              }}
-            >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Remove
-            </Button>
-          </CardContent>
-        </Card>
-      ))}
-      <Button
-        variant="outline"
-        className="w-full"
-        onClick={() =>
-          handleInputChange("testResults", [
-            ...(testResults || []),
-            {
-              testDate: "",
-              testName: "",
-              rawScore: "",
-              percentile: "",
-              description: "",
-            },
-          ])
-        }
-      >
-        <Plus className="h-4 w-4 mr-2" />
-        Add Test Result
-      </Button>
+  // Pre-populate exactly 3 empty rows
+  const preparedRows = (testResults || []).length > 0 
+    ? testResults 
+    : [{}, {}, {}];
+
+  return (
+    <div className="overflow-x-auto">
+      <table className="w-full border-collapse border border-black dark:border-foreground">
+        {/* Header Row */}
+        <thead>
+          <tr>
+            <th className="w-32 border border-black dark:border-foreground bg-gray-300 dark:bg-gray-700 px-3 py-2 text-left text-xs font-bold text-black dark:text-white uppercase">
+              DATE
+            </th>
+            <th className="w-48 border border-black dark:border-foreground bg-gray-300 dark:bg-gray-700 px-3 py-2 text-left text-xs font-bold text-black dark:text-white uppercase">
+              NAME OF TEST
+            </th>
+            <th className="w-16 border border-black dark:border-foreground bg-gray-300 dark:bg-gray-700 px-3 py-2 text-left text-xs font-bold text-black dark:text-white uppercase">
+              RS
+            </th>
+            <th className="w-16 border border-black dark:border-foreground bg-gray-300 dark:bg-gray-700 px-3 py-2 text-left text-xs font-bold text-black dark:text-white uppercase">
+              PR
+            </th>
+            <th className="flex-1 border border-black dark:border-foreground bg-gray-300 dark:bg-gray-700 px-3 py-2 text-left text-xs font-bold text-black dark:text-white uppercase">
+              DESCRIPTION
+            </th>
+          </tr>
+        </thead>
+
+        {/* Data Rows */}
+        <tbody>
+          {preparedRows.map((row: any, idx: number) => (
+            <tr key={idx}>
+              {/* Date Cell */}
+              <td className="border border-black dark:border-foreground p-0 h-12">
+                <div className="relative h-full">
+                  <input
+                    type="date"
+                    value={row?.date || ""}
+                    onChange={(e) =>
+                      handleInputChange(`testResults.${idx}.date`, e.target.value)
+                    }
+                    className="w-full h-full px-2 py-1 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+                  />
+                  {row?.date && (
+                    <Check
+                      size={14}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-teal-600 dark:text-teal-400 pointer-events-none"
+                      strokeWidth={3}
+                    />
+                  )}
+                </div>
+              </td>
+
+              {/* Name of Test Cell */}
+              <td className="border border-black dark:border-foreground p-0 h-12">
+                <div className="relative h-full">
+                  <input
+                    type="text"
+                    value={row?.nameOfTest || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        `testResults.${idx}.nameOfTest`,
+                        e.target.value
+                      )
+                    }
+                    className="w-full h-full px-2 py-1 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+                  />
+                  {row?.nameOfTest && (
+                    <Check
+                      size={14}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-teal-600 dark:text-teal-400 pointer-events-none"
+                      strokeWidth={3}
+                    />
+                  )}
+                </div>
+              </td>
+
+              {/* RS Cell */}
+              <td className="border border-black dark:border-foreground p-0 h-12">
+                <div className="relative h-full">
+                  <input
+                    type="number"
+                    value={row?.rs ?? ""}
+                    onChange={(e) =>
+                      handleInputChange(`testResults.${idx}.rs`, e.target.value)
+                    }
+                    className="w-full h-full px-2 py-1 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+                  />
+                  {row?.rs !== undefined && row?.rs !== "" && (
+                    <Check
+                      size={14}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-teal-600 dark:text-teal-400 pointer-events-none"
+                      strokeWidth={3}
+                    />
+                  )}
+                </div>
+              </td>
+
+              {/* PR Cell */}
+              <td className="border border-black dark:border-foreground p-0 h-12">
+                <div className="relative h-full">
+                  <input
+                    type="number"
+                    value={row?.pr ?? ""}
+                    onChange={(e) =>
+                      handleInputChange(`testResults.${idx}.pr`, e.target.value)
+                    }
+                    className="w-full h-full px-2 py-1 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+                  />
+                  {row?.pr !== undefined && row?.pr !== "" && (
+                    <Check
+                      size={14}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-teal-600 dark:text-teal-400 pointer-events-none"
+                      strokeWidth={3}
+                    />
+                  )}
+                </div>
+              </td>
+
+              {/* Description Cell */}
+              <td className="border border-black dark:border-foreground p-0 h-12">
+                <div className="relative h-full">
+                  <input
+                    type="text"
+                    value={row?.description || ""}
+                    onChange={(e) =>
+                      handleInputChange(
+                        `testResults.${idx}.description`,
+                        e.target.value
+                      )
+                    }
+                    className="w-full h-full px-2 py-1 bg-transparent text-sm focus:outline-none focus:ring-2 focus:ring-blue-400 dark:focus:ring-blue-500"
+                  />
+                  {row?.description && (
+                    <Check
+                      size={14}
+                      className="absolute right-2 top-1/2 transform -translate-y-1/2 text-teal-600 dark:text-teal-400 pointer-events-none"
+                      strokeWidth={3}
+                    />
+                  )}
+                </div>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </div>
   );
 });

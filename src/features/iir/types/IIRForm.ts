@@ -142,6 +142,7 @@ export interface PersonalInfo {
   isEmployed: boolean;
   employerName: string | null;
   employerAddress: string | null;
+  employerContact: string | null;
   emergencyContact: EmergencyContact;
 }
 
