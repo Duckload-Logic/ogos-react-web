@@ -11,10 +11,8 @@ import Login from "@/features/auth/pages/Login";
 import Register from "@/features/auth/pages/Register";
 
 // Student Features
-import GuidanceServices from "@/features/students/pages/GuidanceServices";
+import { Dashboard as StudentDashboard } from "@/features/students/pages/Dashboard";
 import StudentAppointments from "@/features/appointments/pages/student/StudentAppointments";
-import AdmissionSlip from "@/features/students/pages/AdmissionSlip";
-import ViewSchedules from "@/features/students/pages/ViewSchedules";
 import { StudentSlips, SubmitSlip } from "@/features/slips/pages/student";
 
 // Admin Feature
@@ -25,10 +23,8 @@ import ReviewSlips from "@/features/slips/pages/admin/ReviewSlips";
 import SlipLogs from "@/features/slips/pages/admin/SlipLogs";
 import Reports from "@/features/admin/pages/Reports";
 import Analytics from "@/features/admin/pages/Analytics";
-import Frontdesk from "@/features/frontdesk/pages/Frontdesk";
 import IIRProfile from "@/features/iir/pages/IIRProfile";
 import IIRForm from "@/features/iir/pages/IIRForm";
-import { ErrorBoundary } from "@/components/shared";
 import { CreateAppointment } from "@/features/appointments";
 
 export const routes: RouteObject[] = [
@@ -45,7 +41,7 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute requiredRole="student">
         <Layout title="Services">
-          <GuidanceServices />
+          <StudentDashboard />
         </Layout>
       </ProtectedRoute>
     ),
@@ -59,6 +55,16 @@ export const routes: RouteObject[] = [
             <StudentAppointments />
           </Layout>
         </PDSGate>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/student/appointments/schedule",
+    element: (
+      <ProtectedRoute requiredRole="student">
+        <Layout title="Schedule Appointment">
+          <CreateAppointment />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -91,30 +97,6 @@ export const routes: RouteObject[] = [
         <Layout title="Individual Inventory Record">
           <IIRForm />
         </Layout>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/student/excuse-slip",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <PDSGate>
-          <Layout title="Excuse Slip">
-            <AdmissionSlip />
-          </Layout>
-        </PDSGate>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/student/schedules",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <PDSGate>
-          <Layout title="View Schedules">
-            <ViewSchedules />
-          </Layout>
-        </PDSGate>
       </ProtectedRoute>
     ),
   },
@@ -161,7 +143,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/admin/review-excuses",
+    path: "/admin/admission-slips",
     element: (
       <ProtectedRoute requiredRole="admin">
         <Layout title="Review Excuse Slips">
@@ -171,7 +153,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/admin/slip-logs",
+    path: "/admin/admission-slips/logs",
     element: (
       <ProtectedRoute requiredRole="admin">
         <Layout title="Admission Slip Logs">
@@ -196,34 +178,6 @@ export const routes: RouteObject[] = [
       <ProtectedRoute requiredRole="admin">
         <Layout title="Analytics">
           <Analytics />
-        </Layout>
-      </ProtectedRoute>
-    ),
-  },
-
-  // Frontdesk routes
-  {
-    path: "/frontdesk",
-    element: (
-      <ProtectedRoute requiredRole="frontdesk">
-        <Frontdesk />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/frontdesk/review-excuses",
-    element: (
-      <ProtectedRoute requiredRole="frontdesk">
-        <ReviewSlips />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/frontdesk/slip-logs",
-    element: (
-      <ProtectedRoute requiredRole="frontdesk">
-        <Layout title="Admission Slip Logs">
-          <SlipLogs />
         </Layout>
       </ProtectedRoute>
     ),
