@@ -398,7 +398,7 @@ export const PersonalInformationSection = forwardRef<
           />
 
           {studentInfo?.personalInfo?.isEmployed && (
-            <div className="bg-success-background/20 dark:bg-success-background/10 border-l-4 border-green-500 rounded-r-md p-6 mt-6">
+            <div className="bg-background dark:bg-muted border border-border rounded-md p-6 mt-6">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <InputField
                   label="Employer Name"
