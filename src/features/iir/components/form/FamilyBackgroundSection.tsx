@@ -45,6 +45,9 @@ export const FamilyBackgroundSection = forwardRef<
       sectionErrors["family.finance"] =
         "Family financial information is required";
     }
+    if (!family?.finance?.weeklyAllowance || family.finance.weeklyAllowance === "" || family.finance.weeklyAllowance === 0) {
+      sectionErrors["family.finance.weeklyAllowance"] = "Weekly allowance is required";
+    }
 
     setErrors(sectionErrors);
     return {
@@ -958,6 +961,8 @@ export const FamilyBackgroundSection = forwardRef<
               onChange={(val) =>
                 handleInputChange("family.finance.weeklyAllowance", val)
               }
+              error={errors["family.finance.weeklyAllowance"]}
+              required
             />
           </div>
         </div>
