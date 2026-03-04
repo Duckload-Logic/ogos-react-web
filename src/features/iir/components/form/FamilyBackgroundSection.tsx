@@ -921,6 +921,9 @@ export const FamilyBackgroundSection = forwardRef<
                 ))}
                 <option value="others">Others</option>
               </select>
+              {family?.finance?.monthlyFamilyIncomeRange?.id && (
+                <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
+              )}
             </div>
 
             {family?.finance?.monthlyFamilyIncomeRange?.id === "others" && (
