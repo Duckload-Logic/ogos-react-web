@@ -5,15 +5,18 @@ Core utilities, helpers, and libraries for the application. This directory conta
 ## Core Modules
 
 ### API & HTTP Client (`apiClient.ts`)
+
 Centralized HTTP client with authentication and error handling.
 
 **Features:**
+
 - Automatic auth token injection from localStorage
 - Centralized error handling
 - Consistent request/response formatting
 - Singleton instance for app-wide use
 
 **Methods:**
+
 ```typescript
 apiClient.get<T>(url, options?)
 apiClient.post<T>(url, data?, options?)
@@ -23,6 +26,7 @@ apiClient.delete<T>(url, options?)
 ```
 
 **Usage:**
+
 ```typescript
 import { apiClient } from "@/lib/apiClient";
 
@@ -36,69 +40,15 @@ const result = await apiClient.post("/auth/login", { email, password });
 try {
   await apiClient.post("/users", userData);
 } catch (error: any) {
-  console.log(error.statusCode);  // 400, 401, 500, etc.
-  console.log(error.error);       // Error message
+  console.log(error.statusCode); // 400, 401, 500, etc.
+  console.log(error.error); // Error message
 }
-```
-
-### Validation Utilities (`validation.ts`)
-Centralized field and form validation with DRY principle.
-
-**Single-field validators:**
-```typescript
-isValidEmail(email)              // RFC-compliant email
-isValidPhone(phone)              // Philippine phone format
-isValidPassword(password, min)   // Configurable length
-isValidUsername(username, min, max)  // Length constraints
-isValidDateOfBirth(date)         // Age verification (16+)
-```
-
-**Field validation:**
-```typescript
-validateField(fieldName, value)  // Auto-detect field type
-```
-
-**Batch validation:**
-```typescript
-const { isValid, errors } = validateFields(data, requiredFields);
-// Returns array of ValidationError objects
-```
-
-**Utilities:**
-```typescript
-calculateFormCompletion(formData, totalFields)  // Percentage (0-100)
-formatErrorMessage(error)  // Convert error object to string
-```
-
-**Usage Examples:**
-```typescript
-import { 
-  isValidEmail, 
-  validateFields, 
-  calculateFormCompletion 
-} from "@/lib/validation";
-
-// Single field
-if (!isValidEmail(email)) {
-  setError("Invalid email address");
-}
-
-// Batch validation
-const validation = validateFields(formData, ["email", "password", "name"]);
-if (!validation.isValid) {
-  validation.errors.forEach(err => {
-    console.log(`${err.field}: ${err.message}`);
-  });
-}
-
-// Progress tracking
-const progress = calculateFormCompletion(formData, 10);
-console.log(`${progress}% complete`);
 ```
 
 ### Utilities (`utils.ts`)
 
 #### `cn()` Function
+
 Combines `clsx` and `tailwind-merge` for intelligent Tailwind CSS class handling.
 
 ```typescript
@@ -113,6 +63,7 @@ className={cn(
 ```
 
 ### Tests (`utils.spec.ts`)
+
 Unit tests for utility functions. Run with: `npm run test`
 
 ## Best Practices
@@ -127,6 +78,7 @@ Unit tests for utility functions. Run with: `npm run test`
 6. **Named exports** - Use named exports, not default exports
 
 ### Example Utility
+
 ```typescript
 /**
  * formatDate - Formats a date to US locale string
@@ -136,18 +88,18 @@ Unit tests for utility functions. Run with: `npm run test`
  */
 export const formatDate = (
   date: Date,
-  options?: Intl.DateTimeFormatOptions
+  options?: Intl.DateTimeFormatOptions,
 ): string => {
-  return date.toLocaleDateString('en-US', options);
+  return date.toLocaleDateString("en-US", options);
 };
 
 /**
  * Test
  */
-describe('formatDate', () => {
-  it('should format date correctly', () => {
+describe("formatDate", () => {
+  it("should format date correctly", () => {
     const date = new Date(2025, 0, 1);
-    expect(formatDate(date)).toBe('1/1/2025');
+    expect(formatDate(date)).toBe("1/1/2025");
   });
 });
 ```
