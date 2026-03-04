@@ -56,8 +56,10 @@ export const PersonalInformationSection = forwardRef<
     data: provincialBarangays = [],
     isLoading: isProvincialBarangaysLoading,
   } = useBarangays(selectedProvincialCity?.id || 0);
-  const { data: residentialCities = [], isLoading: isResidentialCitiesLoading } =
-    useCities(selectedResidentialRegion?.id || 0);
+  const {
+    data: residentialCities = [],
+    isLoading: isResidentialCitiesLoading,
+  } = useCities(selectedResidentialRegion?.id || 0);
   const {
     data: residentialBarangays = [],
     isLoading: isResidentialBarangaysLoading,
@@ -65,9 +67,13 @@ export const PersonalInformationSection = forwardRef<
 
   // Clear location state when form is reset
   useEffect(() => {
-    const provincialRegionValue = (studentInfo as any)?.addresses?.["provincial"]?.address?.region;
-    const residentialRegionValue = (studentInfo as any)?.addresses?.["residential"]?.address?.region;
-    
+    const provincialRegionValue = (studentInfo as any)?.addresses?.[
+      "provincial"
+    ]?.address?.region;
+    const residentialRegionValue = (studentInfo as any)?.addresses?.[
+      "residential"
+    ]?.address?.region;
+
     // Reset state if region values are empty (form was reset)
     if (!provincialRegionValue && selectedProvincialRegion) {
       setSelectedProvincialRegion(null);
@@ -77,7 +83,10 @@ export const PersonalInformationSection = forwardRef<
       setSelectedResidentialRegion(null);
       setSelectedResidentialCity(null);
     }
-  }, [(studentInfo as any)?.addresses?.["provincial"]?.address?.region, (studentInfo as any)?.addresses?.["residential"]?.address?.region]);
+  }, [
+    (studentInfo as any)?.addresses?.["provincial"]?.address?.region,
+    (studentInfo as any)?.addresses?.["residential"]?.address?.region,
+  ]);
 
   const validate = (): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors = validateObject(
@@ -307,12 +316,16 @@ export const PersonalInformationSection = forwardRef<
 
         {/* Emergency Contact Section */}
         <div className="mt-8 pt-6 border-t border-border">
-          <h3 className="text-sm font-semibold text-foreground mb-5">Emergency Contact Information</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-5">
+            Emergency Contact Information
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Emergency Contact First Name */}
             <InputField
               label="Emergency Contact First Name"
-              value={studentInfo?.personalInfo?.emergencyContact?.firstName || ""}
+              value={
+                studentInfo?.personalInfo?.emergencyContact?.firstName || ""
+              }
               onChange={(val) =>
                 handleInputChange(
                   "student.personalInfo.emergencyContact.firstName",
@@ -326,7 +339,9 @@ export const PersonalInformationSection = forwardRef<
             {/* Emergency Contact Last Name */}
             <InputField
               label="Emergency Contact Last Name"
-              value={studentInfo?.personalInfo?.emergencyContact?.lastName || ""}
+              value={
+                studentInfo?.personalInfo?.emergencyContact?.lastName || ""
+              }
               onChange={(val) =>
                 handleInputChange(
                   "student.personalInfo.emergencyContact.lastName",
@@ -384,10 +399,7 @@ export const PersonalInformationSection = forwardRef<
             checked={studentInfo?.personalInfo?.isEmployed || false}
             onCheckedChange={(checked: boolean | "indeterminate") => {
               const isChecked = checked === true;
-              handleInputChange(
-                "student.personalInfo.isEmployed",
-                isChecked,
-              );
+              handleInputChange("student.personalInfo.isEmployed", isChecked);
             }}
             info="Check if you are currently employed or have a job. You will need to provide employer details if selected."
           />
@@ -407,7 +419,10 @@ export const PersonalInformationSection = forwardRef<
                   label="Employer Address"
                   value={studentInfo?.personalInfo?.employerAddress || ""}
                   onChange={(val) =>
-                    handleInputChange("student.personalInfo.employerAddress", val)
+                    handleInputChange(
+                      "student.personalInfo.employerAddress",
+                      val,
+                    )
                   }
                   placeholder="Company address"
                 />
@@ -416,7 +431,10 @@ export const PersonalInformationSection = forwardRef<
                   inputMode="numeric"
                   value={studentInfo?.personalInfo?.employerContact || ""}
                   onChange={(val) =>
-                    handleInputChange("student.personalInfo.employerContact", val.replace(/\D/g, ""))
+                    handleInputChange(
+                      "student.personalInfo.employerContact",
+                      val.replace(/\D/g, ""),
+                    )
                   }
                   placeholder="e.g., 09123456789"
                 />
@@ -427,13 +445,18 @@ export const PersonalInformationSection = forwardRef<
 
         {/* Residential Addresses Section */}
         <div className="mt-8 pt-6 border-t border-border">
-          <h3 className="text-sm font-semibold text-foreground mb-5">Residential Addresses</h3>
+          <h3 className="text-sm font-semibold text-foreground mb-5">
+            Residential Addresses
+          </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Provincial Region */}
             <DropdownField
               label="Region (Provincial)"
               options={regions}
-              value={(studentInfo as any)?.addresses?.["provincial"]?.address?.region || ""}
+              value={
+                (studentInfo as any)?.addresses?.["provincial"]?.address
+                  ?.region || ""
+              }
               onChange={(val) => {
                 onChange(`student.addresses.provincial.address.region`, val);
                 const selected =
@@ -448,37 +471,52 @@ export const PersonalInformationSection = forwardRef<
               label="City/Municipality (Provincial)"
               options={provincialCities || []}
               enabled={!!selectedProvincialRegion && !isProvincialCitiesLoading}
-              value={(studentInfo as any)?.addresses?.["provincial"]?.address?.city || ""}
+              value={
+                (studentInfo as any)?.addresses?.["provincial"]?.address
+                  ?.city || ""
+              }
               onChange={(val) => {
                 onChange(`student.addresses.provincial.address.city`, val);
                 const selected =
                   provincialCities.find((c: City) => c.id === val) || null;
                 setSelectedProvincialCity(selected);
               }}
-              lockedReason={!selectedProvincialRegion ? "Select a Region first" : ""}
+              lockedReason={
+                !selectedProvincialRegion ? "Select a Region first" : ""
+              }
               required
             />
             {/* Provincial Barangay */}
             <DropdownField
               label="Barangay (Provincial)"
               options={provincialBarangays || []}
-              enabled={!!selectedProvincialCity && !isProvincialBarangaysLoading}
-              value={(studentInfo as any)?.addresses?.["provincial"]?.address?.barangay || ""}
+              enabled={
+                !!selectedProvincialCity && !isProvincialBarangaysLoading
+              }
+              value={
+                (studentInfo as any)?.addresses?.["provincial"]?.address
+                  ?.barangay || ""
+              }
               onChange={(val) => {
                 onChange(`student.addresses.provincial.address.barangay`, val);
               }}
-              lockedReason={!selectedProvincialCity ? "Select a City first" : ""}
+              lockedReason={
+                !selectedProvincialCity ? "Select a City first" : ""
+              }
               required
             />
             {/* Provincial Street */}
             <InputField
               label="Street (Provincial)"
-              value={(studentInfo as any)?.addresses?.["provincial"]?.address?.streetDetail || ""}
+              value={
+                (studentInfo as any)?.addresses?.["provincial"]?.address
+                  ?.streetDetail || ""
+              }
               placeholder="Street/Lot/Blk"
               onChange={(val) =>
                 onChange(
                   `student.addresses.provincial.address.streetDetail`,
-                  val
+                  val,
                 )
               }
             />
@@ -487,7 +525,10 @@ export const PersonalInformationSection = forwardRef<
             <DropdownField
               label="Region (Residential)"
               options={regions}
-              value={(studentInfo as any)?.addresses?.["residential"]?.address?.region || ""}
+              value={
+                (studentInfo as any)?.addresses?.["residential"]?.address
+                  ?.region || ""
+              }
               onChange={(val) => {
                 onChange(`student.addresses.residential.address.region`, val);
                 const selected =
@@ -501,38 +542,55 @@ export const PersonalInformationSection = forwardRef<
             <DropdownField
               label="City/Municipality (Residential)"
               options={residentialCities || []}
-              enabled={!!selectedResidentialRegion && !isResidentialCitiesLoading}
-              value={(studentInfo as any)?.addresses?.["residential"]?.address?.city || ""}
+              enabled={
+                !!selectedResidentialRegion && !isResidentialCitiesLoading
+              }
+              value={
+                (studentInfo as any)?.addresses?.["residential"]?.address
+                  ?.city || ""
+              }
               onChange={(val) => {
                 onChange(`student.addresses.residential.address.city`, val);
                 const selected =
                   residentialCities.find((c: City) => c.id === val) || null;
                 setSelectedResidentialCity(selected);
               }}
-              lockedReason={!selectedResidentialRegion ? "Select a Region first" : ""}
+              lockedReason={
+                !selectedResidentialRegion ? "Select a Region first" : ""
+              }
               required
             />
             {/* Residential Barangay */}
             <DropdownField
               label="Barangay (Residential)"
               options={residentialBarangays || []}
-              enabled={!!selectedResidentialCity && !isResidentialBarangaysLoading}
-              value={(studentInfo as any)?.addresses?.["residential"]?.address?.barangay || ""}
+              enabled={
+                !!selectedResidentialCity && !isResidentialBarangaysLoading
+              }
+              value={
+                (studentInfo as any)?.addresses?.["residential"]?.address
+                  ?.barangay || ""
+              }
               onChange={(val) => {
                 onChange(`student.addresses.residential.address.barangay`, val);
               }}
-              lockedReason={!selectedResidentialCity ? "Select a City first" : ""}
+              lockedReason={
+                !selectedResidentialCity ? "Select a City first" : ""
+              }
               required
             />
             {/* Residential Street */}
             <InputField
               label="Street (Residential)"
-              value={(studentInfo as any)?.addresses?.["residential"]?.address?.streetDetail || ""}
+              value={
+                (studentInfo as any)?.addresses?.["residential"]?.address
+                  ?.streetDetail || ""
+              }
               placeholder="Street/Lot/Blk"
               onChange={(val) =>
                 onChange(
                   `student.addresses.residential.address.streetDetail`,
-                  val
+                  val,
                 )
               }
             />
