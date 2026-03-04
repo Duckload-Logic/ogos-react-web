@@ -69,11 +69,13 @@ export default function InputField({
               placeholder:text-muted-foreground
               focus:ring-offset-0 text-foreground
               ${
-                disabled 
-                  ? 'bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none' 
-                  : value 
+                disabled
+                  ? 'bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none'
+                  : value
                     ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                    : 'bg-white dark:!bg-neutral-800 border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
+                    : required
+                      ? 'bg-white dark:!bg-neutral-800 border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
+                      : 'bg-white dark:!bg-neutral-800 border-border'
               }
             `}
             min={min}
