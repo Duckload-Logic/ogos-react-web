@@ -388,12 +388,6 @@ export const PersonalInformationSection = forwardRef<
                 "student.personalInfo.isEmployed",
                 isChecked,
               );
-              // Clear employer fields if unchecked
-              if (!isChecked) {
-                handleInputChange("student.personalInfo.employerName", "");
-                handleInputChange("student.personalInfo.employerAddress", "");
-                handleInputChange("student.personalInfo.employerContact", "");
-              }
             }}
             info="Check if you are currently employed or have a job. You will need to provide employer details if selected."
           />
@@ -422,7 +416,7 @@ export const PersonalInformationSection = forwardRef<
                   inputMode="numeric"
                   value={studentInfo?.personalInfo?.employerContact || ""}
                   onChange={(val) =>
-                    handleInputChange("student.personalInfo.employerContact", val)
+                    handleInputChange("student.personalInfo.employerContact", val.replace(/\D/g, ""))
                   }
                   placeholder="e.g., 09123456789"
                 />
