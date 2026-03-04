@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle, useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { InputField, Checkbox, RadioField } from "@/components/form";
 import { Check } from "lucide-react";
@@ -28,6 +28,8 @@ export const FamilyBackgroundSection = forwardRef<
   const { data: monthlyFamilyIncomeRanges } = useIncomeRanges();
 
   const [errors, setErrors] = useState<FormErrors>({});
+  const [otherTouched, setOtherTouched] = useState(false);
+  const otherInputRef = useRef<HTMLInputElement | null>(null);
 
   const validate = (): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors: FormErrors = {};
@@ -891,6 +893,10 @@ export const FamilyBackgroundSection = forwardRef<
                       "family.finance.monthlyFamilyIncomeRange.otherSpecification",
                       ""
                     );
+                    setOtherTouched(false);
+                  } else {
+                    // focus the input when Others is selected
+                    setTimeout(() => otherInputRef.current?.focus(), 0);
                   }
                 }}
                 className={`
@@ -916,7 +922,9 @@ export const FamilyBackgroundSection = forwardRef<
 
             {family?.finance?.monthlyFamilyIncomeRange?.id === "others" && (
               <div className="mt-4">
+                <p className="text-sm text-muted-foreground mb-2">Selected "Others" — please specify income range below.</p>
                 <input
+                  ref={otherInputRef}
                   type="text"
                   placeholder="Enter income range"
                   value={family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || ""}
@@ -926,8 +934,16 @@ export const FamilyBackgroundSection = forwardRef<
                       e.target.value
                     )
                   }
-                  className="flex-1 ml-0 mt-2 px-3 py-2 border border-border rounded-md text-sm bg-white dark:!bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-red-600/20"
+                  onBlur={() => setOtherTouched(true)}
+                  className={`flex-1 ml-0 mt-2 px-3 py-2 border rounded-md text-sm bg-white dark:!bg-neutral-800 focus:outline-none ${
+                    otherTouched && !(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "")
+                      ? "border-red-500 focus:ring-red-500/20"
+                      : "border-border"
+                  }`}
                 />
+                {otherTouched && !(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "") && (
+                  <p className="text-xs text-red-500 mt-2">Please provide an income range.</p>
+                )}
               </div>
             )}
           </div>
