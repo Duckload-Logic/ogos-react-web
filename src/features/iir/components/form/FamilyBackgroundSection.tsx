@@ -83,8 +83,6 @@ export const FamilyBackgroundSection = forwardRef<
           </h3>
           <div className="space-y-2">
             <div className="text-sm font-medium text-card-foreground flex items-start gap-1">
-              <span>Select Parental Status</span>
-              <span className="text-red-500">*</span>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {parentalStatusOptions?.map((option: any) => {
