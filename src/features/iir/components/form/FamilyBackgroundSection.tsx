@@ -878,33 +878,44 @@ export const FamilyBackgroundSection = forwardRef<
             <h4 className="font-semibold text-foreground mb-4">
               Parents' Combined Total Monthly Income
             </h4>
-            <RadioField
-              label=""
-              options={monthlyFamilyIncomeRanges || []}
-              value={family?.finance?.monthlyFamilyIncomeRange?.id || ""}
-              onChange={(val) =>
-                handleInputChange("family.finance.monthlyFamilyIncomeRange", {
-                  id: val,
-                })
-              }
-              columns={3}
-            />
-            {/* Others, please specify option */}
-            <label className="flex items-center gap-3 group cursor-pointer mt-4">
-              <input
-                type="radio"
-                name="income-range"
-                value="others"
-                checked={family?.finance?.monthlyFamilyIncomeRange?.id === "others"}
-                onChange={(e) =>
+            <div className="relative">
+              <select
+                value={family?.finance?.monthlyFamilyIncomeRange?.id || ""}
+                onChange={(e) => {
+                  const val = e.target.value;
                   handleInputChange("family.finance.monthlyFamilyIncomeRange", {
-                    id: e.target.value,
-                  })
-                }
-                className="w-4 h-4 cursor-pointer accent-red-600"
-              />
-              <span className="text-sm text-foreground">Others, please specify:</span>
-              {family?.finance?.monthlyFamilyIncomeRange?.id === "others" && (
+                    id: val,
+                  });
+                  if (val !== "others") {
+                    handleInputChange(
+                      "family.finance.monthlyFamilyIncomeRange.otherSpecification",
+                      ""
+                    );
+                  }
+                }}
+                className={`
+                  w-full px-3 py-2 border rounded-md bg-white dark:!bg-neutral-800 text-sm
+                  appearance-none cursor-pointer transition-all duration-200
+                  focus:outline-none focus:ring-2 focus:ring-offset-0 text-foreground
+                  ${
+                    family?.finance?.monthlyFamilyIncomeRange?.id
+                      ? "border-green-500 font-medium hover:border-green-600 focus:border-green-500 focus:ring-green-500/20"
+                      : "border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20"
+                  }
+                `}
+              >
+                <option value="">Select range</option>
+                {monthlyFamilyIncomeRanges?.map((opt: any) => (
+                  <option key={opt.id} value={opt.id}>
+                    {opt.name || opt.text || opt.code}
+                  </option>
+                ))}
+                <option value="others">Others</option>
+              </select>
+            </div>
+
+            {family?.finance?.monthlyFamilyIncomeRange?.id === "others" && (
+              <div className="mt-4">
                 <input
                   type="text"
                   placeholder="Enter income range"
@@ -915,10 +926,10 @@ export const FamilyBackgroundSection = forwardRef<
                       e.target.value
                     )
                   }
-                  className="flex-1 ml-2 px-3 py-2 border border-border rounded-md text-sm bg-white dark:!bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-red-600/20"
+                  className="flex-1 ml-0 mt-2 px-3 py-2 border border-border rounded-md text-sm bg-white dark:!bg-neutral-800 focus:outline-none focus:ring-2 focus:ring-red-600/20"
                 />
-              )}
-            </label>
+              </div>
+            )}
           </div>
 
           <div className="mb-8">
