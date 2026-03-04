@@ -13,8 +13,6 @@ import {
 } from "../../hooks";
 import type { Slip, SlipStats, SlipStatus } from "../../types/slip";
 import { SlipViewModal, SlipsList } from "../../components";
-import { toast } from "@/components/ui/use-toast";
-import { STATUS_COLORS } from "@/config/constants";
 import {
   getDateRange,
   getFilterLabel,
@@ -94,21 +92,10 @@ export default function ReviewSlips() {
       { id, status: "Approved" },
       {
         onSuccess: () => {
-          toast({
-            title: "Success",
-            description: "Excuse slip approved",
-          });
           refetch();
           setIsModalOpen(false);
         },
-        onError: (error) => {
-          toast({
-            title: "Error",
-            description:
-              error instanceof Error ? error.message : "Failed to approve slip",
-            variant: "destructive",
-          });
-        },
+        onError: (error) => {},
       },
     );
   };
@@ -118,21 +105,10 @@ export default function ReviewSlips() {
       { id, status: "Rejected", adminNotes: reason },
       {
         onSuccess: () => {
-          toast({
-            title: "Success",
-            description: "Excuse slip rejected",
-          });
           refetch();
           setIsModalOpen(false);
         },
-        onError: (error) => {
-          toast({
-            title: "Error",
-            description:
-              error instanceof Error ? error.message : "Failed to reject slip",
-            variant: "destructive",
-          });
-        },
+        onError: (error) => {},
       },
     );
   };
@@ -142,23 +118,10 @@ export default function ReviewSlips() {
       { id, status: "For Revision", adminNotes: reason },
       {
         onSuccess: () => {
-          toast({
-            title: "Success",
-            description: "Slip sent for revision",
-          });
           refetch();
           setIsModalOpen(false);
         },
-        onError: (error) => {
-          toast({
-            title: "Error",
-            description:
-              error instanceof Error
-                ? error.message
-                : "Failed to send for revision",
-            variant: "destructive",
-          });
-        },
+        onError: (error) => {},
       },
     );
   };
