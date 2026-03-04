@@ -97,28 +97,28 @@ export const HealthInformationSection = forwardRef<
       label: "Your Vision",
       yesKey: "health.healthRecord.visionHasProblem",
       detailsKey: "health.healthRecord.visionDetails",
-      yesValue: health?.healthRecord?.visionHasProblem === true,
+      yesValue: health?.healthRecord?.visionHasProblem,
       detailsValue: health?.healthRecord?.visionDetails || "",
     },
     {
       label: "Your Hearing",
       yesKey: "health.healthRecord.hearingHasProblem",
       detailsKey: "health.healthRecord.hearingDetails",
-      yesValue: health?.healthRecord?.hearingHasProblem === true,
+      yesValue: health?.healthRecord?.hearingHasProblem,
       detailsValue: health?.healthRecord?.hearingDetails || "",
     },
     {
       label: "Your Speech",
       yesKey: "health.healthRecord.speechHasProblem",
       detailsKey: "health.healthRecord.speechDetails",
-      yesValue: health?.healthRecord?.speechHasProblem === true,
+      yesValue: health?.healthRecord?.speechHasProblem,
       detailsValue: health?.healthRecord?.speechDetails || "",
     },
     {
       label: "Your General Health",
       yesKey: "health.healthRecord.generalHealthHasProblem",
       detailsKey: "health.healthRecord.generalHealthDetails",
-      yesValue: health?.healthRecord?.generalHealthHasProblem === true,
+      yesValue: health?.healthRecord?.generalHealthHasProblem,
       detailsValue: health?.healthRecord?.generalHealthDetails || "",
     },
   ];
@@ -134,7 +134,7 @@ export const HealthInformationSection = forwardRef<
     return {
       label: type,
       type: type,
-      consulted: consultation?.hasConsulted || false,
+      consulted: consultation?.hasConsulted,
       when: consultation?.whenDate || "",
       forWhat: consultation?.forWhat || "",
     };
