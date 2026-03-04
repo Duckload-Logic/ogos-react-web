@@ -39,7 +39,7 @@
     "admin/pages/register/components/Reports-Admin.tsx",
     "admin/pages/register/components/Register-Admin.tsx",
     "admin/pages/register/components/Reports.tsx",
-    "admin/pages/register/components/ReviewExcuses.tsx"
+    "admin/pages/register/components/ReviewSlips.tsx"
   ],
   "exclude": ["node_modules", "dist"]
 }

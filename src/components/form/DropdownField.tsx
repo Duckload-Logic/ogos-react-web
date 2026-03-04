@@ -32,10 +32,8 @@ export default function DropdownField({
   const isFilled = selectedOption !== undefined;
 
   const getLabel = (option: any) => {
-    if (!option) {
-      return enabled ? `Select ${label}` : lockedReason || "Locked";
-    }
-    return option.code || option.name || option.text || "";
+    if (!option) return `Select ${label}`;
+    return option.code || option.name || option.text || option || "";
   };
 
   useEffect(() => {
