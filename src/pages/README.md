@@ -12,7 +12,7 @@ Route components that map to URLs in the application.
 - **`Index.tsx`** - Home/landing page
 - **`StudentForm.tsx`** - Student enrollment form
 - **`AdmissionSlip.tsx`** - Excuse slip request form
-- **`GuidanceServices.tsx`** - Guidance services information/request
+- **`Dashboard.tsx`** - Guidance services information/request
 - **`CreateAppointment.tsx`** - Appointment scheduling
 - **`ViewSchedules.tsx`** - View scheduled appointments
 - **`PlaceholderPage.tsx`** - Placeholder for future pages
