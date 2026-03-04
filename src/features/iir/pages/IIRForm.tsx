@@ -104,7 +104,7 @@ export default function IIRForm() {
           relatedPersons: [],
           finance: {},
         },
-        health: baseData.health || { healthRecord: {} },
+        health: baseData.health || { healthRecord: {}, consultations: [] },
         interests: baseData.interests || {},
         testResults: baseData.testResults || [],
       };

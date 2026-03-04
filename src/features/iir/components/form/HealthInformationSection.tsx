@@ -49,6 +49,48 @@ export const HealthInformationSection = forwardRef<
     clearError(fieldPath);
   };
 
+  const handleConsultationChange = (
+    professionalType: string,
+    field: "consulted" | "whenDate" | "forWhat",
+    value: any
+  ) => {
+    const consultations = Array.isArray(health?.consultations)
+      ? [...health.consultations]
+      : [];
+
+    const existingIndex = consultations.findIndex(
+      (c: any) => c.professionalType === professionalType
+    );
+
+    if (existingIndex >= 0) {
+      // Update existing consultation
+      consultations[existingIndex] = {
+        ...consultations[existingIndex],
+        [field === "consulted" ? "hasConsulted" : field]: value,
+      };
+    } else if (
+      value !== false &&
+      value !== "" &&
+      (field === "consulted" || field === "whenDate" || field === "forWhat")
+    ) {
+      // Create new consultation only if setting to true or non-empty string
+      consultations.push({
+        professionalType,
+        hasConsulted: field === "consulted" ? value : false,
+        whenDate: field === "whenDate" ? value : null,
+        forWhat: field === "forWhat" ? value : null,
+      });
+    } else if (existingIndex >= 0 && value === false) {
+      // If setting consulted to false, we might want to keep the record
+      consultations[existingIndex] = {
+        ...consultations[existingIndex],
+        hasConsulted: false,
+      };
+    }
+
+    onChange("health.consultations", consultations);
+  };
+
   // Array of physical health items for A. Physical
   const physicalItems = [
     {
@@ -82,35 +124,21 @@ export const HealthInformationSection = forwardRef<
   ];
 
   // Array of psychological consultation types
-  const consultationTypes = [
-    {
-      label: "Psychiatrist",
-      yesKey: "health.consultations.psychiatrist.consulted",
-      whenKey: "health.consultations.psychiatrist.when",
-      forWhatKey: "health.consultations.psychiatrist.forWhat",
-      consulted: health?.consultations?.psychiatrist?.consulted,
-      when: health?.consultations?.psychiatrist?.when || "",
-      forWhat: health?.consultations?.psychiatrist?.forWhat || "",
-    },
-    {
-      label: "Psychologist",
-      yesKey: "health.consultations.psychologist.consulted",
-      whenKey: "health.consultations.psychologist.when",
-      forWhatKey: "health.consultations.psychologist.forWhat",
-      consulted: health?.consultations?.psychologist?.consulted,
-      when: health?.consultations?.psychologist?.when || "",
-      forWhat: health?.consultations?.psychologist?.forWhat || "",
-    },
-    {
-      label: "Counselor",
-      yesKey: "health.consultations.counselor.consulted",
-      whenKey: "health.consultations.counselor.when",
-      forWhatKey: "health.consultations.counselor.forWhat",
-      consulted: health?.consultations?.counselor?.consulted,
-      when: health?.consultations?.counselor?.when || "",
-      forWhat: health?.consultations?.counselor?.forWhat || "",
-    },
-  ];
+  const professionalTypes = ["Psychiatrist", "Psychologist", "Counselor"];
+  
+  const consultationTypes = professionalTypes.map((type) => {
+    const consultation = Array.isArray(health?.consultations)
+      ? health.consultations.find((c: any) => c.professionalType === type)
+      : null;
+    
+    return {
+      label: type,
+      type: type,
+      consulted: consultation?.hasConsulted || false,
+      when: consultation?.whenDate || "",
+      forWhat: consultation?.forWhat || "",
+    };
+  });
 
   return (
     <Card className="bg-card border border-border">
@@ -214,7 +242,9 @@ export const HealthInformationSection = forwardRef<
                         name={`consultation-${idx}`}
                         value="yes"
                         checked={type.consulted === true}
-                        onChange={() => handleInputChange(type.yesKey, true)}
+                        onChange={() =>
+                          handleConsultationChange(type.type, "consulted", true)
+                        }
                         className="w-4 h-4 cursor-pointer accent-red-600"
                       />
                     </td>
@@ -224,7 +254,9 @@ export const HealthInformationSection = forwardRef<
                         name={`consultation-${idx}`}
                         value="no"
                         checked={type.consulted === false}
-                        onChange={() => handleInputChange(type.yesKey, false)}
+                        onChange={() =>
+                          handleConsultationChange(type.type, "consulted", false)
+                        }
                         className="w-4 h-4 cursor-pointer accent-red-600"
                       />
                     </td>
@@ -235,7 +267,11 @@ export const HealthInformationSection = forwardRef<
                         disabled={type.consulted !== true}
                         value={type.when}
                         onChange={(e) =>
-                          handleInputChange(type.whenKey, e.target.value)
+                          handleConsultationChange(
+                            type.type,
+                            "whenDate",
+                            e.target.value
+                          )
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           type.consulted === true
@@ -251,7 +287,11 @@ export const HealthInformationSection = forwardRef<
                         disabled={type.consulted !== true}
                         value={type.consulted === true ? type.forWhat : ""}
                         onChange={(e) =>
-                          handleInputChange(type.forWhatKey, e.target.value)
+                          handleConsultationChange(
+                            type.type,
+                            "forWhat",
+                            e.target.value
+                          )
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           type.consulted === true
