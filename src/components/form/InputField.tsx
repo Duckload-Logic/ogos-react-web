@@ -1,6 +1,5 @@
 import { Info, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { is } from "zod/v4/locales";
 
 export default function InputField({
   label,
