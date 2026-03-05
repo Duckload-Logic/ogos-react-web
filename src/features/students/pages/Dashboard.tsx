@@ -1,16 +1,56 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Skeleton } from "@/components/ui/skeleton";
+import { AnimationStyles } from "@/components/ui/animations";
+import { HeroSection } from "@/components/ui/hero-section";
+import { StatsCard } from "@/components/ui/stats-card";
+import { QuickActionsGrid } from "@/components/ui/quick-actions-grid";
+import { StudentProfileCard } from "@/features/students/components/StudentProfileCard";
 import { useEffect, useState } from "react";
-import { AlertTriangle } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle,
+  CalendarPlus,
+  FileText,
+  ClipboardList,
+  ArrowRight,
+} from "lucide-react";
 import { useMe } from "@/features/users/hooks/useMe";
-import { LoadingSpinner } from "@/components/shared";
 import { useUserIIR } from "@/features/iir/hooks/useUserIIR";
+import { useGetSlipStats } from "@/features/slips/hooks";
+import { useAppointmentsStats } from "@/features/appointments/hooks/useAppointments";
+import type { QuickAction } from "@/components/ui/quick-actions-grid";
 
-const PROGRAMS = [
-  { title: "Counseling" },
-  { title: "Appraisal/Testing" },
-  { title: "Individual Inventory" },
-  { title: "Excuse Slip" },
+const QUICK_ACTIONS: QuickAction[] = [
+  {
+    title: "Schedule Appointment",
+    description: "Book a counseling session",
+    icon: CalendarPlus,
+    to: "/student/appointments/schedule",
+    color: "text-blue-600 bg-blue-50",
+  },
+  {
+    title: "Submit Admission Slip",
+    description: "File an excuse slip",
+    icon: FileText,
+    to: "/student/slips/submit",
+    color: "text-green-600 bg-green-50",
+  },
+  {
+    title: "My Appointments",
+    description: "View your appointments",
+    icon: ClipboardList,
+    to: "/student/appointments",
+    color: "text-purple-600 bg-purple-50",
+  },
+  {
+    title: "My Admission Slips",
+    description: "Track submitted slips",
+    icon: FileText,
+    to: "/student/slips",
+    color: "text-orange-600 bg-orange-50",
+  },
 ];
 
 export function Dashboard() {
@@ -18,14 +58,43 @@ export function Dashboard() {
   const { data: iir, isLoading: isIIRLoading } = useUserIIR(
     me?.id || undefined,
   );
+  const { data: slipStats } = useGetSlipStats({});
+  const { data: appointmentStats } = useAppointmentsStats({ params: {} });
 
   const showForm = !!me && iir && !iir.isSubmitted;
+
+  const totalSlips =
+    slipStats?.reduce((sum: number, s: any) => sum + (s.count || 0), 0) || 0;
+  const totalAppointments =
+    appointmentStats?.reduce(
+      (sum: number, s: any) => sum + (s.count || 0),
+      0,
+    ) || 0;
 
   const [isPageLoaded, setIsPageLoaded] = useState(false);
   useEffect(() => setIsPageLoaded(true), []);
 
   if (isUserLoading || isIIRLoading || !isPageLoaded) {
-    return <LoadingSpinner />;
+    return (
+      <div className="space-y-6">
+        {/* Hero skeleton */}
+        <Skeleton className="h-32 w-full rounded-none" />
+        <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <Skeleton className="h-20 rounded-lg" />
+            <Skeleton className="h-20 rounded-lg" />
+          </div>
+          <Skeleton className="h-6 w-32" />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <Skeleton className="h-20 rounded-lg" />
+            <Skeleton className="h-20 rounded-lg" />
+            <Skeleton className="h-20 rounded-lg" />
+            <Skeleton className="h-20 rounded-lg" />
+          </div>
+          <Skeleton className="h-40 rounded-lg" />
+        </div>
+      </div>
+    );
   }
 
   if (!me) {
@@ -38,153 +107,84 @@ export function Dashboard() {
 
   return (
     <>
-      <style>{`
-        @keyframes slideUp {
-          from {
-            opacity: 0;
-            transform: translateY(8px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        @keyframes slideUpStagger {
-          from {
-            opacity: 0;
-            transform: translateY(12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0);
-          }
-        }
-        .alert-banner {
-          animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.1s both;
-        }
-        .programs-section {
-          animation: slideUp 0.5s cubic-bezier(0.4, 0, 0.2, 1) 0.2s both;
-        }
-        .program-card {
-          animation: slideUpStagger 0.5s cubic-bezier(0.4, 0, 0.2, 1) both;
-        }
-        .program-card:nth-child(1) { animation-delay: 0.3s; }
-        .program-card:nth-child(2) { animation-delay: 0.35s; }
-        .program-card:nth-child(3) { animation-delay: 0.4s; }
-        .program-card:nth-child(4) { animation-delay: 0.45s; }
-      `}</style>
-      {/* Hero Section */}
-      <div className="bg-primary text-primary-foreground py-8 md:py-12">
-        <div className="max-w-7xl mx-auto px-4 md:px-8">
-          <h1 className="text-3xl md:text-4xl font-bold">Guidance Services</h1>
-          <p className="text-base md:text-lg mt-2 opacity-90">
-            Supporting your academic and personal growth
-          </p>
-        </div>
-      </div>
+      <AnimationStyles />
 
-      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-12">
-        {/* URGENT: PDS Completion Alert Banner */}
+      <HeroSection
+        greeting="Welcome back,"
+        title={`${me?.firstName} ${me?.lastName}`}
+        subtitle="PUP Guidance Services — Supporting your academic and personal growth"
+      />
+
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-10">
+        {/* PDS Completion Alert */}
         {showForm && (
-          <div className="mb-8 bg-yellow-100 border-l-4 border-yellow-500 p-4 sm:p-6 rounded-lg shadow-md alert-banner">
-            <div className="flex items-start gap-2">
-              <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-              <div className="flex-1">
-                <h3 className="font-bold text-sm text-yellow-800 mb-1">
-                  Important: Complete Your Personal Data Sheet
-                </h3>
-                <p className="text-yellow-700 text-xs sm:text-sm mb-2">
-                  You must complete this form to access all guidance services.
-                  Your information helps us provide better support and
-                  counseling.
-                </p>
-                <Link to="/student/form">
-                  <Button className="bg-yellow-600 hover:bg-yellow-700 text-white font-semibold text-xs py-1 px-3 h-auto">
-                    Complete Form Now
-                  </Button>
-                </Link>
-              </div>
-            </div>
-          </div>
+          <Alert
+            variant="destructive"
+            className="animate-fade-in-up mb-6 border-l-4"
+            style={{ animationDelay: "0.1s", animationFillMode: "both" }}
+          >
+            <AlertTriangle className="h-5 w-5" />
+            <AlertTitle className="text-base font-semibold">
+              Action Required: Complete Your Personal Data Sheet
+            </AlertTitle>
+            <AlertDescription className="mt-1 text-sm">
+              Complete your form to unlock all guidance services.
+            </AlertDescription>
+            <Link to="/student/form" className="mt-3 block">
+              <Button size="sm" className="gap-2">
+                Complete Form Now
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </Alert>
         )}
 
-        {/* How Can We Help You Section */}
-        <section className="bg-white rounded-lg shadow-sm p-5 md:p-6 mb-8 programs-section">
-          <h2 className="text-lg md:text-xl font-bold mb-4 text-primary">
-            How Can We Help You?
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {PROGRAMS.map((program, index) => (
-              <div
-                key={index}
-                className="border-l-4 border-primary pl-3 py-3 transition-all duration-300 hover:bg-gray-50 hover:pl-4 rounded cursor-pointer program-card"
-              >
-                <h3 className="font-semibold text-sm md:text-base text-gray-900 transition-colors duration-300 hover:text-primary">
-                  {program.title}
-                </h3>
-              </div>
-            ))}
-          </div>
-        </section>
+        {/* Stats Row */}
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <StatsCard
+            to="/student/appointments"
+            count={totalAppointments}
+            label="Appointments"
+            icon={ClipboardList}
+            iconColor="text-blue-600"
+            bgColor="bg-blue-50"
+            animationDelay="0.1s"
+          />
+          <StatsCard
+            to="/student/slips"
+            count={totalSlips}
+            label="Admission Slips"
+            icon={FileText}
+            iconColor="text-green-600"
+            bgColor="bg-green-50"
+            animationDelay="0.1s"
+          />
+        </div>
 
-        {/* Student Dashboard Section */}
-        <section
-          className="bg-white rounded-lg shadow-sm p-5 md:p-6 mb-8 programs-section"
-          style={{ animationDelay: "0.25s" }}
-        >
-          <h2 className="text-lg md:text-xl font-bold mb-4 text-primary">
-            Student Dashboard
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Name Card */}
-            <div className="pb-4 border-b border-gray-200">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                Name
-              </label>
-              <p className="text-gray-900 font-bold text-sm mt-1">
-                {me?.lastName}, {me?.firstName}{" "}
-                {me.middleName && typeof me?.middleName === "string"
-                  ? me?.middleName.charAt(0) + "."
-                  : ""}
-              </p>
-            </div>
+        {/* Quick Actions */}
+        <QuickActionsGrid actions={QUICK_ACTIONS} />
 
-            {/* Contact Card */}
-            {/* <div className="pb-4">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                Contact
-              </label>
-              <p className="text-gray-900 font-bold text-sm mt-1">
-                {additionalInfo?.IIRProfile?.contactNo || "-"}
-              </p>
-            </div> */}
+        {/* Student Information */}
+        <StudentProfileCard
+          firstName={me?.firstName}
+          lastName={me?.lastName}
+          middleName={me?.middleName}
+          email={me?.email}
+          isFormIncomplete={showForm}
+        />
 
-            {/* Email Card */}
-            <div className="pb-4">
-              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                Email
-              </label>
-              <p className="text-gray-900 font-bold text-sm mt-1">
-                {me?.email || "-"}
-              </p>
-            </div>
-          </div>
-        </section>
-
-        {/* I Hereby Statement Section */}
+        {/* Confirmation Statement */}
         {!showForm && (
-          <section
-            className="bg-green-50 border-l-4 border-green-500 rounded-lg p-5 md:p-6 mb-8 programs-section"
-            style={{ animationDelay: "0.3s" }}
+          <Alert
+            className="animate-fade-in-up border-l-4 border-green-500"
+            style={{ animationDelay: "0.35s", animationFillMode: "both" }}
           >
-            <p className="text-sm md:text-base text-gray-700 leading-relaxed">
-              <span className="font-semibold text-green-700">
-                I hereby declare
-              </span>{" "}
-              that all the information stated in this document is true and
-              correct to the best of my knowledge and belief.
-            </p>
-          </section>
+            <CheckCircle className="h-5 w-5 text-green-600" />
+            <AlertTitle className="text-green-900">Confirmation</AlertTitle>
+            <AlertDescription className="text-green-800 mt-1 text-sm">
+              I hereby declare that all the information I have provided is true and correct to the best of my knowledge.
+            </AlertDescription>
+          </Alert>
         )}
       </div>
     </>
