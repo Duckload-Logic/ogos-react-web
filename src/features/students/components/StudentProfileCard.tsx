@@ -38,7 +38,7 @@ export function StudentProfileCard({
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="flex gap-4">
-            <User className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+            <User className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                 Full Name
@@ -52,7 +52,7 @@ export function StudentProfileCard({
             </div>
           </div>
           <div className="flex gap-4">
-            <Mail className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+            <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
             <div className="flex-1">
               <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                 Email Address
