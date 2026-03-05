@@ -3,7 +3,6 @@ import { Button } from "@/components/ui/button";
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
@@ -34,11 +33,7 @@ export function StudentProfileCard({
       style={{ animationDelay, animationFillMode: "both" }}
     >
       <CardHeader className="pb-4">
-        <CardTitle className="text-base flex items-center gap-2">
-          <User className="h-4 w-4" />
-          Student Profile
-        </CardTitle>
-        <CardDescription>Your personal information on record</CardDescription>
+        <CardTitle className="text-base">Student Profile</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

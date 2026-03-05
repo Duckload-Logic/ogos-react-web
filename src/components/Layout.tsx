@@ -162,12 +162,12 @@ export default function Layout({ children, title }: LayoutProps) {
           >
             {/* Logo */}
             <div className="h-16 flex items-center gap-3 ml-[-8px]">
-              <img src={PUPLogo} className="w-8 h-8 rounded-full" />
-              <div className="flex flex-col items-center leading-tight font-semibold sm:block scale-[0.8] origin-left">
-                <p className="text-foreground text-[10px]">
+              <img src={PUPLogo} className="w-16 h-16 rounded-full" />
+              <div className="flex flex-col items-center leading-tight font-semibold sm:block origin-left">
+                <p className="text-foreground text-sm">
                   Polytechnic University of the Philippines – Taguig
                 </p>
-                <p className="text-[8px] text-muted-foreground">
+                <p className="text-xs text-muted-foreground">
                   Online Guidance Office Services
                 </p>
               </div>
