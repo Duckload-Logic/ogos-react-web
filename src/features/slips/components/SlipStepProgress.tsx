@@ -18,7 +18,7 @@ export function SlipStepProgress({
   completedSteps,
 }: SlipStepProgressProps) {
   return (
-    <div className="mb-8">
+    <div className="mb-5">
       <div className="flex items-center justify-center gap-0">
         {steps.map((step, index) => {
           const StepIcon = step.icon;
@@ -30,26 +30,26 @@ export function SlipStepProgress({
               <div className="flex flex-col items-center">
                 <div
                   className={`
-                    flex items-center justify-center w-10 h-10 rounded-full
+                    flex items-center justify-center w-9 h-9 rounded-full
                     transition-all duration-300
                     ${
                       isCompleted
                         ? "bg-primary text-primary-foreground"
                         : isCurrent
                           ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
-                          : "bg-muted text-muted-foreground"
+                          : "bg-muted text-foreground"
                     }
                   `}
                 >
                   {isCompleted ? (
-                    <CheckCircle2 className="w-5 h-5" />
+                    <CheckCircle2 className="w-4 h-4" />
                   ) : (
-                    <StepIcon className="w-5 h-5" />
+                    <StepIcon className="w-4 h-4" />
                   )}
                 </div>
                 <span
                   className={`
-                    text-xs font-medium mt-1.5 transition-colors
+                    text-xs font-medium mt-1 transition-colors
                     ${
                       isCurrent || isCompleted
                         ? "text-foreground"
@@ -63,12 +63,12 @@ export function SlipStepProgress({
               {index < steps.length - 1 && (
                 <div
                   className={`
-                    w-16 sm:w-24 h-0.5 mx-3 rounded-full transition-colors duration-300
+                    w-14 sm:w-20 h-0.5 mx-2 rounded-full transition-colors duration-300
                     ${
                       (step.id === 1 && completedSteps[0]) ||
                       (step.id === 2 && completedSteps[1])
                         ? "bg-primary"
-                        : "bg-border"
+                        : "bg-border/60"
                     }
                   `}
                 />

@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { FileUp, Trash2 } from "lucide-react";
+import { Card, CardContent } from "@/components/ui/card";
+import { FileUp, Trash2, CheckCircle2, X } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export interface SlipDocumentUploadSectionProps {
+  number?: number;
   title: string;
   description: string;
   files: File[];
@@ -12,6 +14,7 @@ export interface SlipDocumentUploadSectionProps {
 }
 
 export function SlipDocumentUploadSection({
+  number,
   title,
   description,
   files,
@@ -35,19 +38,31 @@ export function SlipDocumentUploadSection({
   };
 
   return (
-    <Card className="border border-border">
-      <CardHeader className="pb-3">
-        <div className="flex items-center justify-between">
-          <div>
-            <CardTitle className="text-base">
-              {title}
-              {!optional && <span className="text-red-500 ml-1">*</span>}
-            </CardTitle>
-            <p className="text-sm text-muted-foreground mt-1">{description}</p>
+    <Card className="border-0 shadow-sm">
+      <CardContent className="p-4">
+        {/* Header with number and status */}
+        <div className="flex items-start justify-between mb-4">
+          <div className="flex items-start gap-3 flex-1">
+            {number !== undefined && (
+              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-semibold text-foreground shrink-0">
+                {number}
+              </div>
+            )}
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="text-sm font-medium text-foreground">{title}</h3>
+                <Badge variant={optional ? "secondary" : "destructive"} className="text-xs">
+                  {optional ? "Optional" : "Required"}
+                </Badge>
+              </div>
+              <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+            </div>
           </div>
+          {files.length > 0 && (
+            <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0 mt-0.5" />
+          )}
         </div>
-      </CardHeader>
-      <CardContent className="space-y-4">
+
         {/* Upload Area */}
         <div
           onDragEnter={handleDrag}
@@ -58,7 +73,7 @@ export function SlipDocumentUploadSection({
             ${
               dragActive
                 ? "border-primary bg-primary/5"
-                : "border-border hover:border-primary/50"
+                : "border-border/60 hover:border-primary/50"
             }
           `}
         >
@@ -72,42 +87,36 @@ export function SlipDocumentUploadSection({
           <div className="flex flex-col items-center justify-center text-center">
             <FileUp className="w-8 h-8 text-muted-foreground mb-2" />
             <p className="text-sm font-medium text-foreground">
-              Drag and drop or click to upload
+              Click to upload or drag and drop
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              PDF, JPG, PNG, DOC, DOCX up to 5MB
+              PDF, JPG, PNG, DOC up to 5MB
             </p>
           </div>
         </div>
 
         {/* File List */}
         {files.length > 0 && (
-          <div className="space-y-2">
-            <p className="text-xs font-medium text-muted-foreground uppercase">
-              Uploaded Files
-            </p>
+          <div className="space-y-2 mt-3">
             {files.map((file: File, index: number) => (
               <div
                 key={`${file.name}-${index}`}
-                className="flex items-center justify-between p-3 bg-muted rounded-lg hover:bg-muted/80 transition-colors"
+                className="flex items-center justify-between p-2.5 bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 dark:border-green-900/40 rounded-md"
               >
                 <div className="flex items-center gap-2 min-w-0">
-                  <FileUp className="w-4 h-4 text-primary shrink-0" />
+                  <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-foreground truncate">
+                    <p className="text-xs font-medium text-foreground truncate">
                       {file.name}
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      {(file.size / 1024).toFixed(2)} KB
                     </p>
                   </div>
                 </div>
                 <button
                   onClick={() => onFileRemove(index)}
-                  className="p-1 hover:bg-destructive/20 rounded transition-colors shrink-0"
+                  className="p-0.5 hover:bg-red-100/50 dark:hover:bg-red-950/30 rounded transition-colors shrink-0"
                   aria-label="Remove file"
                 >
-                  <Trash2 className="w-4 h-4 text-destructive" />
+                  <X className="w-3.5 h-3.5 text-red-500" />
                 </button>
               </div>
             ))}

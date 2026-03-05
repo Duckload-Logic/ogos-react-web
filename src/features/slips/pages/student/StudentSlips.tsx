@@ -93,7 +93,7 @@ export default function StudentSlips() {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in-down">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-foreground">
-              My Admission Slips
+              Admission Slips
             </h1>
             <p className="text-sm text-muted-foreground mt-2">
               Manage your admission slip requests and track their status
@@ -133,29 +133,31 @@ export default function StudentSlips() {
         {/* Main Content Card */}
         <Card className="border border-border shadow-sm overflow-hidden animate-fade-in-up">
           {/* Filter Tabs */}
-          <CardHeader className="border-b border-border py-4 px-4 bg-gradient-to-r from-muted/30 to-muted/10">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
-                {statsWithAll?.map((filter: any) => (
-                  <button
-                    key={filter.id}
-                    onClick={() => {
-                      setSelectedStatus(filter);
-                      setCurrentPage(1);
-                    }}
-                    className={`
-                      px-4 py-2 rounded-lg text-sm font-medium whitespace-nowrap transition-all
-                      ${
-                        String(selectedStatus.id) === String(filter.id)
-                          ? "bg-primary text-primary-foreground shadow-md"
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      }
-                    `}
+          <CardHeader className="border-b border-border py-2 px-4">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
+              {statsWithAll?.map((filter: any) => (
+                <Button
+                  key={filter.id}
+                  onClick={() => {
+                    setSelectedStatus(filter);
+                    setCurrentPage(1);
+                  }}
+                  variant={String(selectedStatus.id) === String(filter.id) ? "default" : "ghost"}
+                  size="sm"
+                  className="shrink-0 whitespace-nowrap h-9 px-3 text-xs font-medium flex items-center gap-1.5"
+                >
+                  <span>{filter.name}</span>
+                  <Badge 
+                    className={`h-5 min-w-[20px] px-1.5 text-[10px] font-bold flex items-center justify-center ${
+                      String(selectedStatus.id) === String(filter.id) 
+                        ? "bg-primary-foreground/40 text-primary-foreground" 
+                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+                    }`}
                   >
-                    {filter.name} <span className="ml-1 opacity-75">({filter?.count})</span>
-                  </button>
-                ))}
-              </div>
+                    {filter?.count}
+                  </Badge>
+                </Button>
+              ))}
             </div>
           </CardHeader>
 
@@ -173,8 +175,8 @@ export default function StudentSlips() {
                       <div className="flex items-start gap-4">
                         {/* Category Badge */}
                         <div className="hidden sm:flex flex-col items-center justify-center w-20 h-20 bg-primary/10 rounded-lg shrink-0 border border-primary/20">
-                          <FileUp className="w-7 h-7 text-primary mb-1.5" />
-                          <span className="text-xs font-semibold text-primary text-center line-clamp-2">
+                          <FileUp className="w-7 h-7 text-primary mb-2" />
+                          <span className="text-[10px] font-bold text-primary text-center line-clamp-2">
                             {slip.category?.name || "N/A"}
                           </span>
                         </div>
@@ -245,16 +247,6 @@ export default function StudentSlips() {
                     </div>
                   ))}
                 </div>
-
-                <Separator />
-
-                <div className="py-4 px-4">
-                  <Pagination
-                    currentPage={currentPage}
-                    totalPages={data?.totalPages || 1}
-                    onPageChange={(page) => setCurrentPage(page)}
-                  />
-                </div>
               </>
             ) : (
               /* Empty State */
@@ -280,6 +272,15 @@ export default function StudentSlips() {
                 )}
               </div>
             )}
+
+            <Separator />
+
+            <Pagination
+              currentPage={currentPage}
+              totalPages={data?.totalPages || 1}
+              onPageChange={(page) => setCurrentPage(page)}
+              className="px-4 py-3 border-t-0 mt-0"
+            />
           </CardContent>
         </Card>
       </div>

@@ -38,14 +38,14 @@ const QUICK_ACTIONS: QuickAction[] = [
     color: "text-green-600 bg-green-50",
   },
   {
-    title: "My Appointments",
+    title: "Appointments",
     description: "View your appointments",
     icon: ClipboardList,
     to: "/student/appointments",
     color: "text-purple-600 bg-purple-50",
   },
   {
-    title: "My Admission Slips",
+    title: "Admission Slips",
     description: "Track submitted slips",
     icon: FileText,
     to: "/student/slips",

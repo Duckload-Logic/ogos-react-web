@@ -161,7 +161,7 @@ export default function Layout({ children, title }: LayoutProps) {
         "
           >
             {/* Logo */}
-            <div className="h-16 flex items-center gap-3 ml-[-8px]">
+            <div className="h-16 flex items-center gap-3 ml-[-8px] flex-1">
               <img src={PUPLogo} className="w-16 h-16 rounded-full" />
               <div className="flex flex-col items-center leading-tight font-semibold sm:block origin-left">
                 <p className="text-foreground text-sm">
@@ -173,9 +173,9 @@ export default function Layout({ children, title }: LayoutProps) {
               </div>
             </div>
 
-            <span className="text-sm opacity-90">{title}</span>
+            <span className="text-sm opacity-90 flex-1 text-center">{title}</span>
 
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 flex-1 justify-end">
               {/* Notification Bell */}
               <button
                 onClick={() => setShowNotifications(true)}
