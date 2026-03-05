@@ -9,6 +9,7 @@ interface StatsCardProps {
   icon: LucideIcon;
   iconColor: string;
   bgColor: string;
+  borderColor: string;
   animationDelay?: string;
 }
 
@@ -19,12 +20,13 @@ export function StatsCard({
   icon: Icon,
   iconColor,
   bgColor,
+  borderColor,
   animationDelay = "0.1s",
 }: StatsCardProps) {
   return (
     <Link to={to}>
       <Card
-        className="animate-fade-in-up hover:shadow-md transition-shadow cursor-pointer"
+        className={`animate-fade-in-up hover:shadow-md transition-shadow cursor-pointer border-l-4 ${borderColor}`}
         style={{ animationDelay, animationFillMode: "both" }}
       >
         <CardContent className="py-4 px-4 flex items-center gap-3">

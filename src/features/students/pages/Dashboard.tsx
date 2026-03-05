@@ -148,6 +148,7 @@ export function Dashboard() {
             icon={ClipboardList}
             iconColor="text-blue-600"
             bgColor="bg-blue-50"
+            borderColor="border-blue-400"
             animationDelay="0.1s"
           />
           <StatsCard
@@ -157,6 +158,7 @@ export function Dashboard() {
             icon={FileText}
             iconColor="text-green-600"
             bgColor="bg-green-50"
+            borderColor="border-green-400"
             animationDelay="0.1s"
           />
         </div>
