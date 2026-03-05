@@ -33,19 +33,19 @@ export function StudentProfileCard({
       className="animate-fade-in-up mb-6"
       style={{ animationDelay, animationFillMode: "both" }}
     >
-      <CardHeader className="pb-3">
+      <CardHeader className="pb-4">
         <CardTitle className="text-base flex items-center gap-2">
           <User className="h-4 w-4" />
           Student Profile
         </CardTitle>
         <CardDescription>Your personal information on record</CardDescription>
       </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="flex items-center gap-3">
-            <User className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">
+      <CardContent className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="flex gap-4">
+            <User className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+            <div className="flex-1">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                 Full Name
               </p>
               <p className="text-sm font-semibold text-foreground">
@@ -56,10 +56,10 @@ export function StudentProfileCard({
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <Mail className="h-4 w-4 text-muted-foreground" />
-            <div>
-              <p className="text-xs text-muted-foreground uppercase tracking-wide">
+          <div className="flex gap-4">
+            <Mail className="h-5 w-5 text-muted-foreground flex-shrink-0 mt-1" />
+            <div className="flex-1">
+              <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
                 Email Address
               </p>
               <p className="text-sm font-semibold text-foreground">
@@ -67,28 +67,6 @@ export function StudentProfileCard({
               </p>
             </div>
           </div>
-        </div>
-        <Separator className="my-4" />
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Badge
-              variant={isFormIncomplete ? "destructive" : "default"}
-              className="text-xs"
-            >
-              {isFormIncomplete ? "Incomplete" : "Complete"}
-            </Badge>
-            <span className="text-xs text-muted-foreground">
-              Personal Data Sheet
-            </span>
-          </div>
-          {isFormIncomplete && (
-            <Link to="/student/form">
-              <Button variant="outline" size="sm" className="gap-1 text-xs">
-                Complete Now
-                <ArrowRight className="h-3 w-3" />
-              </Button>
-            </Link>
-          )}
         </div>
       </CardContent>
     </Card>
