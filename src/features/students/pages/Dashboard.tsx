@@ -176,12 +176,12 @@ export function Dashboard() {
         {/* Confirmation Statement */}
         {!showForm && (
           <Alert
-            className="animate-fade-in-up border-l-4 border-green-500"
+            className="animate-fade-in-up border-l-4 border-green-500 bg-green-50 dark:bg-green-950/30 dark:border-green-600"
             style={{ animationDelay: "0.35s", animationFillMode: "both" }}
           >
-            <CheckCircle className="h-5 w-5 text-green-600" />
-            <AlertTitle className="text-green-900">Confirmation</AlertTitle>
-            <AlertDescription className="text-green-800 mt-1 text-sm">
+            <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
+            <AlertTitle className="text-green-900 dark:text-green-300">Confirmation</AlertTitle>
+            <AlertDescription className="text-green-800 dark:text-green-200 mt-1 text-sm">
               I hereby declare that all the information I have provided is true and correct to the best of my knowledge.
             </AlertDescription>
           </Alert>
