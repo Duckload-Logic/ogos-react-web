@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
-import { UserCircle, Settings, LogOut } from "lucide-react";
+import { Settings, LogOut } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface ProfileDropdownProps {
   firstName?: string;
@@ -56,7 +57,11 @@ export default function ProfileDropdown({
         onClick={() => setOpen(!open)}
         className="flex items-center gap-2 p-2 rounded hover:bg-muted transition text-foreground"
       >
-        <UserCircle size={28} />
+        <Avatar className="h-7 w-7">
+          <AvatarFallback className="text-xs font-semibold">
+            {firstName?.charAt(0)}{lastName?.charAt(0)}
+          </AvatarFallback>
+        </Avatar>
         <span className="text-sm hidden md:block">{roleLabel}</span>
       </button>
 
@@ -72,7 +77,11 @@ export default function ProfileDropdown({
             className="w-full text-left p-4 border-b border-border hover:bg-muted transition"
           >
             <div className="flex items-center gap-3">
-              <UserCircle size={36} />
+              <Avatar className="h-9 w-9">
+                <AvatarFallback className="font-semibold">
+                  {firstName?.charAt(0)}{lastName?.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
               <div>
                 <p className="text-sm font-semibold">
                   {firstName} {lastName}
