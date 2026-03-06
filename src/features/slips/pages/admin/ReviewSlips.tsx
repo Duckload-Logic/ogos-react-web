@@ -127,9 +127,9 @@ export default function ReviewSlips() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
       {/* Info Banner */}
-      <div className="bg-blue-500/10 border border-blue-300 rounded-lg p-4">
+      <div className="bg-blue-500/10 border border-blue-300 rounded-lg p-4 shadow-sm">
         <p className="text-sm text-blue-600 dark:text-blue-300">
           <strong>Note:</strong> Students request excuse slips in their portal.
           This page allows you to review, approve, reject, or request revisions
@@ -140,7 +140,7 @@ export default function ReviewSlips() {
         <Button
           variant="outline"
           onClick={() => navigate("/admin/slip-logs")}
-          className="gap-2 border-border"
+          className="gap-2 border-border transition-all duration-200 hover:scale-105"
         >
           <Archive className="h-4 w-4" />
           View All Logs
@@ -156,7 +156,7 @@ export default function ReviewSlips() {
                   setTimeFilter(filter);
                   setCurrentPage(1);
                 }}
-                className="transition-all border-border border hover:text-"
+                className="transition-all border-border border hover:scale-[1.03] active:scale-95"
               >
                 {getFilterLabel(filter)}
               </Button>
@@ -166,7 +166,7 @@ export default function ReviewSlips() {
       </div>
 
       {/* Tracker Card */}
-      <Card className="border-2 border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20">
+      <Card className="border-2 border-amber-200 bg-amber-50/50 dark:border-amber-900 dark:bg-amber-950/20 transition-all duration-300 hover:shadow-md hover:scale-[1.02]">
         <CardContent className="pt-6">
           <div className="space-y-2">
             <div className="flex items-center justify-between">
