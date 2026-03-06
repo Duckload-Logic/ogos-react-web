@@ -426,4 +426,17 @@
     ) !important; /* Use theme foreground */
     transition: background-color 5000s ease-in-out 0s; /* Prevent flash */
   }
+
+  /* Sidebar icon tilt animation */
+  @keyframes sidebar-tilt {
+    0% { transform: rotate(0deg); }
+    25% { transform: rotate(-8deg); }
+    50% { transform: rotate(6deg); }
+    75% { transform: rotate(-4deg); }
+    100% { transform: rotate(0deg); }
+  }
+
+  .sidebar-icon-tilt:hover svg {
+    animation: sidebar-tilt 0.35s ease-in-out;
+  }
 }
