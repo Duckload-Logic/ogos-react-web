@@ -80,15 +80,15 @@ export default function RescheduleModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-200">
         <DialogHeader>
           <DialogTitle>Reschedule Appointment</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm leading-relaxed text-muted-foreground">
             Select a new date and time slot.
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4 space-y-4">
+        <div className="py-4 space-y-5">
           <InputField
             type="date"
             label="New Date"
@@ -98,6 +98,12 @@ export default function RescheduleModal({
             onChange={setSelectedDateStr}
           />
 
+        {isLoading && (
+          <p className="text-xs text-muted-foreground animate-pulse">
+            Loading available time slots...
+          </p>
+        )}
+        
           <DropdownField
             label={"New time"}
             options={
@@ -114,12 +120,17 @@ export default function RescheduleModal({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button 
+          variant="outline" 
+          onClick={onClose}
+          className="transition-all duration-200 hover:scale-105"
+          >
             Cancel
           </Button>
           <Button
             onClick={handleConfirm}
             disabled={!selectedDateStr || !selectedSlotId}
+            className="transition-all duration-200 hover:scale-105"
           >
             Confirm Reschedule
           </Button>

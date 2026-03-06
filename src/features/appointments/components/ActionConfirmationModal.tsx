@@ -36,10 +36,10 @@ export default function ActionConfirmModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md animate-in fade-in zoom-in-95 duration-200">
         <DialogHeader>
           <DialogTitle>Confirm {action}</DialogTitle>
-          <DialogDescription>
+          <DialogDescription className="text-sm leading-relaxed">
             Are you sure you want to {action.toLowerCase()} this appointment?
             {requiresMessage && " Please provide a reason (optional)."}
           </DialogDescription>
@@ -52,15 +52,24 @@ export default function ActionConfirmModal({
               value={message}
               onChange={(e) => setMessage(e.target.value)}
               rows={3}
+              className="resize-none transition-all focus:ring-2 focus:ring-primary"
             />
           </div>
         )}
 
         <DialogFooter>
-          <Button variant="outline" onClick={onClose}>
+          <Button variant="outline" 
+          onClick={onClose}
+              className="transition-all duration-200 hover:scale-105"
+          >
             Cancel
           </Button>
-          <Button onClick={handleConfirm}>Confirm</Button>
+          <Button 
+            onClick={handleConfirm}
+            className="transition-all duration-200 hover:scale-105"
+          >
+            Confirm
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
