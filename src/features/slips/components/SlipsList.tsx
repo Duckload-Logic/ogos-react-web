@@ -60,7 +60,7 @@ export function SlipsList({
           ) : (
             <table className="w-full">
               <thead>
-                <tr className="border-b bg-muted/50">
+                <tr className="border-b bg-muted/60 sticky top-0 backdrop-blur">
                   <th className="px-4 py-3 text-left text-sm font-medium text-muted-foreground">
                     Student
                   </th>
@@ -85,11 +85,11 @@ export function SlipsList({
                 {slips.map((slip) => (
                   <tr
                     key={slip.id}
-                    className="border-b last:border-0 hover:bg-muted/50 transition-colors"
+                    className="border-b last:border-0 hover:bg-muted/50 transition-all duration-200 hover:scale-[1.01]"
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary ">
+                        <div className="w-8 h-8 shrink-0 rounded-full bg-primary/10 flex items-center justify-center text-xs font-semibold text-primary transition-transform duration-200 group-hover:scale-110">
                           {slip.user?.firstName?.[0]}
                           {slip.user?.lastName?.[0]}
                         </div>
@@ -135,7 +135,7 @@ export function SlipsList({
                         size="sm"
                         variant="outline"
                         onClick={() => onViewClick(slip)}
-                        className="gap-2 bg-muted/50 hover:bg-secondary/80 transition-colors duration-300"
+                        className="gap-2 bg-muted/50 hover:bg-secondary/80 transition-all duration-300 hover:scale-105"
                       >
                         <Eye className="w-4 h-4" />
                       </Button>

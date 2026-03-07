@@ -188,7 +188,7 @@ export default function AppointmentViewModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-3xl">
+        <DialogContent className="sm:max-w-3xl animate-in fade-in zoom-in-95 duration-200">
           <DialogHeader>
             <DialogTitle className="text-xl font-semibold flex items-center gap-2">
               <Calendar className="w-5 h-5 text-primary" />
@@ -211,7 +211,7 @@ export default function AppointmentViewModal({
             {/* Status Badge */}
             <div className="flex justify-start">
               <span
-                className={`inline-block px-3 py-1 rounded-full text-sm font-medium border ${
+                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border transition-all duration-200 hover:scale-105 ${
                   STATUS_COLORS[appointment.status?.colorKey || "info"]
                 }`}
               >
@@ -284,7 +284,7 @@ export default function AppointmentViewModal({
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Reason for Visit
                     </span>
-                    <span className="text-sm leading-relaxed whitespace-pre-wrap max-h-[150px] overflow-y-auto border border-border rounded-md px-3 py-1 bg-muted/50">
+                    <span className="text-sm leading-relaxed whitespace-pre-wrap max-h-[150px] overflow-y-auto border border-border rounded-md px-3 py-2 bg-muted/50 shadow-sm">
                       {appointment.reason || "No reason provided"}
                     </span>
                   </div>
@@ -315,7 +315,7 @@ export default function AppointmentViewModal({
                     <Button
                       key={action}
                       onClick={() => handleActionClick(action)}
-                      className={`${actionColor(action)} gap-2`}
+                      className={`${actionColor(action)} gap-2 transition-all duration-200 hover:scale-105`}
                       size="sm"
                     >
                       {actionIcon(action)}
@@ -328,7 +328,9 @@ export default function AppointmentViewModal({
           </div>
 
           <div className="flex justify-end">
-            <Button variant="outline" onClick={onClose}>
+            <Button variant="outline" 
+            onClick={onClose}
+            className="transition-all duration-200 hover:scale-105">
               Close
             </Button>
           </div>

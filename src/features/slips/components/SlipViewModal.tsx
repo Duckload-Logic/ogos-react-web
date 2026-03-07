@@ -118,7 +118,7 @@ export function SlipViewModal({
   return (
     <>
       <Dialog open={isOpen} onOpenChange={handleCloseModal}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto md:overflow-hidden flex flex-col w-[95vw] sm:w-full">
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto md:overflow-hidden flex flex-col w-[95vw] sm:w-full animate-in zoom-in-95 fade-in duration-200">
           <DialogHeader>
             <DialogTitle>Excuse Slip Details</DialogTitle>
             <DialogDescription>
@@ -126,11 +126,11 @@ export function SlipViewModal({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden animate-in fade-in duration-300">
             {/* Left Column - Details */}
             <div className="lg:col-span-2 overflow-y-auto pr-4 space-y-6">
               {/* Student Info Card */}
-              <Card>
+              <Card className="transition-all duration-200 hover:shadow-md">
                 <CardContent className="pt-6">
                   <div className="grid grid-cols-2 gap-4">
                     <div>
@@ -200,7 +200,7 @@ export function SlipViewModal({
               </Card>
 
               {/* Reason Card */}
-              <Card>
+              <Card className="transition-all duration-200 hover:shadow-md">
                 <CardContent className="pt-6">
                   <p className="text-sm font-medium text-muted-foreground">
                     Reason for Absence
@@ -211,7 +211,7 @@ export function SlipViewModal({
 
               {/* Admin Notes Card (if exists) */}
               {slip.adminNotes && (
-                <Card className="border-info-foreground border-0 border-l-4">
+                <Card className="border-info-foreground border-0 border-l-4 bg-muted/20 transition-all duration-200 hover:shadow-sm">
                   <CardContent className="pt-6">
                     <p className="text-sm font-medium text-info-foreground">
                       Admin Notes
@@ -229,7 +229,7 @@ export function SlipViewModal({
                   <Button
                     onClick={() => handleActionClick("approve")}
                     disabled={isLoading}
-                    className="gap-2 bg-green-600 hover:bg-green-700"
+                    className="gap-2 bg-green-600 hover:bg-green-700 transition-all duration-200 hover:scale-105"
                   >
                     <CheckCircle2 className="w-4 h-4" />
                     Approve
@@ -238,7 +238,7 @@ export function SlipViewModal({
                     onClick={() => handleActionClick("revision")}
                     disabled={isLoading}
                     variant="outline"
-                    className="gap-2"
+                    className="gap-2 transition-all duration-200 hover:scale-105"
                   >
                     <RefreshCw className="w-4 h-4" />
                     For Revision
@@ -247,7 +247,7 @@ export function SlipViewModal({
                     onClick={() => handleActionClick("reject")}
                     disabled={isLoading}
                     variant="destructive"
-                    className="gap-2"
+                    className="gap-2 transition-all duration-200 hover:scale-105"
                   >
                     <Ban className="w-4 h-4" />
                     Reject
@@ -259,7 +259,7 @@ export function SlipViewModal({
             {/* Right Column - Attachments (Scrollable) */}
             <div className="lg:col-span-1 overflow-y-auto">
               {attachments && attachments.length > 0 && (
-                <Card className="h-fit">
+                <Card className="h-fit transition-all duration-200 hover:shadow-md">
                   <CardContent className="pt-6">
                     <p className="text-sm font-medium text-muted-foreground mb-4">
                       Attachments
@@ -287,7 +287,7 @@ export function SlipViewModal({
           setIsConfirming(open);
         }}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="animate-in fade-in zoom-in-95 duration-200">
           <AlertDialogHeader>
             <AlertDialogTitle>
               {actionType === "approve"

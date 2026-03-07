@@ -3,7 +3,7 @@ import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PDSGate } from "@/components/PDSGate";
 
 // Shared
-import Layout from "@/components/Layout";
+import Layout from "@/components/layout/Layout";
 import NotFound from "@/pages/shared/NotFound";
 
 // Auth Feature

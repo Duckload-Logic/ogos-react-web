@@ -51,7 +51,7 @@ export default function ProfileDropdown({
   }, []);
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div className="relative z-[9999]" ref={menuRef}>
       {/* Trigger */}
       <button
         onClick={() => setOpen(!open)}
@@ -66,7 +66,10 @@ export default function ProfileDropdown({
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-2 w-72 bg-card text-card-foreground border border-border rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in zoom-in-95 isolate">
+        <div
+          onClick={(e) => e.stopPropagation()}
+          className="absolute right-0 mt-2 w-72 bg-card text-card-foreground border border-border rounded-xl shadow-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 isolate"
+        >
 
           {/* Profile Header */}
           <button
