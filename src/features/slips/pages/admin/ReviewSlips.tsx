@@ -139,7 +139,7 @@ export default function ReviewSlips() {
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <Button
           variant="outline"
-          onClick={() => navigate("/admin/slip-logs")}
+          onClick={() => navigate("/admin/admission-slips/logs")}
           className="gap-2 border-border transition-all duration-200 hover:scale-105"
         >
           <Archive className="h-4 w-4" />
