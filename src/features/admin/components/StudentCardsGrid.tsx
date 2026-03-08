@@ -22,7 +22,7 @@ export default function StudentCardsGrid({
   if (isStudentsLoading || !students) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" text="Loading students..." />
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -45,7 +45,7 @@ export default function StudentCardsGrid({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
       {students.map((student) => (
         <div
-          key={student.userId}
+          key={student.email}
           className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 border-3 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:border-primary/50"
         >
           <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-primary/70 opacity-60 group-hover:opacity-100 transition-opacity" />

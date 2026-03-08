@@ -1,12 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
 import { userService } from "../services/service";
+import { User } from "../types/user";
 
 const ME_QUERY_KEY = "me";
 
 export function useMe() {
   return useQuery({
     queryKey: ["users", ME_QUERY_KEY],
-    queryFn: async () => {
+    queryFn: async (): Promise<User> => {
       return userService.getCurrentUser();
     },
     enabled: !!localStorage.getItem("accessToken"),

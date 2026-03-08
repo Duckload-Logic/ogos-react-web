@@ -105,7 +105,6 @@ export interface StudentAddress {
 }
 
 export interface BasicInfo {
-  id?: number;
   firstName: string;
   middleName: string | null;
   lastName: string;

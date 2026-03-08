@@ -126,7 +126,7 @@ export default function SlipLogs() {
         <div className="flex flex-col items-start justify-start gap-8">
           <Link
             className="flex gap-2 group items-center text-sm text-foreground/70 font-medium hover:text-primary transition-colors w-max"
-            to="/admin/review-excuses"
+            to="/admin/admission-slips"
           >
             <div className="flex items-center gap-2">
               <CircleChevronLeft
