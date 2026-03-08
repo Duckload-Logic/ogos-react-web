@@ -24,7 +24,7 @@ export const useAppointments = (
 ) => {
   const { data: me } = useMe();
   return useQuery<PaginatedAppointmentsResponse>({
-    queryKey: [APPOINTMENTS_QUERY_KEY, me?.id, isMe, params],
+    queryKey: [APPOINTMENTS_QUERY_KEY, me?.email, isMe, params],
     queryFn: async () => {
       const result = isMe
         ? await appointmentService.getMyAppointments(params)
@@ -34,14 +34,14 @@ export const useAppointments = (
     staleTime: APPOINTMENT_STALE_TIME,
     gcTime: APPOINTMENT_GC_TIME,
     refetchOnWindowFocus: false,
-    enabled: isMe ? !!me?.id : true,
+    enabled: isMe ? !!me?.email : true,
   });
 };
 
 export const useAppointmentsStats = ({ params }: { params?: QueryParam }) => {
   const { data: me } = useMe();
   return useQuery<StatusCount[]>({
-    queryKey: ["appointments-stats", me?.id, params],
+    queryKey: ["appointments-stats", me?.email, params],
     queryFn: () => appointmentService.getAppointmentStats(params),
     staleTime: APPOINTMENT_STALE_TIME,
     gcTime: APPOINTMENT_GC_TIME,
@@ -58,7 +58,7 @@ export function useSubmitAppointment() {
       appointmentService.submitAppointment(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: [APPOINTMENTS_QUERY_KEY, "me", me?.id],
+        queryKey: [APPOINTMENTS_QUERY_KEY, "me", me?.email],
       });
     },
   });
@@ -76,7 +76,7 @@ export function useUpdateAppointmentStatus() {
         "✅ Mutation successful! Invalidating appointment queries...",
       );
       queryClient.invalidateQueries({
-        queryKey: [APPOINTMENTS_QUERY_KEY, "me", me?.id],
+        queryKey: [APPOINTMENTS_QUERY_KEY, "me", me?.email],
       });
       queryClient.invalidateQueries({
         queryKey: [APPOINTMENTS_QUERY_KEY, "all"],
