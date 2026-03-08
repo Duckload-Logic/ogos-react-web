@@ -119,7 +119,8 @@ const LOOKUP_GET_ROUTES = {
 
 const INVENTORY_GET_ROUTES = {
   listStudents: "/students/inventory/records",
-  iirByUserID: (userID: number) => `/students/inventory/records/user/${userID}`,
+  iirByUserEmail: (userEmail: string) =>
+    `/students/inventory/records/user/${userEmail}`,
   iirByIIRID: (iirID: number) => `/students/inventory/records/iir/${iirID}`,
   IIRProfile: (iirID: number) =>
     `/students/inventory/records/iir/${iirID}/profile`,
@@ -175,8 +176,8 @@ export const iirService = {
     return data;
   },
 
-  async getIIRByUserID(userID: number) {
-    const route = INVENTORY_GET_ROUTES.iirByUserID(userID);
+  async getIIRByUserEmail(userEmail: string) {
+    const route = INVENTORY_GET_ROUTES.iirByUserEmail(userEmail);
     const { data } = await apiClient.get(route);
     return data;
   },
@@ -193,6 +194,7 @@ export const iirService = {
   ): Promise<IIRForm | any> {
     const routeFunc = INVENTORY_GET_ROUTES[resourceType];
     if (typeof routeFunc === "function") {
+      // @ts-ignore
       const route = routeFunc(iirID);
       const { data } = await apiClient.get(route);
       return data;

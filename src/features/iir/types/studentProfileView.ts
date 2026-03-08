@@ -3,7 +3,7 @@ export interface IIRProfileView {
   userId: number;
   studentNumber: string;
   firstName: string;
-  middleName?: NullString;
+  middleName?: string;
   lastName: string;
   gender: {
     id: number;
