@@ -23,7 +23,7 @@ export const PDSGate = ({
   allowOnGuidancePage = false,
 }: PDSGateProps) => {
   const { data: me } = useMe();
-  const { data: iirRecord, isLoading } = useIIRStatus(me?.id || 0);
+  const { data: iirRecord, isLoading } = useIIRStatus(me?.email || "");
 
   if (isLoading) {
     return (
