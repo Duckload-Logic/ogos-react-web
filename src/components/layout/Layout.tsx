@@ -32,12 +32,12 @@ export default function Layout({ children, title }: LayoutProps) {
   const notificationRef = React.useRef<HTMLDivElement>(null);
   const [toasts, setToasts] = useState<string[]>([]);
   const triggerToast = (message: string) => {
-  setToasts((prev) => [...prev, message]);
+    setToasts((prev) => [...prev, message]);
 
-  setTimeout(() => {
-    setToasts((prev) => prev.slice(1));
-  }, 4000);
-};
+    setTimeout(() => {
+      setToasts((prev) => prev.slice(1));
+    }, 4000);
+  };
 
   useEffect(() => {
     if (darkMode) {
@@ -85,30 +85,29 @@ export default function Layout({ children, title }: LayoutProps) {
     <>
       <ErrorBoundary>
         <div className="flex flex-col h-screen overflow-hidden bg-background animate-in fade-in duration-300">
+          <Header
+            title={title}
+            user={user}
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
+            handleLogout={handleLogout}
+            getRoleLabel={getRoleLabel}
+            showNotifications={showNotifications}
+            setShowNotifications={setShowNotifications}
+          />
 
-        <Header
-          title={title}
-          user={user}
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-          handleLogout={handleLogout}
-          getRoleLabel={getRoleLabel}
-          showNotifications={showNotifications}
-          setShowNotifications={setShowNotifications}
-        />
-
-        <NotificationModal
-          showNotifications={showNotifications}
-          setShowNotifications={setShowNotifications}
-          toasts={toasts}
-        />
+          <NotificationModal
+            showNotifications={showNotifications}
+            setShowNotifications={setShowNotifications}
+            toasts={toasts}
+          />
 
           <div className="flex flex-1 overflow-hidden relative">
-              <Sidebar
-                navigationItems={navigationItems}
-                location={location}
-                setIsHovered={setIsHovered}
-              />
+            <Sidebar
+              navigationItems={navigationItems}
+              location={location}
+              setIsHovered={setIsHovered}
+            />
 
             {/* Main Content */}
             <div className="flex-1 flex flex-col overflow-hidden w-full relative">
