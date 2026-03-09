@@ -58,11 +58,11 @@ export default function AppointmentsList({
 
   return (
     <Card
-      className={`border border-border shadow-sm lg:col-span-3 flex flex-col justify-between transition-all duration-300 hover:shadow-md ${className || ""}`}
+      className={`border border-border shadow-sm lg:col-span-3 flex flex-col ${className || ""}`}
     >
-      <CardHeader className="border-b border-border px-5 py-5 space-y-5">
+      <CardHeader className="border-b border-border px-5 py-5 space-y-5 bg-muted/45">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="space-y-1">
+          <div className="space-y-1 text-left">
             <h2 className="text-lg font-semibold text-foreground">{title}</h2>
             <p className="text-sm text-muted-foreground">
               Review, filter, and manage appointment requests.
@@ -70,7 +70,7 @@ export default function AppointmentsList({
           </div>
 
           {!isLoading && appointments.length > 0 && (
-            <div className="rounded-full border border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground">
+            <div className="rounded-full border border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground self-start">
               {appointments.length} appointment
               {appointments.length !== 1 ? "s" : ""}
             </div>
@@ -91,7 +91,7 @@ export default function AppointmentsList({
               <button
                 key={filter.id}
                 onClick={() => onStatusChange(filter)}
-                className={`px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-all duration-200 ${
+                className={`px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-colors duration-200 ${
                   selectedStatus?.id === filter.id
                     ? "bg-primary text-primary-foreground border-primary shadow-sm"
                     : "bg-background text-muted-foreground border-border hover:bg-muted/60 hover:text-foreground"
@@ -115,9 +115,9 @@ export default function AppointmentsList({
         </div>
       </CardHeader>
 
-      <CardContent className="p-0">
+      <CardContent className="p-0 flex-1">
         {isLoading ? (
-          <div className="p-8 text-center">
+          <div className="flex min-h-[320px] items-center justify-center px-4 text-center">
             <p className="text-muted-foreground">Loading appointments...</p>
           </div>
         ) : appointments.length === 0 ? (
@@ -153,10 +153,9 @@ export default function AppointmentsList({
                   {appointments.map((apt) => (
                     <tr
                       key={apt.id}
-                      className="group rounded-xl bg-background shadow-sm ring-1 ring-border transition-all duration-200 hover:shadow-md hover:ring-primary/20"
+                      className="group rounded-xl bg-background shadow-sm ring-1 ring-border transition-colors duration-200 hover:bg-muted/20"
                     >
-                      <td className="px-4 py-4 text-foreground font-medium rounded-l-xl relative group-hover:text-primary">
-                        <span className="absolute left-0 top-2 bottom-2 w-1 bg-primary opacity-0 group-hover:opacity-100 transition rounded-r" />
+                      <td className="px-4 py-4 text-foreground font-medium rounded-l-xl">
                         {apt.user?.firstName}{" "}
                         {apt.user?.middleName?.[0]
                           ? `${apt.user?.middleName?.[0]}. `
@@ -209,7 +208,7 @@ export default function AppointmentsList({
               {appointments.map((apt) => (
                 <div
                   key={apt.id}
-                  className="p-4 space-y-3 hover:bg-muted/50 transition-all duration-200 hover:shadow-sm"
+                  className="p-4 space-y-3 hover:bg-muted/30 transition-colors duration-200"
                 >
                   <div className="flex items-start justify-between gap-2">
                     <div className="flex items-center gap-2 text-foreground font-medium">
@@ -252,7 +251,7 @@ export default function AppointmentsList({
                       variant="outline"
                       size="sm"
                       onClick={() => onViewClick(apt)}
-                      className="gap-1 transition-all duration-200 hover:scale-105"
+                      className="gap-1"
                     >
                       <Eye className="w-4 h-4" />
                       View
