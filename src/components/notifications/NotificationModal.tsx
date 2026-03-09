@@ -15,19 +15,13 @@ export default function NotificationModal({
 
   return (
     <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-
-      {/* Backdrop */}
       <div
-        className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
+        className="absolute inset-0 bg-slate-950/12 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
         onClick={() => setShowNotifications(false)}
       />
 
-      {/* Panel */}
-      <div className="relative bg-card w-[90%] max-w-2xl h-[75vh] rounded-2xl shadow-2xl border border-border flex flex-col animate-in fade-in zoom-in-95 slide-in-from-bottom-6 duration-300 backdrop-blur-lg">
-
-        {/* Header */}
+      <div className="relative bg-card w-[90%] max-w-2xl h-[75vh] rounded-2xl shadow-2xl border border-border flex flex-col animate-in fade-in zoom-in-95 slide-in-from-bottom-6 duration-300">
         <div className="flex items-center justify-between p-5 border-b border-border">
-
           <div>
             <h2 className="text-lg font-semibold flex items-center gap-2">
               <Bell size={16} className="text-primary" />
@@ -40,7 +34,6 @@ export default function NotificationModal({
           </div>
 
           <div className="flex items-center gap-3">
-
             <button className="text-xs text-muted-foreground hover:text-primary transition">
               Mark all as read
             </button>
@@ -51,11 +44,9 @@ export default function NotificationModal({
             >
               <X size={16} />
             </button>
-
           </div>
         </div>
 
-        {/* Tabs */}
         <div className="flex gap-6 px-6 py-3 border-b border-border text-sm">
           <button className="font-medium text-primary relative after:absolute after:-bottom-2 after:left-0 after:w-full after:h-[2px] after:bg-primary">
             All
@@ -66,10 +57,7 @@ export default function NotificationModal({
           </button>
         </div>
 
-        {/* Notification List */}
         <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1 scroll-smooth">
-
-          {/* Notification */}
           <NotificationItem
             icon={Calendar}
             color="blue"
@@ -95,19 +83,15 @@ export default function NotificationModal({
             description="The system generated the monthly analytics report."
             time="Yesterday"
           />
-
         </div>
 
-        {/* Footer */}
         <div className="border-t border-border p-4 text-center">
           <button className="text-sm text-primary hover:underline transition">
             View All Notifications
           </button>
         </div>
-
       </div>
 
-      {/* Toasts */}
       <div className="fixed top-6 right-6 z-[99999] flex flex-col gap-3">
         {toasts.map((toast, index) => (
           <div
@@ -119,11 +103,9 @@ export default function NotificationModal({
           </div>
         ))}
       </div>
-
     </div>
   );
 }
-
 
 function NotificationItem({
   icon: Icon,
@@ -133,7 +115,6 @@ function NotificationItem({
   time,
   unread,
 }: any) {
-
   const colors: any = {
     blue: "text-blue-500 bg-blue-500/10",
     purple: "text-purple-500 bg-purple-500/10",
@@ -142,36 +123,25 @@ function NotificationItem({
 
   return (
     <div
-      className={`group flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-all duration-200 hover:bg-muted/60 hover:scale-[1.02] hover:translate-x-1 hover:shadow-md ${
+      className={`group flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-colors duration-200 hover:bg-muted/60 ${
         unread ? "" : "opacity-70"
       }`}
     >
+      <span
+        className={`w-2 h-2 rounded-full mt-2 ${unread ? "bg-blue-500 shadow-sm" : ""}`}
+      />
 
-      {/* unread dot */}
-      <span className={`w-2 h-2 rounded-full mt-2 ${unread ? "bg-blue-500 animate-pulse shadow-sm" : ""}`} />
-
-      {/* icon */}
-      <div className={`p-2 rounded-lg transition-transform duration-200 group-hover:scale-110 ${colors[color]}`}>
+      <div className={`p-2 rounded-lg ${colors[color]}`}>
         <Icon size={18} />
       </div>
 
-      {/* content */}
       <div className="flex-1">
+        <p className="text-sm font-medium">{title}</p>
 
-        <p className="text-sm font-medium">
-          {title}
-        </p>
+        <p className="text-xs text-muted-foreground">{description}</p>
 
-        <p className="text-xs text-muted-foreground">
-          {description}
-        </p>
-
-        <p className="text-[11px] text-muted-foreground mt-1">
-          {time}
-        </p>
-
+        <p className="text-[11px] text-muted-foreground mt-1">{time}</p>
       </div>
-
     </div>
   );
 }
