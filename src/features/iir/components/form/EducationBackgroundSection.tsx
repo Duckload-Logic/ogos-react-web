@@ -2,7 +2,6 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Check } from "lucide-react";
 import { InputField } from "@/components/form";
-import { Checkbox } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
 
 interface FormErrors {
@@ -91,37 +90,41 @@ export const EducationBackgroundSection = forwardRef<
             Nature of Schooling
           </label>
           <div className="flex items-center gap-6">
-            {/* Continuous Checkbox */}
-            <div className="flex items-center gap-2">
-              <Checkbox square
-                id="continuous"
-                name="continuous"
-                checked={education?.natureOfSchooling === "Continuous"}
-                onCheckedChange={(checked) =>
-                  handleInputChange(
-                    "education.natureOfSchooling",
-                    checked ? "Continuous" : ""
-                  )
-                }
-                label="Continuous"
-              />
-            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                <input
+                  type="radio"
+                  name="natureOfSchooling"
+                  value="Continuous"
+                  checked={education?.natureOfSchooling === "Continuous"}
+                  onChange={() =>
+                    handleInputChange("education.natureOfSchooling", "Continuous")
+                  }
+                  className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                />
+                <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+              </div>
+              <span className="text-sm text-foreground">Continuous</span>
+            </label>
 
-            {/* Interrupted Checkbox */}
-            <div className="flex items-center gap-2">
-              <Checkbox square
-                id="interrupted"
-                name="interrupted"
-                checked={education?.natureOfSchooling === "Interrupted"}
-                onCheckedChange={(checked) =>
-                  handleInputChange(
-                    "education.natureOfSchooling",
-                    checked ? "Interrupted" : ""
-                  )
-                }
-                label="Interrupted, Why?"
-              />
-            </div>
+            <label className="flex items-center gap-2 cursor-pointer">
+              <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                <input
+                  type="radio"
+                  name="natureOfSchooling"
+                  value="Interrupted"
+                  checked={education?.natureOfSchooling === "Interrupted"}
+                  onChange={() =>
+                    handleInputChange("education.natureOfSchooling", "Interrupted")
+                  }
+                  className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                />
+                <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+              </div>
+              <span className="text-sm text-foreground">Interrupted, Why?</span>
+            </label>
           </div>
 
           {/* Interruption Reason Input */}
