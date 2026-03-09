@@ -14,10 +14,7 @@ import { useStatuses } from "../../hooks/useLookups";
 import { useDebounce } from "@/hooks/useDebounce";
 import { toISODateString } from "../../utils";
 import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { STATUS_COLORS } from "@/config/constants";
-import { useIIRPagination } from "@/features/iir/hooks";
-import { useNavigate } from "react-router-dom";
 
 import {
   Bar,
@@ -28,11 +25,7 @@ import {
   YAxis,
   Cell,
 } from "recharts";
-import {
-  ChartContainer,
-  ChartTooltip,
-  ChartTooltipContent,
-} from "@/components/ui/chart";
+import { ChartContainer } from "@/components/ui/chart";
 
 const chartConfig = {
   pending: {
@@ -66,7 +59,6 @@ const chartConfig = {
 };
 
 export default function AppointmentsManagement() {
-  const navigate = useNavigate();
   const { data: appointmentStatuses } = useStatuses();
 
   const statusWithAll = useMemo(() => {
@@ -254,30 +246,8 @@ export default function AppointmentsManagement() {
     };
   });
 
-  const { data: priorityStudentsData, isLoading: isPriorityStudentsLoading } =
-    useIIRPagination({
-      page: 1,
-      search: "",
-      courseId: 0,
-      genderId: 0,
-      yearLevel: 0,
-    });
-
-  const priorityStudents = useMemo(() => {
-    const students = priorityStudentsData?.students || [];
-
-    return [...students].sort((a, b) => b.yearLevel - a.yearLevel).slice(0, 3);
-  }, [priorityStudentsData]);
-
-  const formatYearLevel = (yearLevel: number) => {
-    if (yearLevel === 1) return "1st Year";
-    if (yearLevel === 2) return "2nd Year";
-    if (yearLevel === 3) return "3rd Year";
-    return `${yearLevel}th Year`;
-  };
-
   return (
-    <div className="max-w-8xl mx-auto px-4 py-2 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div className="max-w-8xl mx-auto px-4 py-2 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
       <div className="bg-blue-500/10 border border-blue-300 shadow-sm rounded-lg p-4">
         <p className="text-sm text-blue-600 dark:text-blue-300">
           <strong>Note:</strong> Students request appointments in their portal.
@@ -286,83 +256,28 @@ export default function AppointmentsManagement() {
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-6 gap-5 items-stretch">
-        {/* Row 1: Priority + Overview */}
-        <Card className="lg:col-span-2 border border-border shadow-sm overflow-hidden">
-          <div className="border-b border-border bg-gradient-to-r from-card to-muted/20 px-6 py-5">
-            <h2 className="text-xl font-bold tracking-tight text-foreground">
-              Priority Students
-            </h2>
-          </div>
-
-          <CardContent className="p-5 flex flex-col h-[calc(100%-76px)]">
-            <p className="text-sm text-muted-foreground mb-4">
-              Students to review quickly from current records.
-            </p>
-
-            <div className="space-y-3 flex-1">
-              {isPriorityStudentsLoading ? (
-                <div className="space-y-3">
-                  <div className="h-12 rounded-xl bg-muted animate-pulse" />
-                  <div className="h-12 rounded-xl bg-muted animate-pulse" />
-                  <div className="h-12 rounded-xl bg-muted animate-pulse" />
-                </div>
-              ) : priorityStudents.length > 0 ? (
-                priorityStudents.map((student) => (
-                  <div key={student.iirId} className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-muted text-sm font-semibold text-foreground">
-                      {student.firstName?.[0]}
-                      {student.lastName?.[0]}
-                    </div>
-
-                    <div className="min-w-0">
-                      <p className="text-sm font-semibold leading-tight text-foreground">
-                        {student.firstName} {student.lastName}
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        {student.course?.code} • {formatYearLevel(student.yearLevel)}
-                      </p>
-                    </div>
-                  </div>
-                ))
-              ) : (
-                <div className="rounded-xl border border-dashed border-border p-4 text-sm text-muted-foreground">
-                  No student records available.
-                </div>
-              )}
-            </div>
-
-            <Button
-              variant="outline"
-              className="w-full mt-4 rounded-xl h-10 text-sm font-medium"
-              onClick={() => navigate("/admin/student-records")}
-            >
-              View Student Directory
-            </Button>
-          </CardContent>
-        </Card>
-
-        <Card className="lg:col-span-4 border border-border shadow-sm overflow-hidden">
-          <div className="border-b border-border bg-gradient-to-r from-card to-muted/20 px-6 py-5">
+      <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 items-stretch">
+        <Card className="lg:col-span-6 border border-border bg-background/80 shadow-sm overflow-hidden">
+          <div className="border-b border-border bg-muted/45 px-6 py-5">
             <h2 className="text-xl font-bold tracking-tight text-foreground">
               Appointment Overview
             </h2>
           </div>
 
-          <CardContent className="p-6 flex flex-col min-h-[260px]">
+          <CardContent className="p-5 flex flex-col min-h-[250px]">
             <p className="text-sm text-muted-foreground mb-4">
               Current appointment status distribution
             </p>
 
-            <div className="rounded-2xl border border-border bg-card/60 p-3">
-              <div className="h-[220px]">
+            <div className="rounded-2xl border border-border bg-background/90 px-2 py-3 sm:px-3">
+              <div className="h-[236px]">
                 <ChartContainer config={chartConfig} className="h-full w-full">
                   <BarChart
                     layout="vertical"
                     accessibilityLayer
                     data={chartData}
-                    margin={{ top: 4, right: 20, left: 24, bottom: 2 }}
-                    barCategoryGap="18%"
+                    margin={{ top: 4, right: 8, left: 0, bottom: 2 }}
+                    barCategoryGap="16%"
                   >
                     <CartesianGrid
                       horizontal
@@ -384,14 +299,10 @@ export default function AppointmentsManagement() {
                       dataKey="status"
                       tickLine={false}
                       axisLine={false}
-                      width={130}
+                      width={88}
                       interval={0}
+                      tickMargin={6}
                       tick={{ fontSize: 11, fill: "#64748b", fontWeight: 600 }}
-                    />
-
-                    <ChartTooltip
-                      cursor={{ fill: "rgba(148,163,184,0.05)" }}
-                      content={<ChartTooltipContent hideLabel />}
                     />
 
                     <Bar
@@ -415,7 +326,7 @@ export default function AppointmentsManagement() {
                 </ChartContainer>
               </div>
 
-              <div className="mt-2 flex flex-wrap gap-2">
+              <div className="mt-3 flex flex-wrap gap-2">
                 {chartData.map((item) => (
                   <div
                     key={item.status}
@@ -438,7 +349,6 @@ export default function AppointmentsManagement() {
           </CardContent>
         </Card>
 
-        {/* Row 2: Calendar + List */}
         <div className="lg:col-span-2 h-full">
           <AppointmentCalendar
             title="Appointments Calendar"
