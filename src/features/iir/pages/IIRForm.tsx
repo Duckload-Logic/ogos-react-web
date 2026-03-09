@@ -75,7 +75,7 @@ export default function IIRForm() {
 
   useEffect(() => {
     const initializeFormData = () => {
-      if (isLoadingDraft || !me) return;
+      if (isLoadingDraft || !me || hasInitialized.current) return;
 
       const baseData = draft || EMPTY_IIR_FORM;
 
@@ -101,7 +101,7 @@ export default function IIRForm() {
         education: baseData.education || { schools: [] },
         family: baseData.family || {
           background: {},
-          relatedPersons: [],
+          relatedPersons: {},
           finance: {},
         },
         health: baseData.health || { healthRecord: {}, consultations: [] },
@@ -185,8 +185,9 @@ export default function IIRForm() {
           // Keep arrays as arrays
           current[key] = Array.isArray(current[key]) ? [...current[key]] : current[key];
         } else {
-          // Spread objects
-          current[key] = Array.isArray(current[key]) ? [...current[key]] : { ...current[key] };
+          // Next key is a string property — always spread as object
+          // Using [...array] would lose non-numeric string properties (e.g. relatedPersons.father)
+          current[key] = { ...current[key] };
         }
         current = current[key];
       }

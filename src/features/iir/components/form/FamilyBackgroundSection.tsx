@@ -410,7 +410,7 @@ export const FamilyBackgroundSection = forwardRef<
                       type="radio"
                       name="father-status"
                       value="living"
-                      checked={family?.relatedPersons?.father?.isLiving !== false}
+                      checked={family?.relatedPersons?.father?.isLiving === true}
                       onChange={() =>
                         handleInputChange("family.relatedPersons.father.isLiving", true)
                       }
@@ -507,7 +507,7 @@ export const FamilyBackgroundSection = forwardRef<
                       type="radio"
                       name="mother-status"
                       value="living"
-                      checked={family?.relatedPersons?.mother?.isLiving !== false}
+                      checked={family?.relatedPersons?.mother?.isLiving === true}
                       onChange={() =>
                         handleInputChange("family.relatedPersons.mother.isLiving", true)
                       }
@@ -604,7 +604,7 @@ export const FamilyBackgroundSection = forwardRef<
                       type="radio"
                       name="guardian-status"
                       value="living"
-                      checked={family?.relatedPersons?.guardian?.isLiving !== false}
+                      checked={family?.relatedPersons?.guardian?.isLiving === true}
                       onChange={() =>
                         handleInputChange("family.relatedPersons.guardian.isLiving", true)
                       }
