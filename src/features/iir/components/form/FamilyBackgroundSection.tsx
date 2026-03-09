@@ -92,16 +92,20 @@ export const FamilyBackgroundSection = forwardRef<
                 if (isOther && isSelected) {
                   return (
                     <div key={option.id} className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="parentalStatus"
-                        value={option.id}
-                        checked={true}
-                        onChange={(e) =>
-                          handleInputChange("family.background.parentalStatus", e.target.value)
-                        }
-                        className="w-4 h-4 cursor-pointer accent-red-600 flex-shrink-0"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                        <input
+                          type="radio"
+                          name="parentalStatus"
+                          value={option.id}
+                          checked={true}
+                          onChange={(e) =>
+                            handleInputChange("family.background.parentalStatus", e.target.value)
+                          }
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                       <span className="text-sm text-foreground whitespace-nowrap">Other, please specify:</span>
                       <input
                         type="text"
@@ -110,23 +114,27 @@ export const FamilyBackgroundSection = forwardRef<
                         onChange={(e) =>
                           handleInputChange("family.background.parentalStatusOther", e.target.value)
                         }
-                        className="flex-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm"
+                        className="flex-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm bg-card text-foreground"
                       />
                     </div>
                   );
                 } else if (isOther) {
                   return (
                     <label key={option.id} className="flex items-center gap-3 group cursor-pointer">
-                      <input
-                        type="radio"
-                        name="parentalStatus"
-                        value={option.id}
-                        checked={false}
-                        onChange={(e) =>
-                          handleInputChange("family.background.parentalStatus", e.target.value)
-                        }
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                        <input
+                          type="radio"
+                          name="parentalStatus"
+                          value={option.id}
+                          checked={false}
+                          onChange={(e) =>
+                            handleInputChange("family.background.parentalStatus", e.target.value)
+                          }
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                       <span className="text-sm text-foreground group-hover:text-primary transition-colors duration-200">
                         Other, please specify:
                       </span>
@@ -135,16 +143,20 @@ export const FamilyBackgroundSection = forwardRef<
                 } else {
                   return (
                     <label key={option.id} className="flex items-center gap-3 group cursor-pointer">
-                      <input
-                        type="radio"
-                        name="parentalStatus"
-                        value={option.id}
-                        checked={isSelected}
-                        onChange={(e) =>
-                          handleInputChange("family.background.parentalStatus", e.target.value)
-                        }
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                        <input
+                          type="radio"
+                          name="parentalStatus"
+                          value={option.id}
+                          checked={isSelected}
+                          onChange={(e) =>
+                            handleInputChange("family.background.parentalStatus", e.target.value)
+                          }
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                       <span className="text-sm text-foreground group-hover:text-primary transition-colors duration-200">
                         {option.name || option.text || option.code}
                       </span>
@@ -218,7 +230,7 @@ export const FamilyBackgroundSection = forwardRef<
                 Nature of Residence
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Checkbox
+                <Checkbox square
                   id="residence-family"
                   label="Family Home"
                   name="residence-family"
@@ -232,7 +244,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-bed"
                   label="Bed Spacer"
                   name="residence-bed"
@@ -246,7 +258,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-relative"
                   label="Relative's House"
                   name="residence-relative"
@@ -261,7 +273,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-rented"
                   label="Rented Apartment"
                   name="residence-rented"
@@ -276,7 +288,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-dorm"
                   label="Dormitory"
                   name="residence-dorm"
@@ -290,7 +302,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-married"
                   label="House of Married Brother/Sister"
                   name="residence-married"
@@ -305,7 +317,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-shared"
                   label="Shares Apartment with Friends"
                   name="residence-shared"
@@ -393,29 +405,37 @@ export const FamilyBackgroundSection = forwardRef<
               <label className="text-sm font-medium text-card-foreground">Status:</label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="father-status"
-                    value="living"
-                    checked={family?.relatedPersons?.father?.isLiving !== false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.father.isLiving", true)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="father-status"
+                      value="living"
+                      checked={family?.relatedPersons?.father?.isLiving !== false}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.father.isLiving", true)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Living</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="father-status"
-                    value="deceased"
-                    checked={family?.relatedPersons?.father?.isLiving === false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.father.isLiving", false)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="father-status"
+                      value="deceased"
+                      checked={family?.relatedPersons?.father?.isLiving === false}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.father.isLiving", false)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Deceased</span>
                 </label>
               </div>
@@ -482,29 +502,37 @@ export const FamilyBackgroundSection = forwardRef<
               <label className="text-sm font-medium text-card-foreground">Status:</label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="mother-status"
-                    value="living"
-                    checked={family?.relatedPersons?.mother?.isLiving !== false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.mother.isLiving", true)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="mother-status"
+                      value="living"
+                      checked={family?.relatedPersons?.mother?.isLiving !== false}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.mother.isLiving", true)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Living</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="mother-status"
-                    value="deceased"
-                    checked={family?.relatedPersons?.mother?.isLiving === false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.mother.isLiving", false)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="mother-status"
+                      value="deceased"
+                      checked={family?.relatedPersons?.mother?.isLiving === false}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.mother.isLiving", false)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Deceased</span>
                 </label>
               </div>
@@ -571,29 +599,37 @@ export const FamilyBackgroundSection = forwardRef<
               <label className="text-sm font-medium text-card-foreground">Status:</label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="guardian-status"
-                    value="living"
-                    checked={family?.relatedPersons?.guardian?.isLiving !== false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.guardian.isLiving", true)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="guardian-status"
+                      value="living"
+                      checked={family?.relatedPersons?.guardian?.isLiving !== false}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.guardian.isLiving", true)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Living</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="guardian-status"
-                    value="deceased"
-                    checked={family?.relatedPersons?.guardian?.isLiving === false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.guardian.isLiving", false)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="guardian-status"
+                      value="deceased"
+                      checked={family?.relatedPersons?.guardian?.isLiving === false}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.guardian.isLiving", false)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Deceased</span>
                 </label>
               </div>
@@ -727,7 +763,7 @@ export const FamilyBackgroundSection = forwardRef<
               Is your brother/sister who is gainfully employed providing support to your:
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Checkbox
+              <Checkbox square
                 id="sibling-support-family"
                 label="Family"
                 name="sibling-support-family"
@@ -741,7 +777,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="sibling-support-studies"
                 label="Your studies"
                 name="sibling-support-studies"
@@ -755,7 +791,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="sibling-support-own-family"
                 label="His/Her Own Family"
                 name="sibling-support-own-family"
@@ -780,7 +816,7 @@ export const FamilyBackgroundSection = forwardRef<
               Who finances your schooling?
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Checkbox
+              <Checkbox square
                 id="finance-parents"
                 label="Parents"
                 name="finance-parents"
@@ -794,7 +830,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="finance-spouse"
                 label="Spouse"
                 name="finance-spouse"
@@ -808,7 +844,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="finance-sibling"
                 label="Brother/Sister"
                 name="finance-sibling"
@@ -822,7 +858,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="finance-scholarship"
                 label="Scholarship"
                 name="finance-scholarship"
@@ -836,7 +872,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="finance-relatives"
                 label="Relatives"
                 name="finance-relatives"
@@ -850,7 +886,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="finance-self"
                 label="Self-supporting/Working Student"
                 name="finance-self"

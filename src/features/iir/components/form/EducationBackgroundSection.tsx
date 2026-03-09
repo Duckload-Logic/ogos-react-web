@@ -93,7 +93,7 @@ export const EducationBackgroundSection = forwardRef<
           <div className="flex items-center gap-6">
             {/* Continuous Checkbox */}
             <div className="flex items-center gap-2">
-              <Checkbox
+              <Checkbox square
                 id="continuous"
                 name="continuous"
                 checked={education?.natureOfSchooling === "Continuous"}
@@ -109,7 +109,7 @@ export const EducationBackgroundSection = forwardRef<
 
             {/* Interrupted Checkbox */}
             <div className="flex items-center gap-2">
-              <Checkbox
+              <Checkbox square
                 id="interrupted"
                 name="interrupted"
                 checked={education?.natureOfSchooling === "Interrupted"}

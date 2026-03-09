@@ -59,7 +59,7 @@ export const InterestsSection = forwardRef<
           {/* Academic Clubs Checkboxes - 3 column grid */}
           <div className="mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <Checkbox
+              <Checkbox square
                 id="mathClub"
                 name="mathClub"
                 label="Math Club"
@@ -69,7 +69,7 @@ export const InterestsSection = forwardRef<
                 }
               />
 
-              <Checkbox
+              <Checkbox square
                 id="scienceClub"
                 name="scienceClub"
                 label="Science Club"
@@ -92,7 +92,7 @@ export const InterestsSection = forwardRef<
                     }}
                     className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
                   />
-                  <div className="h-full w-full rounded-full border border-card-foreground bg-white transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
+                  <div className="h-full w-full rounded border border-card-foreground bg-card transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
                   <Check className="absolute h-3 w-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
                 </div>
                 <span className="text-sm text-foreground flex-shrink-0">Others:</span>
@@ -103,14 +103,14 @@ export const InterestsSection = forwardRef<
                     handleInputChange("interests.academic.othersSpecify", e.target.value)
                   }
                   placeholder="specify"
-                  className="px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm w-32 flex-shrink-0"
+                  className="px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm w-32 flex-shrink-0 bg-card text-foreground"
                   disabled={!interests?.academic?.othersChecked}
                 />
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Checkbox
+              <Checkbox square
                 id="debatingClub"
                 name="debatingClub"
                 label="Debating Club"
@@ -120,7 +120,7 @@ export const InterestsSection = forwardRef<
                 }
               />
 
-              <Checkbox
+              <Checkbox square
                 id="quizzersClub"
                 name="quizzersClub"
                 label="Quizzer's Club"
@@ -269,7 +269,7 @@ export const InterestsSection = forwardRef<
               Which of the following organizations have you participated in and which interest you most? (Please specify)
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <Checkbox
+              <Checkbox square
                 id="athletics"
                 name="athletics"
                 label="Athletics"
@@ -279,7 +279,7 @@ export const InterestsSection = forwardRef<
                 }
               />
 
-              <Checkbox
+              <Checkbox square
                 id="religiousOrganization"
                 name="religiousOrganization"
                 label="Religious Organization"
@@ -289,7 +289,7 @@ export const InterestsSection = forwardRef<
                 }
               />
 
-              <Checkbox
+              <Checkbox square
                 id="gleeClub"
                 name="gleeClub"
                 label="Glee Club"
@@ -299,7 +299,7 @@ export const InterestsSection = forwardRef<
                 }
               />
 
-              <Checkbox
+              <Checkbox square
                 id="dramatics"
                 name="dramatics"
                 label="Dramatics"
@@ -309,7 +309,7 @@ export const InterestsSection = forwardRef<
                 }
               />
 
-              <Checkbox
+              <Checkbox square
                 id="chessClub"
                 name="chessClub"
                 label="Chess Club"
@@ -319,7 +319,7 @@ export const InterestsSection = forwardRef<
                 }
               />
 
-              <Checkbox
+              <Checkbox square
                 id="scouting"
                 name="scouting"
                 label="Scouting"
@@ -344,7 +344,7 @@ export const InterestsSection = forwardRef<
                   }}
                   className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
                 />
-                <div className="h-full w-full rounded-full border border-card-foreground bg-white transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
+                <div className="h-full w-full rounded border border-card-foreground bg-card transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
                 <Check className="absolute h-3 w-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
               </div>
               <span className="text-sm text-foreground flex-shrink-0">Others:</span>
@@ -355,7 +355,7 @@ export const InterestsSection = forwardRef<
                   handleInputChange("interests.extraCurricular.organizationOthers", e.target.value)
                 }
                 placeholder="specify"
-                className="px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm w-32 flex-shrink-0"
+                className="px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm w-32 flex-shrink-0 bg-card text-foreground"
                 disabled={!interests?.extraCurricular?.organizationOthersChecked}
               />
             </div>
@@ -368,44 +368,56 @@ export const InterestsSection = forwardRef<
             </p>
             <div className="flex items-center gap-6">
               <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="occupationalPosition"
-                  value="officer"
-                  checked={interests?.extraCurricular?.occupationalPosition === "officer"}
-                  onChange={() =>
-                    handleInputChange("interests.extraCurricular.occupationalPosition", "officer")
-                  }
-                  className="w-4 h-4 cursor-pointer accent-red-600"
-                />
+                <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                  <input
+                    type="radio"
+                    name="occupationalPosition"
+                    value="officer"
+                    checked={interests?.extraCurricular?.occupationalPosition === "officer"}
+                    onChange={() =>
+                      handleInputChange("interests.extraCurricular.occupationalPosition", "officer")
+                    }
+                    className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                  <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                </div>
                 <span className="text-sm text-foreground">Officer</span>
               </label>
 
               <label className="flex items-center gap-3 cursor-pointer">
-                <input
-                  type="radio"
-                  name="occupationalPosition"
-                  value="member"
-                  checked={interests?.extraCurricular?.occupationalPosition === "member"}
-                  onChange={() =>
-                    handleInputChange("interests.extraCurricular.occupationalPosition", "member")
-                  }
-                  className="w-4 h-4 cursor-pointer accent-red-600"
-                />
+                <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                  <input
+                    type="radio"
+                    name="occupationalPosition"
+                    value="member"
+                    checked={interests?.extraCurricular?.occupationalPosition === "member"}
+                    onChange={() =>
+                      handleInputChange("interests.extraCurricular.occupationalPosition", "member")
+                    }
+                    className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                  <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                </div>
                 <span className="text-sm text-foreground">Member</span>
               </label>
 
               <div className="flex items-center gap-3">
-                <input
-                  type="radio"
-                  name="occupationalPosition"
-                  value="others"
-                  checked={interests?.extraCurricular?.occupationalPosition === "others"}
-                  onChange={() =>
-                    handleInputChange("interests.extraCurricular.occupationalPosition", "others")
-                  }
-                  className="w-4 h-4 cursor-pointer accent-red-600"
-                />
+                <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                  <input
+                    type="radio"
+                    name="occupationalPosition"
+                    value="others"
+                    checked={interests?.extraCurricular?.occupationalPosition === "others"}
+                    onChange={() =>
+                      handleInputChange("interests.extraCurricular.occupationalPosition", "others")
+                    }
+                    className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                  />
+                  <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                  <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm text-foreground">Others, please specify</span>
                   <input

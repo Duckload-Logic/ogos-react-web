@@ -392,7 +392,7 @@ export const PersonalInformationSection = forwardRef<
 
         {/* Employment Status Section */}
         <div className="mt-8 pt-6 border-t border-border">
-          <Checkbox
+          <Checkbox square
             id="isEmployed"
             label="Currently Employed"
             name="isEmployed"

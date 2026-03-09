@@ -167,24 +167,32 @@ export const HealthInformationSection = forwardRef<
                   <tr key={idx} className="border-b border-border">
                     <td className="py-2 px-3 text-sm text-foreground">{item.label}</td>
                     <td className="py-2 px-3 text-center">
-                      <input
-                        type="radio"
-                        name={`physical-${idx}`}
-                        value="yes"
-                        checked={item.yesValue === true}
-                        onChange={() => handleInputChange(item.yesKey, true)}
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
+                        <input
+                          type="radio"
+                          name={`physical-${idx}`}
+                          value="yes"
+                          checked={item.yesValue === true}
+                          onChange={() => handleInputChange(item.yesKey, true)}
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                     </td>
                     <td className="py-2 px-3 text-center">
-                      <input
-                        type="radio"
-                        name={`physical-${idx}`}
-                        value="no"
-                        checked={item.yesValue === false}
-                        onChange={() => handleInputChange(item.yesKey, false)}
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
+                        <input
+                          type="radio"
+                          name={`physical-${idx}`}
+                          value="no"
+                          checked={item.yesValue === false}
+                          onChange={() => handleInputChange(item.yesKey, false)}
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                     </td>
                     <td className="py-2 px-3">
                       <input
@@ -237,28 +245,36 @@ export const HealthInformationSection = forwardRef<
                   <tr key={idx} className="border-b border-border">
                     <td className="py-2 px-3 text-sm text-foreground">{type.label}</td>
                     <td className="py-2 px-3 text-center">
-                      <input
-                        type="radio"
-                        name={`consultation-${idx}`}
-                        value="yes"
-                        checked={type.consulted === true}
-                        onChange={() =>
-                          handleConsultationChange(type.type, "consulted", true)
-                        }
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
+                        <input
+                          type="radio"
+                          name={`consultation-${idx}`}
+                          value="yes"
+                          checked={type.consulted === true}
+                          onChange={() =>
+                            handleConsultationChange(type.type, "consulted", true)
+                          }
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                     </td>
                     <td className="py-2 px-3 text-center">
-                      <input
-                        type="radio"
-                        name={`consultation-${idx}`}
-                        value="no"
-                        checked={type.consulted === false}
-                        onChange={() =>
-                          handleConsultationChange(type.type, "consulted", false)
-                        }
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
+                        <input
+                          type="radio"
+                          name={`consultation-${idx}`}
+                          value="no"
+                          checked={type.consulted === false}
+                          onChange={() =>
+                            handleConsultationChange(type.type, "consulted", false)
+                          }
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                     </td>
                     <td className="py-2 px-3">
                       <input
