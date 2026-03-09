@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { useIsMobile } from "@/hooks/useIsMobile";
 
+
 export default function Navigation({
   navigationItems,
   location,
@@ -13,17 +14,20 @@ export default function Navigation({
 }) {
   const isMobile = useIsMobile();
 
+
   // 1. Lazy initializer: Read from localStorage immediately
   const [isHovered, setIsHovered] = useState(() => {
     const saved = localStorage.getItem("sidebarHovered");
     return saved ? JSON.parse(saved) : false;
   });
 
+
   // 2. Notify parent of state changes safely
   useEffect(() => {
     setExpanded(isHovered);
     localStorage.setItem("sidebarHovered", JSON.stringify(isHovered));
   }, [isHovered, setExpanded]);
+
 
   // Render bottom navigation for mobile
   if (isMobile) {
@@ -32,6 +36,7 @@ export default function Navigation({
         <div className="flex items-center justify-around h-16 px-2">
           {navigationItems.map((item) => {
             const activePage = location.pathname.startsWith(item.href);
+
 
             return (
               <Link
@@ -70,6 +75,7 @@ export default function Navigation({
     );
   }
 
+
   // Render sidebar for desktop
   return (
     <>
@@ -91,6 +97,7 @@ export default function Navigation({
               item.href === "/admin"
                 ? location.pathname === "/admin" // Strict match for Home
                 : location.pathname.startsWith(item.href); // Partial match for others
+
 
             return (
               <Link
@@ -116,6 +123,7 @@ export default function Navigation({
                   </div>
                 </div>
 
+
                 {/* 2. Label: Moved to a fixed left position so it doesn't push the icon */}
                 <span
                   className={`
@@ -138,3 +146,5 @@ export default function Navigation({
     </>
   );
 }
+
+
