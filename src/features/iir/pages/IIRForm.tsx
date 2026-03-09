@@ -14,6 +14,8 @@ import { LoadingSpinner } from "@/components/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HeroSection } from "@/components/ui/hero-section";
+import { AnimationStyles } from "@/components/ui/animations";
 import {
   AlertCircle,
   Save,
@@ -457,18 +459,13 @@ export default function IIRForm() {
   const currentSectionDef = FORM_SECTIONS.find((s) => s.id === currentSection);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Red Hero Section */}
-      <div className="bg-destructive text-white py-8 md:py-12 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold">
-            Individual Inventory Record Form
-          </h1>
-          <p className="text-base md:text-lg mt-2">
-            Complete your student profile information
-          </p>
-        </div>
-      </div>
+    <>
+      <AnimationStyles />
+      <HeroSection
+        greeting="Student Form"
+        title="Individual Inventory Record"
+        subtitle="Complete your student profile information for PUP Guidance Services"
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
@@ -818,6 +815,6 @@ export default function IIRForm() {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }
