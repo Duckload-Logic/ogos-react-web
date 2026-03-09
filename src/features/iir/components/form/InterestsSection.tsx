@@ -56,44 +56,50 @@ export const InterestsSection = forwardRef<
             A. Academic
           </h3>
 
-          {/* Academic Clubs Checkboxes - 3 column grid */}
+          {/* Academic Clubs - Radio buttons (single selection) */}
           <div className="mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <Checkbox square
-                id="mathClub"
-                name="mathClub"
-                label="Math Club"
-                checked={interests?.academic?.mathClub || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.academic.mathClub", checked === true)
-                }
-              />
-
-              <Checkbox square
-                id="scienceClub"
-                name="scienceClub"
-                label="Science Club"
-                checked={interests?.academic?.scienceClub || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.academic.scienceClub", checked === true)
-                }
-              />
+              {[
+                { value: "mathClub", label: "Math Club" },
+                { value: "scienceClub", label: "Science Club" },
+                { value: "debatingClub", label: "Debating Club" },
+                { value: "quizzersClub", label: "Quizzer's Club" },
+              ].map((opt) => (
+                <label key={opt.value} className="flex items-center gap-3 cursor-pointer">
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="academicClub"
+                      value={opt.value}
+                      checked={interests?.academic?.academicClub === opt.value}
+                      onChange={() => {
+                        handleInputChange("interests.academic.academicClub", opt.value);
+                        handleInputChange("interests.academic.othersSpecify", "");
+                      }}
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
+                  <span className="text-sm text-foreground">{opt.label}</span>
+                </label>
+              ))}
 
               <div className="flex items-center gap-3 whitespace-nowrap">
                 <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
                   <input
-                    type="checkbox"
-                    checked={interests?.academic?.othersChecked || false}
-                    onChange={(e) => {
-                      handleInputChange("interests.academic.othersChecked", e.target.checked);
-                      if (!e.target.checked) {
-                        handleInputChange("interests.academic.othersSpecify", "");
-                      }
+                    type="radio"
+                    name="academicClub"
+                    value="others"
+                    checked={interests?.academic?.academicClub === "others"}
+                    onChange={() => {
+                      handleInputChange("interests.academic.academicClub", "others");
+                      handleInputChange("interests.academic.othersSpecify", "");
                     }}
                     className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
                   />
-                  <div className="h-full w-full rounded border border-card-foreground bg-card transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
-                  <Check className="absolute h-3 w-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
+                  <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                  <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
                 </div>
                 <span className="text-sm text-foreground flex-shrink-0">Others:</span>
                 <input
@@ -104,31 +110,9 @@ export const InterestsSection = forwardRef<
                   }
                   placeholder="specify"
                   className="px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm w-32 flex-shrink-0 bg-card text-foreground"
-                  disabled={!interests?.academic?.othersChecked}
+                  disabled={interests?.academic?.academicClub !== "others"}
                 />
               </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Checkbox square
-                id="debatingClub"
-                name="debatingClub"
-                label="Debating Club"
-                checked={interests?.academic?.debatingClub || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.academic.debatingClub", checked === true)
-                }
-              />
-
-              <Checkbox square
-                id="quizzersClub"
-                name="quizzersClub"
-                label="Quizzer's Club"
-                checked={interests?.academic?.quizzersClub || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.academic.quizzersClub", checked === true)
-                }
-              />
             </div>
           </div>
 
@@ -269,85 +253,53 @@ export const InterestsSection = forwardRef<
               Which of the following organizations have you participated in and which interest you most? (Please specify)
             </p>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <Checkbox square
-                id="athletics"
-                name="athletics"
-                label="Athletics"
-                checked={interests?.extraCurricular?.athletics || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.extraCurricular.athletics", checked === true)
-                }
-              />
-
-              <Checkbox square
-                id="religiousOrganization"
-                name="religiousOrganization"
-                label="Religious Organization"
-                checked={interests?.extraCurricular?.religiousOrganization || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.extraCurricular.religiousOrganization", checked === true)
-                }
-              />
-
-              <Checkbox square
-                id="gleeClub"
-                name="gleeClub"
-                label="Glee Club"
-                checked={interests?.extraCurricular?.gleeClub || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.extraCurricular.gleeClub", checked === true)
-                }
-              />
-
-              <Checkbox square
-                id="dramatics"
-                name="dramatics"
-                label="Dramatics"
-                checked={interests?.extraCurricular?.dramatics || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.extraCurricular.dramatics", checked === true)
-                }
-              />
-
-              <Checkbox square
-                id="chessClub"
-                name="chessClub"
-                label="Chess Club"
-                checked={interests?.extraCurricular?.chessClub || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.extraCurricular.chessClub", checked === true)
-                }
-              />
-
-              <Checkbox square
-                id="scouting"
-                name="scouting"
-                label="Scouting"
-                checked={interests?.extraCurricular?.scouting || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.extraCurricular.scouting", checked === true)
-                }
-              />
+              {[
+                { value: "athletics", label: "Athletics" },
+                { value: "religiousOrganization", label: "Religious Organization" },
+                { value: "gleeClub", label: "Glee Club" },
+                { value: "dramatics", label: "Dramatics" },
+                { value: "chessClub", label: "Chess Club" },
+                { value: "scouting", label: "Scouting" },
+              ].map((opt) => (
+                <label key={opt.value} className="flex items-center gap-3 cursor-pointer">
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="organization"
+                      value={opt.value}
+                      checked={interests?.extraCurricular?.organization === opt.value}
+                      onChange={() => {
+                        handleInputChange("interests.extraCurricular.organization", opt.value);
+                        handleInputChange("interests.extraCurricular.organizationOthers", "");
+                      }}
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
+                  <span className="text-sm text-foreground">{opt.label}</span>
+                </label>
+              ))}
             </div>
 
             {/* Others - Separate row */}
             <div className="flex items-center gap-3 whitespace-nowrap">
               <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
                 <input
-                  type="checkbox"
-                  checked={interests?.extraCurricular?.organizationOthersChecked || false}
-                  onChange={(e) => {
-                    handleInputChange("interests.extraCurricular.organizationOthersChecked", e.target.checked);
-                    if (!e.target.checked) {
-                      handleInputChange("interests.extraCurricular.organizationOthers", "");
-                    }
+                  type="radio"
+                  name="organization"
+                  value="others"
+                  checked={interests?.extraCurricular?.organization === "others"}
+                  onChange={() => {
+                    handleInputChange("interests.extraCurricular.organization", "others");
+                    handleInputChange("interests.extraCurricular.organizationOthers", "");
                   }}
                   className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
                 />
-                <div className="h-full w-full rounded border border-card-foreground bg-card transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
-                <Check className="absolute h-3 w-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
+                <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
               </div>
-              <span className="text-sm text-foreground flex-shrink-0">Others:</span>
+              <span className="text-sm text-foreground flex-shrink-0">Others, please specify</span>
               <input
                 type="text"
                 value={interests?.extraCurricular?.organizationOthers || ""}
@@ -356,7 +308,7 @@ export const InterestsSection = forwardRef<
                 }
                 placeholder="specify"
                 className="px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm w-32 flex-shrink-0 bg-card text-foreground"
-                disabled={!interests?.extraCurricular?.organizationOthersChecked}
+                disabled={interests?.extraCurricular?.organization !== "others"}
               />
             </div>
           </div>

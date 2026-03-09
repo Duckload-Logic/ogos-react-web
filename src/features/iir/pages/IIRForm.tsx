@@ -10,6 +10,8 @@ import {
 } from "@/features/iir/hooks";
 import { IIRForm as IIRFormType } from "@/features/iir/types/IIRForm";
 import { EMPTY_IIR_FORM } from "@/features/iir/constants";
+import { validateObject } from "@/services/validationSchema";
+import { personalInformationValidationSchema } from "@/features/iir/config/personalInfoValidationSchema";
 import { LoadingSpinner } from "@/components/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -351,91 +353,168 @@ export default function IIRForm() {
     let totalCount = 0;
 
     switch (sectionIndex) {
-      case 1: // Personal Information
-        // BasicInfo fields (auto-filled but still count)
-        const basicFields = ["firstName", "lastName", "email"];
-        basicFields.forEach((field) => {
-          totalCount++;
-          if (countFilledField((localFormData?.student?.basicInfo as any)?.[field])) {
-            filledCount++;
-          }
-        });
+      case 1: { // Personal Information
+        // Drive completion from the same schema used for validation
+        const schemaFields = Object.keys(personalInformationValidationSchema);
+        const schemaErrors = validateObject({ student: localFormData?.student }, personalInformationValidationSchema);
+        totalCount = schemaFields.length;
+        filledCount = schemaFields.length - Object.keys(schemaErrors).length;
+        break;
+      }
 
-        // Key PersonalInfo fields to track
-        const personalFields = [
-          "dateOfBirth",
-          "placeOfBirth",
-          "gender",
-          "heightFt",
-          "weightKg",
-          "civilStatus",
-          "course",
-          "highSchoolGWA",
-          "mobileNumber",
-        ];
-        personalFields.forEach((field) => {
-          totalCount++;
-          if (countFilledField((localFormData?.student?.personalInfo as any)?.[field])) {
-            filledCount++;
-          }
-        });
+      case 2: { // Education
+        // Nature of schooling
+        totalCount++;
+        if (localFormData?.education?.natureOfSchooling) filledCount++;
 
-        // Emergency contact fields
-        const emergencyFields = ["firstName", "lastName", "contactNumber", "relationship"];
-        emergencyFields.forEach((field) => {
-          totalCount++;
-          if (countFilledField((localFormData?.student?.personalInfo?.emergencyContact as any)?.[field])) {
-            filledCount++;
-          }
-        });
-
-        // Address fields (Provincial and Residential)
-        const addressTypes = ["provincial", "residential"];
-        addressTypes.forEach((addrType) => {
-          const addressFields = ["region", "city", "barangay", "streetDetail"];
-          addressFields.forEach((field) => {
+        // Mirror the requiredFields from EducationBackgroundSection.getCompletionLevel
+        // There are 5 school levels displayed (indices 0-4); count all of them
+        const schoolFields = ["schoolName", "schoolAddress", "schoolType", "yearStarted", "yearCompleted"];
+        const schools = localFormData?.education?.schools ?? [];
+        const SCHOOL_LEVEL_COUNT = 5;
+        for (let i = 0; i < SCHOOL_LEVEL_COUNT; i++) {
+          schoolFields.forEach((field) => {
             totalCount++;
-            const val = (localFormData?.student?.addresses as any)?.[addrType]?.address?.[field];
-            if (countFilledField(val)) {
-              filledCount++;
-            }
+            if (countFilledField((schools[i] as any)?.[field])) filledCount++;
+          });
+        }
+        break;
+      }
+
+      case 3: { // Family Background
+        const bg = localFormData?.family?.background as any;
+        const finance = localFormData?.family?.finance as any;
+        const relatedPersons = localFormData?.family?.relatedPersons as any;
+
+        // Parental status
+        const familyBgFields = ["parentalStatus", "numberOfChildren", "brothers", "sisters"];
+        familyBgFields.forEach((field) => {
+          totalCount++;
+          if (bg?.[field] !== undefined && bg?.[field] !== null && bg?.[field] !== "") filledCount++;
+        });
+
+        // natureOfResidence is an object of booleans — check at least one is true
+        totalCount++;
+        const residence = bg?.natureOfResidence;
+        if (residence && Object.values(residence).some((v) => v === true)) filledCount++;
+
+        // Finance fields
+        totalCount++;
+        if (finance?.monthlyFamilyIncomeRange?.id) filledCount++;
+        totalCount++;
+        if (finance?.weeklyAllowance && finance.weeklyAllowance !== "0" && finance.weeklyAllowance !== 0) filledCount++;
+
+        // Track father and mother name fields individually
+        const personFields = ["name", "age", "educationalAttainment", "occupation"];
+        ["father", "mother"].forEach((person) => {
+          personFields.forEach((field) => {
+            totalCount++;
+            if (countFilledField(relatedPersons?.[person]?.[field])) filledCount++;
           });
         });
         break;
+      }
 
-      case 2: // Education
-        totalCount = 1;
-        filledCount = (localFormData?.education?.schools?.length ?? 0) > 0 ? 1 : 0;
+      case 4: { // Health Information
+        const hr = localFormData?.health?.healthRecord as any;
+
+        // Physical items: yes/no answer required; if yes, details field also required
+        const physicalItems = [
+          { bool: "visionHasProblem", detail: "visionDetails" },
+          { bool: "hearingHasProblem", detail: "hearingDetails" },
+          { bool: "speechHasProblem", detail: "speechDetails" },
+          { bool: "generalHealthHasProblem", detail: "generalHealthDetails" },
+        ];
+        physicalItems.forEach(({ bool, detail }) => {
+          totalCount++;
+          if (hr?.[bool] !== undefined) {
+            filledCount++;
+            if (hr[bool] === true) {
+              // YES selected — require the details field too
+              totalCount++;
+              if (countFilledField(hr?.[detail])) filledCount++;
+            }
+          }
+        });
+
+        // Consultations: yes/no required per type; if yes, whenDate + forWhat also required
+        const consultations = localFormData?.health?.consultations ?? [];
+        const consultationTypes = ["Psychiatrist", "Psychologist", "Counselor"];
+        consultationTypes.forEach((type) => {
+          totalCount++;
+          const record = Array.isArray(consultations)
+            ? consultations.find((c: any) => c?.professionalType === type)
+            : null;
+          if (record?.hasConsulted !== undefined) {
+            filledCount++;
+            if (record.hasConsulted === true) {
+              // YES selected — require whenDate and forWhat too
+              totalCount += 2;
+              if (countFilledField(record?.whenDate)) filledCount++;
+              if (countFilledField(record?.forWhat)) filledCount++;
+            }
+          }
+        });
         break;
+      }
 
-      case 3: // Family Background
-        totalCount = 2;
-        if (localFormData?.family?.background && Object.keys(localFormData.family.background).length > 0) {
+      case 5: { // Interests and Hobbies
+        const interests = localFormData?.interests as any;
+
+        // Favorite and least liked subjects
+        totalCount++;
+        if (interests?.academic?.favoriteSubjects) filledCount++;
+        totalCount++;
+        if (interests?.academic?.leastLikedSubjects) filledCount++;
+
+        // At least one hobby filled (check first two)
+        totalCount++;
+        if (interests?.hobbies?.[0]?.hobbyName || interests?.hobbies?.["0"]?.hobbyName) filledCount++;
+        totalCount++;
+        if (interests?.hobbies?.[1]?.hobbyName || interests?.hobbies?.["1"]?.hobbyName) filledCount++;
+
+        // Academic club (single radio selection)
+        totalCount++;
+        const academicClub = interests?.academic?.academicClub;
+        if (academicClub) {
           filledCount++;
+          if (academicClub === "others") {
+            totalCount++;
+            if (countFilledField(interests?.academic?.othersSpecify)) filledCount++;
+          }
         }
-        if ((localFormData?.family?.relatedPersons?.length ?? 0) > 0) {
-          filledCount++;
-        }
-        break;
 
-      case 4: // Health
-        totalCount = 1;
-        if (localFormData?.health?.healthRecord && Object.keys(localFormData.health.healthRecord).length > 0) {
+        // Organization (single radio selection)
+        totalCount++;
+        const org = interests?.extraCurricular?.organization;
+        if (org) {
           filledCount++;
+          if (org === "others") {
+            totalCount++;
+            if (countFilledField(interests?.extraCurricular?.organizationOthers)) filledCount++;
+          }
+        }
+
+        // Occupational position in organization
+        totalCount++;
+        const occPos = interests?.extraCurricular?.occupationalPosition;
+        if (occPos) {
+          filledCount++;
+          if (occPos === "others") {
+            totalCount++;
+            if (countFilledField(interests?.extraCurricular?.occupationalOthers)) filledCount++;
+          }
         }
         break;
+      }
 
-      case 5: // Interests
+      case 6: { // Test Results (optional)
         totalCount = 1;
-        if (localFormData?.interests && Object.keys(localFormData.interests).length > 0) {
-          filledCount++;
-        }
+        const hasTestResults = Array.isArray(localFormData?.testResults) &&
+          localFormData.testResults.some((r: any) => r?.nameOfTest || r?.testName || r?.date || r?.testDate);
+        filledCount = hasTestResults ? 1 : 0;
         break;
-
-      case 6: // Test Results
-        totalCount = 1;
-        filledCount = (localFormData?.testResults?.length ?? 0) > 0 ? 1 : 0;
-        break;
+      }
     }
 
     return totalCount > 0 ? Math.round((filledCount / totalCount) * 100) : 0;
