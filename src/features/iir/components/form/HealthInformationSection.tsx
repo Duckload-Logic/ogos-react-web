@@ -68,24 +68,14 @@ export const HealthInformationSection = forwardRef<
         ...consultations[existingIndex],
         [field === "consulted" ? "hasConsulted" : field]: value,
       };
-    } else if (
-      value !== false &&
-      value !== "" &&
-      (field === "consulted" || field === "whenDate" || field === "forWhat")
-    ) {
-      // Create new consultation only if setting to true or non-empty string
+    } else if (field === "consulted" || (value !== "" && value !== null)) {
+      // Create a new record for any consulted click (yes or no) or non-empty text fields
       consultations.push({
         professionalType,
         hasConsulted: field === "consulted" ? value : false,
         whenDate: field === "whenDate" ? value : null,
         forWhat: field === "forWhat" ? value : null,
       });
-    } else if (existingIndex >= 0 && value === false) {
-      // If setting consulted to false, we might want to keep the record
-      consultations[existingIndex] = {
-        ...consultations[existingIndex],
-        hasConsulted: false,
-      };
     }
 
     onChange("health.consultations", consultations);
