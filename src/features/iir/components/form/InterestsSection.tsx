@@ -56,50 +56,44 @@ export const InterestsSection = forwardRef<
             A. Academic
           </h3>
 
-          {/* Academic Clubs - Radio buttons (single selection) */}
+          {/* Academic Clubs Checkboxes - 3 column grid */}
           <div className="mb-6">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              {[
-                { value: "mathClub", label: "Math Club" },
-                { value: "scienceClub", label: "Science Club" },
-                { value: "debatingClub", label: "Debating Club" },
-                { value: "quizzersClub", label: "Quizzer's Club" },
-              ].map((opt) => (
-                <label key={opt.value} className="flex items-center gap-3 cursor-pointer">
-                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                    <input
-                      type="radio"
-                      name="academicClub"
-                      value={opt.value}
-                      checked={interests?.academic?.academicClub === opt.value}
-                      onChange={() => {
-                        handleInputChange("interests.academic.academicClub", opt.value);
-                        handleInputChange("interests.academic.othersSpecify", "");
-                      }}
-                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                  </div>
-                  <span className="text-sm text-foreground">{opt.label}</span>
-                </label>
-              ))}
+              <Checkbox square
+                id="mathClub"
+                name="mathClub"
+                label="Math Club"
+                checked={interests?.academic?.mathClub || false}
+                onCheckedChange={(checked) =>
+                  handleInputChange("interests.academic.mathClub", checked === true)
+                }
+              />
+
+              <Checkbox square
+                id="scienceClub"
+                name="scienceClub"
+                label="Science Club"
+                checked={interests?.academic?.scienceClub || false}
+                onCheckedChange={(checked) =>
+                  handleInputChange("interests.academic.scienceClub", checked === true)
+                }
+              />
 
               <div className="flex items-center gap-3 whitespace-nowrap">
                 <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
                   <input
-                    type="radio"
-                    name="academicClub"
-                    value="others"
-                    checked={interests?.academic?.academicClub === "others"}
-                    onChange={() => {
-                      handleInputChange("interests.academic.academicClub", "others");
-                      handleInputChange("interests.academic.othersSpecify", "");
+                    type="checkbox"
+                    checked={interests?.academic?.othersChecked || false}
+                    onChange={(e) => {
+                      handleInputChange("interests.academic.othersChecked", e.target.checked);
+                      if (!e.target.checked) {
+                        handleInputChange("interests.academic.othersSpecify", "");
+                      }
                     }}
                     className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
                   />
-                  <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                  <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  <div className="h-full w-full rounded border border-card-foreground bg-card transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
+                  <Check className="absolute h-3 w-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
                 </div>
                 <span className="text-sm text-foreground flex-shrink-0">Others:</span>
                 <input
@@ -110,9 +104,31 @@ export const InterestsSection = forwardRef<
                   }
                   placeholder="specify"
                   className="px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm w-32 flex-shrink-0 bg-card text-foreground"
-                  disabled={interests?.academic?.academicClub !== "others"}
+                  disabled={!interests?.academic?.othersChecked}
                 />
               </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <Checkbox square
+                id="debatingClub"
+                name="debatingClub"
+                label="Debating Club"
+                checked={interests?.academic?.debatingClub || false}
+                onCheckedChange={(checked) =>
+                  handleInputChange("interests.academic.debatingClub", checked === true)
+                }
+              />
+
+              <Checkbox square
+                id="quizzersClub"
+                name="quizzersClub"
+                label="Quizzer's Club"
+                checked={interests?.academic?.quizzersClub || false}
+                onCheckedChange={(checked) =>
+                  handleInputChange("interests.academic.quizzersClub", checked === true)
+                }
+              />
             </div>
           </div>
 

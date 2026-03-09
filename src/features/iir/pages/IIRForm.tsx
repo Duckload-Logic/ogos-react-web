@@ -473,16 +473,11 @@ export default function IIRForm() {
         totalCount++;
         if (interests?.hobbies?.[1]?.hobbyName || interests?.hobbies?.["1"]?.hobbyName) filledCount++;
 
-        // Academic club (single radio selection)
+        // At least one academic club checked
         totalCount++;
-        const academicClub = interests?.academic?.academicClub;
-        if (academicClub) {
-          filledCount++;
-          if (academicClub === "others") {
-            totalCount++;
-            if (countFilledField(interests?.academic?.othersSpecify)) filledCount++;
-          }
-        }
+        const hasAcademic = interests?.academic?.mathClub || interests?.academic?.scienceClub ||
+          interests?.academic?.debatingClub || interests?.academic?.quizzersClub || interests?.academic?.othersChecked;
+        if (hasAcademic) filledCount++;
 
         // Organization (single radio selection)
         totalCount++;
