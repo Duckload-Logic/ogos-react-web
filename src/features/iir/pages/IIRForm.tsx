@@ -579,7 +579,7 @@ export default function IIRForm() {
                         className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium text-xs sm:text-sm transition-colors flex flex-col items-center gap-1 min-w-fit ${
                           currentSection === section.id
                             ? "bg-primary text-primary-foreground shadow-md"
-                            : "bg-white border border-gray-200 text-gray-900"
+                            : "bg-card border border-border text-foreground"
                         }`}
                       >
                         <span className="whitespace-nowrap">{section.id}</span>
@@ -666,7 +666,7 @@ export default function IIRForm() {
             </div>
 
             {/* Form Navigation Buttons */}
-            <div className="sticky bottom-0 flex justify-between gap-3 bg-white dark:bg-neutral-800 p-4 border-t border-gray-300 dark:border-gray-700 shadow-lg flex-wrap z-20 rounded-2xl">
+            <div className="sticky bottom-0 flex justify-between gap-3 bg-card p-4 border-t border-border shadow-lg flex-wrap z-20 rounded-2xl">
               <Button
                 onClick={() => {
                   // Reset form but preserve autofilled fields

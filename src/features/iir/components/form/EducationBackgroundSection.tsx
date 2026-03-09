@@ -212,7 +212,7 @@ export const EducationBackgroundSection = forwardRef<
                             )
                           }
                           className={`
-                            w-full px-3 py-2 border rounded-md bg-white dark:!bg-neutral-800 text-sm
+                            w-full px-3 py-2 border rounded-md bg-card text-sm
                             appearance-none cursor-pointer transition-all duration-200
                             focus:outline-none focus:ring-2 focus:ring-offset-0
                             ${

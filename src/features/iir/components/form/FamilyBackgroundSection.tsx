@@ -619,8 +619,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.numberOfChildren
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.numberOfChildren && (
@@ -640,8 +640,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.brothers
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.brothers && (
@@ -661,8 +661,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.sisters
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.sisters && (
@@ -685,8 +685,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.employedSiblings
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.employedSiblings && (
@@ -706,8 +706,8 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.ordinalPosition
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {family?.background?.ordinalPosition && (
@@ -901,7 +901,7 @@ export const FamilyBackgroundSection = forwardRef<
                   }
                 }}
                 className={`
-                  w-full px-3 py-2 border rounded-md bg-white dark:!bg-neutral-800 text-sm
+                  w-full px-3 py-2 border rounded-md bg-card text-sm
                   appearance-none cursor-pointer transition-all duration-200
                   focus:outline-none focus:ring-2 focus:ring-offset-0 text-foreground
                   ${
@@ -939,7 +939,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                   onBlur={() => setOtherTouched(true)}
-                  className={`flex-1 ml-0 mt-2 px-3 py-2 border rounded-md text-sm bg-white dark:!bg-neutral-800 focus:outline-none ${
+                  className={`flex-1 ml-0 mt-2 px-3 py-2 border rounded-md text-sm bg-card focus:outline-none ${
                     otherTouched && !(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "")
                       ? "border-red-500 focus:ring-red-500/20"
                       : "border-border"

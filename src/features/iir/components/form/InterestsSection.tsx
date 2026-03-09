@@ -182,8 +182,8 @@ export const InterestsSection = forwardRef<
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       interests?.hobbies?.[0]?.hobbyName
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {interests?.hobbies?.[0]?.hobbyName && (
@@ -205,8 +205,8 @@ export const InterestsSection = forwardRef<
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       interests?.hobbies?.[2]?.hobbyName
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {interests?.hobbies?.[2]?.hobbyName && (
@@ -228,8 +228,8 @@ export const InterestsSection = forwardRef<
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       interests?.hobbies?.[1]?.hobbyName
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {interests?.hobbies?.[1]?.hobbyName && (
@@ -251,8 +251,8 @@ export const InterestsSection = forwardRef<
                     placeholder="Hobby"
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       interests?.hobbies?.[3]?.hobbyName
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
                   {interests?.hobbies?.[3]?.hobbyName && (
@@ -418,8 +418,8 @@ export const InterestsSection = forwardRef<
                     disabled={interests?.extraCurricular?.occupationalPosition !== "others"}
                     className={`px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                       interests?.extraCurricular?.occupationalPosition === "others"
-                        ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
-                        : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
+                        ? "border-border bg-card focus:border-border focus:ring-ring/20"
+                        : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
                     }`}
                   />
                 </div>

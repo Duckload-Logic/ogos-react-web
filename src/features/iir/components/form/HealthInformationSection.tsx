@@ -197,8 +197,8 @@ export const HealthInformationSection = forwardRef<
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           item.yesValue === true
-                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
-                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
+                            ? "border-border bg-card focus:border-border focus:ring-ring/20"
+                            : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
                     </td>
@@ -275,8 +275,8 @@ export const HealthInformationSection = forwardRef<
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           type.consulted === true
-                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
-                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
+                            ? "border-border bg-card focus:border-border focus:ring-ring/20"
+                            : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
                     </td>
@@ -295,8 +295,8 @@ export const HealthInformationSection = forwardRef<
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           type.consulted === true
-                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
-                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
+                            ? "border-border bg-card focus:border-border focus:ring-ring/20"
+                            : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
                     </td>

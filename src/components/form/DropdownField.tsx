@@ -82,8 +82,8 @@ export default function DropdownField({
               !enabled || loading
                 ? 'bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none'
                 : isFilled
-                  ? 'bg-white dark:bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                  : 'bg-white dark:bg-neutral-800 border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
+                  ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                  : 'bg-card border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
             } ${
               error ? "border-red-500" : ""
             }`}
@@ -112,7 +112,7 @@ export default function DropdownField({
           </button>
         </div>
         {isOpen && (
-          <div className="w-full min-w-[200px] max-h-[200px] overflow-y-auto absolute mt-1 bg-white dark:bg-neutral-800 border border-border rounded-md shadow-lg z-50 p-2">
+          <div className="w-full min-w-[200px] max-h-[200px] overflow-y-auto absolute mt-1 bg-card border border-border rounded-md shadow-lg z-50 p-2">
             {options.length === 0 ? (
               <div className="px-2 py-1.5 text-sm text-muted-foreground">
                 No options available
