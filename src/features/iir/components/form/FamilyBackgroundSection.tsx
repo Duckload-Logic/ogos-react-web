@@ -659,7 +659,7 @@ export const FamilyBackgroundSection = forwardRef<
                         : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {family?.background?.numberOfChildren && (
+                  {!!family?.background?.numberOfChildren && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -680,7 +680,7 @@ export const FamilyBackgroundSection = forwardRef<
                         : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {family?.background?.brothers && (
+                  {!!family?.background?.brothers && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -701,7 +701,7 @@ export const FamilyBackgroundSection = forwardRef<
                         : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {family?.background?.sisters && (
+                  {!!family?.background?.sisters && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -725,7 +725,7 @@ export const FamilyBackgroundSection = forwardRef<
                         : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {family?.background?.employedSiblings && (
+                  {!!family?.background?.employedSiblings && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -746,7 +746,7 @@ export const FamilyBackgroundSection = forwardRef<
                         : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {family?.background?.ordinalPosition && (
+                  {!!family?.background?.ordinalPosition && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -955,7 +955,7 @@ export const FamilyBackgroundSection = forwardRef<
                 ))}
                 <option value="others">Others</option>
               </select>
-              {family?.finance?.monthlyFamilyIncomeRange?.id && (
+              {!!family?.finance?.monthlyFamilyIncomeRange?.id && (
                 <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
               )}
             </div>
