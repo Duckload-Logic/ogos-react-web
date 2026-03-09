@@ -182,7 +182,7 @@ export const PersonalInformationSection = forwardRef<
           />
 
           {/* Civil Status */}
-          <DropdownField
+          <DropdownField formStyle
             label="Civil Status"
             options={civilStatuses}
             value={studentInfo?.personalInfo?.civilStatus?.id || ""}
@@ -193,7 +193,7 @@ export const PersonalInformationSection = forwardRef<
           />
 
           {/* Religion */}
-          <DropdownField
+          <DropdownField formStyle
             label="Religion"
             options={religions}
             value={studentInfo?.personalInfo?.religion?.id || ""}
@@ -217,7 +217,7 @@ export const PersonalInformationSection = forwardRef<
           />
 
           {/* Course */}
-          <DropdownField
+          <DropdownField formStyle
             label="Course"
             options={courses}
             value={studentInfo?.personalInfo?.course?.id || ""}
@@ -277,7 +277,7 @@ export const PersonalInformationSection = forwardRef<
           />
 
           {/* Gender */}
-          <DropdownField
+          <DropdownField formStyle
             label="Gender"
             options={genders}
             value={studentInfo?.personalInfo?.gender?.id || ""}
@@ -370,7 +370,7 @@ export const PersonalInformationSection = forwardRef<
             />
 
             {/* Emergency Contact Relationship */}
-            <DropdownField
+            <DropdownField formStyle
               label="Relationship"
               options={studentRelationshipTypes}
               value={
@@ -450,7 +450,7 @@ export const PersonalInformationSection = forwardRef<
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Provincial Region */}
-            <DropdownField
+            <DropdownField formStyle
               label="Region (Provincial)"
               options={regions}
               value={
@@ -467,7 +467,7 @@ export const PersonalInformationSection = forwardRef<
               required
             />
             {/* Provincial City */}
-            <DropdownField
+            <DropdownField formStyle
               label="City/Municipality (Provincial)"
               options={provincialCities || []}
               enabled={!!selectedProvincialRegion && !isProvincialCitiesLoading}
@@ -487,7 +487,7 @@ export const PersonalInformationSection = forwardRef<
               required
             />
             {/* Provincial Barangay */}
-            <DropdownField
+            <DropdownField formStyle
               label="Barangay (Provincial)"
               options={provincialBarangays || []}
               enabled={
@@ -522,7 +522,7 @@ export const PersonalInformationSection = forwardRef<
             />
 
             {/* Residential Region */}
-            <DropdownField
+            <DropdownField formStyle
               label="Region (Residential)"
               options={regions}
               value={
@@ -539,7 +539,7 @@ export const PersonalInformationSection = forwardRef<
               required
             />
             {/* Residential City */}
-            <DropdownField
+            <DropdownField formStyle
               label="City/Municipality (Residential)"
               options={residentialCities || []}
               enabled={
@@ -561,7 +561,7 @@ export const PersonalInformationSection = forwardRef<
               required
             />
             {/* Residential Barangay */}
-            <DropdownField
+            <DropdownField formStyle
               label="Barangay (Residential)"
               options={residentialBarangays || []}
               enabled={

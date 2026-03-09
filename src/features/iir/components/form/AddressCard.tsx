@@ -41,7 +41,7 @@ export function AddressCard({
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <DropdownField
+            <DropdownField formStyle
               label="Region"
               options={regions}
               value={studentInfo?.addresses?.[id]?.address?.region || ""}
@@ -54,7 +54,7 @@ export function AddressCard({
               }}
               required
             />
-            <DropdownField
+            <DropdownField formStyle
               label="City/Municipality"
               options={cities || []}
               enabled={!!selectedRegion && !isCitiesLoading}
@@ -66,7 +66,7 @@ export function AddressCard({
               }}
               required
             />
-            <DropdownField
+            <DropdownField formStyle
               label="Barangay"
               options={barangays || []}
               enabled={!!selectedCity && !isBarangaysLoading}
