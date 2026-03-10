@@ -33,7 +33,6 @@ export default function Sidebar({
       "
     >
       <nav className="flex flex-col gap-2 p-3 mt-2">
-
         {navigationItems.map((item) => (
           <SidebarItem
             key={item.href}
@@ -41,7 +40,6 @@ export default function Sidebar({
             active={location.pathname === item.href}
           />
         ))}
-
       </nav>
     </aside>
   );

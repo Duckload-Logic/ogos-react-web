@@ -23,15 +23,12 @@ export default function Header({
   getRoleLabel,
   showNotifications,
   setShowNotifications,
-}: HeaderProps)
-
-{
+}: HeaderProps) {
   return (
-    <header className="h-20 flex items-center justify-between px-6 border-b bg-background/80 backdrop-blur-lg sticky top-0 relative z-30">
-
+    <header className="h-20 flex items-center justify-between px-6 border-b bg-background/80 backdrop-blur-lg sticky top-0 z-30">
       {/* Logo */}
       <div className="flex items-center gap-3">
-       <img
+        <img
           src={PUPLogo}
           className="w-8 h-8 rounded-full transition-transform duration-200 hover:scale-110"
         />
@@ -39,9 +36,11 @@ export default function Header({
           <p className="font-semibold">
             Polytechnic University of the Philippines – Taguig
           </p>
-          
-          <p className="
-          text-muted-foreground">
+
+          <p
+            className="
+          text-muted-foreground"
+          >
             Online Guidance Office Services
           </p>
         </div>
@@ -57,16 +56,12 @@ export default function Header({
 
       {/* Controls */}
       <div className="flex items-center gap-3">
-
-        <NotificationBell
+        {/* <NotificationBell
           showNotifications={showNotifications}
           setShowNotifications={setShowNotifications}
-        />
+        /> */}
 
-        <ThemeToggle
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-        />
+        <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
 
         <ProfileDropdown
           firstName={user?.firstName}
@@ -75,9 +70,7 @@ export default function Header({
           profilePath="/admin/profile"
           onLogout={handleLogout}
         />
-
       </div>
-
     </header>
   );
 }

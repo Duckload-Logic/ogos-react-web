@@ -4,7 +4,7 @@ import { useAuth } from "@/context";
 const ROLE_MAP: { [key: number]: string } = {
   1: "student",
   2: "admin",
-  3: "frontdesk",
+  3: "superadmin",
 };
 
 interface ProtectedRouteProps {

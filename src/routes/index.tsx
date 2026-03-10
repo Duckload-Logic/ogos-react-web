@@ -27,6 +27,15 @@ import IIRProfile from "@/features/iir/pages/IIRProfile";
 import IIRForm from "@/features/iir/pages/IIRForm";
 import { CreateAppointment } from "@/features/appointments";
 
+// Super Admin Feature
+import {
+  SuperAdminDashboard,
+  APIManagement,
+  SecurityLogs,
+  SystemLogs,
+  AuditLogs,
+} from "@/features/superadmin";
+
 export const routes: RouteObject[] = [
   // Root route - redirect to login
   { path: "/", element: <Navigate to="/login" replace /> },
@@ -178,6 +187,58 @@ export const routes: RouteObject[] = [
       <ProtectedRoute requiredRole="admin">
         <Layout title="Analytics">
           <Analytics />
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
+
+  // Super Admin routes
+  {
+    path: "/superadmin/home",
+    element: (
+      <ProtectedRoute requiredRole="superadmin">
+        <Layout title="Super Admin Dashboard">
+          <SuperAdminDashboard />
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/superadmin/api-management",
+    element: (
+      <ProtectedRoute requiredRole="superadmin">
+        <Layout title="API Management">
+          <APIManagement />
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/superadmin/security-logs",
+    element: (
+      <ProtectedRoute requiredRole="superadmin">
+        <Layout title="Security Logs">
+          <SecurityLogs />
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/superadmin/system-logs",
+    element: (
+      <ProtectedRoute requiredRole="superadmin">
+        <Layout title="System Logs">
+          <SystemLogs />
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/superadmin/audit-logs",
+    element: (
+      <ProtectedRoute requiredRole="superadmin">
+        <Layout title="Audit Logs">
+          <AuditLogs />
         </Layout>
       </ProtectedRoute>
     ),

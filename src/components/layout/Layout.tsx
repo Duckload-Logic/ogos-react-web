@@ -77,7 +77,7 @@ export default function Layout({ children, title }: LayoutProps) {
 
   const getRoleLabel = () => {
     if (!user) return "";
-    if (user.role?.id === 3) return "Front Desk Account";
+    if (user.role?.id === 3) return "Super Admin Account";
     if (user.role?.id === 2) return "Admin Account";
     return "Student Account";
   };
