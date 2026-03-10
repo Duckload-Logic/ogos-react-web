@@ -12,6 +12,8 @@ export default function DropdownField({
   get = "id",
   loading = false,
   lockedReason = "Locked",
+  formStyle = false,
+  labelKey,
 }: {
   label: string;
   options: any[];
@@ -23,6 +25,8 @@ export default function DropdownField({
   get?: string;
   loading?: boolean;
   lockedReason?: string;
+  formStyle?: boolean;
+  labelKey?: string;
 }) {
   const selectedOption = options.find((opt) => opt.id == value);
   const [isOpen, setIsOpen] = useState(false);
@@ -31,6 +35,7 @@ export default function DropdownField({
 
   const getLabel = (option: any) => {
     if (!option) return `Select ${label}`;
+    if (labelKey) return option[labelKey] || "";
     return option.code || option.name || option.text || option || "";
   };
 
@@ -81,9 +86,11 @@ export default function DropdownField({
             className={`flex w-full items-center justify-between px-3 py-2 h-10 text-left font-normal border rounded-md focus:ring-2 focus:ring-offset-0 outline-none transition-colors duration-200 text-foreground ${
               !enabled || loading
                 ? 'bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none'
-                : isFilled
-                  ? 'bg-white dark:bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                  : 'bg-white dark:bg-neutral-800 border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
+                : formStyle
+                  ? isFilled
+                    ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                    : 'bg-card border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
+                  : 'bg-background border-border hover:border-primary focus:border-primary focus:ring-primary/20'
             } ${
               error ? "border-red-500" : ""
             }`}
@@ -100,7 +107,7 @@ export default function DropdownField({
               {!enabled && (
                 <Lock size={16} className="text-muted-foreground" strokeWidth={2} />
               )}
-              {enabled && isFilled && !error && (
+              {enabled && isFilled && !error && formStyle && (
                 <Check size={16} className="text-green-500" strokeWidth={2.5} />
               )}
               {enabled && (
@@ -112,7 +119,7 @@ export default function DropdownField({
           </button>
         </div>
         {isOpen && (
-          <div className="w-full min-w-[200px] max-h-[200px] overflow-y-auto absolute mt-1 bg-white dark:bg-neutral-800 border border-border rounded-md shadow-lg z-50 p-2">
+          <div className={`w-full min-w-[200px] max-h-[200px] overflow-y-auto absolute mt-1 border border-border rounded-md shadow-lg z-50 p-2 ${formStyle ? 'bg-card' : 'bg-background'}`}>
             {options.length === 0 ? (
               <div className="px-2 py-1.5 text-sm text-muted-foreground">
                 No options available

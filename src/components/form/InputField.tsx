@@ -71,10 +71,10 @@ export default function InputField({
                 disabled
                   ? 'bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none'
                   : value
-                    ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                    ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
                     : required
-                      ? 'bg-white dark:!bg-neutral-800 border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
-                      : 'bg-white dark:!bg-neutral-800 border-border'
+                      ? 'bg-card border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
+                      : 'bg-card border-border'
               }
             `}
             min={min}

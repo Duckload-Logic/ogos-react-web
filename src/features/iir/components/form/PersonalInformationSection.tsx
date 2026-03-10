@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
+﻿import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { DropdownField, InputField, Checkbox } from "@/components/form";
 import {
@@ -41,52 +41,28 @@ export const PersonalInformationSection = forwardRef<
   const { data: regions = [] } = useRegions();
 
   const [errors, setErrors] = useState<FormErrors>({});
-  const [selectedProvincialRegion, setSelectedProvincialRegion] =
-    useState<Region | null>(null);
-  const [selectedProvincialCity, setSelectedProvincialCity] =
-    useState<City | null>(null);
-  const [selectedResidentialRegion, setSelectedResidentialRegion] =
-    useState<Region | null>(null);
-  const [selectedResidentialCity, setSelectedResidentialCity] =
-    useState<City | null>(null);
+
+  // Derive location IDs directly from form data so cities/barangays always
+  // reflect the current selection even after page load or draft restore.
+  const provincialRegionId = (studentInfo as any)?.addresses?.["provincial"]?.address?.region;
+  const provincialCityId   = (studentInfo as any)?.addresses?.["provincial"]?.address?.city;
+  const residentialRegionId = (studentInfo as any)?.addresses?.["residential"]?.address?.region;
+  const residentialCityId   = (studentInfo as any)?.addresses?.["residential"]?.address?.city;
 
   const { data: provincialCities = [], isLoading: isProvincialCitiesLoading } =
-    useCities(selectedProvincialRegion?.id || 0);
+    useCities(provincialRegionId || 0);
   const {
     data: provincialBarangays = [],
     isLoading: isProvincialBarangaysLoading,
-  } = useBarangays(selectedProvincialCity?.id || 0);
+  } = useBarangays(provincialCityId || 0);
   const {
     data: residentialCities = [],
     isLoading: isResidentialCitiesLoading,
-  } = useCities(selectedResidentialRegion?.id || 0);
+  } = useCities(residentialRegionId || 0);
   const {
     data: residentialBarangays = [],
     isLoading: isResidentialBarangaysLoading,
-  } = useBarangays(selectedResidentialCity?.id || 0);
-
-  // Clear location state when form is reset
-  useEffect(() => {
-    const provincialRegionValue = (studentInfo as any)?.addresses?.[
-      "provincial"
-    ]?.address?.region;
-    const residentialRegionValue = (studentInfo as any)?.addresses?.[
-      "residential"
-    ]?.address?.region;
-
-    // Reset state if region values are empty (form was reset)
-    if (!provincialRegionValue && selectedProvincialRegion) {
-      setSelectedProvincialRegion(null);
-      setSelectedProvincialCity(null);
-    }
-    if (!residentialRegionValue && selectedResidentialRegion) {
-      setSelectedResidentialRegion(null);
-      setSelectedResidentialCity(null);
-    }
-  }, [
-    (studentInfo as any)?.addresses?.["provincial"]?.address?.region,
-    (studentInfo as any)?.addresses?.["residential"]?.address?.region,
-  ]);
+  } = useBarangays(residentialCityId || 0);
 
   const validate = (): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors = validateObject(
@@ -182,42 +158,45 @@ export const PersonalInformationSection = forwardRef<
           />
 
           {/* Civil Status */}
-          <DropdownField
+          <DropdownField formStyle
             label="Civil Status"
             options={civilStatuses}
             value={studentInfo?.personalInfo?.civilStatus?.id || ""}
             onChange={(val) =>
               handleInputChange("student.personalInfo.civilStatus", { id: val })
             }
+            error={errors["student.personalInfo.civilStatus"]}
             required
           />
 
           {/* Religion */}
-          <DropdownField
+          <DropdownField formStyle
             label="Religion"
             options={religions}
             value={studentInfo?.personalInfo?.religion?.id || ""}
             onChange={(val) =>
               handleInputChange("student.personalInfo.religion", { id: val })
             }
+            error={errors["student.personalInfo.religion"]}
             required
           />
 
           {/* High School GWA */}
           <InputField
             label="High School General Average"
-            type="number"
+            type="text"
             inputMode="decimal"
             value={studentInfo?.personalInfo?.highSchoolGWA || ""}
             onChange={(val) =>
-              handleInputChange("student.personalInfo.highSchoolGWA", val)
+              handleInputChange("student.personalInfo.highSchoolGWA", val.replace(/[^0-9.]/g, ""))
             }
+            error={errors["student.personalInfo.highSchoolGWA"]}
             placeholder="e.g., 85"
             required
           />
 
           {/* Course */}
-          <DropdownField
+          <DropdownField formStyle
             label="Course"
             options={courses}
             value={studentInfo?.personalInfo?.course?.id || ""}
@@ -236,6 +215,7 @@ export const PersonalInformationSection = forwardRef<
             onChange={(val) =>
               handleInputChange("student.personalInfo.dateOfBirth", val)
             }
+            error={errors["student.personalInfo.dateOfBirth"]}
             required
           />
 
@@ -246,6 +226,7 @@ export const PersonalInformationSection = forwardRef<
             onChange={(val) =>
               handleInputChange("student.personalInfo.placeOfBirth", val)
             }
+            error={errors["student.personalInfo.placeOfBirth"]}
             placeholder="City/Municipality, Province"
             required
           />
@@ -253,12 +234,13 @@ export const PersonalInformationSection = forwardRef<
           {/* Height */}
           <InputField
             label="Height (ft.)"
-            type="number"
+            type="text"
             inputMode="decimal"
             value={studentInfo?.personalInfo?.heightFt || ""}
             onChange={(val) =>
-              handleInputChange("student.personalInfo.heightFt", val)
+              handleInputChange("student.personalInfo.heightFt", val.replace(/[^0-9.]/g, ""))
             }
+            error={errors["student.personalInfo.heightFt"]}
             placeholder="e.g., 5.8"
             required
           />
@@ -266,18 +248,19 @@ export const PersonalInformationSection = forwardRef<
           {/* Weight */}
           <InputField
             label="Weight (kg.)"
-            type="number"
+            type="text"
             inputMode="decimal"
             value={studentInfo?.personalInfo?.weightKg || ""}
             onChange={(val) =>
-              handleInputChange("student.personalInfo.weightKg", val)
+              handleInputChange("student.personalInfo.weightKg", val.replace(/[^0-9.]/g, ""))
             }
+            error={errors["student.personalInfo.weightKg"]}
             placeholder="e.g., 70"
             required
           />
 
           {/* Gender */}
-          <DropdownField
+          <DropdownField formStyle
             label="Gender"
             options={genders}
             value={studentInfo?.personalInfo?.gender?.id || ""}
@@ -294,7 +277,7 @@ export const PersonalInformationSection = forwardRef<
             inputMode="numeric"
             value={studentInfo?.personalInfo?.mobileNumber || ""}
             onChange={(val) =>
-              handleInputChange("student.personalInfo.mobileNumber", val)
+              handleInputChange("student.personalInfo.mobileNumber", val.replace(/[^0-9]/g, ""))
             }
             error={errors["student.personalInfo.mobileNumber"]}
             placeholder="e.g., 09123456789"
@@ -307,8 +290,9 @@ export const PersonalInformationSection = forwardRef<
             inputMode="numeric"
             value={studentInfo?.personalInfo?.telephoneNumber || ""}
             onChange={(val) =>
-              handleInputChange("student.personalInfo.telephoneNumber", val)
+              handleInputChange("student.personalInfo.telephoneNumber", val.replace(/[^0-9]/g, ""))
             }
+            error={errors["student.personalInfo.telephoneNumber"]}
             placeholder="(02) 1234-5678"
             required
           />
@@ -332,6 +316,7 @@ export const PersonalInformationSection = forwardRef<
                   val,
                 )
               }
+              error={errors["student.personalInfo.emergencyContact.firstName"]}
               placeholder="First name"
               required
             />
@@ -348,6 +333,7 @@ export const PersonalInformationSection = forwardRef<
                   val,
                 )
               }
+              error={errors["student.personalInfo.emergencyContact.lastName"]}
               placeholder="Last name"
               required
             />
@@ -362,15 +348,16 @@ export const PersonalInformationSection = forwardRef<
               onChange={(val) =>
                 handleInputChange(
                   "student.personalInfo.emergencyContact.contactNumber",
-                  val,
+                  val.replace(/[^0-9]/g, ""),
                 )
               }
+              error={errors["student.personalInfo.emergencyContact.contactNumber"]}
               placeholder="Phone number"
               required
             />
 
             {/* Emergency Contact Relationship */}
-            <DropdownField
+            <DropdownField formStyle
               label="Relationship"
               options={studentRelationshipTypes}
               value={
@@ -385,6 +372,7 @@ export const PersonalInformationSection = forwardRef<
                   },
                 )
               }
+              error={errors["student.personalInfo.emergencyContact.relationship"]}
               required
             />
           </div>
@@ -450,59 +438,49 @@ export const PersonalInformationSection = forwardRef<
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {/* Provincial Region */}
-            <DropdownField
+            <DropdownField formStyle labelKey="name"
               label="Region (Provincial)"
               options={regions}
-              value={
-                (studentInfo as any)?.addresses?.["provincial"]?.address
-                  ?.region || ""
-              }
+              value={provincialRegionId || ""}
               onChange={(val) => {
                 onChange(`student.addresses.provincial.address.region`, val);
-                const selected =
-                  regions.find((r: Region) => r.id === val) || null;
-                setSelectedProvincialRegion(selected);
-                setSelectedProvincialCity(null);
+                onChange(`student.addresses.provincial.address.city`, "");
+                onChange(`student.addresses.provincial.address.barangay`, "");
+                setErrors((prev) => { const u = { ...prev }; delete u["student.addresses.provincial.address.region"]; return u; });
               }}
+              error={errors["student.addresses.provincial.address.region"]}
               required
             />
             {/* Provincial City */}
-            <DropdownField
+            <DropdownField formStyle labelKey="name"
               label="City/Municipality (Provincial)"
               options={provincialCities || []}
-              enabled={!!selectedProvincialRegion && !isProvincialCitiesLoading}
-              value={
-                (studentInfo as any)?.addresses?.["provincial"]?.address
-                  ?.city || ""
-              }
+              enabled={!!provincialRegionId && !isProvincialCitiesLoading}
+              value={provincialCityId || ""}
               onChange={(val) => {
                 onChange(`student.addresses.provincial.address.city`, val);
-                const selected =
-                  provincialCities.find((c: City) => c.id === val) || null;
-                setSelectedProvincialCity(selected);
+                onChange(`student.addresses.provincial.address.barangay`, "");
+                setErrors((prev) => { const u = { ...prev }; delete u["student.addresses.provincial.address.city"]; return u; });
               }}
-              lockedReason={
-                !selectedProvincialRegion ? "Select a Region first" : ""
-              }
+              lockedReason={!provincialRegionId ? "Select a Region first" : ""}
+              error={errors["student.addresses.provincial.address.city"]}
               required
             />
             {/* Provincial Barangay */}
-            <DropdownField
+            <DropdownField formStyle labelKey="name"
               label="Barangay (Provincial)"
               options={provincialBarangays || []}
-              enabled={
-                !!selectedProvincialCity && !isProvincialBarangaysLoading
-              }
+              enabled={!!provincialCityId && !isProvincialBarangaysLoading}
               value={
                 (studentInfo as any)?.addresses?.["provincial"]?.address
                   ?.barangay || ""
               }
               onChange={(val) => {
                 onChange(`student.addresses.provincial.address.barangay`, val);
+                setErrors((prev) => { const u = { ...prev }; delete u["student.addresses.provincial.address.barangay"]; return u; });
               }}
-              lockedReason={
-                !selectedProvincialCity ? "Select a City first" : ""
-              }
+              lockedReason={!provincialCityId ? "Select a City first" : ""}
+              error={errors["student.addresses.provincial.address.barangay"]}
               required
             />
             {/* Provincial Street */}
@@ -522,61 +500,49 @@ export const PersonalInformationSection = forwardRef<
             />
 
             {/* Residential Region */}
-            <DropdownField
+            <DropdownField formStyle labelKey="name"
               label="Region (Residential)"
               options={regions}
-              value={
-                (studentInfo as any)?.addresses?.["residential"]?.address
-                  ?.region || ""
-              }
+              value={residentialRegionId || ""}
               onChange={(val) => {
                 onChange(`student.addresses.residential.address.region`, val);
-                const selected =
-                  regions.find((r: Region) => r.id === val) || null;
-                setSelectedResidentialRegion(selected);
-                setSelectedResidentialCity(null);
+                onChange(`student.addresses.residential.address.city`, "");
+                onChange(`student.addresses.residential.address.barangay`, "");
+                setErrors((prev) => { const u = { ...prev }; delete u["student.addresses.residential.address.region"]; return u; });
               }}
+              error={errors["student.addresses.residential.address.region"]}
               required
             />
             {/* Residential City */}
-            <DropdownField
+            <DropdownField formStyle labelKey="name"
               label="City/Municipality (Residential)"
               options={residentialCities || []}
-              enabled={
-                !!selectedResidentialRegion && !isResidentialCitiesLoading
-              }
-              value={
-                (studentInfo as any)?.addresses?.["residential"]?.address
-                  ?.city || ""
-              }
+              enabled={!!residentialRegionId && !isResidentialCitiesLoading}
+              value={residentialCityId || ""}
               onChange={(val) => {
                 onChange(`student.addresses.residential.address.city`, val);
-                const selected =
-                  residentialCities.find((c: City) => c.id === val) || null;
-                setSelectedResidentialCity(selected);
+                onChange(`student.addresses.residential.address.barangay`, "");
+                setErrors((prev) => { const u = { ...prev }; delete u["student.addresses.residential.address.city"]; return u; });
               }}
-              lockedReason={
-                !selectedResidentialRegion ? "Select a Region first" : ""
-              }
+              lockedReason={!residentialRegionId ? "Select a Region first" : ""}
+              error={errors["student.addresses.residential.address.city"]}
               required
             />
             {/* Residential Barangay */}
-            <DropdownField
+            <DropdownField formStyle labelKey="name"
               label="Barangay (Residential)"
               options={residentialBarangays || []}
-              enabled={
-                !!selectedResidentialCity && !isResidentialBarangaysLoading
-              }
+              enabled={!!residentialCityId && !isResidentialBarangaysLoading}
               value={
                 (studentInfo as any)?.addresses?.["residential"]?.address
                   ?.barangay || ""
               }
               onChange={(val) => {
                 onChange(`student.addresses.residential.address.barangay`, val);
+                setErrors((prev) => { const u = { ...prev }; delete u["student.addresses.residential.address.barangay"]; return u; });
               }}
-              lockedReason={
-                !selectedResidentialCity ? "Select a City first" : ""
-              }
+              lockedReason={!residentialCityId ? "Select a City first" : ""}
+              error={errors["student.addresses.residential.address.barangay"]}
               required
             />
             {/* Residential Street */}
