@@ -13,6 +13,7 @@ export default function DropdownField({
   loading = false,
   lockedReason = "Locked",
   formStyle = false,
+  labelKey,
 }: {
   label: string;
   options: any[];
@@ -25,6 +26,7 @@ export default function DropdownField({
   loading?: boolean;
   lockedReason?: string;
   formStyle?: boolean;
+  labelKey?: string;
 }) {
   const selectedOption = options.find((opt) => opt.id == value);
   const [isOpen, setIsOpen] = useState(false);
@@ -33,6 +35,7 @@ export default function DropdownField({
 
   const getLabel = (option: any) => {
     if (!option) return `Select ${label}`;
+    if (labelKey) return option[labelKey] || "";
     return option.code || option.name || option.text || option || "";
   };
 
