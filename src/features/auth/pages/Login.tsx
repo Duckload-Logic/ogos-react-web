@@ -44,7 +44,6 @@ export default function Login() {
 
       const result = await refetch();
 
-      console.log("User data after login:", result.data);
       // Navigate immediately after we have user data
       if (result.data) {
         const roleId = result.data.role?.id;

@@ -119,8 +119,8 @@ const LOOKUP_GET_ROUTES = {
 
 const INVENTORY_GET_ROUTES = {
   listStudents: "/students/inventory/records",
-  iirByUserEmail: (userEmail: string) =>
-    `/students/inventory/records/user/${userEmail}`,
+  iirByUserID: (userId: number) =>
+    `/students/inventory/records/user/${userId}`,
   iirByIIRID: (iirID: number) => `/students/inventory/records/iir/${iirID}`,
   IIRProfile: (iirID: number) =>
     `/students/inventory/records/iir/${iirID}/profile`,
@@ -176,9 +176,8 @@ export const iirService = {
     return data;
   },
 
-  async getIIRByUserEmail(userEmail: string) {
-    const route = INVENTORY_GET_ROUTES.iirByUserEmail(userEmail);
-    const { data } = await apiClient.get(route);
+  async getIIRByUserID(userId: number) {
+    const { data } = await apiClient.get(INVENTORY_GET_ROUTES.iirByUserID(userId));
     return data;
   },
 

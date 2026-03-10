@@ -8,7 +8,7 @@ export function useMe() {
   return useQuery({
     queryKey: ["users", ME_QUERY_KEY],
     queryFn: async (): Promise<User> => {
-      return userService.getCurrentUser();
+      return await userService.getCurrentUser();
     },
     enabled: !!localStorage.getItem("accessToken"),
     retry: false,

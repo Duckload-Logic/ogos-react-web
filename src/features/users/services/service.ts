@@ -1,5 +1,5 @@
 import { apiClient } from "@/lib/api";
-import { User } from "@/types";
+import { User } from "@/features/users/types/user";
 
 const USER_GET_ROUTES = {
   me: "/users/me",
@@ -12,7 +12,7 @@ export const userService = {
     return data;
   },
 
-  async getUserByID(userID: number) {
+  async getUserByID(userID: number): Promise<User> {
     const route = USER_GET_ROUTES.user(userID);
     const { data } = await apiClient.get(route);
     return data.user;
