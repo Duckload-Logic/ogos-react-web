@@ -46,10 +46,8 @@ export const TestResultsSection = forwardRef<
     clearError(fieldPath);
   };
 
-  // Pre-populate exactly 3 empty rows
-  const preparedRows = (testResults || []).length > 0 
-    ? testResults 
-    : [{}, {}, {}];
+  // Always show exactly 3 rows, filling from existing data
+  const preparedRows = Array.from({ length: 3 }, (_, i) => (testResults || [])[i] || {});
 
   return (
     <Card className="bg-card border border-border overflow-hidden">

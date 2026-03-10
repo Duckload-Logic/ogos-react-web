@@ -503,11 +503,17 @@ export default function IIRForm() {
         break;
       }
 
-      case 6: { // Test Results (optional)
-        totalCount = 1;
-        const hasTestResults = Array.isArray(localFormData?.testResults) &&
-          localFormData.testResults.some((r: any) => r?.nameOfTest || r?.testName || r?.date || r?.testDate);
-        filledCount = hasTestResults ? 1 : 0;
+      case 6: { // Test Results - count each individual field across 3 rows (5 fields each = 15 total)
+        const rows = Array.from({ length: 3 }, (_, i) => (localFormData?.testResults || [])[i] || {});
+        totalCount = 15;
+        filledCount = rows.reduce((acc: number, r: any) => {
+          if (r?.date || r?.testDate) acc++;
+          if (r?.nameOfTest || r?.testName) acc++;
+          if (r?.rs !== undefined && r?.rs !== "" && r?.rs !== null) acc++;
+          if (r?.pr !== undefined && r?.pr !== "" && r?.pr !== null) acc++;
+          if (r?.description) acc++;
+          return acc;
+        }, 0);
         break;
       }
     }
