@@ -608,22 +608,6 @@ export default function IIRForm() {
                     >
                       <div className="flex-1">
                         <p className="text-sm">{section.title}</p>
-                        <div
-                          className={`w-full bg-muted-foreground/30 rounded-full h-1.5 mt-2 overflow-hidden ${currentSection === section.id ? "bg-primary-foreground" : ""}`}
-                        >
-                          <div
-                            className={`h-full rounded-full transition-all ${
-                              currentSection === section.id
-                                ? "bg-primary-foreground"
-                                : status === "complete"
-                                  ? "bg-green-500"
-                                  : status === "partial"
-                                    ? "bg-secondary"
-                                    : "bg-gray-300"
-                            }`}
-                            style={{ width: `${percentage}%` }}
-                          />
-                        </div>
                       </div>
                       {status === "complete" && (
                         <Check className="w-5 h-5 ml-2 flex-shrink-0 text-green-500" />
@@ -655,20 +639,6 @@ export default function IIRForm() {
                         }`}
                       >
                         <span className="whitespace-nowrap">{section.id}</span>
-                        <div className="w-12 h-1 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full transition-all ${
-                              currentSection === section.id
-                                ? "bg-primary-foreground"
-                                : status === "complete"
-                                  ? "bg-green-500"
-                                  : status === "partial"
-                                    ? "bg-secondary"
-                                    : "bg-gray-300"
-                            }`}
-                            style={{ width: `${percentage}%` }}
-                          />
-                        </div>
                         {status === "complete" && (
                           <Check className="w-3 h-3 text-green-500" />
                         )}
