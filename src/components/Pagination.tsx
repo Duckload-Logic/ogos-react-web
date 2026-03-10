@@ -99,7 +99,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   return (
     <nav
       className={cn(
-        "flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:gap-4 sm:justify-between py-3 px-6 border-t border-border",
+        "flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:gap-4 sm:justify-between py-3 px-6",
         className,
       )}
       aria-label="Pagination navigation"
@@ -109,7 +109,10 @@ export const Pagination: React.FC<PaginationProps> = ({
       {showPageInfo && (
         <div className="flex items-center justify-center sm:justify-start gap-1">
           <span className="text-xs sm:text-sm text-muted-foreground">
-            Page <span className="font-semibold text-foreground">{currentPage}</span> of <span className="font-semibold text-foreground">{totalPages}</span>
+            Page{" "}
+            <span className="font-semibold text-foreground">{currentPage}</span>{" "}
+            of{" "}
+            <span className="font-semibold text-foreground">{totalPages}</span>
           </span>
         </div>
       )}
