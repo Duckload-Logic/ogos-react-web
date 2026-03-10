@@ -21,6 +21,7 @@ import { useUserIIR } from "@/features/iir/hooks/useUserIIR";
 import { useGetSlipStats } from "@/features/slips/hooks";
 import { useAppointmentsStats } from "@/features/appointments/hooks/useAppointments";
 import type { QuickAction } from "@/components/ui/quick-actions-grid";
+import PortalShell from "../../../layout/PortalShell";
 
 const QUICK_ACTIONS: QuickAction[] = [
   {
@@ -76,37 +77,40 @@ export function Dashboard() {
 
   if (isUserLoading || isIIRLoading || !isPageLoaded) {
     return (
-      <div className="space-y-6">
-        {/* Hero skeleton */}
-        <Skeleton className="h-32 w-full rounded-none" />
-        <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-4">
-          <div className="grid grid-cols-2 gap-4">
-            <Skeleton className="h-20 rounded-lg" />
-            <Skeleton className="h-20 rounded-lg" />
+      <PortalShell role="student">
+        <div className="space-y-6">
+          <Skeleton className="h-32 w-full rounded-none" />
+          <div className="max-w-7xl mx-auto px-4 md:px-8 space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <Skeleton className="h-20 rounded-lg" />
+              <Skeleton className="h-20 rounded-lg" />
+            </div>
+            <Skeleton className="h-6 w-32" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <Skeleton className="h-20 rounded-lg" />
+              <Skeleton className="h-20 rounded-lg" />
+              <Skeleton className="h-20 rounded-lg" />
+              <Skeleton className="h-20 rounded-lg" />
+            </div>
+            <Skeleton className="h-40 rounded-lg" />
           </div>
-          <Skeleton className="h-6 w-32" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <Skeleton className="h-20 rounded-lg" />
-            <Skeleton className="h-20 rounded-lg" />
-            <Skeleton className="h-20 rounded-lg" />
-            <Skeleton className="h-20 rounded-lg" />
-          </div>
-          <Skeleton className="h-40 rounded-lg" />
         </div>
-      </div>
+      </PortalShell>
     );
   }
 
   if (!me) {
     return (
-      <div className="text-center py-12">
-        <p className="text-red-600">Unable to load user information</p>
-      </div>
+      <PortalShell role="student">
+        <div className="text-center py-12">
+          <p className="text-red-600">Unable to load user information</p>
+        </div>
+      </PortalShell>
     );
   }
 
   return (
-    <>
+    <PortalShell role="student">
       <AnimationStyles />
 
       <HeroSection
@@ -116,7 +120,6 @@ export function Dashboard() {
       />
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-10">
-        {/* PDS Completion Alert */}
         {showForm && (
           <Alert
             variant="destructive"
@@ -139,7 +142,6 @@ export function Dashboard() {
           </Alert>
         )}
 
-        {/* Stats Row */}
         <div className="grid grid-cols-2 gap-4 mb-6">
           <StatsCard
             to="/student/appointments"
@@ -163,10 +165,8 @@ export function Dashboard() {
           />
         </div>
 
-        {/* Quick Actions */}
         <QuickActionsGrid actions={QUICK_ACTIONS} />
 
-        {/* Student Information */}
         <StudentProfileCard
           firstName={me?.firstName}
           lastName={me?.lastName}
@@ -175,20 +175,22 @@ export function Dashboard() {
           isFormIncomplete={showForm}
         />
 
-        {/* Confirmation Statement */}
         {!showForm && (
           <Alert
             className="animate-fade-in-up border-l-4 border-green-500 bg-green-50 dark:bg-green-950/30 dark:border-green-600"
             style={{ animationDelay: "0.35s", animationFillMode: "both" }}
           >
             <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
-            <AlertTitle className="text-green-900 dark:text-green-300">Confirmation</AlertTitle>
+            <AlertTitle className="text-green-900 dark:text-green-300">
+              Confirmation
+            </AlertTitle>
             <AlertDescription className="text-green-800 dark:text-green-200 mt-1 text-sm">
-              I hereby declare that all the information I have provided is true and correct to the best of my knowledge.
+              I hereby declare that all the information I have provided is true
+              and correct to the best of my knowledge.
             </AlertDescription>
           </Alert>
         )}
       </div>
-    </>
+    </PortalShell>
   );
 }

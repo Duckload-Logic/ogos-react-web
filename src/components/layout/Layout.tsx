@@ -1,6 +1,7 @@
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import NotificationModal from "@/components/notifications/NotificationModal";
+import AppFooter from "@/components/common/AppFooter";
 import Toast from "@/components/ui/Toast";
 import { NAV_CONFIG, roleMap } from "@/config/navigation";
 
@@ -83,51 +84,53 @@ export default function Layout({ children, title }: LayoutProps) {
   };
 
   return (
-    <>
-      <ErrorBoundary>
-        <div className="flex flex-col h-screen overflow-hidden bg-background animate-in fade-in duration-300">
-          <Header
-            title={title}
-            user={user}
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-            handleLogout={handleLogout}
-            getRoleLabel={getRoleLabel}
-            showNotifications={showNotifications}
-            setShowNotifications={setShowNotifications}
+    <ErrorBoundary>
+      <div className="flex h-screen flex-col overflow-hidden bg-background animate-in fade-in duration-300">
+        <Header
+          title={title}
+          user={user}
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          handleLogout={handleLogout}
+          getRoleLabel={getRoleLabel}
+          showNotifications={showNotifications}
+          setShowNotifications={setShowNotifications}
+        />
+
+        <NotificationModal
+          showNotifications={showNotifications}
+          setShowNotifications={setShowNotifications}
+          toasts={toasts}
+        />
+
+        <div className="flex min-h-0 flex-1 w-full">
+          <Sidebar
+            navigationItems={navigationItems}
+            location={location}
+            setIsHovered={setIsHovered}
           />
 
-          <NotificationModal
-            showNotifications={showNotifications}
-            setShowNotifications={setShowNotifications}
-            toasts={toasts}
-          />
+          <div className="relative min-w-0 flex-1 overflow-hidden">
+            {expanded && (
+              <div className="absolute inset-0 z-0 bg-black/10 backdrop-blur-sm animate-in fade-in duration-200 pointer-events-none" />
+            )}
 
-          <div className="flex flex-1 overflow-hidden w-full">
-            <Sidebar
-              navigationItems={navigationItems}
-              location={location}
-              setIsHovered={setIsHovered}
-            />
-
-            <div className="flex-1 relative overflow-hidden">
-              {expanded && (
-                <div className="absolute inset-0 z-0 bg-black/10 backdrop-blur-sm animate-in fade-in duration-200 pointer-events-none" />
-              )}
-
-              <main
-                className={`relative z-10 h-full overflow-auto p-4 md:p-8 pb-20 md:pb-8 bg-transparent transition-all duration-300 animate-in fade-in slide-in-from-bottom-2 ${
-                  expanded ? "blur-sm" : ""
-                }`}
-              >
+            <div
+              className={`relative z-10 flex h-full flex-col overflow-y-auto transition-all duration-300 ${
+                expanded ? "blur-sm" : ""
+              }`}
+            >
+              <main className="flex-1 bg-transparent p-4 md:p-8 animate-in fade-in slide-in-from-bottom-2">
                 {children}
               </main>
+
+              <AppFooter />
             </div>
           </div>
         </div>
 
         <Toast toasts={toasts} />
-      </ErrorBoundary>
-    </>
+      </div>
+    </ErrorBoundary>
   );
 }
