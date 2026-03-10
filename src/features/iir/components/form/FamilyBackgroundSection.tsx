@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, useRef } from "react";
+﻿import { forwardRef, useImperativeHandle, useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { InputField, Checkbox, RadioField } from "@/components/form";
 import { Check } from "lucide-react";
@@ -34,19 +34,80 @@ export const FamilyBackgroundSection = forwardRef<
   const validate = (): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors: FormErrors = {};
 
-    if (!family?.background) {
-      sectionErrors["family.background"] = "Family background is required";
+    // Parental status
+    if (!family?.background?.parentalStatus) {
+      sectionErrors["family.background.parentalStatus"] = "Parental status is required";
     }
-    if (!family?.relatedPersons) {
-      sectionErrors["family.relatedPersons"] =
-        "Family members information is required";
+
+    // Family members
+    const persons = [
+      { key: "father", label: "Father" },
+      { key: "mother", label: "Mother" },
+      { key: "guardian", label: "Guardian" },
+    ] as const;
+
+    persons.forEach(({ key, label }) => {
+      const person = family?.relatedPersons?.[key] || {};
+
+      const name = (person?.name || "").trim();
+      if (!name) {
+        sectionErrors[`family.relatedPersons.${key}.name`] = `${label} name is required`;
+      } else if (name.length < 2) {
+        sectionErrors[`family.relatedPersons.${key}.name`] = `${label} name must be at least 2 characters`;
+      }
+
+      const age = person?.age;
+      if (age === undefined || age === null || age === "" || Number(age) === 0) {
+        sectionErrors[`family.relatedPersons.${key}.age`] = `${label} age is required`;
+      } else {
+        const ageNum = Number(age);
+        if (isNaN(ageNum) || !Number.isInteger(ageNum) || ageNum <= 0) {
+          sectionErrors[`family.relatedPersons.${key}.age`] = `${label} age must be a positive whole number`;
+        }
+      }
+
+      const educ = (person?.educationalAttainment || "").trim();
+      if (!educ) {
+        sectionErrors[`family.relatedPersons.${key}.educationalAttainment`] = `${label} educational attainment is required`;
+      } else if (educ.length < 2) {
+        sectionErrors[`family.relatedPersons.${key}.educationalAttainment`] = `${label} educational attainment must be at least 2 characters`;
+      }
+
+      const occ = (person?.occupation || "").trim();
+      if (!occ) {
+        sectionErrors[`family.relatedPersons.${key}.occupation`] = `${label} occupation is required`;
+      } else if (occ.length < 2) {
+        sectionErrors[`family.relatedPersons.${key}.occupation`] = `${label} occupation must be at least 2 characters`;
+      }
+
+      if (!(person?.employerName || "").trim()) {
+        sectionErrors[`family.relatedPersons.${key}.employerName`] = `${label} employer name is required`;
+      }
+
+      if (!(person?.employerAddress || "").trim()) {
+        sectionErrors[`family.relatedPersons.${key}.employerAddress`] = `${label} employer address is required`;
+      }
+
+      if (person?.isLiving === undefined || person?.isLiving === null) {
+        sectionErrors[`family.relatedPersons.${key}.isLiving`] = `${label} status (Living/Deceased) is required`;
+      }
+    });
+
+    // Finance
+    if (!family?.finance?.monthlyFamilyIncomeRange?.id) {
+      sectionErrors["family.finance.monthlyFamilyIncomeRange"] = "Monthly family income range is required";
     }
-    if (!family?.finance) {
-      sectionErrors["family.finance"] =
-        "Family financial information is required";
+    if (family?.finance?.monthlyFamilyIncomeRange?.id === "others") {
+      if (!(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "").trim()) {
+        sectionErrors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] = "Please specify the income range";
+      }
     }
-    if (!family?.finance?.weeklyAllowance || family.finance.weeklyAllowance === "" || family.finance.weeklyAllowance === 0) {
+
+    const wa = family?.finance?.weeklyAllowance;
+    if (wa === undefined || wa === null || wa === "" || Number(wa) === 0) {
       sectionErrors["family.finance.weeklyAllowance"] = "Weekly allowance is required";
+    } else if (isNaN(Number(wa)) || Number(wa) <= 0) {
+      sectionErrors["family.finance.weeklyAllowance"] = "Weekly allowance must be a positive number";
     }
 
     setErrors(sectionErrors);
@@ -92,16 +153,20 @@ export const FamilyBackgroundSection = forwardRef<
                 if (isOther && isSelected) {
                   return (
                     <div key={option.id} className="flex items-center gap-2">
-                      <input
-                        type="radio"
-                        name="parentalStatus"
-                        value={option.id}
-                        checked={true}
-                        onChange={(e) =>
-                          handleInputChange("family.background.parentalStatus", e.target.value)
-                        }
-                        className="w-4 h-4 cursor-pointer accent-red-600 flex-shrink-0"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                        <input
+                          type="radio"
+                          name="parentalStatus"
+                          value={option.id}
+                          checked={true}
+                          onChange={(e) =>
+                            handleInputChange("family.background.parentalStatus", e.target.value)
+                          }
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                       <span className="text-sm text-foreground whitespace-nowrap">Other, please specify:</span>
                       <input
                         type="text"
@@ -110,23 +175,27 @@ export const FamilyBackgroundSection = forwardRef<
                         onChange={(e) =>
                           handleInputChange("family.background.parentalStatusOther", e.target.value)
                         }
-                        className="flex-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm"
+                        className="flex-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm bg-card text-foreground"
                       />
                     </div>
                   );
                 } else if (isOther) {
                   return (
                     <label key={option.id} className="flex items-center gap-3 group cursor-pointer">
-                      <input
-                        type="radio"
-                        name="parentalStatus"
-                        value={option.id}
-                        checked={false}
-                        onChange={(e) =>
-                          handleInputChange("family.background.parentalStatus", e.target.value)
-                        }
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                        <input
+                          type="radio"
+                          name="parentalStatus"
+                          value={option.id}
+                          checked={false}
+                          onChange={(e) =>
+                            handleInputChange("family.background.parentalStatus", e.target.value)
+                          }
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                       <span className="text-sm text-foreground group-hover:text-primary transition-colors duration-200">
                         Other, please specify:
                       </span>
@@ -135,16 +204,20 @@ export const FamilyBackgroundSection = forwardRef<
                 } else {
                   return (
                     <label key={option.id} className="flex items-center gap-3 group cursor-pointer">
-                      <input
-                        type="radio"
-                        name="parentalStatus"
-                        value={option.id}
-                        checked={isSelected}
-                        onChange={(e) =>
-                          handleInputChange("family.background.parentalStatus", e.target.value)
-                        }
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                        <input
+                          type="radio"
+                          name="parentalStatus"
+                          value={option.id}
+                          checked={isSelected}
+                          onChange={(e) =>
+                            handleInputChange("family.background.parentalStatus", e.target.value)
+                          }
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                       <span className="text-sm text-foreground group-hover:text-primary transition-colors duration-200">
                         {option.name || option.text || option.code}
                       </span>
@@ -153,6 +226,9 @@ export const FamilyBackgroundSection = forwardRef<
                 }
               })}
             </div>
+            {errors["family.background.parentalStatus"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["family.background.parentalStatus"]}</p>
+            )}
           </div>
         </div>
 
@@ -218,7 +294,7 @@ export const FamilyBackgroundSection = forwardRef<
                 Nature of Residence
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Checkbox
+                <Checkbox square
                   id="residence-family"
                   label="Family Home"
                   name="residence-family"
@@ -232,7 +308,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-bed"
                   label="Bed Spacer"
                   name="residence-bed"
@@ -246,7 +322,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-relative"
                   label="Relative's House"
                   name="residence-relative"
@@ -261,7 +337,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-rented"
                   label="Rented Apartment"
                   name="residence-rented"
@@ -276,7 +352,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-dorm"
                   label="Dormitory"
                   name="residence-dorm"
@@ -290,7 +366,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-married"
                   label="House of Married Brother/Sister"
                   name="residence-married"
@@ -305,7 +381,7 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                 />
-                <Checkbox
+                <Checkbox square
                   id="residence-shared"
                   label="Shares Apartment with Friends"
                   name="residence-shared"
@@ -346,15 +422,20 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.father.name", val)
                 }
                 placeholder="Father's name"
+                required
+                error={errors["family.relatedPersons.father.name"]}
               />
               <InputField
                 label="Age"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={family?.relatedPersons?.father?.age || ""}
                 onChange={(val) =>
-                  handleInputChange("family.relatedPersons.father.age", val)
+                  handleInputChange("family.relatedPersons.father.age", val.replace(/[^0-9]/g, ""))
                 }
                 placeholder="Age"
+                required
+                error={errors["family.relatedPersons.father.age"]}
               />
               <InputField
                 label="Educational Attainment"
@@ -363,6 +444,8 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.father.educationalAttainment", val)
                 }
                 placeholder="e.g., College Graduate"
+                required
+                error={errors["family.relatedPersons.father.educationalAttainment"]}
               />
               <InputField
                 label="Occupation"
@@ -371,6 +454,8 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.father.occupation", val)
                 }
                 placeholder="e.g., Engineer"
+                required
+                error={errors["family.relatedPersons.father.occupation"]}
               />
               <InputField
                 label="Name of Employer"
@@ -379,6 +464,8 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.father.employerName", val)
                 }
                 placeholder="Company name"
+                required
+                error={errors["family.relatedPersons.father.employerName"]}
               />
               <InputField
                 label="Address of Employer"
@@ -387,44 +474,53 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.father.employerAddress", val)
                 }
                 placeholder="Company address"
+                required
+                error={errors["family.relatedPersons.father.employerAddress"]}
               />
             </div>
             <div className="flex gap-6">
               <label className="text-sm font-medium text-card-foreground">Status:</label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="father-status"
-                    value="living"
-                    checked={family?.relatedPersons?.father?.isLiving !== false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.father.isLiving", true)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="father-status"
+                      value="living"
+                      checked={family?.relatedPersons?.father?.isLiving === true}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.father.isLiving", true)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Living</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="father-status"
-                    value="deceased"
-                    checked={family?.relatedPersons?.father?.isLiving === false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.father.isLiving", false)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="father-status"
+                      value="deceased"
+                      checked={family?.relatedPersons?.father?.isLiving === false}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.father.isLiving", false)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Deceased</span>
                 </label>
               </div>
             </div>
+            {errors["family.relatedPersons.father.isLiving"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["family.relatedPersons.father.isLiving"]}</p>
+            )}
             </div>
-
-            <div className="border-t border-border my-6"></div>
-
-            {/* Mother Sub-section */}
             <div className="mb-6">
             <h4 className="font-semibold text-foreground mb-4">Mother</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -435,15 +531,20 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.mother.name", val)
                 }
                 placeholder="Mother's name"
+                required
+                error={errors["family.relatedPersons.mother.name"]}
               />
               <InputField
                 label="Age"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={family?.relatedPersons?.mother?.age || ""}
                 onChange={(val) =>
-                  handleInputChange("family.relatedPersons.mother.age", val)
+                  handleInputChange("family.relatedPersons.mother.age", val.replace(/[^0-9]/g, ""))
                 }
                 placeholder="Age"
+                required
+                error={errors["family.relatedPersons.mother.age"]}
               />
               <InputField
                 label="Educational Attainment"
@@ -452,6 +553,8 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.mother.educationalAttainment", val)
                 }
                 placeholder="e.g., College Graduate"
+                required
+                error={errors["family.relatedPersons.mother.educationalAttainment"]}
               />
               <InputField
                 label="Occupation"
@@ -460,6 +563,8 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.mother.occupation", val)
                 }
                 placeholder="e.g., Engineer"
+                required
+                error={errors["family.relatedPersons.mother.occupation"]}
               />
               <InputField
                 label="Name of Employer"
@@ -468,6 +573,8 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.mother.employerName", val)
                 }
                 placeholder="Company name"
+                required
+                error={errors["family.relatedPersons.mother.employerName"]}
               />
               <InputField
                 label="Address of Employer"
@@ -476,39 +583,52 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.mother.employerAddress", val)
                 }
                 placeholder="Company address"
+                required
+                error={errors["family.relatedPersons.mother.employerAddress"]}
               />
             </div>
             <div className="flex gap-6">
               <label className="text-sm font-medium text-card-foreground">Status:</label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="mother-status"
-                    value="living"
-                    checked={family?.relatedPersons?.mother?.isLiving !== false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.mother.isLiving", true)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="mother-status"
+                      value="living"
+                      checked={family?.relatedPersons?.mother?.isLiving === true}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.mother.isLiving", true)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Living</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="mother-status"
-                    value="deceased"
-                    checked={family?.relatedPersons?.mother?.isLiving === false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.mother.isLiving", false)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="mother-status"
+                      value="deceased"
+                      checked={family?.relatedPersons?.mother?.isLiving === false}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.mother.isLiving", false)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Deceased</span>
                 </label>
               </div>
             </div>
+            {errors["family.relatedPersons.mother.isLiving"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["family.relatedPersons.mother.isLiving"]}</p>
+            )}
             </div>
 
             <div className="border-t border-border my-6"></div>
@@ -524,15 +644,20 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.guardian.name", val)
                 }
                 placeholder="Guardian's name"
+                required
+                error={errors["family.relatedPersons.guardian.name"]}
               />
               <InputField
                 label="Age"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={family?.relatedPersons?.guardian?.age || ""}
                 onChange={(val) =>
-                  handleInputChange("family.relatedPersons.guardian.age", val)
+                  handleInputChange("family.relatedPersons.guardian.age", val.replace(/[^0-9]/g, ""))
                 }
                 placeholder="Age"
+                required
+                error={errors["family.relatedPersons.guardian.age"]}
               />
               <InputField
                 label="Educational Attainment"
@@ -541,6 +666,8 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.guardian.educationalAttainment", val)
                 }
                 placeholder="e.g., College Graduate"
+                required
+                error={errors["family.relatedPersons.guardian.educationalAttainment"]}
               />
               <InputField
                 label="Occupation"
@@ -549,6 +676,8 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.guardian.occupation", val)
                 }
                 placeholder="e.g., Engineer"
+                required
+                error={errors["family.relatedPersons.guardian.occupation"]}
               />
               <InputField
                 label="Name of Employer"
@@ -557,6 +686,8 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.guardian.employerName", val)
                 }
                 placeholder="Company name"
+                required
+                error={errors["family.relatedPersons.guardian.employerName"]}
               />
               <InputField
                 label="Address of Employer"
@@ -565,39 +696,52 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.guardian.employerAddress", val)
                 }
                 placeholder="Company address"
+                required
+                error={errors["family.relatedPersons.guardian.employerAddress"]}
               />
             </div>
             <div className="flex gap-6">
               <label className="text-sm font-medium text-card-foreground">Status:</label>
               <div className="flex gap-4">
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="guardian-status"
-                    value="living"
-                    checked={family?.relatedPersons?.guardian?.isLiving !== false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.guardian.isLiving", true)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="guardian-status"
+                      value="living"
+                      checked={family?.relatedPersons?.guardian?.isLiving === true}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.guardian.isLiving", true)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Living</span>
                 </label>
                 <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="radio"
-                    name="guardian-status"
-                    value="deceased"
-                    checked={family?.relatedPersons?.guardian?.isLiving === false}
-                    onChange={() =>
-                      handleInputChange("family.relatedPersons.guardian.isLiving", false)
-                    }
-                    className="w-4 h-4 accent-red-600"
-                  />
+                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                    <input
+                      type="radio"
+                      name="guardian-status"
+                      value="deceased"
+                      checked={family?.relatedPersons?.guardian?.isLiving === false}
+                      onChange={() =>
+                        handleInputChange("family.relatedPersons.guardian.isLiving", false)
+                      }
+                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                    />
+                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  </div>
                   <span className="text-sm">Deceased</span>
                 </label>
               </div>
             </div>
+            {errors["family.relatedPersons.guardian.isLiving"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["family.relatedPersons.guardian.isLiving"]}</p>
+            )}
             </div>
 
             <div className="border-t border-border my-6"></div>
@@ -611,19 +755,20 @@ export const FamilyBackgroundSection = forwardRef<
                 <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Children (incl. yourself)</label>
                 <div className="relative">
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="0"
                     value={family?.background?.numberOfChildren || ""}
                     onChange={(e) =>
-                      handleInputChange("family.background.numberOfChildren", e.target.value)
+                      handleInputChange("family.background.numberOfChildren", e.target.value.replace(/[^0-9]/g, ""))
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.numberOfChildren
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {family?.background?.numberOfChildren && (
+                  {!!family?.background?.numberOfChildren && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -632,19 +777,20 @@ export const FamilyBackgroundSection = forwardRef<
                 <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Brothers</label>
                 <div className="relative">
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="0"
                     value={family?.background?.brothers || ""}
                     onChange={(e) =>
-                      handleInputChange("family.background.brothers", e.target.value)
+                      handleInputChange("family.background.brothers", e.target.value.replace(/[^0-9]/g, ""))
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.brothers
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {family?.background?.brothers && (
+                  {!!family?.background?.brothers && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -653,19 +799,20 @@ export const FamilyBackgroundSection = forwardRef<
                 <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Sisters</label>
                 <div className="relative">
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="0"
                     value={family?.background?.sisters || ""}
                     onChange={(e) =>
-                      handleInputChange("family.background.sisters", e.target.value)
+                      handleInputChange("family.background.sisters", e.target.value.replace(/[^0-9]/g, ""))
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.sisters
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {family?.background?.sisters && (
+                  {!!family?.background?.sisters && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -677,19 +824,20 @@ export const FamilyBackgroundSection = forwardRef<
                 <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Gainfully Employed</label>
                 <div className="relative">
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="0"
                     value={family?.background?.employedSiblings || ""}
                     onChange={(e) =>
-                      handleInputChange("family.background.employedSiblings", e.target.value)
+                      handleInputChange("family.background.employedSiblings", e.target.value.replace(/[^0-9]/g, ""))
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.employedSiblings
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {family?.background?.employedSiblings && (
+                  {!!family?.background?.employedSiblings && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -706,11 +854,11 @@ export const FamilyBackgroundSection = forwardRef<
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.ordinalPosition
-                        ? 'bg-white dark:!bg-neutral-800 border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-white dark:!bg-neutral-800 border-red-500 focus:border-red-500 focus:ring-red-500/20'
+                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
+                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
                     }`}
                   />
-                  {family?.background?.ordinalPosition && (
+                  {!!family?.background?.ordinalPosition && (
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
@@ -727,7 +875,7 @@ export const FamilyBackgroundSection = forwardRef<
               Is your brother/sister who is gainfully employed providing support to your:
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Checkbox
+              <Checkbox square
                 id="sibling-support-family"
                 label="Family"
                 name="sibling-support-family"
@@ -741,7 +889,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="sibling-support-studies"
                 label="Your studies"
                 name="sibling-support-studies"
@@ -755,7 +903,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="sibling-support-own-family"
                 label="His/Her Own Family"
                 name="sibling-support-own-family"
@@ -780,7 +928,7 @@ export const FamilyBackgroundSection = forwardRef<
               Who finances your schooling?
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Checkbox
+              <Checkbox square
                 id="finance-parents"
                 label="Parents"
                 name="finance-parents"
@@ -794,7 +942,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="finance-spouse"
                 label="Spouse"
                 name="finance-spouse"
@@ -808,7 +956,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="finance-sibling"
                 label="Brother/Sister"
                 name="finance-sibling"
@@ -822,7 +970,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="finance-scholarship"
                 label="Scholarship"
                 name="finance-scholarship"
@@ -836,7 +984,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="finance-relatives"
                 label="Relatives"
                 name="finance-relatives"
@@ -850,7 +998,7 @@ export const FamilyBackgroundSection = forwardRef<
                   )
                 }
               />
-              <Checkbox
+              <Checkbox square
                 id="finance-self"
                 label="Self-supporting/Working Student"
                 name="finance-self"
@@ -901,7 +1049,7 @@ export const FamilyBackgroundSection = forwardRef<
                   }
                 }}
                 className={`
-                  w-full px-3 py-2 border rounded-md bg-white dark:!bg-neutral-800 text-sm
+                  w-full px-3 py-2 border rounded-md bg-card text-sm
                   appearance-none cursor-pointer transition-all duration-200
                   focus:outline-none focus:ring-2 focus:ring-offset-0 text-foreground
                   ${
@@ -919,10 +1067,13 @@ export const FamilyBackgroundSection = forwardRef<
                 ))}
                 <option value="others">Others</option>
               </select>
-              {family?.finance?.monthlyFamilyIncomeRange?.id && (
+              {!!family?.finance?.monthlyFamilyIncomeRange?.id && (
                 <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
               )}
             </div>
+            {errors["family.finance.monthlyFamilyIncomeRange"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["family.finance.monthlyFamilyIncomeRange"]}</p>
+            )}
 
             {family?.finance?.monthlyFamilyIncomeRange?.id === "others" && (
               <div className="mt-4">
@@ -939,15 +1090,15 @@ export const FamilyBackgroundSection = forwardRef<
                     )
                   }
                   onBlur={() => setOtherTouched(true)}
-                  className={`flex-1 ml-0 mt-2 px-3 py-2 border rounded-md text-sm bg-white dark:!bg-neutral-800 focus:outline-none ${
+                  className={`flex-1 ml-0 mt-2 px-3 py-2 border rounded-md text-sm bg-card focus:outline-none ${
                     otherTouched && !(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "")
                       ? "border-red-500 focus:ring-red-500/20"
                       : "border-border"
                   }`}
                 />
-                {otherTouched && !(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "") && (
-                  <p className="text-xs text-red-500 mt-2">Please provide an income range.</p>
-                )}
+                {(otherTouched && !(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "")) || errors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] ? (
+                  <p className="text-xs text-red-500 mt-2">{errors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] || "Please provide an income range."}</p>
+                ) : null}
               </div>
             )}
           </div>
@@ -955,12 +1106,12 @@ export const FamilyBackgroundSection = forwardRef<
           <div className="mb-8">
             <InputField
               label="Weekly Allowance (PHP)"
-              type="number"
+              type="text"
               inputMode="decimal"
               placeholder="Enter amount"
               value={family?.finance?.weeklyAllowance || ""}
               onChange={(val) =>
-                handleInputChange("family.finance.weeklyAllowance", val)
+                handleInputChange("family.finance.weeklyAllowance", val.replace(/[^0-9.]/g, ""))
               }
               error={errors["family.finance.weeklyAllowance"]}
               required

@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+﻿import { forwardRef, useImperativeHandle, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface FormErrors {
@@ -21,9 +21,41 @@ export const HealthInformationSection = forwardRef<
   const validate = (): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors: FormErrors = {};
 
-    if (!health?.healthRecord) {
-      sectionErrors["health.healthRecord"] = "Health record is required";
-    }
+    // Physical items – each YES/NO must be answered; if YES, details are required
+    const physicalFields = [
+      { yesKey: "visionHasProblem", detailKey: "visionDetails", label: "Vision" },
+      { yesKey: "hearingHasProblem", detailKey: "hearingDetails", label: "Hearing" },
+      { yesKey: "speechHasProblem", detailKey: "speechDetails", label: "Speech" },
+      { yesKey: "generalHealthHasProblem", detailKey: "generalHealthDetails", label: "General Health" },
+    ];
+
+    physicalFields.forEach(({ yesKey, detailKey, label }) => {
+      const hasProblem = health?.healthRecord?.[yesKey];
+      if (hasProblem === undefined || hasProblem === null) {
+        sectionErrors[`health.healthRecord.${yesKey}`] = `${label}: Please select Yes or No`;
+      } else if (hasProblem === true) {
+        if (!(health?.healthRecord?.[detailKey] || "").trim()) {
+          sectionErrors[`health.healthRecord.${detailKey}`] = `${label}: Please specify the problem`;
+        }
+      }
+    });
+
+    // Consultation items – each YES/NO must be answered; if YES, whenDate and forWhat are required
+    ["Psychiatrist", "Psychologist", "Counselor"].forEach((type) => {
+      const consultation = Array.isArray(health?.consultations)
+        ? health.consultations.find((c: any) => c.professionalType === type)
+        : null;
+      if (!consultation || consultation.hasConsulted === undefined || consultation.hasConsulted === null) {
+        sectionErrors[`health.consultations.${type}.hasConsulted`] = `${type}: Please select Yes or No`;
+      } else if (consultation.hasConsulted === true) {
+        if (!(consultation.whenDate || "").trim()) {
+          sectionErrors[`health.consultations.${type}.whenDate`] = `${type}: Please specify when`;
+        }
+        if (!(consultation.forWhat || "").trim()) {
+          sectionErrors[`health.consultations.${type}.forWhat`] = `${type}: Please specify reason`;
+        }
+      }
+    });
 
     setErrors(sectionErrors);
     return {
@@ -68,24 +100,14 @@ export const HealthInformationSection = forwardRef<
         ...consultations[existingIndex],
         [field === "consulted" ? "hasConsulted" : field]: value,
       };
-    } else if (
-      value !== false &&
-      value !== "" &&
-      (field === "consulted" || field === "whenDate" || field === "forWhat")
-    ) {
-      // Create new consultation only if setting to true or non-empty string
+    } else if (field === "consulted" || (value !== "" && value !== null)) {
+      // Create a new record for any consulted click (yes or no) or non-empty text fields
       consultations.push({
         professionalType,
         hasConsulted: field === "consulted" ? value : false,
         whenDate: field === "whenDate" ? value : null,
         forWhat: field === "forWhat" ? value : null,
       });
-    } else if (existingIndex >= 0 && value === false) {
-      // If setting consulted to false, we might want to keep the record
-      consultations[existingIndex] = {
-        ...consultations[existingIndex],
-        hasConsulted: false,
-      };
     }
 
     onChange("health.consultations", consultations);
@@ -165,26 +187,39 @@ export const HealthInformationSection = forwardRef<
               <tbody>
                   {physicalItems.map((item, idx) => (
                   <tr key={idx} className="border-b border-border">
-                    <td className="py-2 px-3 text-sm text-foreground">{item.label}</td>
-                    <td className="py-2 px-3 text-center">
-                      <input
-                        type="radio"
-                        name={`physical-${idx}`}
-                        value="yes"
-                        checked={item.yesValue === true}
-                        onChange={() => handleInputChange(item.yesKey, true)}
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                    <td className="py-2 px-3 text-sm">
+                      <span className="text-foreground">{item.label}</span>
+                      {errors[item.yesKey] && (
+                        <p className="text-xs text-red-500">{errors[item.yesKey]}</p>
+                      )}
                     </td>
                     <td className="py-2 px-3 text-center">
-                      <input
-                        type="radio"
-                        name={`physical-${idx}`}
-                        value="no"
-                        checked={item.yesValue === false}
-                        onChange={() => handleInputChange(item.yesKey, false)}
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
+                        <input
+                          type="radio"
+                          name={`physical-${idx}`}
+                          value="yes"
+                          checked={item.yesValue === true}
+                          onChange={() => handleInputChange(item.yesKey, true)}
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
+                    </td>
+                    <td className="py-2 px-3 text-center">
+                      <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
+                        <input
+                          type="radio"
+                          name={`physical-${idx}`}
+                          value="no"
+                          checked={item.yesValue === false}
+                          onChange={() => handleInputChange(item.yesKey, false)}
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                     </td>
                     <td className="py-2 px-3">
                       <input
@@ -197,10 +232,13 @@ export const HealthInformationSection = forwardRef<
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           item.yesValue === true
-                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
-                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
+                            ? "border-border bg-card focus:border-border focus:ring-ring/20"
+                            : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
+                      {errors[item.detailsKey] && (
+                        <p className="text-xs text-red-500 mt-1">{errors[item.detailsKey]}</p>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -235,30 +273,43 @@ export const HealthInformationSection = forwardRef<
               <tbody>
                 {consultationTypes.map((type, idx) => (
                   <tr key={idx} className="border-b border-border">
-                    <td className="py-2 px-3 text-sm text-foreground">{type.label}</td>
-                    <td className="py-2 px-3 text-center">
-                      <input
-                        type="radio"
-                        name={`consultation-${idx}`}
-                        value="yes"
-                        checked={type.consulted === true}
-                        onChange={() =>
-                          handleConsultationChange(type.type, "consulted", true)
-                        }
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                    <td className="py-2 px-3 text-sm">
+                      <span className="text-foreground">{type.label}</span>
+                      {errors[`health.consultations.${type.type}.hasConsulted`] && (
+                        <p className="text-xs text-red-500">{errors[`health.consultations.${type.type}.hasConsulted`]}</p>
+                      )}
                     </td>
                     <td className="py-2 px-3 text-center">
-                      <input
-                        type="radio"
-                        name={`consultation-${idx}`}
-                        value="no"
-                        checked={type.consulted === false}
-                        onChange={() =>
-                          handleConsultationChange(type.type, "consulted", false)
-                        }
-                        className="w-4 h-4 cursor-pointer accent-red-600"
-                      />
+                      <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
+                        <input
+                          type="radio"
+                          name={`consultation-${idx}`}
+                          value="yes"
+                          checked={type.consulted === true}
+                          onChange={() =>
+                            handleConsultationChange(type.type, "consulted", true)
+                          }
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
+                    </td>
+                    <td className="py-2 px-3 text-center">
+                      <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
+                        <input
+                          type="radio"
+                          name={`consultation-${idx}`}
+                          value="no"
+                          checked={type.consulted === false}
+                          onChange={() =>
+                            handleConsultationChange(type.type, "consulted", false)
+                          }
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
                     </td>
                     <td className="py-2 px-3">
                       <input
@@ -275,10 +326,13 @@ export const HealthInformationSection = forwardRef<
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           type.consulted === true
-                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
-                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
+                            ? "border-border bg-card focus:border-border focus:ring-ring/20"
+                            : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
+                      {errors[`health.consultations.${type.type}.whenDate`] && (
+                        <p className="text-xs text-red-500 mt-1">{errors[`health.consultations.${type.type}.whenDate`]}</p>
+                      )}
                     </td>
                     <td className="py-2 px-3">
                       <input
@@ -295,10 +349,13 @@ export const HealthInformationSection = forwardRef<
                         }
                         className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
                           type.consulted === true
-                            ? "border-border bg-white dark:!bg-neutral-800 focus:border-border focus:ring-ring/20"
-                            : "border-border bg-white dark:!bg-neutral-800 opacity-50 text-foreground cursor-not-allowed"
+                            ? "border-border bg-card focus:border-border focus:ring-ring/20"
+                            : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
+                      {errors[`health.consultations.${type.type}.forWhat`] && (
+                        <p className="text-xs text-red-500 mt-1">{errors[`health.consultations.${type.type}.forWhat`]}</p>
+                      )}
                     </td>
                   </tr>
                 ))}

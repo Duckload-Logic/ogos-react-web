@@ -10,10 +10,14 @@ import {
 } from "@/features/iir/hooks";
 import { IIRForm as IIRFormType } from "@/features/iir/types/IIRForm";
 import { EMPTY_IIR_FORM } from "@/features/iir/constants";
+import { validateObject } from "@/services/validationSchema";
+import { personalInformationValidationSchema } from "@/features/iir/config/personalInfoValidationSchema";
 import { LoadingSpinner } from "@/components/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { HeroSection } from "@/components/ui/hero-section";
+import { AnimationStyles } from "@/components/ui/animations";
 import {
   AlertCircle,
   Save,
@@ -75,7 +79,7 @@ export default function IIRForm() {
 
   useEffect(() => {
     const initializeFormData = () => {
-      if (isLoadingDraft || !me) return;
+      if (isLoadingDraft || !me || hasInitialized.current) return;
 
       const baseData = draft || EMPTY_IIR_FORM;
 
@@ -101,7 +105,7 @@ export default function IIRForm() {
         education: baseData.education || { schools: [] },
         family: baseData.family || {
           background: {},
-          relatedPersons: [],
+          relatedPersons: {},
           finance: {},
         },
         health: baseData.health || { healthRecord: {}, consultations: [] },
@@ -185,8 +189,9 @@ export default function IIRForm() {
           // Keep arrays as arrays
           current[key] = Array.isArray(current[key]) ? [...current[key]] : current[key];
         } else {
-          // Spread objects
-          current[key] = Array.isArray(current[key]) ? [...current[key]] : { ...current[key] };
+          // Next key is a string property — always spread as object
+          // Using [...array] would lose non-numeric string properties (e.g. relatedPersons.father)
+          current[key] = { ...current[key] };
         }
         current = current[key];
       }
@@ -348,91 +353,169 @@ export default function IIRForm() {
     let totalCount = 0;
 
     switch (sectionIndex) {
-      case 1: // Personal Information
-        // BasicInfo fields (auto-filled but still count)
-        const basicFields = ["firstName", "lastName", "email"];
-        basicFields.forEach((field) => {
-          totalCount++;
-          if (countFilledField((localFormData?.student?.basicInfo as any)?.[field])) {
-            filledCount++;
-          }
-        });
+      case 1: { // Personal Information
+        // Drive completion from the same schema used for validation
+        const schemaFields = Object.keys(personalInformationValidationSchema);
+        const schemaErrors = validateObject({ student: localFormData?.student }, personalInformationValidationSchema);
+        totalCount = schemaFields.length;
+        filledCount = schemaFields.length - Object.keys(schemaErrors).length;
+        break;
+      }
 
-        // Key PersonalInfo fields to track
-        const personalFields = [
-          "dateOfBirth",
-          "placeOfBirth",
-          "gender",
-          "heightFt",
-          "weightKg",
-          "civilStatus",
-          "course",
-          "highSchoolGWA",
-          "mobileNumber",
-        ];
-        personalFields.forEach((field) => {
-          totalCount++;
-          if (countFilledField((localFormData?.student?.personalInfo as any)?.[field])) {
-            filledCount++;
-          }
-        });
+      case 2: { // Education
+        // Nature of schooling
+        totalCount++;
+        if (localFormData?.education?.natureOfSchooling) filledCount++;
 
-        // Emergency contact fields
-        const emergencyFields = ["firstName", "lastName", "contactNumber", "relationship"];
-        emergencyFields.forEach((field) => {
-          totalCount++;
-          if (countFilledField((localFormData?.student?.personalInfo?.emergencyContact as any)?.[field])) {
-            filledCount++;
-          }
-        });
-
-        // Address fields (Provincial and Residential)
-        const addressTypes = ["provincial", "residential"];
-        addressTypes.forEach((addrType) => {
-          const addressFields = ["region", "city", "barangay", "streetDetail"];
-          addressFields.forEach((field) => {
+        // Mirror the requiredFields from EducationBackgroundSection.getCompletionLevel
+        // There are 5 school levels displayed (indices 0-4); count all of them
+        const schoolFields = ["schoolName", "schoolAddress", "schoolType", "yearStarted", "yearCompleted"];
+        const schools = localFormData?.education?.schools ?? [];
+        const SCHOOL_LEVEL_COUNT = 5;
+        for (let i = 0; i < SCHOOL_LEVEL_COUNT; i++) {
+          schoolFields.forEach((field) => {
             totalCount++;
-            const val = (localFormData?.student?.addresses as any)?.[addrType]?.address?.[field];
-            if (countFilledField(val)) {
-              filledCount++;
-            }
+            if (countFilledField((schools[i] as any)?.[field])) filledCount++;
+          });
+        }
+        break;
+      }
+
+      case 3: { // Family Background
+        const bg = localFormData?.family?.background as any;
+        const finance = localFormData?.family?.finance as any;
+        const relatedPersons = localFormData?.family?.relatedPersons as any;
+
+        // Parental status
+        const familyBgFields = ["parentalStatus", "numberOfChildren", "brothers", "sisters"];
+        familyBgFields.forEach((field) => {
+          totalCount++;
+          if (bg?.[field] !== undefined && bg?.[field] !== null && bg?.[field] !== "") filledCount++;
+        });
+
+        // natureOfResidence is an object of booleans — check at least one is true
+        totalCount++;
+        const residence = bg?.natureOfResidence;
+        if (residence && Object.values(residence).some((v) => v === true)) filledCount++;
+
+        // Finance fields
+        totalCount++;
+        if (finance?.monthlyFamilyIncomeRange?.id) filledCount++;
+        totalCount++;
+        if (finance?.weeklyAllowance && finance.weeklyAllowance !== "0" && finance.weeklyAllowance !== 0) filledCount++;
+
+        // Track father and mother name fields individually
+        const personFields = ["name", "age", "educationalAttainment", "occupation"];
+        ["father", "mother"].forEach((person) => {
+          personFields.forEach((field) => {
+            totalCount++;
+            if (countFilledField(relatedPersons?.[person]?.[field])) filledCount++;
           });
         });
         break;
+      }
 
-      case 2: // Education
-        totalCount = 1;
-        filledCount = (localFormData?.education?.schools?.length ?? 0) > 0 ? 1 : 0;
+      case 4: { // Health Information
+        const hr = localFormData?.health?.healthRecord as any;
+
+        // Physical items: yes/no answer required; if yes, details field also required
+        const physicalItems = [
+          { bool: "visionHasProblem", detail: "visionDetails" },
+          { bool: "hearingHasProblem", detail: "hearingDetails" },
+          { bool: "speechHasProblem", detail: "speechDetails" },
+          { bool: "generalHealthHasProblem", detail: "generalHealthDetails" },
+        ];
+        physicalItems.forEach(({ bool, detail }) => {
+          totalCount++;
+          if (hr?.[bool] !== undefined) {
+            filledCount++;
+            if (hr[bool] === true) {
+              // YES selected — require the details field too
+              totalCount++;
+              if (countFilledField(hr?.[detail])) filledCount++;
+            }
+          }
+        });
+
+        // Consultations: yes/no required per type; if yes, whenDate + forWhat also required
+        const consultations = localFormData?.health?.consultations ?? [];
+        const consultationTypes = ["Psychiatrist", "Psychologist", "Counselor"];
+        consultationTypes.forEach((type) => {
+          totalCount++;
+          const record = Array.isArray(consultations)
+            ? consultations.find((c: any) => c?.professionalType === type)
+            : null;
+          if (record?.hasConsulted !== undefined) {
+            filledCount++;
+            if (record.hasConsulted === true) {
+              // YES selected — require whenDate and forWhat too
+              totalCount += 2;
+              if (countFilledField(record?.whenDate)) filledCount++;
+              if (countFilledField(record?.forWhat)) filledCount++;
+            }
+          }
+        });
         break;
+      }
 
-      case 3: // Family Background
-        totalCount = 2;
-        if (localFormData?.family?.background && Object.keys(localFormData.family.background).length > 0) {
+      case 5: { // Interests and Hobbies
+        const interests = localFormData?.interests as any;
+
+        // Favorite and least liked subjects
+        totalCount++;
+        if (interests?.academic?.favoriteSubjects) filledCount++;
+        totalCount++;
+        if (interests?.academic?.leastLikedSubjects) filledCount++;
+
+        // At least one hobby filled (check first two)
+        totalCount++;
+        if (interests?.hobbies?.[0]?.hobbyName || interests?.hobbies?.["0"]?.hobbyName) filledCount++;
+        totalCount++;
+        if (interests?.hobbies?.[1]?.hobbyName || interests?.hobbies?.["1"]?.hobbyName) filledCount++;
+
+        // At least one academic club checked
+        totalCount++;
+        const hasAcademic = interests?.academic?.mathClub || interests?.academic?.scienceClub ||
+          interests?.academic?.debatingClub || interests?.academic?.quizzersClub || interests?.academic?.othersChecked;
+        if (hasAcademic) filledCount++;
+
+        // Organization (single radio selection)
+        totalCount++;
+        const org = interests?.extraCurricular?.organization;
+        if (org) {
           filledCount++;
+          if (org === "others") {
+            totalCount++;
+            if (countFilledField(interests?.extraCurricular?.organizationOthers)) filledCount++;
+          }
         }
-        if ((localFormData?.family?.relatedPersons?.length ?? 0) > 0) {
-          filledCount++;
-        }
-        break;
 
-      case 4: // Health
-        totalCount = 1;
-        if (localFormData?.health?.healthRecord && Object.keys(localFormData.health.healthRecord).length > 0) {
+        // Occupational position in organization
+        totalCount++;
+        const occPos = interests?.extraCurricular?.occupationalPosition;
+        if (occPos) {
           filledCount++;
+          if (occPos === "others") {
+            totalCount++;
+            if (countFilledField(interests?.extraCurricular?.occupationalOthers)) filledCount++;
+          }
         }
         break;
+      }
 
-      case 5: // Interests
-        totalCount = 1;
-        if (localFormData?.interests && Object.keys(localFormData.interests).length > 0) {
-          filledCount++;
-        }
+      case 6: { // Test Results - count each individual field across 3 rows (5 fields each = 15 total)
+        const rows = Array.from({ length: 3 }, (_, i) => (localFormData?.testResults || [])[i] || {});
+        totalCount = 15;
+        filledCount = rows.reduce((acc: number, r: any) => {
+          if (r?.date || r?.testDate) acc++;
+          if (r?.nameOfTest || r?.testName) acc++;
+          if (r?.rs !== undefined && r?.rs !== "" && r?.rs !== null) acc++;
+          if (r?.pr !== undefined && r?.pr !== "" && r?.pr !== null) acc++;
+          if (r?.description) acc++;
+          return acc;
+        }, 0);
         break;
-
-      case 6: // Test Results
-        totalCount = 1;
-        filledCount = (localFormData?.testResults?.length ?? 0) > 0 ? 1 : 0;
-        break;
+      }
     }
 
     return totalCount > 0 ? Math.round((filledCount / totalCount) * 100) : 0;
@@ -456,18 +539,13 @@ export default function IIRForm() {
   const currentSectionDef = FORM_SECTIONS.find((s) => s.id === currentSection);
 
   return (
-    <div className="min-h-screen bg-background">
-      {/* Red Hero Section */}
-      <div className="bg-destructive text-white py-8 md:py-12 px-4 md:px-8">
-        <div className="max-w-7xl mx-auto">
-          <h1 className="text-3xl md:text-4xl font-bold">
-            Individual Inventory Record Form
-          </h1>
-          <p className="text-base md:text-lg mt-2">
-            Complete your student profile information
-          </p>
-        </div>
-      </div>
+    <>
+      <AnimationStyles />
+      <HeroSection
+        greeting="Student Form"
+        title="Individual Inventory Record"
+        subtitle="Complete your student profile information for PUP Guidance Services"
+      />
 
       {/* Main Content */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
@@ -536,22 +614,6 @@ export default function IIRForm() {
                     >
                       <div className="flex-1">
                         <p className="text-sm">{section.title}</p>
-                        <div
-                          className={`w-full bg-muted-foreground/30 rounded-full h-1.5 mt-2 overflow-hidden ${currentSection === section.id ? "bg-primary-foreground" : ""}`}
-                        >
-                          <div
-                            className={`h-full rounded-full transition-all ${
-                              currentSection === section.id
-                                ? "bg-primary-foreground"
-                                : status === "complete"
-                                  ? "bg-green-500"
-                                  : status === "partial"
-                                    ? "bg-secondary"
-                                    : "bg-gray-300"
-                            }`}
-                            style={{ width: `${percentage}%` }}
-                          />
-                        </div>
                       </div>
                       {status === "complete" && (
                         <Check className="w-5 h-5 ml-2 flex-shrink-0 text-green-500" />
@@ -579,24 +641,10 @@ export default function IIRForm() {
                         className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium text-xs sm:text-sm transition-colors flex flex-col items-center gap-1 min-w-fit ${
                           currentSection === section.id
                             ? "bg-primary text-primary-foreground shadow-md"
-                            : "bg-white border border-gray-200 text-gray-900"
+                            : "bg-card border border-border text-foreground"
                         }`}
                       >
                         <span className="whitespace-nowrap">{section.id}</span>
-                        <div className="w-12 h-1 bg-gray-200 rounded-full overflow-hidden">
-                          <div
-                            className={`h-full transition-all ${
-                              currentSection === section.id
-                                ? "bg-primary-foreground"
-                                : status === "complete"
-                                  ? "bg-green-500"
-                                  : status === "partial"
-                                    ? "bg-secondary"
-                                    : "bg-gray-300"
-                            }`}
-                            style={{ width: `${percentage}%` }}
-                          />
-                        </div>
                         {status === "complete" && (
                           <Check className="w-3 h-3 text-green-500" />
                         )}
@@ -613,7 +661,7 @@ export default function IIRForm() {
                     <CardTitle className="text-base sm:text-lg md:text-xl">
                       {currentSectionDef?.title}
                     </CardTitle>
-                    <span className="text-xs font-semibold text-gray-600 bg-gray-200 px-3 py-1.5 rounded-full w-fit">
+                    <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1.5 rounded-full w-fit">
                       {calculateSectionCompletion(currentSection)}% Complete
                     </span>
                   </div>
@@ -666,7 +714,7 @@ export default function IIRForm() {
             </div>
 
             {/* Form Navigation Buttons */}
-            <div className="sticky bottom-0 flex justify-between gap-3 bg-white dark:bg-neutral-800 p-4 border-t border-gray-300 dark:border-gray-700 shadow-lg flex-wrap z-20 rounded-2xl">
+            <div className="sticky bottom-0 flex justify-between gap-3 bg-card p-4 border-t border-border shadow-lg flex-wrap z-20 rounded-2xl">
               <Button
                 onClick={() => {
                   // Reset form but preserve autofilled fields
@@ -817,6 +865,6 @@ export default function IIRForm() {
           </div>
         )}
       </div>
-    </div>
+    </>
   );
 }

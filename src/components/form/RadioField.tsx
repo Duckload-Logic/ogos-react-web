@@ -45,7 +45,7 @@ export default function RadioField({
                 disabled={disabled}
                 className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
               />
-              <div className="h-full w-full rounded-full border border-card-foreground bg-white transition-all duration-200 peer-checked:border-red-600 peer-hover:border-red-600" />
+              <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600 peer-hover:border-red-600" />
               <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
             </div>
             <span className="text-sm text-foreground group-hover:text-primary transition-colors duration-200">

@@ -9,35 +9,66 @@ import {
 } from "@/services/validationSchema";
 
 export const personalInformationValidationSchema: FieldValidationSchema = {
-  // Basic Information Section
-  "student.basicInfo.firstName": [commonRules.required("First name")],
-  "student.basicInfo.lastName": [commonRules.required("Last name")],
-  "student.basicInfo.email": [
-    commonRules.required("Email"),
-    commonRules.email(),
-  ],
+  // Basic Information
+  "student.basicInfo.firstName": [commonRules.required("First name"), commonRules.minLength(2)],
+  "student.basicInfo.lastName": [commonRules.required("Last name"), commonRules.minLength(2)],
+  "student.basicInfo.email": [commonRules.required("Email"), commonRules.email()],
 
-  // Personal Details Section
-  "student.personalInfo.studentNumber": [
-    commonRules.required("Student number"),
-  ],
-  "student.personalInfo.dateOfBirth": [commonRules.required("Date of birth")],
-  "student.personalInfo.placeOfBirth": [commonRules.required("Place of birth")],
+  // Personal Details
+  "student.personalInfo.studentNumber": [commonRules.required("Student number"), commonRules.minLength(2)],
+  "student.personalInfo.dateOfBirth": [commonRules.required("Date of birth"), commonRules.validDate()],
+  "student.personalInfo.placeOfBirth": [commonRules.required("Place of birth"), commonRules.minLength(2)],
   "student.personalInfo.gender": [commonRules.required("Gender")],
+  "student.personalInfo.civilStatus": [commonRules.required("Civil status")],
+  "student.personalInfo.religion": [commonRules.required("Religion")],
   "student.personalInfo.course": [commonRules.required("Course")],
-  "student.personalInfo.mobileNumber": [commonRules.required("Mobile number")],
+  "student.personalInfo.highSchoolGWA": [
+    commonRules.required("High school GWA"),
+    commonRules.numeric(),
+    commonRules.minValue(60),
+    commonRules.maxValue(100),
+  ],
+  "student.personalInfo.heightFt": [
+    commonRules.required("Height"),
+    commonRules.positiveNumber(),
+  ],
+  "student.personalInfo.weightKg": [
+    commonRules.required("Weight"),
+    commonRules.positiveNumber(),
+  ],
+  "student.personalInfo.mobileNumber": [
+    commonRules.required("Mobile number"),
+    commonRules.phone(),
+  ],
+  "student.personalInfo.telephoneNumber": [
+    commonRules.required("Telephone number"),
+    commonRules.minLength(7),
+  ],
 
-  // Physical Characteristics Section (optional)
-  // "student.personalInfo.heightFt": [commonRules.numeric()],
-  // "student.personalInfo.weightKg": [commonRules.numeric()],
+  // Emergency Contact
+  "student.personalInfo.emergencyContact.firstName": [
+    commonRules.required("Emergency contact first name"),
+    commonRules.minLength(2),
+  ],
+  "student.personalInfo.emergencyContact.lastName": [
+    commonRules.required("Emergency contact last name"),
+    commonRules.minLength(2),
+  ],
+  "student.personalInfo.emergencyContact.contactNumber": [
+    commonRules.required("Emergency contact number"),
+    commonRules.phone(),
+  ],
+  "student.personalInfo.emergencyContact.relationship": [
+    commonRules.required("Relationship"),
+  ],
 
-  // Academic Information Section (optional)
-  // "student.personalInfo.highSchoolGWA": [
-  //   commonRules.numeric(),
-  //   commonRules.minValue(0),
-  //   commonRules.maxValue(4.0),
-  // ],
+  // Addresses – Provincial
+  "student.addresses.provincial.address.region": [commonRules.required("Region (Provincial)")],
+  "student.addresses.provincial.address.city": [commonRules.required("City/Municipality (Provincial)")],
+  "student.addresses.provincial.address.barangay": [commonRules.required("Barangay (Provincial)")],
 
-  // You can add more validation rules for other fields as needed
-  // Simply uncomment and configure based on your requirements
+  // Addresses – Residential
+  "student.addresses.residential.address.region": [commonRules.required("Region (Residential)")],
+  "student.addresses.residential.address.city": [commonRules.required("City/Municipality (Residential)")],
+  "student.addresses.residential.address.barangay": [commonRules.required("Barangay (Residential)")],
 };
