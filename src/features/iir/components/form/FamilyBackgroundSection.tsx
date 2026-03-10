@@ -358,6 +358,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.father.name", val)
                 }
                 placeholder="Father's name"
+                required
               />
               <InputField
                 label="Age"
@@ -367,6 +368,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.father.age", val)
                 }
                 placeholder="Age"
+                required
               />
               <InputField
                 label="Educational Attainment"
@@ -375,6 +377,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.father.educationalAttainment", val)
                 }
                 placeholder="e.g., College Graduate"
+                required
               />
               <InputField
                 label="Occupation"
@@ -383,6 +386,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.father.occupation", val)
                 }
                 placeholder="e.g., Engineer"
+                required
               />
               <InputField
                 label="Name of Employer"
@@ -391,6 +395,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.father.employerName", val)
                 }
                 placeholder="Company name"
+                required
               />
               <InputField
                 label="Address of Employer"
@@ -399,6 +404,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.father.employerAddress", val)
                 }
                 placeholder="Company address"
+                required
               />
             </div>
             <div className="flex gap-6">
@@ -455,6 +461,8 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.mother.name", val)
                 }
                 placeholder="Mother's name"
+                required
+                error={errors["family.relatedPersons.mother.name"]}
               />
               <InputField
                 label="Age"
@@ -464,6 +472,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.mother.age", val)
                 }
                 placeholder="Age"
+                required
               />
               <InputField
                 label="Educational Attainment"
@@ -472,6 +481,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.mother.educationalAttainment", val)
                 }
                 placeholder="e.g., College Graduate"
+                required
               />
               <InputField
                 label="Occupation"
@@ -480,6 +490,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.mother.occupation", val)
                 }
                 placeholder="e.g., Engineer"
+                required
               />
               <InputField
                 label="Name of Employer"
@@ -488,6 +499,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.mother.employerName", val)
                 }
                 placeholder="Company name"
+                required
               />
               <InputField
                 label="Address of Employer"
@@ -496,6 +508,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.mother.employerAddress", val)
                 }
                 placeholder="Company address"
+                required
               />
             </div>
             <div className="flex gap-6">
@@ -552,6 +565,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.guardian.name", val)
                 }
                 placeholder="Guardian's name"
+                required
               />
               <InputField
                 label="Age"
@@ -561,6 +575,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.guardian.age", val)
                 }
                 placeholder="Age"
+                required
               />
               <InputField
                 label="Educational Attainment"
@@ -569,6 +584,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.guardian.educationalAttainment", val)
                 }
                 placeholder="e.g., College Graduate"
+                required
               />
               <InputField
                 label="Occupation"
@@ -577,6 +593,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.guardian.occupation", val)
                 }
                 placeholder="e.g., Engineer"
+                required
               />
               <InputField
                 label="Name of Employer"
@@ -585,6 +602,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.guardian.employerName", val)
                 }
                 placeholder="Company name"
+                required
               />
               <InputField
                 label="Address of Employer"
@@ -593,6 +611,7 @@ export const FamilyBackgroundSection = forwardRef<
                   handleInputChange("family.relatedPersons.guardian.employerAddress", val)
                 }
                 placeholder="Company address"
+                required
               />
             </div>
             <div className="flex gap-6">
