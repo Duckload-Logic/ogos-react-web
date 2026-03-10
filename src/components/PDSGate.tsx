@@ -23,10 +23,9 @@ export const PDSGate = ({
   children,
   allowOnGuidancePage = false,
 }: PDSGateProps) => {
-  const { data: me } = useMe();
-  const { data: iirRecord, isLoading } = useIIRStatus(me?.email || "");
+  const { data: iirRecord, isLoading: isIIRLoading } = useIIRStatus();
 
-  if (isLoading) {
+  if (isIIRLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
