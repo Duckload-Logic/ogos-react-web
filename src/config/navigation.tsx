@@ -7,6 +7,10 @@ import {
   BarChart3,
   Timer,
   TrendingUp,
+  Key,
+  Shield,
+  Server,
+  ClipboardList,
 } from "lucide-react";
 
 export interface NavItem {
@@ -20,7 +24,7 @@ const ICON_SIZE = 20;
 export const roleMap: Record<number, string> = {
   1: "student",
   2: "admin",
-  3: "frontdesk",
+  3: "superadmin",
 };
 
 export const NAV_CONFIG: Record<string, NavItem[]>[] = [
@@ -74,6 +78,35 @@ export const NAV_CONFIG: Record<string, NavItem[]>[] = [
         label: "Admission Slips",
         href: "/student/slips",
         icon: <FileText size={ICON_SIZE} />,
+      },
+    ],
+  },
+  {
+    superadmin: [
+      {
+        label: "Dashboard",
+        href: "/superadmin/home",
+        icon: <Home size={ICON_SIZE} />,
+      },
+      {
+        label: "API Management",
+        href: "/superadmin/api-management",
+        icon: <Key size={ICON_SIZE} />,
+      },
+      {
+        label: "Security Logs",
+        href: "/superadmin/security-logs",
+        icon: <Shield size={ICON_SIZE} />,
+      },
+      {
+        label: "System Logs",
+        href: "/superadmin/system-logs",
+        icon: <Server size={ICON_SIZE} />,
+      },
+      {
+        label: "Audit Logs",
+        href: "/superadmin/audit-logs",
+        icon: <ClipboardList size={ICON_SIZE} />,
       },
     ],
   },
