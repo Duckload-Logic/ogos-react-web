@@ -1,4 +1,4 @@
-import { useState } from "react";
+﻿import { useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { DropdownField, InputField } from "@/components/form";
 import {
@@ -83,7 +83,7 @@ export function AddressCard({
               label="Street"
               value={studentInfo?.addresses?.[id]?.address?.streetDetail || ""}
               placeholder="Street/Lot/Blk"
-              onChange={(val) =>
+              onChange={(val: string) =>
                 onChange(`student.addresses.${id}.address.streetDetail`, val)
               }
             />

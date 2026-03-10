@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+﻿import { forwardRef, useImperativeHandle, useState } from "react";
 import { Check } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 
@@ -118,11 +118,12 @@ export const TestResultsSection = forwardRef<
                   <td className="border-b border-r border-border p-0 h-12">
                     <div className="relative h-full">
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
                         value={row?.rs ?? ""}
                         placeholder="0"
                         onChange={(e) =>
-                          handleInputChange(`testResults.${idx}.rs`, e.target.value)
+                          handleInputChange(`testResults.${idx}.rs`, e.target.value.replace(/[^0-9]/g, ""))
                         }
                         className="w-full h-full px-3 py-2 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary/30 transition-colors"
                       />
@@ -136,11 +137,12 @@ export const TestResultsSection = forwardRef<
                   <td className="border-b border-r border-border p-0 h-12">
                     <div className="relative h-full">
                       <input
-                        type="number"
+                        type="text"
+                        inputMode="numeric"
                         value={row?.pr ?? ""}
                         placeholder="0"
                         onChange={(e) =>
-                          handleInputChange(`testResults.${idx}.pr`, e.target.value)
+                          handleInputChange(`testResults.${idx}.pr`, e.target.value.replace(/[^0-9]/g, ""))
                         }
                         className="w-full h-full px-3 py-2 bg-transparent text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-inset focus:ring-primary/30 transition-colors"
                       />

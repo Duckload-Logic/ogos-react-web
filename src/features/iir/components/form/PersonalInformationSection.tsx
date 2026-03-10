@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
+﻿import { forwardRef, useImperativeHandle, useState, useEffect } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { DropdownField, InputField, Checkbox } from "@/components/form";
 import {
@@ -184,11 +184,11 @@ export const PersonalInformationSection = forwardRef<
           {/* High School GWA */}
           <InputField
             label="High School General Average"
-            type="number"
+            type="text"
             inputMode="decimal"
             value={studentInfo?.personalInfo?.highSchoolGWA || ""}
             onChange={(val) =>
-              handleInputChange("student.personalInfo.highSchoolGWA", val)
+              handleInputChange("student.personalInfo.highSchoolGWA", val.replace(/[^0-9.]/g, ""))
             }
             error={errors["student.personalInfo.highSchoolGWA"]}
             placeholder="e.g., 85"
@@ -234,11 +234,11 @@ export const PersonalInformationSection = forwardRef<
           {/* Height */}
           <InputField
             label="Height (ft.)"
-            type="number"
+            type="text"
             inputMode="decimal"
             value={studentInfo?.personalInfo?.heightFt || ""}
             onChange={(val) =>
-              handleInputChange("student.personalInfo.heightFt", val)
+              handleInputChange("student.personalInfo.heightFt", val.replace(/[^0-9.]/g, ""))
             }
             error={errors["student.personalInfo.heightFt"]}
             placeholder="e.g., 5.8"
@@ -248,11 +248,11 @@ export const PersonalInformationSection = forwardRef<
           {/* Weight */}
           <InputField
             label="Weight (kg.)"
-            type="number"
+            type="text"
             inputMode="decimal"
             value={studentInfo?.personalInfo?.weightKg || ""}
             onChange={(val) =>
-              handleInputChange("student.personalInfo.weightKg", val)
+              handleInputChange("student.personalInfo.weightKg", val.replace(/[^0-9.]/g, ""))
             }
             error={errors["student.personalInfo.weightKg"]}
             placeholder="e.g., 70"
@@ -277,7 +277,7 @@ export const PersonalInformationSection = forwardRef<
             inputMode="numeric"
             value={studentInfo?.personalInfo?.mobileNumber || ""}
             onChange={(val) =>
-              handleInputChange("student.personalInfo.mobileNumber", val)
+              handleInputChange("student.personalInfo.mobileNumber", val.replace(/[^0-9]/g, ""))
             }
             error={errors["student.personalInfo.mobileNumber"]}
             placeholder="e.g., 09123456789"
@@ -290,7 +290,7 @@ export const PersonalInformationSection = forwardRef<
             inputMode="numeric"
             value={studentInfo?.personalInfo?.telephoneNumber || ""}
             onChange={(val) =>
-              handleInputChange("student.personalInfo.telephoneNumber", val)
+              handleInputChange("student.personalInfo.telephoneNumber", val.replace(/[^0-9]/g, ""))
             }
             error={errors["student.personalInfo.telephoneNumber"]}
             placeholder="(02) 1234-5678"
@@ -348,7 +348,7 @@ export const PersonalInformationSection = forwardRef<
               onChange={(val) =>
                 handleInputChange(
                   "student.personalInfo.emergencyContact.contactNumber",
-                  val,
+                  val.replace(/[^0-9]/g, ""),
                 )
               }
               error={errors["student.personalInfo.emergencyContact.contactNumber"]}

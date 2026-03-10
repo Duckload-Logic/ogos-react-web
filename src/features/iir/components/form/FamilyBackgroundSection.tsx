@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState, useRef } from "react";
+﻿import { forwardRef, useImperativeHandle, useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { InputField, Checkbox, RadioField } from "@/components/form";
 import { Check } from "lucide-react";
@@ -34,19 +34,80 @@ export const FamilyBackgroundSection = forwardRef<
   const validate = (): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors: FormErrors = {};
 
-    if (!family?.background) {
-      sectionErrors["family.background"] = "Family background is required";
+    // Parental status
+    if (!family?.background?.parentalStatus) {
+      sectionErrors["family.background.parentalStatus"] = "Parental status is required";
     }
-    if (!family?.relatedPersons) {
-      sectionErrors["family.relatedPersons"] =
-        "Family members information is required";
+
+    // Family members
+    const persons = [
+      { key: "father", label: "Father" },
+      { key: "mother", label: "Mother" },
+      { key: "guardian", label: "Guardian" },
+    ] as const;
+
+    persons.forEach(({ key, label }) => {
+      const person = family?.relatedPersons?.[key] || {};
+
+      const name = (person?.name || "").trim();
+      if (!name) {
+        sectionErrors[`family.relatedPersons.${key}.name`] = `${label} name is required`;
+      } else if (name.length < 2) {
+        sectionErrors[`family.relatedPersons.${key}.name`] = `${label} name must be at least 2 characters`;
+      }
+
+      const age = person?.age;
+      if (age === undefined || age === null || age === "" || Number(age) === 0) {
+        sectionErrors[`family.relatedPersons.${key}.age`] = `${label} age is required`;
+      } else {
+        const ageNum = Number(age);
+        if (isNaN(ageNum) || !Number.isInteger(ageNum) || ageNum <= 0) {
+          sectionErrors[`family.relatedPersons.${key}.age`] = `${label} age must be a positive whole number`;
+        }
+      }
+
+      const educ = (person?.educationalAttainment || "").trim();
+      if (!educ) {
+        sectionErrors[`family.relatedPersons.${key}.educationalAttainment`] = `${label} educational attainment is required`;
+      } else if (educ.length < 2) {
+        sectionErrors[`family.relatedPersons.${key}.educationalAttainment`] = `${label} educational attainment must be at least 2 characters`;
+      }
+
+      const occ = (person?.occupation || "").trim();
+      if (!occ) {
+        sectionErrors[`family.relatedPersons.${key}.occupation`] = `${label} occupation is required`;
+      } else if (occ.length < 2) {
+        sectionErrors[`family.relatedPersons.${key}.occupation`] = `${label} occupation must be at least 2 characters`;
+      }
+
+      if (!(person?.employerName || "").trim()) {
+        sectionErrors[`family.relatedPersons.${key}.employerName`] = `${label} employer name is required`;
+      }
+
+      if (!(person?.employerAddress || "").trim()) {
+        sectionErrors[`family.relatedPersons.${key}.employerAddress`] = `${label} employer address is required`;
+      }
+
+      if (person?.isLiving === undefined || person?.isLiving === null) {
+        sectionErrors[`family.relatedPersons.${key}.isLiving`] = `${label} status (Living/Deceased) is required`;
+      }
+    });
+
+    // Finance
+    if (!family?.finance?.monthlyFamilyIncomeRange?.id) {
+      sectionErrors["family.finance.monthlyFamilyIncomeRange"] = "Monthly family income range is required";
     }
-    if (!family?.finance) {
-      sectionErrors["family.finance"] =
-        "Family financial information is required";
+    if (family?.finance?.monthlyFamilyIncomeRange?.id === "others") {
+      if (!(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "").trim()) {
+        sectionErrors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] = "Please specify the income range";
+      }
     }
-    if (!family?.finance?.weeklyAllowance || family.finance.weeklyAllowance === "" || family.finance.weeklyAllowance === 0) {
+
+    const wa = family?.finance?.weeklyAllowance;
+    if (wa === undefined || wa === null || wa === "" || Number(wa) === 0) {
       sectionErrors["family.finance.weeklyAllowance"] = "Weekly allowance is required";
+    } else if (isNaN(Number(wa)) || Number(wa) <= 0) {
+      sectionErrors["family.finance.weeklyAllowance"] = "Weekly allowance must be a positive number";
     }
 
     setErrors(sectionErrors);
@@ -165,6 +226,9 @@ export const FamilyBackgroundSection = forwardRef<
                 }
               })}
             </div>
+            {errors["family.background.parentalStatus"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["family.background.parentalStatus"]}</p>
+            )}
           </div>
         </div>
 
@@ -359,16 +423,19 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="Father's name"
                 required
+                error={errors["family.relatedPersons.father.name"]}
               />
               <InputField
                 label="Age"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={family?.relatedPersons?.father?.age || ""}
                 onChange={(val) =>
-                  handleInputChange("family.relatedPersons.father.age", val)
+                  handleInputChange("family.relatedPersons.father.age", val.replace(/[^0-9]/g, ""))
                 }
                 placeholder="Age"
                 required
+                error={errors["family.relatedPersons.father.age"]}
               />
               <InputField
                 label="Educational Attainment"
@@ -378,6 +445,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="e.g., College Graduate"
                 required
+                error={errors["family.relatedPersons.father.educationalAttainment"]}
               />
               <InputField
                 label="Occupation"
@@ -387,6 +455,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="e.g., Engineer"
                 required
+                error={errors["family.relatedPersons.father.occupation"]}
               />
               <InputField
                 label="Name of Employer"
@@ -396,6 +465,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="Company name"
                 required
+                error={errors["family.relatedPersons.father.employerName"]}
               />
               <InputField
                 label="Address of Employer"
@@ -405,6 +475,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="Company address"
                 required
+                error={errors["family.relatedPersons.father.employerAddress"]}
               />
             </div>
             <div className="flex gap-6">
@@ -446,11 +517,10 @@ export const FamilyBackgroundSection = forwardRef<
                 </label>
               </div>
             </div>
+            {errors["family.relatedPersons.father.isLiving"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["family.relatedPersons.father.isLiving"]}</p>
+            )}
             </div>
-
-            <div className="border-t border-border my-6"></div>
-
-            {/* Mother Sub-section */}
             <div className="mb-6">
             <h4 className="font-semibold text-foreground mb-4">Mother</h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
@@ -466,13 +536,15 @@ export const FamilyBackgroundSection = forwardRef<
               />
               <InputField
                 label="Age"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={family?.relatedPersons?.mother?.age || ""}
                 onChange={(val) =>
-                  handleInputChange("family.relatedPersons.mother.age", val)
+                  handleInputChange("family.relatedPersons.mother.age", val.replace(/[^0-9]/g, ""))
                 }
                 placeholder="Age"
                 required
+                error={errors["family.relatedPersons.mother.age"]}
               />
               <InputField
                 label="Educational Attainment"
@@ -482,6 +554,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="e.g., College Graduate"
                 required
+                error={errors["family.relatedPersons.mother.educationalAttainment"]}
               />
               <InputField
                 label="Occupation"
@@ -491,6 +564,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="e.g., Engineer"
                 required
+                error={errors["family.relatedPersons.mother.occupation"]}
               />
               <InputField
                 label="Name of Employer"
@@ -500,6 +574,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="Company name"
                 required
+                error={errors["family.relatedPersons.mother.employerName"]}
               />
               <InputField
                 label="Address of Employer"
@@ -509,6 +584,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="Company address"
                 required
+                error={errors["family.relatedPersons.mother.employerAddress"]}
               />
             </div>
             <div className="flex gap-6">
@@ -550,6 +626,9 @@ export const FamilyBackgroundSection = forwardRef<
                 </label>
               </div>
             </div>
+            {errors["family.relatedPersons.mother.isLiving"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["family.relatedPersons.mother.isLiving"]}</p>
+            )}
             </div>
 
             <div className="border-t border-border my-6"></div>
@@ -566,16 +645,19 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="Guardian's name"
                 required
+                error={errors["family.relatedPersons.guardian.name"]}
               />
               <InputField
                 label="Age"
-                type="number"
+                type="text"
+                inputMode="numeric"
                 value={family?.relatedPersons?.guardian?.age || ""}
                 onChange={(val) =>
-                  handleInputChange("family.relatedPersons.guardian.age", val)
+                  handleInputChange("family.relatedPersons.guardian.age", val.replace(/[^0-9]/g, ""))
                 }
                 placeholder="Age"
                 required
+                error={errors["family.relatedPersons.guardian.age"]}
               />
               <InputField
                 label="Educational Attainment"
@@ -585,6 +667,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="e.g., College Graduate"
                 required
+                error={errors["family.relatedPersons.guardian.educationalAttainment"]}
               />
               <InputField
                 label="Occupation"
@@ -594,6 +677,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="e.g., Engineer"
                 required
+                error={errors["family.relatedPersons.guardian.occupation"]}
               />
               <InputField
                 label="Name of Employer"
@@ -603,6 +687,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="Company name"
                 required
+                error={errors["family.relatedPersons.guardian.employerName"]}
               />
               <InputField
                 label="Address of Employer"
@@ -612,6 +697,7 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 placeholder="Company address"
                 required
+                error={errors["family.relatedPersons.guardian.employerAddress"]}
               />
             </div>
             <div className="flex gap-6">
@@ -653,6 +739,9 @@ export const FamilyBackgroundSection = forwardRef<
                 </label>
               </div>
             </div>
+            {errors["family.relatedPersons.guardian.isLiving"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["family.relatedPersons.guardian.isLiving"]}</p>
+            )}
             </div>
 
             <div className="border-t border-border my-6"></div>
@@ -666,11 +755,12 @@ export const FamilyBackgroundSection = forwardRef<
                 <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Children (incl. yourself)</label>
                 <div className="relative">
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="0"
                     value={family?.background?.numberOfChildren || ""}
                     onChange={(e) =>
-                      handleInputChange("family.background.numberOfChildren", e.target.value)
+                      handleInputChange("family.background.numberOfChildren", e.target.value.replace(/[^0-9]/g, ""))
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.numberOfChildren
@@ -687,11 +777,12 @@ export const FamilyBackgroundSection = forwardRef<
                 <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Brothers</label>
                 <div className="relative">
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="0"
                     value={family?.background?.brothers || ""}
                     onChange={(e) =>
-                      handleInputChange("family.background.brothers", e.target.value)
+                      handleInputChange("family.background.brothers", e.target.value.replace(/[^0-9]/g, ""))
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.brothers
@@ -708,11 +799,12 @@ export const FamilyBackgroundSection = forwardRef<
                 <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Sisters</label>
                 <div className="relative">
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="0"
                     value={family?.background?.sisters || ""}
                     onChange={(e) =>
-                      handleInputChange("family.background.sisters", e.target.value)
+                      handleInputChange("family.background.sisters", e.target.value.replace(/[^0-9]/g, ""))
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.sisters
@@ -732,11 +824,12 @@ export const FamilyBackgroundSection = forwardRef<
                 <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Gainfully Employed</label>
                 <div className="relative">
                   <input
-                    type="number"
+                    type="text"
+                    inputMode="numeric"
                     placeholder="0"
                     value={family?.background?.employedSiblings || ""}
                     onChange={(e) =>
-                      handleInputChange("family.background.employedSiblings", e.target.value)
+                      handleInputChange("family.background.employedSiblings", e.target.value.replace(/[^0-9]/g, ""))
                     }
                     className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
                       family?.background?.employedSiblings
@@ -978,6 +1071,9 @@ export const FamilyBackgroundSection = forwardRef<
                 <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
               )}
             </div>
+            {errors["family.finance.monthlyFamilyIncomeRange"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["family.finance.monthlyFamilyIncomeRange"]}</p>
+            )}
 
             {family?.finance?.monthlyFamilyIncomeRange?.id === "others" && (
               <div className="mt-4">
@@ -1000,9 +1096,9 @@ export const FamilyBackgroundSection = forwardRef<
                       : "border-border"
                   }`}
                 />
-                {otherTouched && !(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "") && (
-                  <p className="text-xs text-red-500 mt-2">Please provide an income range.</p>
-                )}
+                {(otherTouched && !(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "")) || errors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] ? (
+                  <p className="text-xs text-red-500 mt-2">{errors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] || "Please provide an income range."}</p>
+                ) : null}
               </div>
             )}
           </div>
@@ -1010,12 +1106,12 @@ export const FamilyBackgroundSection = forwardRef<
           <div className="mb-8">
             <InputField
               label="Weekly Allowance (PHP)"
-              type="number"
+              type="text"
               inputMode="decimal"
               placeholder="Enter amount"
               value={family?.finance?.weeklyAllowance || ""}
               onChange={(val) =>
-                handleInputChange("family.finance.weeklyAllowance", val)
+                handleInputChange("family.finance.weeklyAllowance", val.replace(/[^0-9.]/g, ""))
               }
               error={errors["family.finance.weeklyAllowance"]}
               required

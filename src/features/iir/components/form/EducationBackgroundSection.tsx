@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+﻿import { forwardRef, useImperativeHandle, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Plus, Check } from "lucide-react";
 import { InputField } from "@/components/form";
@@ -26,15 +26,72 @@ export const EducationBackgroundSection = forwardRef<
 
   const validate = (): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors: FormErrors = {};
+    const currentYear = new Date().getFullYear();
 
-    if (!education?.schools || education.schools.length === 0) {
-      sectionErrors["education.schools"] =
-        "At least one school record is required";
+    if (!education?.natureOfSchooling) {
+      sectionErrors["education.natureOfSchooling"] = "Nature of schooling is required";
+    }
+
+    if (education?.natureOfSchooling === "Interrupted") {
+      const details = (education?.interruptedDetails || "").trim();
+      if (!details) {
+        sectionErrors["education.interruptedDetails"] = "Reason for interruption is required";
+      } else if (details.length < 2) {
+        sectionErrors["education.interruptedDetails"] = "Reason must be at least 2 characters";
+      }
+    }
+
+    const schools: any[] = education?.schools || [];
+    const requiredFields = ["schoolName", "schoolAddress", "schoolType", "yearStarted", "yearCompleted"];
+
+    const hasAnySchool = schools.some((s) =>
+      requiredFields.some((f) => s[f]?.toString().trim())
+    );
+
+    if (!hasAnySchool) {
+      sectionErrors["education.schools"] = "At least one school record is required";
     } else {
-      education.schools.forEach((school: any, idx: number) => {
-        if (!school.schoolName?.trim()) {
-          sectionErrors[`education.schools.${idx}.schoolName`] =
-            "School name is required";
+      schools.forEach((school, idx) => {
+        const hasPartialData = requiredFields.some((f) => school[f]?.toString().trim());
+        if (hasPartialData) {
+          const name = (school.schoolName || "").trim();
+          if (!name) {
+            sectionErrors[`education.schools.${idx}.schoolName`] = "School name is required";
+          } else if (name.length < 2) {
+            sectionErrors[`education.schools.${idx}.schoolName`] = "School name must be at least 2 characters";
+          }
+
+          const addr = (school.schoolAddress || "").trim();
+          if (!addr) {
+            sectionErrors[`education.schools.${idx}.schoolAddress`] = "School address is required";
+          } else if (addr.length < 2) {
+            sectionErrors[`education.schools.${idx}.schoolAddress`] = "School address must be at least 2 characters";
+          }
+
+          if (!school.schoolType?.toString().trim())
+            sectionErrors[`education.schools.${idx}.schoolType`] = "School type is required";
+
+          const yearStartedStr = school.yearStarted?.toString().trim();
+          if (!yearStartedStr) {
+            sectionErrors[`education.schools.${idx}.yearStarted`] = "Year started is required";
+          } else {
+            const ys = Number(yearStartedStr);
+            if (isNaN(ys) || !Number.isInteger(ys) || ys < 1900 || ys > currentYear) {
+              sectionErrors[`education.schools.${idx}.yearStarted`] = `Must be a valid year (1900–${currentYear})`;
+            }
+          }
+
+          const yearCompletedStr = school.yearCompleted?.toString().trim();
+          if (!yearCompletedStr) {
+            sectionErrors[`education.schools.${idx}.yearCompleted`] = "Year completed is required";
+          } else {
+            const yc = Number(yearCompletedStr);
+            if (isNaN(yc) || !Number.isInteger(yc) || yc < 1900 || yc > currentYear) {
+              sectionErrors[`education.schools.${idx}.yearCompleted`] = `Must be a valid year (1900–${currentYear})`;
+            } else if (school.yearStarted && !isNaN(Number(school.yearStarted)) && yc < Number(school.yearStarted)) {
+              sectionErrors[`education.schools.${idx}.yearCompleted`] = "Year completed cannot be before year started";
+            }
+          }
         }
       });
     }
@@ -126,6 +183,9 @@ export const EducationBackgroundSection = forwardRef<
               <span className="text-sm text-foreground">Interrupted, Why?</span>
             </label>
           </div>
+          {errors["education.natureOfSchooling"] && (
+            <p className="text-xs text-red-500 mt-1">{errors["education.natureOfSchooling"]}</p>
+          )}
 
           {/* Interruption Reason Input */}
           {education?.natureOfSchooling === "Interrupted" && (
@@ -133,6 +193,7 @@ export const EducationBackgroundSection = forwardRef<
               <InputField
                 label="Reason for Interruption"
                 isTextarea
+                required
                 value={
                   typeof education?.interruptedDetails === "string"
                     ? education?.interruptedDetails
@@ -142,6 +203,7 @@ export const EducationBackgroundSection = forwardRef<
                   handleInputChange("education.interruptedDetails", val)
                 }
                 placeholder="Explain the reason for interruption"
+                error={errors["education.interruptedDetails"]}
               />
             </div>
           )}
@@ -199,6 +261,7 @@ export const EducationBackgroundSection = forwardRef<
                         )
                       }
                       placeholder="School location"
+                      error={errors[`education.schools.${idx}.schoolAddress`]}
                     />
                     <div>
                       <label className="block text-sm font-medium text-foreground mb-2">
@@ -236,32 +299,39 @@ export const EducationBackgroundSection = forwardRef<
                           </div>
                         )}
                       </div>
+                      {errors[`education.schools.${idx}.schoolType`] && (
+                        <p className="text-xs text-red-500 mt-1">{errors[`education.schools.${idx}.schoolType`]}</p>
+                      )}
                     </div>
                     <InputField
                       label="Year Started"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       required
                       value={school.yearStarted || ""}
                       onChange={(val) =>
                         handleInputChange(
                           `education.schools.${idx}.yearStarted`,
-                          val
+                          val.replace(/[^0-9]/g, "")
                         )
                       }
                       placeholder="e.g., 2012"
+                      error={errors[`education.schools.${idx}.yearStarted`]}
                     />
                     <InputField
                       label="Year Completed"
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       required
                       value={school.yearCompleted || ""}
                       onChange={(val) =>
                         handleInputChange(
                           `education.schools.${idx}.yearCompleted`,
-                          val
+                          val.replace(/[^0-9]/g, "")
                         )
                       }
                       placeholder="e.g., 2018"
+                      error={errors[`education.schools.${idx}.yearCompleted`]}
                     />
                     <InputField
                       label="Awards/Honors"

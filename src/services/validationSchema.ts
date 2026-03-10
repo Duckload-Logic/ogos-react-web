@@ -22,25 +22,25 @@ export const commonRules = {
         return value?.trim().length > 0;
       }
       if (typeof value === "object" && value !== null) {
-        return value.id !== undefined && value.id !== null && value.id !== 0;
+        return value.id !== undefined && value.id !== null && value.id !== 0 && value.id !== "";
       }
-      return Boolean(value);
+      return value !== undefined && value !== null && Boolean(value);
     },
     message: `${fieldName} is required`,
   }),
 
   email: (): ValidationRule => ({
     validate: (value: any) => {
-      if (!value || typeof value !== "string") return true; // Optional if not provided
-      return value.includes("@");
+      if (!value || typeof value !== "string") return true;
+      return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     },
-    message: "Email format is invalid",
+    message: "Enter a valid email address",
   }),
 
   minLength: (length: number): ValidationRule => ({
     validate: (value: any) => {
       if (!value) return true;
-      return String(value).length >= length;
+      return String(value).trim().length >= length;
     },
     message: `Must be at least ${length} characters`,
   }),
@@ -55,7 +55,7 @@ export const commonRules = {
 
   minValue: (min: number): ValidationRule => ({
     validate: (value: any) => {
-      if (value === "" || value === null) return true;
+      if (value === "" || value === null || value === undefined) return true;
       return Number(value) >= min;
     },
     message: `Must be at least ${min}`,
@@ -63,7 +63,7 @@ export const commonRules = {
 
   maxValue: (max: number): ValidationRule => ({
     validate: (value: any) => {
-      if (value === "" || value === null) return true;
+      if (value === "" || value === null || value === undefined) return true;
       return Number(value) <= max;
     },
     message: `Cannot exceed ${max}`,
@@ -71,10 +71,66 @@ export const commonRules = {
 
   numeric: (): ValidationRule => ({
     validate: (value: any) => {
-      if (!value) return true;
+      if (value === "" || value === null || value === undefined) return true;
       return !isNaN(Number(value));
     },
     message: "Must be a valid number",
+  }),
+
+  positiveNumber: (): ValidationRule => ({
+    validate: (value: any) => {
+      if (value === "" || value === null || value === undefined) return true;
+      const n = Number(value);
+      return !isNaN(n) && n > 0;
+    },
+    message: "Must be a positive number",
+  }),
+
+  positiveInteger: (): ValidationRule => ({
+    validate: (value: any) => {
+      if (value === "" || value === null || value === undefined) return true;
+      const n = Number(value);
+      return !isNaN(n) && Number.isInteger(n) && n > 0;
+    },
+    message: "Must be a positive whole number",
+  }),
+
+  year: (): ValidationRule => {
+    const currentYear = new Date().getFullYear();
+    return {
+      validate: (value: any) => {
+        if (value === "" || value === null || value === undefined) return true;
+        const n = Number(value);
+        return !isNaN(n) && Number.isInteger(n) && n >= 1900 && n <= currentYear;
+      },
+      message: `Must be a valid year between 1900 and ${new Date().getFullYear()}`,
+    };
+  },
+
+  validDate: (): ValidationRule => {
+    const currentYear = new Date().getFullYear();
+    return {
+      validate: (value: any) => {
+        if (!value || typeof value !== "string") return true;
+        const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value);
+        if (!match) return false;
+        const year = parseInt(match[1], 10);
+        const month = parseInt(match[2], 10);
+        const day = parseInt(match[3], 10);
+        if (year < 1900 || year > currentYear || month < 1 || month > 12 || day < 1 || day > 31) return false;
+        const d = new Date(year, month - 1, day);
+        return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+      },
+      message: `Must be a valid date (year between 1900 and ${new Date().getFullYear()})`,
+    };
+  },
+
+  phone: (): ValidationRule => ({
+    validate: (value: any) => {
+      if (!value) return true;
+      return /^09\d{9}$/.test(String(value));
+    },
+    message: "Must be a valid Philippine mobile number (09XXXXXXXXX, 11 digits)",
   }),
 
   pattern: (pattern: RegExp, message: string): ValidationRule => ({

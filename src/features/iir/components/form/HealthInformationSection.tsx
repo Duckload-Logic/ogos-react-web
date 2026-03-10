@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+﻿import { forwardRef, useImperativeHandle, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface FormErrors {
@@ -21,9 +21,41 @@ export const HealthInformationSection = forwardRef<
   const validate = (): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors: FormErrors = {};
 
-    if (!health?.healthRecord) {
-      sectionErrors["health.healthRecord"] = "Health record is required";
-    }
+    // Physical items – each YES/NO must be answered; if YES, details are required
+    const physicalFields = [
+      { yesKey: "visionHasProblem", detailKey: "visionDetails", label: "Vision" },
+      { yesKey: "hearingHasProblem", detailKey: "hearingDetails", label: "Hearing" },
+      { yesKey: "speechHasProblem", detailKey: "speechDetails", label: "Speech" },
+      { yesKey: "generalHealthHasProblem", detailKey: "generalHealthDetails", label: "General Health" },
+    ];
+
+    physicalFields.forEach(({ yesKey, detailKey, label }) => {
+      const hasProblem = health?.healthRecord?.[yesKey];
+      if (hasProblem === undefined || hasProblem === null) {
+        sectionErrors[`health.healthRecord.${yesKey}`] = `${label}: Please select Yes or No`;
+      } else if (hasProblem === true) {
+        if (!(health?.healthRecord?.[detailKey] || "").trim()) {
+          sectionErrors[`health.healthRecord.${detailKey}`] = `${label}: Please specify the problem`;
+        }
+      }
+    });
+
+    // Consultation items – each YES/NO must be answered; if YES, whenDate and forWhat are required
+    ["Psychiatrist", "Psychologist", "Counselor"].forEach((type) => {
+      const consultation = Array.isArray(health?.consultations)
+        ? health.consultations.find((c: any) => c.professionalType === type)
+        : null;
+      if (!consultation || consultation.hasConsulted === undefined || consultation.hasConsulted === null) {
+        sectionErrors[`health.consultations.${type}.hasConsulted`] = `${type}: Please select Yes or No`;
+      } else if (consultation.hasConsulted === true) {
+        if (!(consultation.whenDate || "").trim()) {
+          sectionErrors[`health.consultations.${type}.whenDate`] = `${type}: Please specify when`;
+        }
+        if (!(consultation.forWhat || "").trim()) {
+          sectionErrors[`health.consultations.${type}.forWhat`] = `${type}: Please specify reason`;
+        }
+      }
+    });
 
     setErrors(sectionErrors);
     return {
@@ -155,7 +187,12 @@ export const HealthInformationSection = forwardRef<
               <tbody>
                   {physicalItems.map((item, idx) => (
                   <tr key={idx} className="border-b border-border">
-                    <td className="py-2 px-3 text-sm text-foreground">{item.label}</td>
+                    <td className="py-2 px-3 text-sm">
+                      <span className="text-foreground">{item.label}</span>
+                      {errors[item.yesKey] && (
+                        <p className="text-xs text-red-500">{errors[item.yesKey]}</p>
+                      )}
+                    </td>
                     <td className="py-2 px-3 text-center">
                       <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
                         <input
@@ -199,6 +236,9 @@ export const HealthInformationSection = forwardRef<
                             : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
+                      {errors[item.detailsKey] && (
+                        <p className="text-xs text-red-500 mt-1">{errors[item.detailsKey]}</p>
+                      )}
                     </td>
                   </tr>
                 ))}
@@ -233,7 +273,12 @@ export const HealthInformationSection = forwardRef<
               <tbody>
                 {consultationTypes.map((type, idx) => (
                   <tr key={idx} className="border-b border-border">
-                    <td className="py-2 px-3 text-sm text-foreground">{type.label}</td>
+                    <td className="py-2 px-3 text-sm">
+                      <span className="text-foreground">{type.label}</span>
+                      {errors[`health.consultations.${type.type}.hasConsulted`] && (
+                        <p className="text-xs text-red-500">{errors[`health.consultations.${type.type}.hasConsulted`]}</p>
+                      )}
+                    </td>
                     <td className="py-2 px-3 text-center">
                       <div className="relative flex items-center justify-center h-4 w-4 mx-auto">
                         <input
@@ -285,6 +330,9 @@ export const HealthInformationSection = forwardRef<
                             : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
+                      {errors[`health.consultations.${type.type}.whenDate`] && (
+                        <p className="text-xs text-red-500 mt-1">{errors[`health.consultations.${type.type}.whenDate`]}</p>
+                      )}
                     </td>
                     <td className="py-2 px-3">
                       <input
@@ -305,6 +353,9 @@ export const HealthInformationSection = forwardRef<
                             : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
                         }`}
                       />
+                      {errors[`health.consultations.${type.type}.forWhat`] && (
+                        <p className="text-xs text-red-500 mt-1">{errors[`health.consultations.${type.type}.forWhat`]}</p>
+                      )}
                     </td>
                   </tr>
                 ))}

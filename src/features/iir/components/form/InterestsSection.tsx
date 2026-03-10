@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+﻿import { forwardRef, useImperativeHandle, useState } from "react";
 import { Check } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { InputField, Checkbox } from "@/components/form";
@@ -21,11 +21,41 @@ export const InterestsSection = forwardRef<
   const [errors, setErrors] = useState<FormErrors>({});
 
   const validate = (): { isValid: boolean; errors: FormErrors } => {
-    // Interests section has no required validation
     const sectionErrors: FormErrors = {};
+
+    const favSubjects = (interests?.academic?.favoriteSubjects || "").trim();
+    if (!favSubjects) {
+      sectionErrors["interests.academic.favoriteSubjects"] = "Favorite subjects are required";
+    } else if (favSubjects.length < 2) {
+      sectionErrors["interests.academic.favoriteSubjects"] = "Must be at least 2 characters";
+    }
+
+    const leastLiked = (interests?.academic?.leastLikedSubjects || "").trim();
+    if (!leastLiked) {
+      sectionErrors["interests.academic.leastLikedSubjects"] = "Least liked subjects are required";
+    } else if (leastLiked.length < 2) {
+      sectionErrors["interests.academic.leastLikedSubjects"] = "Must be at least 2 characters";
+    }
+
+    if (!(interests?.hobbies?.[0]?.hobbyName || "").trim()) {
+      sectionErrors["interests.hobbies.0.hobbyName"] = "First hobby is required";
+    }
+
+    if (!(interests?.hobbies?.[1]?.hobbyName || "").trim()) {
+      sectionErrors["interests.hobbies.1.hobbyName"] = "Second hobby is required";
+    }
+
+    if (!interests?.extraCurricular?.organization) {
+      sectionErrors["interests.extraCurricular.organization"] = "Please select an organization";
+    }
+
+    if (!interests?.extraCurricular?.occupationalPosition) {
+      sectionErrors["interests.extraCurricular.occupationalPosition"] = "Please select an occupational position";
+    }
+
     setErrors(sectionErrors);
     return {
-      isValid: true,
+      isValid: Object.keys(sectionErrors).length === 0,
       errors: sectionErrors,
     };
   };
@@ -136,19 +166,23 @@ export const InterestsSection = forwardRef<
           <div className="space-y-4">
             <InputField
               label="What is/are your favorite subject/s?"
+              required
               value={interests?.academic?.favoriteSubjects || ""}
               onChange={(val) =>
                 handleInputChange("interests.academic.favoriteSubjects", val)
               }
               placeholder="Enter favorite subjects"
+              error={errors["interests.academic.favoriteSubjects"]}
             />
             <InputField
               label="What is/are the subject/s you like least?"
+              required
               value={interests?.academic?.leastLikedSubjects || ""}
               onChange={(val) =>
                 handleInputChange("interests.academic.leastLikedSubjects", val)
               }
               placeholder="Enter least liked subjects"
+              error={errors["interests.academic.leastLikedSubjects"]}
             />
           </div>
         </div>
@@ -190,6 +224,9 @@ export const InterestsSection = forwardRef<
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
+                {errors["interests.hobbies.0.hobbyName"] && (
+                  <p className="text-xs text-red-500 mt-1">{errors["interests.hobbies.0.hobbyName"]}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
@@ -236,6 +273,9 @@ export const InterestsSection = forwardRef<
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
+                {errors["interests.hobbies.1.hobbyName"] && (
+                  <p className="text-xs text-red-500 mt-1">{errors["interests.hobbies.1.hobbyName"]}</p>
+                )}
               </div>
               <div>
                 <label className="block text-sm font-medium text-foreground mb-2">
@@ -327,6 +367,9 @@ export const InterestsSection = forwardRef<
                 disabled={interests?.extraCurricular?.organization !== "others"}
               />
             </div>
+            {errors["interests.extraCurricular.organization"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["interests.extraCurricular.organization"]}</p>
+            )}
           </div>
 
           {/* Occupational Position */}
@@ -405,6 +448,9 @@ export const InterestsSection = forwardRef<
                 </div>
               </div>
             </div>
+            {errors["interests.extraCurricular.occupationalPosition"] && (
+              <p className="text-xs text-red-500 mt-2">{errors["interests.extraCurricular.occupationalPosition"]}</p>
+            )}
           </div>
         </div>
       </CardContent>
