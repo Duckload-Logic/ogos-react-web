@@ -41,7 +41,6 @@ const FORM_SECTIONS = [
   { title: "III. Home and Family Background", id: 3, key: "family" },
   { title: "IV. Health Information", id: 4, key: "health" },
   { title: "V. Interests and Hobbies", id: 5, key: "interests" },
-  { title: "VI. Test Results", id: 6, key: "testResults" },
 ];
 
 export default function IIRForm() {
@@ -589,70 +588,33 @@ export default function IIRForm() {
           </Alert>
         )}
 
-        {/* Main Layout: Desktop Side Navigation + Mobile Top Tabs */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Desktop Side Navigation */}
-          {!isMobileNav && (
-            <div className="lg:col-span-1">
-              <div className="space-y-2">
-                <h3 className="font-semibold text-xs uppercase text-foreground px-2 mb-3">
-                  Form Sections
-                </h3>
-                {FORM_SECTIONS.map((section, idx) => {
-                  const status = getSectionStatus(section.id);
-                  const percentage = calculateSectionCompletion(section.id);
-                  return (
-                    <button
-                      key={section.id}
-                      onClick={() => setCurrentSection(section.id)}
-                      disabled={currentSection === section.id}
-                      className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-between ${
-                        currentSection === section.id
-                          ? "bg-primary text-primary-foreground shadow-md"
-                          : "bg-card text-card-foreground border border-border hover:border-primary/30"
-                      }`}
-                    >
-                      <div className="flex-1">
-                        <p className="text-sm">{section.title}</p>
-                      </div>
-                      {status === "complete" && (
-                        <Check className="w-5 h-5 ml-2 flex-shrink-0 text-green-500" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+        {/* Main Layout: Horizontal Section Nav + Form Content */}
+        <div className="flex flex-col gap-6">
+          {/* Horizontal Section Navigation */}
+          <div className="flex overflow-x-auto gap-2 pb-1">
+            {FORM_SECTIONS.map((section) => {
+              const status = getSectionStatus(section.id);
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => setCurrentSection(section.id)}
+                  disabled={currentSection === section.id}
+                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${
+                    currentSection === section.id
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : "bg-card text-card-foreground border border-border hover:border-primary/30"
+                  }`}
+                >
+                  {section.title}
+                  {status === "complete" && (
+                    <Check className="w-4 h-4 flex-shrink-0 text-green-500" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-          <div className="flex flex-col gap-2 col-span-2">
-            {/* Mobile Top Navigation + Form Content */}
-            <div className={`${isMobileNav ? "col-span-1" : "lg:col-span-3"}`}>
-              {/* Mobile Top Tabs */}
-              {isMobileNav && (
-                <div className="mb-6 flex overflow-x-auto gap-2-mx-4 px-4">
-                  {FORM_SECTIONS.map((section, idx) => {
-                    const status = getSectionStatus(section.id);
-                    const percentage = calculateSectionCompletion(section.id);
-                    return (
-                      <button
-                        key={section.id}
-                        onClick={() => setCurrentSection(section.id)}
-                        className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium text-xs sm:text-sm transition-colors flex flex-col items-center gap-1 min-w-fit ${
-                          currentSection === section.id
-                            ? "bg-primary text-primary-foreground shadow-md"
-                            : "bg-card border border-border text-foreground"
-                        }`}
-                      >
-                        <span className="whitespace-nowrap">{section.id}</span>
-                        {status === "complete" && (
-                          <Check className="w-3 h-3 text-green-500" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+          <div className="flex flex-col gap-2">
 
               {/* Form Content Card */}
               <Card className="border-0 shadow-sm bg-background">
@@ -792,7 +754,6 @@ export default function IIRForm() {
                 )}
               </div>
             </div>
-          </div>
         </div>
 
         {/* Submit Confirmation Modal */}
