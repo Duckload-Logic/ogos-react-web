@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import {
   AuthHeader,
   AuthMessages,
@@ -7,8 +6,6 @@ import {
 } from "@/features/auth/components";
 
 export default function Register() {
-  const navigate = useNavigate();
-  // const { register } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [middleInitial, setMiddleInitial] = useState("");
   const [surname, setSurname] = useState("");
@@ -25,7 +22,6 @@ export default function Register() {
     setSuccess("");
     setIsLoading(true);
 
-    // Validation
     if (!firstName.trim()) {
       setError("Please enter your first name");
       setIsLoading(false);
@@ -68,41 +64,44 @@ export default function Register() {
       return;
     }
 
-    // Simulate loading delay
     await new Promise((resolve) => setTimeout(resolve, 500));
-
-    // Combine name parts for registration
-    const fullName =
-      `${firstName.trim()} ${middleInitial.trim()} ${surname.trim()}`.trim();
-
-    // Register user
-    // const result = register(fullName, email, password);
-    // if (result.success) {
-    //   setSuccess("Account created successfully! Redirecting...");
-    //   setTimeout(() => {
-    //     navigate("/");
-    //   }, 1500);
-    // } else {
-    //   setError(result.error || "Registration failed");
-    // }
 
     setIsLoading(false);
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-3 sm:px-4 py-6 sm:py-8">
-      <div className="w-full max-w-md">
-        {/* Card Container */}
-        <div className="bg-white rounded-lg shadow-xl overflow-hidden">
-          {/* Header */}
-          <AuthHeader title="PUPT OGOS" subtitle="Create Your Account" />
+    <section className="mx-auto flex w-full max-w-[1180px] items-center justify-center py-3 sm:py-5 lg:py-6">
+      <div className="relative grid w-full overflow-hidden rounded-[30px] border border-[hsl(var(--border)/0.65)] bg-[hsl(var(--card)/0.82)] shadow-[0_30px_90px_-40px_rgba(0,0,0,0.55)] backdrop-blur-2xl lg:grid-cols-[0.9fr_1.1fr]">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute -right-12 top-0 h-48 w-48 rounded-full bg-red-500/10 blur-3xl" />
+          <div className="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-amber-300/10 blur-3xl" />
+          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.10),transparent_45%,rgba(255,255,255,0.03))]" />
+        </div>
 
-          {/* Form Content */}
-          <div className="px-4 sm:px-6 py-6 sm:py-8">
-            {/* Messages */}
+        <AuthHeader
+          title="PUPT OGOS"
+          subtitle="Create your account and get started with a cleaner, more focused onboarding flow."
+        />
+
+        <div className="relative flex items-center p-6 sm:p-8 lg:p-10">
+          <div className="mx-auto w-full max-w-xl">
+            <div className="mb-7 space-y-2">
+              <span className="inline-flex rounded-full border border-[hsl(var(--border)/0.7)] bg-[hsl(var(--background)/0.72)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground backdrop-blur">
+                Register
+              </span>
+
+              <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                Create your account
+              </h2>
+
+              <p className="text-sm leading-6 text-muted-foreground">
+                Fill in your details to access guidance services and student
+                support tools.
+              </p>
+            </div>
+
             <AuthMessages error={error} success={success} />
 
-            {/* Form */}
             <RegisterForm
               firstName={firstName}
               middleInitial={middleInitial}
@@ -119,14 +118,13 @@ export default function Register() {
               onSubmit={handleSubmit}
               isLoading={isLoading}
             />
+
+            <p className="mt-6 text-center text-sm text-muted-foreground">
+              Need help? Contact the guidance office.
+            </p>
           </div>
         </div>
-
-        {/* Support Text */}
-        <p className="text-center text-xs sm:text-sm text-muted-foreground mt-6">
-          Need help? Contact the guidance office
-        </p>
       </div>
-    </div>
+    </section>
   );
 }
