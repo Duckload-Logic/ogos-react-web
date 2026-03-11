@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { AuthHeader, AuthMessages, RegisterForm } from "@/features/auth/components";
+import {
+  AuthHeader,
+  AuthMessages,
+  RegisterForm,
+} from "@/features/auth/components";
 
 export default function Register() {
   const navigate = useNavigate();
@@ -68,7 +72,8 @@ export default function Register() {
     await new Promise((resolve) => setTimeout(resolve, 500));
 
     // Combine name parts for registration
-    const fullName = `${firstName.trim()} ${middleInitial.trim()} ${surname.trim()}`.trim();
+    const fullName =
+      `${firstName.trim()} ${middleInitial.trim()} ${surname.trim()}`.trim();
 
     // Register user
     // const result = register(fullName, email, password);
@@ -90,10 +95,7 @@ export default function Register() {
         {/* Card Container */}
         <div className="bg-white rounded-lg shadow-xl overflow-hidden">
           {/* Header */}
-          <AuthHeader
-            title="PUPT OGOS"
-            subtitle="Create Your Account"
-          />
+          <AuthHeader title="PUPT OGOS" subtitle="Create Your Account" />
 
           {/* Form Content */}
           <div className="px-4 sm:px-6 py-6 sm:py-8">
