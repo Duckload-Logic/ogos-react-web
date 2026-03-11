@@ -22,7 +22,7 @@ export const useAppointments = (
     params: QueryParam;
   } = {} as any,
 ) => {
-  const { data: me } = useMe();
+  const { data: me } = useMe({});
   return useQuery<PaginatedAppointmentsResponse>({
     queryKey: [APPOINTMENTS_QUERY_KEY, me?.email, isMe, params],
     queryFn: async () => {
@@ -39,7 +39,7 @@ export const useAppointments = (
 };
 
 export const useAppointmentsStats = ({ params }: { params?: QueryParam }) => {
-  const { data: me } = useMe();
+  const { data: me } = useMe({});
   return useQuery<StatusCount[]>({
     queryKey: ["appointments-stats", me?.email, params],
     queryFn: () => appointmentService.getAppointmentStats(params),
@@ -51,7 +51,7 @@ export const useAppointmentsStats = ({ params }: { params?: QueryParam }) => {
 
 export function useSubmitAppointment() {
   const queryClient = useQueryClient();
-  const { data: me } = useMe();
+  const { data: me } = useMe({});
 
   return useMutation({
     mutationFn: (data: Appointment) =>
@@ -66,7 +66,7 @@ export function useSubmitAppointment() {
 
 export function useUpdateAppointmentStatus() {
   const queryClient = useQueryClient();
-  const { data: me } = useMe();
+  const { data: me } = useMe({});
 
   return useMutation({
     mutationFn: ({ id, status }: { id: number; status: AppointmentStatus }) =>

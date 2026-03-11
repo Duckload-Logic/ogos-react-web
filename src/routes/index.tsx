@@ -36,6 +36,7 @@ import {
   SystemLogs,
   AuditLogs,
 } from "@/features/superadmin";
+import Callback from "@/features/auth/pages/Callback";
 
 export const routes: RouteObject[] = [
   // Root route - redirect to login
@@ -282,4 +283,5 @@ export const routes: RouteObject[] = [
 
   // 404
   { path: "*", element: <NotFound /> },
+  { path: "/callback", element: <Callback /> },
 ];
