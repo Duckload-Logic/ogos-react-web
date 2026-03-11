@@ -1,7 +1,8 @@
 import NotificationBell from "@/components/notifications/NotificationBell";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import ProfileDropdown from "@/components/ProfileDropdown";
-import Logo from "../../../public/logo.svg";
+
+const LOGO_SRC = "/logo.svg";
 
 interface HeaderProps {
   title?: string;
@@ -28,10 +29,9 @@ export default function Header({
 }: HeaderProps) {
   return (
     <header className="h-20 flex items-center justify-between px-6 border-b bg-background/80 backdrop-blur-lg sticky top-0 z-30">
-      {/* Logo */}
       <div className="flex items-center gap-3">
         <img
-          src={Logo}
+          src={LOGO_SRC}
           alt="Logo"
           className="w-10 h-10 rounded-full transition-transform duration-200 hover:scale-110"
         />
@@ -39,17 +39,12 @@ export default function Header({
           <p className="font-semibold">
             Polytechnic University of the Philippines – Taguig
           </p>
-
-          <p
-            className="
-          text-muted-foreground"
-          >
+          <p className="text-muted-foreground">
             Online Guidance Office Services
           </p>
         </div>
       </div>
 
-      {/* Title */}
       {isLoggedIn && (
         <div className="text-center">
           <p className="text-sm font-medium">{title}</p>
@@ -59,13 +54,11 @@ export default function Header({
         </div>
       )}
 
-      {/* Controls */}
       <div className="flex items-center gap-3">
         {/* <NotificationBell
           showNotifications={showNotifications}
           setShowNotifications={setShowNotifications}
         /> */}
-
         <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
         {isLoggedIn && (
           <ProfileDropdown
