@@ -5,20 +5,23 @@ interface AuthMessagesProps {
   success?: string | null;
 }
 
-export default function AuthMessages({ error, success }: AuthMessagesProps) {
+export default function AuthMessages({
+  error,
+  success,
+}: AuthMessagesProps) {
   return (
     <>
       {success && (
-        <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex gap-3">
-          <CheckCircle className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-green-800">{success}</p>
+        <div className="mb-4 flex gap-3 rounded-2xl border border-emerald-200/70 bg-white/65 p-3 text-emerald-700 shadow-sm backdrop-blur dark:border-emerald-400/20 dark:bg-emerald-500/10 dark:text-emerald-300 dark:shadow-none">
+          <CheckCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
+          <p className="text-sm">{success}</p>
         </div>
       )}
 
       {error && (
-        <div className="mb-4 p-3 bg-destructive/10 border border-destructive/30 rounded-lg flex gap-3">
-          <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0 mt-0.5" />
-          <p className="text-sm text-destructive">{error}</p>
+        <div className="mb-4 flex gap-3 rounded-2xl border border-red-200/70 bg-white/65 p-3 text-red-700 shadow-sm backdrop-blur dark:border-red-400/20 dark:bg-red-500/10 dark:text-red-300 dark:shadow-none">
+          <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0" />
+          <p className="text-sm">{error}</p>
         </div>
       )}
     </>
