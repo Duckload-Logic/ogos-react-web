@@ -3,19 +3,19 @@ import { Button } from "@/components/ui/button";
 
 type Role = "student" | "admin";
 
-type TermsAndConditionsModalProps = {
+type ConsentModalProps = {
   open: boolean;
   role: Role;
   loading?: boolean;
   onAccept: () => Promise<void> | void;
 };
 
-export default function TermsAndConditionsModal({
+export default function ConsentModal({
   open,
   role,
   loading = false,
   onAccept,
-}: TermsAndConditionsModalProps) {
+}: ConsentModalProps) {
   const [agreed, setAgreed] = useState(false);
 
   useEffect(() => {
@@ -42,18 +42,25 @@ export default function TermsAndConditionsModal({
 
         <div className="space-y-5 text-[16px] leading-9 text-slate-700">
           <p>
-            By clicking <span className="font-bold text-slate-900">“I Agree”</span>,
-            you consent to the collection, use, and processing of your personal
-            data for legitimate purposes related to this service.
+            By clicking{" "}
+            <span className="font-bold text-slate-900">“I Agree”</span>, you
+            consent to the collection, use, and processing of your personal data
+            for legitimate purposes related to this service.
           </p>
 
           <p>
             Your information will be handled in accordance with our{" "}
-            <span className="font-bold text-slate-900">Privacy Policy</span> and
-            in compliance with the{" "}
+            <a
+              className="font-bold text-primary hover:text-primary/60"
+              href="/privacy"
+            >
+              Privacy Policy
+            </a>{" "}
+            and in compliance with the{" "}
             <span className="font-bold text-slate-900">
               Data Privacy Act of 2012
-            </span>.
+            </span>
+            .
           </p>
         </div>
 
@@ -97,7 +104,13 @@ export default function TermsAndConditionsModal({
 
             <span className="text-base leading-7 text-slate-800">
               I agree and acknowledge the{" "}
-              <span className="font-bold">Terms and Conditions</span>
+              <a
+                className="font-bold text-primary hover:text-primary/60"
+                href="/terms"
+              >
+                Terms of Service
+              </a>
+              .
             </span>
           </label>
         </div>
