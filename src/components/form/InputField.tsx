@@ -86,7 +86,7 @@ export default function InputField({
         </div>
       </div>
       {info && <p className="text-xs text-muted-foreground">{info}</p>}
-      {error && <p className="text-sm text-red-500">{error}</p>}
+      {error && <p className="text-xs font-semibold text-red-600 mt-1">{error}</p>}
     </div>
   );
 }

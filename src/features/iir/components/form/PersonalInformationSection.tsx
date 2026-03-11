@@ -14,7 +14,7 @@ import {
   useBarangays,
 } from "@/features/locations/hooks";
 import { StudentSection } from "@/features/iir/types/IIRForm";
-import { validateObject, validateField } from "@/services/validationSchema";
+import { validateObject, validateField, commonRules } from "@/services/validationSchema";
 import { personalInformationValidationSchema } from "@/features/iir/config/personalInfoValidationSchema";
 import type { Region, City, Barangay } from "@/features/iir/types/IIRForm";
 
@@ -65,10 +65,22 @@ export const PersonalInformationSection = forwardRef<
   } = useBarangays(residentialCityId || 0);
 
   const validate = (): { isValid: boolean; errors: FormErrors } => {
-    const sectionErrors = validateObject(
-      { student: studentInfo },
-      personalInformationValidationSchema,
-    );
+    // Build a schema copy and add employer rules conditionally when employed
+    const runtimeSchema = { ...personalInformationValidationSchema };
+    if ((studentInfo as any)?.personalInfo?.isEmployed) {
+      runtimeSchema["student.personalInfo.employerName"] = [
+        commonRules.required("Employer name"),
+      ];
+      runtimeSchema["student.personalInfo.employerAddress"] = [
+        commonRules.required("Employer address"),
+      ];
+      runtimeSchema["student.personalInfo.employerContact"] = [
+        commonRules.required("Employer contact"),
+        commonRules.phone(),
+      ];
+    }
+
+    const sectionErrors = validateObject({ student: studentInfo }, runtimeSchema);
 
     setErrors(sectionErrors);
     return {
@@ -402,6 +414,8 @@ export const PersonalInformationSection = forwardRef<
                     handleInputChange("student.personalInfo.employerName", val)
                   }
                   placeholder="Company name"
+                  error={errors["student.personalInfo.employerName"]}
+                  required={studentInfo?.personalInfo?.isEmployed}
                 />
                 <InputField
                   label="Employer Address"
@@ -413,6 +427,8 @@ export const PersonalInformationSection = forwardRef<
                     )
                   }
                   placeholder="Company address"
+                  error={errors["student.personalInfo.employerAddress"]}
+                  required={studentInfo?.personalInfo?.isEmployed}
                 />
                 <InputField
                   label="Employer Contact"
@@ -425,6 +441,8 @@ export const PersonalInformationSection = forwardRef<
                     )
                   }
                   placeholder="e.g., 09123456789"
+                  error={errors["student.personalInfo.employerContact"]}
+                  required={studentInfo?.personalInfo?.isEmployed}
                 />
               </div>
             </div>

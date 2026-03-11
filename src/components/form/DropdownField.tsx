@@ -150,7 +150,7 @@ export default function DropdownField({
           </div>
         )}
       </div>
-      {error && <p className="text-xs text-red-500">{error}</p>}
+      {error && <p className="text-xs font-semibold text-red-600 mt-1">{error}</p>}
       {/* tooltip removed: showTooltip/tooltipRef were unused */}
     </div>
   );
