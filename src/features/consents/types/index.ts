@@ -1,0 +1,1 @@
+export type { Statement as default } from "./statement";

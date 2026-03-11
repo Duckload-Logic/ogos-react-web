@@ -1,7 +1,6 @@
 import Header from "@/components/layout/Header";
 import Sidebar from "@/components/layout/Sidebar";
 import NotificationModal from "@/components/notifications/NotificationModal";
-import TermsAndConditionsModal from "@/components/common/TermsAndConditionsModal";
 import AppFooter from "@/components/common/AppFooter";
 import Toast from "@/components/ui/Toast";
 import { NAV_CONFIG, roleMap } from "@/config/navigation";
@@ -11,13 +10,37 @@ import { useLocation, useNavigate } from "react-router-dom";
 
 import { useAuth } from "@/context";
 import { ErrorBoundary } from "../shared";
+import ConsentModal from "@/features/consents/components/ConsentModal";
+import { useGetLatestStatement } from "@/features/consents/hooks";
+import useCheckUserConsent from "@/features/consents/hooks/useCheckUserConsent";
+import { useGiveConsent } from "@/features/consents/hooks/useGiveConsent";
 
 interface LayoutProps {
   children: React.ReactNode;
   title?: string;
+  showSidebar?: boolean;
 }
 
-export default function Layout({ children, title }: LayoutProps) {
+export default function Layout({
+  children,
+  title,
+  showSidebar = true,
+}: LayoutProps) {
+  const { user, logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const { data: latestDocument, isLoading: isLatestDocumentLoading } =
+    useGetLatestStatement("terms");
+  const { data: userConsent, isLoading: isUserConsentLoading } =
+    useCheckUserConsent(latestDocument?.id);
+  const { mutate: giveConsent } = useGiveConsent();
+
+  // pages excluded from consent modal
+  const excludedPaths = ["/terms", "/privacy"];
+  const currentPath = location.pathname;
+  const isExcluded = excludedPaths.includes(currentPath);
+
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem("theme");
     const isDark = saved ? saved === "dark" : false;
@@ -36,10 +59,6 @@ export default function Layout({ children, title }: LayoutProps) {
   const [termsOpen, setTermsOpen] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
-
-  const { user, logout } = useAuth();
-  const location = useLocation();
-  const navigate = useNavigate();
 
   const [isHovered, setIsHovered] = useState(false);
   const expanded = isHovered;
@@ -88,18 +107,12 @@ export default function Layout({ children, title }: LayoutProps) {
   const currentRole =
     user?.role?.id === 2 || user?.role?.id === 3 ? "admin" : "student";
 
+  const mustAcceptTerms =
+    !isUserConsentLoading && userConsent?.accepted === false && !isExcluded;
   useEffect(() => {
     if (!user) return;
-
-    const termsKey = `terms-accepted-${user.id ?? currentRole}`;
-    const hasAccepted = localStorage.getItem(termsKey) === "true";
-
-    if (!hasAccepted) {
-      setTermsOpen(true);
-    } else {
-      setTermsOpen(false);
-    }
-  }, [user, currentRole]);
+    setTermsOpen(mustAcceptTerms);
+  }, [user, mustAcceptTerms]);
 
   useEffect(() => {
     const node = contentRef.current;
@@ -115,22 +128,40 @@ export default function Layout({ children, title }: LayoutProps) {
   }, [termsOpen]);
 
   const handleAcceptTerms = () => {
-    if (!user) return;
-
-    const termsKey = `terms-accepted-${user.id ?? currentRole}`;
-    localStorage.setItem(termsKey, "true");
-    setTermsOpen(false);
-    triggerToast("Terms and Conditions accepted.");
+    console.log("handleAcceptTerms called", {
+      user: user?.id,
+      docId: latestDocument?.id,
+    });
+    if (!user || !latestDocument?.id) {
+      triggerToast("Document not ready. Please try again.");
+      return;
+    }
+    giveConsent(
+      { type: "terms", docId: latestDocument.id },
+      {
+        onSuccess: () => {
+          console.log("Consent mutation succeeded");
+          setTermsOpen(false);
+          triggerToast("Terms and Conditions accepted.");
+        },
+        onError: (error) => {
+          console.error("Consent mutation failed:", error);
+          triggerToast("Failed to accept terms. Please try again.");
+        },
+      },
+    );
   };
 
   return (
     <ErrorBoundary>
       <div className="flex h-screen flex-col overflow-hidden bg-background animate-in fade-in duration-300">
-        <TermsAndConditionsModal
-          open={termsOpen}
-          role={currentRole}
-          onAccept={handleAcceptTerms}
-        />
+        {!userConsent?.accepted && (
+          <ConsentModal
+            open={termsOpen}
+            role={currentRole}
+            onAccept={handleAcceptTerms}
+          />
+        )}
 
         <div
           ref={contentRef}
@@ -156,11 +187,13 @@ export default function Layout({ children, title }: LayoutProps) {
           />
 
           <div className="flex min-h-0 flex-1 w-full">
-            <Sidebar
-              navigationItems={navigationItems}
-              location={location}
-              setIsHovered={setIsHovered}
-            />
+            {showSidebar && (
+              <Sidebar
+                navigationItems={navigationItems}
+                location={location}
+                setIsHovered={setIsHovered}
+              />
+            )}
 
             <div className="relative min-w-0 flex-1 overflow-hidden">
               {expanded && !termsOpen && (

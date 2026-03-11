@@ -7,12 +7,12 @@ export default function AppFooter() {
         </p>
 
         <div className="flex items-center gap-4 text-sm">
-          <a href="#" className="transition hover:text-white/80">
-            Terms of Use
+          <a href="/terms" className="transition hover:text-white/80">
+            Terms of Service
           </a>
           <span className="text-white/50">|</span>
-          <a href="#" className="transition hover:text-white/80">
-            Privacy Statement
+          <a href="/privacy" className="transition hover:text-white/80">
+            Privacy Policy
           </a>
         </div>
       </div>
