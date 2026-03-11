@@ -9,7 +9,7 @@ interface ConsentPayload {
 
 export function useGiveConsent() {
   const queryClient = useQueryClient();
-  const { data: me } = useMe();
+  const { data: me } = useMe({});
 
   return useMutation({
     mutationFn: async ({ type, docId }: ConsentPayload) => {

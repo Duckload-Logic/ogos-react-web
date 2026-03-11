@@ -55,7 +55,7 @@ const QUICK_ACTIONS: QuickAction[] = [
 ];
 
 export function Dashboard() {
-  const { data: me, isLoading: isUserLoading } = useMe();
+  const { data: me, isLoading: isUserLoading } = useMe({});
   const { data: iir, isLoading: isIIRLoading } = useUserIIR(
     me?.id || undefined,
   );

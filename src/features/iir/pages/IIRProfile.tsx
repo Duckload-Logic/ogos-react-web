@@ -14,7 +14,7 @@ const ICON_SIZE = 20;
 export default function IIRProfile() {
   const location = useLocation();
   const { iirId: hashedId } = useParams();
-  const { data: me } = useMe();
+  const { data: me } = useMe({});
   const { data: iir } = useUserIIR(!hashedId && me?.id ? me.id : 0);
   const isAdmin = me?.role.name.toLowerCase() === "admin";
 

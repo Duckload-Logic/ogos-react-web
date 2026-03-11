@@ -19,12 +19,14 @@ interface LayoutProps {
   children: React.ReactNode;
   title?: string;
   showSidebar?: boolean;
+  isLoggedIn?: boolean;
 }
 
 export default function Layout({
   children,
   title,
   showSidebar = true,
+  isLoggedIn = true,
 }: LayoutProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -178,6 +180,7 @@ export default function Layout({
             getRoleLabel={getRoleLabel}
             showNotifications={showNotifications}
             setShowNotifications={setShowNotifications}
+            isLoggedIn={isLoggedIn}
           />
 
           <NotificationModal
@@ -187,7 +190,7 @@ export default function Layout({
           />
 
           <div className="flex min-h-0 flex-1 w-full">
-            {showSidebar && (
+            {isLoggedIn && (
               <Sidebar
                 navigationItems={navigationItems}
                 location={location}
