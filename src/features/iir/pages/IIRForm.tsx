@@ -20,6 +20,16 @@ import { HeroSection } from "@/components/ui/hero-section";
 import { AnimationStyles } from "@/components/ui/animations";
 import Toast from "@/components/ui/Toast";
 import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
+import {
   AlertCircle,
   Save,
   ChevronLeft,
@@ -68,6 +78,7 @@ export default function IIRForm() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [consentAgreed, setConsentAgreed] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [validationErrorList, setValidationErrorList] = useState<string[]>([]);
@@ -419,6 +430,25 @@ export default function IIRForm() {
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const confirmReset = () => {
+    // preserve autofilled basicInfo
+    const resetData = {
+      ...EMPTY_IIR_FORM,
+      student: {
+        ...EMPTY_IIR_FORM.student,
+        basicInfo: {
+          firstName: me?.firstName || "",
+          middleName: me?.middleName && typeof me?.middleName === "string" ? me?.middleName : "",
+          lastName: me?.lastName || "",
+          email: me?.email || "",
+        },
+      },
+    };
+    setLocalFormData(resetData);
+    setShowResetConfirm(false);
+    addToast("Form reset.");
   };
 
   // Calculate section completion percentage
@@ -779,25 +809,7 @@ export default function IIRForm() {
             {/* Form Navigation Buttons */}
             <div className="sticky bottom-0 flex justify-between gap-3 bg-card p-4 border-t border-border shadow-lg flex-wrap z-20 rounded-2xl">
               <Button
-                onClick={() => {
-                  // Reset form but preserve autofilled fields
-                  const resetData = {
-                    ...EMPTY_IIR_FORM,
-                    student: {
-                      ...EMPTY_IIR_FORM.student,
-                      basicInfo: {
-                        firstName: me?.firstName || "",
-                        middleName:
-                          me?.middleName && typeof me?.middleName === "string"
-                            ? me?.middleName
-                            : "" as any,
-                        lastName: me?.lastName || "",
-                        email: me?.email || "",
-                      },
-                    },
-                  };
-                  setLocalFormData(resetData);
-                }}
+                onClick={() => setShowResetConfirm(true)}
                 className="bg-destructive hover:bg-destructive/90 text-white"
               >
                 Reset Form
@@ -954,6 +966,24 @@ export default function IIRForm() {
             </Card>
           </div>
         )}
+
+        {/* Reset Confirmation Modal */}
+        <AlertDialog open={showResetConfirm} onOpenChange={(open) => setShowResetConfirm(open)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Reset Form</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will clear your current responses while preserving autofilled basic information. Are you sure you want to Reset?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel asChild>
+                <Button variant="ghost" className="border border-border hover:bg-muted">Cancel</Button>
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={confirmReset} className="bg-destructive hover:bg-destructive/90 text-white">Reset</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
 
       {/* Toast Notifications */}
