@@ -7,7 +7,7 @@ const SLIP_STATS_STALE_TIME = 5 * 60 * 1000; // 5 minutes
 const SLIP_STATS_GC_TIME = 30 * 60 * 1000; // 30 minutes
 
 export function useGetSlipStats({ params }: { params?: any } = {}) {
-  const { data: me } = useMe();
+  const { data: me } = useMe({});
   return useQuery({
     queryKey: [SLIP_STATS_QUERY_KEY, me?.id, params],
     queryFn: async () => {

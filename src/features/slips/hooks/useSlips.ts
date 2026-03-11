@@ -11,7 +11,7 @@ export function useSlips({
   isAdmin = false,
   params,
 }: { isAdmin?: boolean; params?: QueryParams } = {}) {
-  const { data: me } = useMe();
+  const { data: me } = useMe({});
   return useQuery({
     queryKey: [EXCUSE_SLIPS_QUERY_KEY, me?.id, params, isAdmin],
     queryFn: isAdmin
