@@ -17,24 +17,29 @@ interface FormFieldProps extends React.InputHTMLAttributes<HTMLInputElement> {
 }
 
 export const FormField = React.forwardRef<HTMLInputElement, FormFieldProps>(
-  (
-    { label, error, required, helperText, disabled, ...props },
-    ref,
-  ) => (
+  ({ label, error, required, helperText, disabled, className, ...props }, ref) => (
     <div className="space-y-2">
-      <Label className="text-sm font-medium">
+      <Label className="text-sm font-medium text-foreground">
         {label}
-        {required && <span className="text-red-500 ml-1"> *</span>}
+        {required && <span className="ml-1 text-destructive">*</span>}
       </Label>
-      <Input ref={ref} disabled={disabled} {...props} />
+
+      <Input
+        ref={ref}
+        disabled={disabled}
+        className={className}
+        {...props}
+      />
+
       {error && (
-        <div className="flex items-center gap-1 text-sm text-red-500 mt-1">
-          <AlertCircle className="w-4 h-4" />
+        <div className="mt-1 flex items-center gap-1 text-sm text-destructive">
+          <AlertCircle className="h-4 w-4" />
           <span>{error}</span>
         </div>
       )}
+
       {helperText && !error && (
-        <p className="text-xs text-muted-foreground mt-1">{helperText}</p>
+        <p className="mt-1 text-xs text-muted-foreground">{helperText}</p>
       )}
     </div>
   ),
