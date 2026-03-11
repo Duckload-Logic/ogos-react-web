@@ -43,58 +43,51 @@ export const EducationBackgroundSection = forwardRef<
 
     const schools: any[] = education?.schools || [];
     const requiredFields = ["schoolName", "schoolAddress", "schoolType", "yearStarted", "yearCompleted"];
+    const levelNames = ["Pre-elementary", "Elementary", "High School", "Vocational", "College"];
 
-    const hasAnySchool = schools.some((s) =>
-      requiredFields.some((f) => s[f]?.toString().trim())
-    );
+    // All 5 school levels are required
+    levelNames.forEach((levelName, idx) => {
+      const school = schools[idx] || {};
 
-    if (!hasAnySchool) {
-      sectionErrors["education.schools"] = "At least one school record is required";
-    } else {
-      schools.forEach((school, idx) => {
-        const hasPartialData = requiredFields.some((f) => school[f]?.toString().trim());
-        if (hasPartialData) {
-          const name = (school.schoolName || "").trim();
-          if (!name) {
-            sectionErrors[`education.schools.${idx}.schoolName`] = "School name is required";
-          } else if (name.length < 2) {
-            sectionErrors[`education.schools.${idx}.schoolName`] = "School name must be at least 2 characters";
-          }
+      const name = (school.schoolName || "").trim();
+      if (!name) {
+        sectionErrors[`education.schools.${idx}.schoolName`] = "School name is required";
+      } else if (name.length < 2) {
+        sectionErrors[`education.schools.${idx}.schoolName`] = "School name must be at least 2 characters";
+      }
 
-          const addr = (school.schoolAddress || "").trim();
-          if (!addr) {
-            sectionErrors[`education.schools.${idx}.schoolAddress`] = "School address is required";
-          } else if (addr.length < 2) {
-            sectionErrors[`education.schools.${idx}.schoolAddress`] = "School address must be at least 2 characters";
-          }
+      const addr = (school.schoolAddress || "").trim();
+      if (!addr) {
+        sectionErrors[`education.schools.${idx}.schoolAddress`] = "School address is required";
+      } else if (addr.length < 2) {
+        sectionErrors[`education.schools.${idx}.schoolAddress`] = "School address must be at least 2 characters";
+      }
 
-          if (!school.schoolType?.toString().trim())
-            sectionErrors[`education.schools.${idx}.schoolType`] = "School type is required";
+      if (!school.schoolType?.toString().trim())
+        sectionErrors[`education.schools.${idx}.schoolType`] = "School type is required";
 
-          const yearStartedStr = school.yearStarted?.toString().trim();
-          if (!yearStartedStr) {
-            sectionErrors[`education.schools.${idx}.yearStarted`] = "Year started is required";
-          } else {
-            const ys = Number(yearStartedStr);
-            if (isNaN(ys) || !Number.isInteger(ys) || ys < 1900 || ys > currentYear) {
-              sectionErrors[`education.schools.${idx}.yearStarted`] = `Must be a valid year (1900–${currentYear})`;
-            }
-          }
-
-          const yearCompletedStr = school.yearCompleted?.toString().trim();
-          if (!yearCompletedStr) {
-            sectionErrors[`education.schools.${idx}.yearCompleted`] = "Year completed is required";
-          } else {
-            const yc = Number(yearCompletedStr);
-            if (isNaN(yc) || !Number.isInteger(yc) || yc < 1900 || yc > currentYear) {
-              sectionErrors[`education.schools.${idx}.yearCompleted`] = `Must be a valid year (1900–${currentYear})`;
-            } else if (school.yearStarted && !isNaN(Number(school.yearStarted)) && yc < Number(school.yearStarted)) {
-              sectionErrors[`education.schools.${idx}.yearCompleted`] = "Year completed cannot be before year started";
-            }
-          }
+      const yearStartedStr = school.yearStarted?.toString().trim();
+      if (!yearStartedStr) {
+        sectionErrors[`education.schools.${idx}.yearStarted`] = "Year started is required";
+      } else {
+        const ys = Number(yearStartedStr);
+        if (isNaN(ys) || !Number.isInteger(ys) || ys < 1900 || ys > currentYear) {
+          sectionErrors[`education.schools.${idx}.yearStarted`] = `Must be a valid year (1900–${currentYear})`;
         }
-      });
-    }
+      }
+
+      const yearCompletedStr = school.yearCompleted?.toString().trim();
+      if (!yearCompletedStr) {
+        sectionErrors[`education.schools.${idx}.yearCompleted`] = "Year completed is required";
+      } else {
+        const yc = Number(yearCompletedStr);
+        if (isNaN(yc) || !Number.isInteger(yc) || yc < 1900 || yc > currentYear) {
+          sectionErrors[`education.schools.${idx}.yearCompleted`] = `Must be a valid year (1900–${currentYear})`;
+        } else if (school.yearStarted && !isNaN(Number(school.yearStarted)) && yc < Number(school.yearStarted)) {
+          sectionErrors[`education.schools.${idx}.yearCompleted`] = "Year completed cannot be before year started";
+        }
+      }
+    });
 
     setErrors(sectionErrors);
     return {
@@ -184,7 +177,7 @@ export const EducationBackgroundSection = forwardRef<
             </label>
           </div>
           {errors["education.natureOfSchooling"] && (
-            <p className="text-xs text-red-500 mt-1">{errors["education.natureOfSchooling"]}</p>
+            <p className="text-xs font-semibold text-red-600 mt-1">{errors["education.natureOfSchooling"]}</p>
           )}
 
           {/* Interruption Reason Input */}
@@ -300,7 +293,7 @@ export const EducationBackgroundSection = forwardRef<
                         )}
                       </div>
                       {errors[`education.schools.${idx}.schoolType`] && (
-                        <p className="text-xs text-red-500 mt-1">{errors[`education.schools.${idx}.schoolType`]}</p>
+                        <p className="text-xs font-semibold text-red-600 mt-1">{errors[`education.schools.${idx}.schoolType`]}</p>
                       )}
                     </div>
                     <InputField
