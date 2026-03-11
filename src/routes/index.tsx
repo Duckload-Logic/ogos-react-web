@@ -36,7 +36,7 @@ import {
   SystemLogs,
   AuditLogs,
 } from "@/features/superadmin";
-import Callback from "@/pages/Callback";
+import Callback from "@/features/auth/pages/Callback";
 
 export const routes: RouteObject[] = [
   // Root route - redirect to login
