@@ -110,6 +110,54 @@ export const FamilyBackgroundSection = forwardRef<
       sectionErrors["family.finance.weeklyAllowance"] = "Weekly allowance must be a positive number";
     }
 
+    // Sibling counts
+    if (family?.background?.numberOfChildren === undefined || family?.background?.numberOfChildren === null || family?.background?.numberOfChildren === "") {
+      sectionErrors["family.background.numberOfChildren"] = "Number of children is required";
+    }
+    if (family?.background?.brothers === undefined || family?.background?.brothers === null || family?.background?.brothers === "") {
+      sectionErrors["family.background.brothers"] = "Number of brothers is required";
+    }
+    if (family?.background?.sisters === undefined || family?.background?.sisters === null || family?.background?.sisters === "") {
+      sectionErrors["family.background.sisters"] = "Number of sisters is required";
+    }
+    if (family?.background?.employedSiblings === undefined || family?.background?.employedSiblings === null || family?.background?.employedSiblings === "") {
+      sectionErrors["family.background.employedSiblings"] = "Number of gainfully employed is required";
+    }
+    if (!(family?.background?.ordinalPosition || "").trim()) {
+      sectionErrors["family.background.ordinalPosition"] = "Ordinal position is required";
+    }
+
+    // Living situation
+    if (!family?.background?.quietPlaceToStudy) {
+      sectionErrors["family.background.quietPlaceToStudy"] = "Please indicate if you have a quiet place to study";
+    }
+    if (!family?.background?.sharesRoom) {
+      sectionErrors["family.background.sharesRoom"] = "Please indicate if you share your room";
+    }
+
+    // Nature of Residence (at least one)
+    const hasResidence = family?.background?.natureOfResidence &&
+      Object.values(family.background.natureOfResidence).some(Boolean);
+    if (!hasResidence) {
+      sectionErrors["family.background.natureOfResidence"] = "Please select at least one nature of residence";
+    }
+
+    // Financing source (at least one)
+    const hasFinancingSource = family?.background?.financingSource &&
+      Object.values(family.background.financingSource).some(Boolean);
+    if (!hasFinancingSource) {
+      sectionErrors["family.background.financingSource"] = "Please select at least one financing source";
+    }
+
+    // Sibling support (required only if there are employed siblings)
+    if (Number(family?.background?.employedSiblings) > 0) {
+      const hasSiblingSupport = family?.background?.siblingSupport &&
+        Object.values(family.background.siblingSupport).some(Boolean);
+      if (!hasSiblingSupport) {
+        sectionErrors["family.background.siblingSupport"] = "Please indicate how employed siblings are providing support";
+      }
+    }
+
     setErrors(sectionErrors);
     return {
       isValid: Object.keys(sectionErrors).length === 0,
@@ -227,7 +275,7 @@ export const FamilyBackgroundSection = forwardRef<
               })}
             </div>
             {errors["family.background.parentalStatus"] && (
-              <p className="text-xs text-red-500 mt-2">{errors["family.background.parentalStatus"]}</p>
+              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.parentalStatus"]}</p>
             )}
           </div>
         </div>
@@ -257,6 +305,9 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 columns={2}
               />
+              {errors["family.background.quietPlaceToStudy"] && (
+                <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.quietPlaceToStudy"]}</p>
+              )}
             </div>
 
             <div className="p-4 bg-background dark:bg-muted rounded-lg border border-border">
@@ -275,6 +326,9 @@ export const FamilyBackgroundSection = forwardRef<
                 }
                 columns={2}
               />
+              {errors["family.background.sharesRoom"] && (
+                <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.sharesRoom"]}</p>
+              )}
               {family?.background?.sharesRoom === "yes" && (
                 <div className="mt-4">
                   <InputField
@@ -397,6 +451,9 @@ export const FamilyBackgroundSection = forwardRef<
                   }
                 />
               </div>
+              {errors["family.background.natureOfResidence"] && (
+                <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.natureOfResidence"]}</p>
+              )}
             </div>
           </div>
         </div>
@@ -518,7 +575,7 @@ export const FamilyBackgroundSection = forwardRef<
               </div>
             </div>
             {errors["family.relatedPersons.father.isLiving"] && (
-              <p className="text-xs text-red-500 mt-2">{errors["family.relatedPersons.father.isLiving"]}</p>
+              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.relatedPersons.father.isLiving"]}</p>
             )}
             </div>
             <div className="mb-6">
@@ -627,7 +684,7 @@ export const FamilyBackgroundSection = forwardRef<
               </div>
             </div>
             {errors["family.relatedPersons.mother.isLiving"] && (
-              <p className="text-xs text-red-500 mt-2">{errors["family.relatedPersons.mother.isLiving"]}</p>
+              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.relatedPersons.mother.isLiving"]}</p>
             )}
             </div>
 
@@ -740,7 +797,7 @@ export const FamilyBackgroundSection = forwardRef<
               </div>
             </div>
             {errors["family.relatedPersons.guardian.isLiving"] && (
-              <p className="text-xs text-red-500 mt-2">{errors["family.relatedPersons.guardian.isLiving"]}</p>
+              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.relatedPersons.guardian.isLiving"]}</p>
             )}
             </div>
 
@@ -772,6 +829,9 @@ export const FamilyBackgroundSection = forwardRef<
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
+                {errors["family.background.numberOfChildren"] && (
+                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.numberOfChildren"]}</p>
+                )}
               </div>
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Brothers</label>
@@ -794,6 +854,9 @@ export const FamilyBackgroundSection = forwardRef<
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
+                {errors["family.background.brothers"] && (
+                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.brothers"]}</p>
+                )}
               </div>
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Sisters</label>
@@ -816,6 +879,9 @@ export const FamilyBackgroundSection = forwardRef<
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
+                {errors["family.background.sisters"] && (
+                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.sisters"]}</p>
+                )}
               </div>
             </div>
             {/* Row 2: 2 columns */}
@@ -841,6 +907,9 @@ export const FamilyBackgroundSection = forwardRef<
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
+                {errors["family.background.employedSiblings"] && (
+                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.employedSiblings"]}</p>
+                )}
               </div>
               <div className="flex flex-col">
                 <label className="text-sm font-medium text-foreground h-10 flex items-center">Ordinal Position</label>
@@ -862,6 +931,9 @@ export const FamilyBackgroundSection = forwardRef<
                     <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
                   )}
                 </div>
+                {errors["family.background.ordinalPosition"] && (
+                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.ordinalPosition"]}</p>
+                )}
               </div>
             </div>
             </div>
@@ -918,6 +990,9 @@ export const FamilyBackgroundSection = forwardRef<
                 }
               />
             </div>
+            {errors["family.background.siblingSupport"] && (
+              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.siblingSupport"]}</p>
+            )}
             </div>
 
             <div className="border-t border-border my-6"></div>
@@ -1013,6 +1088,9 @@ export const FamilyBackgroundSection = forwardRef<
                 }
               />
             </div>
+            {errors["family.background.financingSource"] && (
+              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.financingSource"]}</p>
+            )}
           </div>
         </div>
 
@@ -1072,7 +1150,7 @@ export const FamilyBackgroundSection = forwardRef<
               )}
             </div>
             {errors["family.finance.monthlyFamilyIncomeRange"] && (
-              <p className="text-xs text-red-500 mt-2">{errors["family.finance.monthlyFamilyIncomeRange"]}</p>
+              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.finance.monthlyFamilyIncomeRange"]}</p>
             )}
 
             {family?.finance?.monthlyFamilyIncomeRange?.id === "others" && (
@@ -1097,7 +1175,7 @@ export const FamilyBackgroundSection = forwardRef<
                   }`}
                 />
                 {(otherTouched && !(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "")) || errors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] ? (
-                  <p className="text-xs text-red-500 mt-2">{errors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] || "Please provide an income range."}</p>
+                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] || "Please provide an income range."}</p>
                 ) : null}
               </div>
             )}

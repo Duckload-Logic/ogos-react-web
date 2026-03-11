@@ -18,6 +18,17 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HeroSection } from "@/components/ui/hero-section";
 import { AnimationStyles } from "@/components/ui/animations";
+import Toast from "@/components/ui/Toast";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogAction,
+  AlertDialogCancel,
+} from "@/components/ui/alert-dialog";
 import {
   AlertCircle,
   Save,
@@ -41,7 +52,6 @@ const FORM_SECTIONS = [
   { title: "III. Home and Family Background", id: 3, key: "family" },
   { title: "IV. Health Information", id: 4, key: "health" },
   { title: "V. Interests and Hobbies", id: 5, key: "interests" },
-  { title: "VI. Test Results", id: 6, key: "testResults" },
 ];
 
 export default function IIRForm() {
@@ -68,14 +78,18 @@ export default function IIRForm() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [showResetConfirm, setShowResetConfirm] = useState(false);
+  const [consentAgreed, setConsentAgreed] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [validationErrorList, setValidationErrorList] = useState<string[]>([]);
   const [showValidationError, setShowValidationError] = useState(false);
+  const [sectionsWithErrors, setSectionsWithErrors] = useState<number[]>([]);
   const [autoSaveStatus, setAutoSaveStatus] = useState<
     "idle" | "saving" | "saved"
   >("idle");
   const [isMobileNav, setIsMobileNav] = useState(window.innerWidth < 1024);
   const [lastSaved, setLastSaved] = useState<string>("");
+  const [toasts, setToasts] = useState<string[]>([]);
 
   useEffect(() => {
     const initializeFormData = () => {
@@ -161,6 +175,14 @@ export default function IIRForm() {
     } catch (err) {
       setAutoSaveStatus("idle");
     }
+  };
+
+  const addToast = (message: string, duration: number = 3000) => {
+    const id = Math.random();
+    setToasts((prev) => [...prev, message]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((_, i) => i !== prev.length - 1));
+    }, duration);
   };
 
   if (isInitializing) return <LoadingSpinner />;
@@ -266,54 +288,126 @@ export default function IIRForm() {
   };
 
   const handleSubmit = async () => {
-    // Validate all sections using their refs
+    // Always trigger validate() on the current section so inline field errors show
+    const currentSectionRefs: Record<number, any> = {
+      1: personalSectionRef,
+      2: educationSectionRef,
+      3: familySectionRef,
+      4: healthSectionRef,
+      5: interestsSectionRef,
+    };
+    currentSectionRefs[currentSection]?.current?.validate?.();
+
+    // First check: Use completion percentage as source of truth
+    // All sections must be 100% complete
+    const incompleteCompletionSections: number[] = [];
+    const incompleteCompletionMessages: string[] = [];
+    
+    for (let i = 1; i <= FORM_SECTIONS.length; i++) {
+      const completion = calculateSectionCompletion(i);
+      if (completion < 100) {
+        incompleteCompletionSections.push(i);
+        incompleteCompletionMessages.push(
+          `${FORM_SECTIONS[i - 1].title} — ${completion}% complete (required 100%)`
+        );
+      }
+    }
+    
+    // If any section is not 100% complete, block submission
+    if (incompleteCompletionSections.length > 0) {
+      setSectionsWithErrors(incompleteCompletionSections);
+      setValidationErrorList(incompleteCompletionMessages);
+      setShowValidationError(true);
+      addToast("Please complete all sections before submitting.");
+      
+      // Only navigate away if current section is not already the failing one
+      if (!incompleteCompletionSections.includes(currentSection)) {
+        setCurrentSection(incompleteCompletionSections[0]);
+      }
+      return;
+    }
+
+    // Second check: Validate all sections using their refs
     const errorMessages: string[] = [];
+    const sectionsWithValidationErrors: number[] = [];
     let hasErrors = false;
 
-    // Validate Personal Information
+    // Validate Personal Information (Section 1)
     if (personalSectionRef?.current?.validate) {
       const validation = personalSectionRef.current.validate();
       if (!validation.isValid) {
         hasErrors = true;
-        errorMessages.push("Personal Information has missing required fields");
+        sectionsWithValidationErrors.push(1);
+        errorMessages.push("I. Personal Information — missing required fields");
       }
     }
 
-    // Validate Education
+    // Validate Education (Section 2)
     if (educationSectionRef?.current?.validate) {
       const validation = educationSectionRef.current.validate();
       if (!validation.isValid) {
         hasErrors = true;
-        errorMessages.push(
-          "Educational Background has missing required fields",
-        );
+        sectionsWithValidationErrors.push(2);
+        errorMessages.push("II. Educational Background — missing required fields");
       }
     }
 
-    // Validate Family
+    // Validate Family (Section 3)
     if (familySectionRef?.current?.validate) {
       const validation = familySectionRef.current.validate();
       if (!validation.isValid) {
         hasErrors = true;
-        errorMessages.push("Family Background has missing required fields");
+        sectionsWithValidationErrors.push(3);
+        errorMessages.push("III. Family Background — missing required fields");
       }
     }
 
-    // Validate Health
+    // Validate Health (Section 4)
     if (healthSectionRef?.current?.validate) {
       const validation = healthSectionRef.current.validate();
       if (!validation.isValid) {
         hasErrors = true;
-        errorMessages.push("Health Information has missing required fields");
+        sectionsWithValidationErrors.push(4);
+        errorMessages.push("IV. Health Information — missing required fields");
+      }
+    }
+
+    // Validate Interests (Section 5)
+    if (interestsSectionRef?.current?.validate) {
+      const validation = interestsSectionRef.current.validate();
+      if (!validation.isValid) {
+        hasErrors = true;
+        sectionsWithValidationErrors.push(5);
+        errorMessages.push("V. Interests and Hobbies — missing required fields");
+      }
+    }
+
+    // Validate Test Results (Section 6)
+    if (testResultsSectionRef?.current?.validate) {
+      const validation = testResultsSectionRef.current.validate();
+      if (!validation.isValid) {
+        hasErrors = true;
+        sectionsWithValidationErrors.push(6);
+        errorMessages.push("VI. Test Results — missing required fields");
       }
     }
 
     if (hasErrors) {
+      setSectionsWithErrors(sectionsWithValidationErrors);
       setValidationErrorList(errorMessages);
       setShowValidationError(true);
+      addToast("Please fix errors before submitting.");
+      
+      // Only navigate away if current section has no errors
+      if (!sectionsWithValidationErrors.includes(currentSection)) {
+        setCurrentSection(sectionsWithValidationErrors[0]);
+      }
       return;
     }
 
+    // All validations passed, clear section errors and open confirmation dialog
+    setSectionsWithErrors([]);
+    setConsentAgreed(false);
     setShowSubmitConfirm(true);
   };
 
@@ -325,15 +419,36 @@ export default function IIRForm() {
       if (localFormData?.id) {
         await submitFormAsync(localFormData.id);
       }
+      addToast("✓ Form submitted successfully!");
       setShowSuccessPopup(true);
       setTimeout(() => {
         navigate("/student");
       }, 3000);
     } catch (err: any) {
+      addToast("Failed to submit form. Please try again.");
       console.error("Error submitting form:", err);
     } finally {
       setIsSaving(false);
     }
+  };
+
+  const confirmReset = () => {
+    // preserve autofilled basicInfo
+    const resetData = {
+      ...EMPTY_IIR_FORM,
+      student: {
+        ...EMPTY_IIR_FORM.student,
+        basicInfo: {
+          firstName: me?.firstName || "",
+          middleName: me?.middleName && typeof me?.middleName === "string" ? me?.middleName : "",
+          lastName: me?.lastName || "",
+          email: me?.email || "",
+        },
+      },
+    };
+    setLocalFormData(resetData);
+    setShowResetConfirm(false);
+    addToast("Form reset.");
   };
 
   // Calculate section completion percentage
@@ -359,6 +474,14 @@ export default function IIRForm() {
         const schemaErrors = validateObject({ student: localFormData?.student }, personalInformationValidationSchema);
         totalCount = schemaFields.length;
         filledCount = schemaFields.length - Object.keys(schemaErrors).length;
+        // If employed, include employer fields in completion
+        const isEmployed = (localFormData as any)?.student?.personalInfo?.isEmployed;
+        if (isEmployed) {
+          totalCount += 3; // employerName, employerAddress, employerContact
+          if ((localFormData as any)?.student?.personalInfo?.employerName) filledCount++;
+          if ((localFormData as any)?.student?.personalInfo?.employerAddress) filledCount++;
+          if ((localFormData as any)?.student?.personalInfo?.employerContact) filledCount++;
+        }
         break;
       }
 
@@ -473,10 +596,14 @@ export default function IIRForm() {
         totalCount++;
         if (interests?.hobbies?.[1]?.hobbyName || interests?.hobbies?.["1"]?.hobbyName) filledCount++;
 
-        // At least one academic club checked
+        // At least one academic club checked (if 'Others' is selected, require specify to count)
         totalCount++;
-        const hasAcademic = interests?.academic?.mathClub || interests?.academic?.scienceClub ||
-          interests?.academic?.debatingClub || interests?.academic?.quizzersClub || interests?.academic?.othersChecked;
+        const hasAcademic =
+          interests?.academic?.mathClub ||
+          interests?.academic?.scienceClub ||
+          interests?.academic?.debatingClub ||
+          interests?.academic?.quizzersClub ||
+          (interests?.academic?.othersChecked && countFilledField(interests?.academic?.othersSpecify));
         if (hasAcademic) filledCount++;
 
         // Organization (single radio selection)
@@ -589,70 +716,44 @@ export default function IIRForm() {
           </Alert>
         )}
 
-        {/* Main Layout: Desktop Side Navigation + Mobile Top Tabs */}
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Desktop Side Navigation */}
-          {!isMobileNav && (
-            <div className="lg:col-span-1">
-              <div className="space-y-2">
-                <h3 className="font-semibold text-xs uppercase text-foreground px-2 mb-3">
-                  Form Sections
-                </h3>
-                {FORM_SECTIONS.map((section, idx) => {
-                  const status = getSectionStatus(section.id);
-                  const percentage = calculateSectionCompletion(section.id);
-                  return (
-                    <button
-                      key={section.id}
-                      onClick={() => setCurrentSection(section.id)}
-                      disabled={currentSection === section.id}
-                      className={`w-full text-left px-4 py-3 rounded-lg font-medium transition-colors flex items-center justify-between ${
-                        currentSection === section.id
-                          ? "bg-primary text-primary-foreground shadow-md"
-                          : "bg-card text-card-foreground border border-border hover:border-primary/30"
-                      }`}
-                    >
-                      <div className="flex-1">
-                        <p className="text-sm">{section.title}</p>
-                      </div>
-                      {status === "complete" && (
-                        <Check className="w-5 h-5 ml-2 flex-shrink-0 text-green-500" />
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          )}
+        {/* Main Layout: Horizontal Section Nav + Form Content */}
+        <div className="flex flex-col gap-6">
+          {/* Horizontal Section Navigation */}
+          <div className="flex overflow-x-auto gap-2 pb-1">
+            {FORM_SECTIONS.map((section) => {
+              const status = getSectionStatus(section.id);
+              const hasError = sectionsWithErrors.includes(section.id);
+              return (
+                <button
+                  key={section.id}
+                  onClick={() => {
+                    setCurrentSection(section.id);
+                    // Clear validation errors when navigating to a different section
+                    setSectionsWithErrors([]);
+                    setShowValidationError(false);
+                  }}
+                  disabled={currentSection === section.id}
+                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors whitespace-nowrap relative ${
+                    currentSection === section.id
+                      ? "bg-primary text-primary-foreground shadow-md"
+                      : hasError
+                      ? "bg-card text-card-foreground border-2 border-destructive"
+                      : "bg-card text-card-foreground border border-border hover:border-primary/30"
+                  }`}
+                >
+                  {section.title}
+                  {hasError && (
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-destructive" />
+                  )}
+                  {status === "complete" && !hasError && (
+                    <Check className="w-4 h-4 flex-shrink-0 text-green-500" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
 
-          <div className="flex flex-col gap-2 col-span-2">
-            {/* Mobile Top Navigation + Form Content */}
-            <div className={`${isMobileNav ? "col-span-1" : "lg:col-span-3"}`}>
-              {/* Mobile Top Tabs */}
-              {isMobileNav && (
-                <div className="mb-6 flex overflow-x-auto gap-2-mx-4 px-4">
-                  {FORM_SECTIONS.map((section, idx) => {
-                    const status = getSectionStatus(section.id);
-                    const percentage = calculateSectionCompletion(section.id);
-                    return (
-                      <button
-                        key={section.id}
-                        onClick={() => setCurrentSection(section.id)}
-                        className={`flex-shrink-0 px-4 py-3 rounded-lg font-medium text-xs sm:text-sm transition-colors flex flex-col items-center gap-1 min-w-fit ${
-                          currentSection === section.id
-                            ? "bg-primary text-primary-foreground shadow-md"
-                            : "bg-card border border-border text-foreground"
-                        }`}
-                      >
-                        <span className="whitespace-nowrap">{section.id}</span>
-                        {status === "complete" && (
-                          <Check className="w-3 h-3 text-green-500" />
-                        )}
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
+          <div className="flex flex-col gap-2">
 
               {/* Form Content Card */}
               <Card className="border-0 shadow-sm bg-background">
@@ -716,26 +817,7 @@ export default function IIRForm() {
             {/* Form Navigation Buttons */}
             <div className="sticky bottom-0 flex justify-between gap-3 bg-card p-4 border-t border-border shadow-lg flex-wrap z-20 rounded-2xl">
               <Button
-                onClick={() => {
-                  // Reset form but preserve autofilled fields
-                  const resetData = {
-                    ...EMPTY_IIR_FORM,
-                    student: {
-                      ...EMPTY_IIR_FORM.student,
-                      basicInfo: {
-                        firstName: me?.firstName || "",
-                        middleName:
-                          me?.middleName && typeof me?.middleName === "string"
-                            ? me?.middleName
-                            : "" as any,
-                        lastName: me?.lastName || "",
-                        email: me?.email || "",
-                      },
-                    },
-                  };
-                  setLocalFormData(resetData);
-                  setCurrentSection(1);
-                }}
+                onClick={() => setShowResetConfirm(true)}
                 className="bg-destructive hover:bg-destructive/90 text-white"
               >
                 Reset Form
@@ -792,40 +874,52 @@ export default function IIRForm() {
                 )}
               </div>
             </div>
-          </div>
         </div>
 
         {/* Submit Confirmation Modal */}
         {showSubmitConfirm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-md shadow-2xl">
-              <CardHeader className="bg-gray-50 pb-4">
-                <CardTitle className="text-2xl text-gray-900">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 pointer-events-none">
+            <Card className="w-full max-w-md shadow-2xl bg-card border-border pointer-events-auto">
+              <CardHeader className="bg-card border-b border-border pb-4">
+                <CardTitle className="text-2xl text-foreground">
                   Confirm Submission
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6 pt-6">
-                <div className="space-y-2">
-                  <p className="text-gray-700 font-medium">
-                    Please confirm form submission
+                <div className="space-y-4">
+                  <p className="text-sm text-foreground">
+                    By clicking "I Agree", you consent to the collection, use, and processing of your personal data for legitimate purposes related to this service.
                   </p>
-                  <p className="text-sm text-gray-600">
-                    Once submitted, you will not be able to edit the form.
-                    Please review all information before confirming.
+                  <p className="text-sm text-foreground">
+                    Your information will be handled in accordance with our Privacy Policy and in compliance with the Data Privacy Act of 2012.
                   </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="consent-agree"
+                    checked={consentAgreed}
+                    onChange={(e) => setConsentAgreed(e.target.checked)}
+                    className="mt-1 rounded border-border cursor-pointer"
+                  />
+                  <label htmlFor="consent-agree" className="text-sm text-foreground cursor-pointer">
+                    I have read and understood the above, and I confirm that all information in my Individual Inventory Record is true and correct.
+                  </label>
                 </div>
                 <div className="flex gap-3 justify-end pt-4">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={() => setShowSubmitConfirm(false)}
+                    className="border border-border hover:bg-muted"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={confirmSubmit}
-                    className="bg-green-600 hover:bg-green-700"
+                    disabled={!consentAgreed}
+                    className={consentAgreed ? "bg-destructive hover:bg-destructive/90 text-white" : "bg-gray-400 text-gray-600 cursor-not-allowed"}
                   >
-                    Confirm & Submit
+                    I Agree & Submit
                   </Button>
                 </div>
               </CardContent>
@@ -835,28 +929,44 @@ export default function IIRForm() {
 
         {/* Success Popup */}
         {showSuccessPopup && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-md shadow-2xl text-center">
-              <CardHeader className="bg-green-50 py-8">
-                <div className="text-5xl mb-4">✅</div>
-                <CardTitle className="text-2xl text-green-900">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 pointer-events-none">
+            <Card className="w-full max-w-md shadow-2xl pointer-events-auto bg-card border-border">
+              <CardHeader className="bg-card border-b border-border py-8 text-center">
+                <div className="flex justify-center mb-4">
+                  <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
+                    <svg
+                      className="w-10 h-10 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <CardTitle className="text-2xl text-foreground">
                   Form Submitted!
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6 pt-6">
+              <CardContent className="space-y-6 pt-6 text-center">
                 <div className="space-y-2">
-                  <p className="text-gray-700 font-medium">
+                  <p className="text-foreground font-medium">
                     Your Individual Inventory Record has been successfully
                     submitted.
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     Thank you for completing the form. The information has been
                     saved and will be reviewed.
                   </p>
                 </div>
                 <Button
                   onClick={() => navigate("/student")}
-                  className="w-full bg-green-600 hover:bg-green-700"
+                  className="w-full bg-destructive hover:bg-destructive/90 text-white"
                 >
                   Return to Dashboard
                 </Button>
@@ -864,7 +974,28 @@ export default function IIRForm() {
             </Card>
           </div>
         )}
+
+        {/* Reset Confirmation Modal */}
+        <AlertDialog open={showResetConfirm} onOpenChange={(open) => setShowResetConfirm(open)}>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Reset Form</AlertDialogTitle>
+              <AlertDialogDescription>
+                This will clear your current responses while preserving autofilled basic information. Are you sure you want to Reset?
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogCancel asChild>
+                <Button variant="ghost" className="border border-border hover:bg-muted">Cancel</Button>
+              </AlertDialogCancel>
+              <AlertDialogAction onClick={confirmReset} className="bg-destructive hover:bg-destructive/90 text-white">Reset</AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
       </div>
+
+      {/* Toast Notifications */}
+      <Toast toasts={toasts} />
     </>
   );
 }
