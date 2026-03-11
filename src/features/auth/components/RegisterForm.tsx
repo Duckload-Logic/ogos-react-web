@@ -1,5 +1,6 @@
-import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 
 interface RegisterFormProps {
@@ -37,30 +38,30 @@ export default function RegisterForm({
 }: RegisterFormProps) {
   return (
     <>
-      <form onSubmit={onSubmit} className="space-y-4">
-        {/* Name Fields - Responsive Grid */}
-        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-          {/* First Name */}
-          <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+      <form onSubmit={onSubmit} className="space-y-5">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-[minmax(0,1fr)_110px_minmax(0,1fr)]">
+          <div className="space-y-2">
+            <Label htmlFor="firstName" className="text-sm font-medium text-foreground">
               First Name
-            </label>
+            </Label>
             <Input
+              id="firstName"
               type="text"
+              autoComplete="given-name"
               placeholder="John"
               value={firstName}
               onChange={(e) => onFirstNameChange(e.target.value)}
               disabled={isLoading}
-              className="w-full"
+              className="h-12 rounded-2xl border-[hsl(var(--border)/0.9)] bg-[hsl(var(--background)/0.78)] px-4 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur placeholder:text-muted-foreground focus-visible:ring-2"
             />
           </div>
 
-          {/* Middle Initial */}
-          <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-2">
+            <Label htmlFor="middleInitial" className="text-sm font-medium text-foreground">
               Middle Initial
-            </label>
+            </Label>
             <Input
+              id="middleInitial"
               type="text"
               placeholder="Q"
               maxLength={1}
@@ -69,89 +70,94 @@ export default function RegisterForm({
                 onMiddleInitialChange(e.target.value.toUpperCase())
               }
               disabled={isLoading}
-              className="w-full"
+              className="h-12 rounded-2xl border-[hsl(var(--border)/0.9)] bg-[hsl(var(--background)/0.78)] px-4 text-center text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur placeholder:text-muted-foreground focus-visible:ring-2"
             />
           </div>
 
-          {/* Surname */}
-          <div>
-            <label className="block text-xs sm:text-sm font-medium text-gray-700 mb-1">
+          <div className="space-y-2">
+            <Label htmlFor="surname" className="text-sm font-medium text-foreground">
               Surname
-            </label>
+            </Label>
             <Input
+              id="surname"
               type="text"
+              autoComplete="family-name"
               placeholder="Doe"
               value={surname}
               onChange={(e) => onSurnameChange(e.target.value)}
               disabled={isLoading}
-              className="w-full"
+              className="h-12 rounded-2xl border-[hsl(var(--border)/0.9)] bg-[hsl(var(--background)/0.78)] px-4 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur placeholder:text-muted-foreground focus-visible:ring-2"
             />
           </div>
         </div>
 
-        {/* Email Address */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
+        <div className="space-y-2">
+          <Label htmlFor="email" className="text-sm font-medium text-foreground">
             Email Address
-          </label>
+          </Label>
           <Input
+            id="email"
             type="email"
+            autoComplete="email"
             placeholder="Enter your email address"
             value={email}
             onChange={(e) => onEmailChange(e.target.value)}
             disabled={isLoading}
-            className="w-full"
+            className="h-12 rounded-2xl border-[hsl(var(--border)/0.9)] bg-[hsl(var(--background)/0.78)] px-4 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur placeholder:text-muted-foreground focus-visible:ring-2"
           />
         </div>
 
-        {/* Password */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Password
-          </label>
-          <Input
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => onPasswordChange(e.target.value)}
-            disabled={isLoading}
-            className="w-full"
-          />
-          <p className="text-xs text-muted-foreground mt-1">
-            Must be at least 6 characters
-          </p>
+        <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+          <div className="space-y-2">
+            <Label htmlFor="password" className="text-sm font-medium text-foreground">
+              Password
+            </Label>
+            <Input
+              id="password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => onPasswordChange(e.target.value)}
+              disabled={isLoading}
+              className="h-12 rounded-2xl border-[hsl(var(--border)/0.9)] bg-[hsl(var(--background)/0.78)] px-4 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur placeholder:text-muted-foreground focus-visible:ring-2"
+            />
+            <p className="text-xs text-muted-foreground">
+              Must be at least 6 characters
+            </p>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="confirmPassword" className="text-sm font-medium text-foreground">
+              Confirm Password
+            </Label>
+            <Input
+              id="confirmPassword"
+              type="password"
+              autoComplete="new-password"
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={(e) => onConfirmPasswordChange(e.target.value)}
+              disabled={isLoading}
+              className="h-12 rounded-2xl border-[hsl(var(--border)/0.9)] bg-[hsl(var(--background)/0.78)] px-4 text-foreground shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] backdrop-blur placeholder:text-muted-foreground focus-visible:ring-2"
+            />
+          </div>
         </div>
 
-        {/* Confirm Password */}
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Confirm Password
-          </label>
-          <Input
-            type="password"
-            placeholder="Confirm your password"
-            value={confirmPassword}
-            onChange={(e) => onConfirmPasswordChange(e.target.value)}
-            disabled={isLoading}
-            className="w-full"
-          />
-        </div>
-
-        {/* Register Button */}
         <Button
           type="submit"
           disabled={isLoading}
-          className="w-full h-10 sm:h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold text-sm sm:text-base"
+          className="mt-2 h-12 w-full rounded-2xl bg-primary text-sm font-semibold text-primary-foreground shadow-[0_14px_30px_-16px_rgba(220,38,38,0.55)] transition hover:bg-primary/90 sm:text-base"
         >
           {isLoading ? "Creating Account..." : "Create Account"}
         </Button>
       </form>
 
-      <p className="text-center text-xs sm:text-sm text-muted-foreground mt-6">
+      <p className="mt-6 text-center text-sm text-muted-foreground">
         Already have an account?{" "}
         <Link
           to="/login"
-          className="text-primary hover:text-primary-dark font-medium"
+          className="font-semibold text-primary transition-colors hover:opacity-80"
         >
           Login
         </Link>
