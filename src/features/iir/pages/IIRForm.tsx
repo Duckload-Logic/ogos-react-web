@@ -474,6 +474,14 @@ export default function IIRForm() {
         const schemaErrors = validateObject({ student: localFormData?.student }, personalInformationValidationSchema);
         totalCount = schemaFields.length;
         filledCount = schemaFields.length - Object.keys(schemaErrors).length;
+        // If employed, include employer fields in completion
+        const isEmployed = (localFormData as any)?.student?.personalInfo?.isEmployed;
+        if (isEmployed) {
+          totalCount += 3; // employerName, employerAddress, employerContact
+          if ((localFormData as any)?.student?.personalInfo?.employerName) filledCount++;
+          if ((localFormData as any)?.student?.personalInfo?.employerAddress) filledCount++;
+          if ((localFormData as any)?.student?.personalInfo?.employerContact) filledCount++;
+        }
         break;
       }
 
