@@ -4,7 +4,7 @@ import { useAuth } from "@/context";
 const ROLE_MAP: { [key: number]: string } = {
   1: "student",
   2: "admin",
-  3: "frontdesk",
+  3: "superadmin",
 };
 
 interface ProtectedRouteProps {
@@ -12,18 +12,25 @@ interface ProtectedRouteProps {
   requiredRole?: string;
 }
 
-export const ProtectedRoute = ({ children, requiredRole }: ProtectedRouteProps) => {
+export const ProtectedRoute = ({
+  children,
+  requiredRole,
+}: ProtectedRouteProps) => {
   const { user, isLoading } = useAuth();
 
   if (isLoading) {
-    return <div className="flex items-center justify-center min-h-screen">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        Loading...
+      </div>
+    );
   }
 
   if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requiredRole && ROLE_MAP[user.roleId] !== requiredRole) {
+  if (requiredRole && ROLE_MAP[user.role?.id || 0] !== requiredRole) {
     return <Navigate to="/" replace />;
   }
 

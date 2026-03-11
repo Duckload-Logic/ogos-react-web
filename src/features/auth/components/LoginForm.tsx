@@ -1,5 +1,7 @@
+import { Checkbox } from "@/components/form";
 import { FormField, LoadingSpinner } from "@/components/shared";
 import { Button } from "@/components/ui/button";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 
 interface LoginFormProps {
@@ -19,6 +21,8 @@ export default function LoginForm({
   onSubmit,
   isLoading,
 }: LoginFormProps) {
+  const [rememberMe, setRememberMe] = useState(false);
+
   return (
     <>
       <form onSubmit={onSubmit} className="space-y-4">
@@ -41,10 +45,13 @@ export default function LoginForm({
         />
 
         <div className="flex items-center justify-between text-sm">
-          <label className="flex items-center gap-2">
-            <input type="checkbox" className="rounded" disabled={isLoading} />
-            Remember me
-          </label>
+          <Checkbox
+            label="Remember me"
+            id="remember"
+            name="Remember"
+            checked={rememberMe}
+            onCheckedChange={(checked) => setRememberMe(checked === true)}
+          />
           <Link
             to="#"
             className="text-primary hover:text-primary-dark font-medium"
@@ -59,6 +66,14 @@ export default function LoginForm({
           className="w-full h-10 sm:h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold text-sm sm:text-base flex items-center justify-center"
         >
           {isLoading ? <LoadingSpinner size="sm" /> : "Login"}
+        </Button>
+
+        <Button
+          type="button"
+          disabled={isLoading}
+          className="w-full h-10 sm:h-11 bg-primary hover:bg-primary-dark text-primary-foreground font-semibold text-sm sm:text-base flex items-center justify-center"
+        >
+          Login with PUPT-IDP
         </Button>
       </form>
 

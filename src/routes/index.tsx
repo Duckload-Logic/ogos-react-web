@@ -1,9 +1,9 @@
 import { RouteObject, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { PDSGate } from "@/components/PDSGate";
-import Header from "@/components/Header";
 
 // Shared
+import Layout from "@/components/layout/Layout";
 import NotFound from "@/pages/shared/NotFound";
 
 // Auth Feature
@@ -11,21 +11,31 @@ import Login from "@/features/auth/pages/Login";
 import Register from "@/features/auth/pages/Register";
 
 // Student Features
-import GuidanceServices from "@/features/guidance-services/pages/GuidanceServices";
-import ScheduleAppointment from "@/features/appointments/pages/ScheduleAppointment";
-import StudentForm from "@/features/students/pages/StudentForm";
-import ExcuseSlip from "@/features/excuse-slips/pages/ExcuseSlip";
-import ViewSchedules from "@/features/schedules/pages/ViewSchedules";
+import { Dashboard as StudentDashboard } from "@/features/students/pages/Dashboard";
+import StudentAppointments from "@/features/appointments/pages/student/StudentAppointments";
+import { StudentSlips, SubmitSlip } from "@/features/slips/pages/student";
 
 // Admin Feature
 import Dashboard from "@/features/admin/pages/Dashboard";
 import StudentRecords from "@/features/admin/pages/StudentRecords";
-import Appointments from "@/features/admin/pages/Appointments";
-import AppointmentsManagement from "@/features/admin/pages/AppointmentsManagement";
-import ReviewExcuses from "@/features/admin/pages/ReviewExcuses";
-import Reports from "@/features/admin/pages/Reports";
-import Frontdesk from "@/features/frontdesk/pages/Frontdesk";
-import StudentProfile from "@/features/admin/pages/StudentProfile";
+import AppointmentsManagement from "@/features/appointments/pages/admin/AppointmentsManagement";
+import ReviewSlips from "@/features/slips/pages/admin/ReviewSlips";
+import SlipLogs from "@/features/slips/pages/admin/SlipLogs";
+import Reports from "@/features/analytics/pages/Reports";
+import Analytics from "@/features/analytics/pages/Analytics";
+import IIRProfile from "@/features/iir/pages/IIRProfile";
+import IIRForm from "@/features/iir/pages/IIRForm";
+import { CreateAppointment } from "@/features/appointments";
+import StatementPage from "@/features/consents/pages/StatementPage";
+
+// Super Admin Feature
+import {
+  SuperAdminDashboard,
+  APIManagement,
+  SecurityLogs,
+  SystemLogs,
+  AuditLogs,
+} from "@/features/superadmin";
 
 export const routes: RouteObject[] = [
   // Root route - redirect to login
@@ -37,21 +47,55 @@ export const routes: RouteObject[] = [
 
   // Student routes
   {
-    path: "/student",
+    path: "/student/home",
     element: (
       <ProtectedRoute requiredRole="student">
-        <Header />
-        <GuidanceServices />
+        <Layout title="Services">
+          <StudentDashboard />
+        </Layout>
       </ProtectedRoute>
     ),
   },
   {
-    path: "/student/schedule",
+    path: "/student/appointments",
     element: (
       <ProtectedRoute requiredRole="student">
         <PDSGate>
-          <Header />
-          <ScheduleAppointment />
+          <Layout title="View Appointments">
+            <StudentAppointments />
+          </Layout>
+        </PDSGate>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/student/appointments/schedule",
+    element: (
+      <ProtectedRoute requiredRole="student">
+        <Layout title="Schedule Appointment">
+          <CreateAppointment />
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/student/slips",
+    element: (
+      <ProtectedRoute requiredRole="student">
+        <PDSGate>
+          <Layout title="My Admission Slips">
+            <StudentSlips />
+          </Layout>
+        </PDSGate>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/student/slips/submit",
+    element: (
+      <ProtectedRoute requiredRole="student">
+        <PDSGate>
+          <SubmitSlip />
         </PDSGate>
       </ProtectedRoute>
     ),
@@ -60,40 +104,21 @@ export const routes: RouteObject[] = [
     path: "/student/form",
     element: (
       <ProtectedRoute requiredRole="student">
-        <Header />
-        <StudentForm />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/student/excuse-slip",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <PDSGate>
-          <Header />
-          <ExcuseSlip />
-        </PDSGate>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/student/schedules",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <PDSGate>
-          <Header />
-          <ViewSchedules />
-        </PDSGate>
+        <Layout title="Individual Inventory Record">
+          <IIRForm />
+        </Layout>
       </ProtectedRoute>
     ),
   },
 
   // Admin routes
   {
-    path: "/admin",
+    path: "/admin/home",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <Dashboard />
+        <Layout title="Dashboard">
+          <Dashboard />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -101,7 +126,9 @@ export const routes: RouteObject[] = [
     path: "/admin/student-records",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <StudentRecords />
+        <Layout title="Student Records">
+          <StudentRecords />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -109,7 +136,9 @@ export const routes: RouteObject[] = [
     path: "/admin/student-records/:studentId",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <StudentProfile />
+        <Layout title="Individual Inventory Record">
+          <IIRProfile />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -117,23 +146,29 @@ export const routes: RouteObject[] = [
     path: "/admin/appointments",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <AppointmentsManagement />
+        <Layout title="Appointments">
+          <AppointmentsManagement />
+        </Layout>
       </ProtectedRoute>
     ),
   },
   {
-    path: "/admin/view-schedule",
+    path: "/admin/admission-slips",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <Appointments />
+        <Layout title="Review Excuse Slips">
+          <ReviewSlips />
+        </Layout>
       </ProtectedRoute>
     ),
   },
   {
-    path: "/admin/review-excuses",
+    path: "/admin/admission-slips/logs",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <ReviewExcuses />
+        <Layout title="Admission Slip Logs">
+          <SlipLogs />
+        </Layout>
       </ProtectedRoute>
     ),
   },
@@ -141,34 +176,93 @@ export const routes: RouteObject[] = [
     path: "/admin/reports",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <Reports />
+        <Layout title="Reports">
+          <Reports />
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/analytics",
+    element: (
+      <ProtectedRoute requiredRole="admin">
+        <Layout title="Analytics">
+          <Analytics />
+        </Layout>
       </ProtectedRoute>
     ),
   },
 
-  // Frontdesk routes
+  // Super Admin routes
   {
-    path: "/frontdesk",
+    path: "/superadmin/home",
     element: (
-      <ProtectedRoute requiredRole="frontdesk">
-        <Frontdesk />
+      <ProtectedRoute requiredRole="superadmin">
+        <Layout title="Super Admin Dashboard">
+          <SuperAdminDashboard />
+        </Layout>
       </ProtectedRoute>
     ),
   },
   {
-    path: "/frontdesk/appointments",
+    path: "/superadmin/api-management",
     element: (
-      <ProtectedRoute requiredRole="frontdesk">
-        <Appointments />
+      <ProtectedRoute requiredRole="superadmin">
+        <Layout title="API Management">
+          <APIManagement />
+        </Layout>
       </ProtectedRoute>
     ),
   },
   {
-    path: "/frontdesk/review-excuses",
+    path: "/superadmin/security-logs",
     element: (
-      <ProtectedRoute requiredRole="frontdesk">
-        <ReviewExcuses />
+      <ProtectedRoute requiredRole="superadmin">
+        <Layout title="Security Logs">
+          <SecurityLogs />
+        </Layout>
       </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/superadmin/system-logs",
+    element: (
+      <ProtectedRoute requiredRole="superadmin">
+        <Layout title="System Logs">
+          <SystemLogs />
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/superadmin/audit-logs",
+    element: (
+      <ProtectedRoute requiredRole="superadmin">
+        <Layout title="Audit Logs">
+          <AuditLogs />
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/terms",
+    element: (
+      <Layout title="Terms and Conditions" showSidebar={false}>
+        <div className="prose max-w-none">
+          <StatementPage statementType="terms" />
+        </div>
+      </Layout>
+    ),
+  },
+  {
+    path: "/privacy",
+    element: (
+      <Layout title="Privacy Policy" showSidebar={false}>
+        <div className="prose max-w-none">
+          <StatementPage statementType="privacy" />
+        </div>
+      </Layout>
     ),
   },
 

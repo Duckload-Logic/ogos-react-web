@@ -3,7 +3,6 @@
  * Central export for all components
  */
 
-export { default as Header } from "./Header";
 export { ProtectedRoute } from "./ProtectedRoute";
 export { PDSGate } from "./PDSGate";
 

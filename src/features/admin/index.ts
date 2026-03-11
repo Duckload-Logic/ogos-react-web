@@ -1,22 +1,20 @@
 /**
  * Admin Feature - Public API
  * Multi-subdomain admin feature organized by domain:
- * dashboard, appointments, students, excuse-slips, reports
+ * dashboard, appointments, students, slips, reports
  */
 
 // Subdomains
 // @ts-expect-error
-export * from "./dashboard"; 
+export * from "./dashboard";
 // @ts-expect-error
 export * from "./appointments";
 // @ts-expect-error
 export * from "./students";
 // @ts-expect-error
-export * from "./excuse-slips";
+export * from "./slips";
 // @ts-expect-error
-export * from "./reports"; 
+export * from "./reports";
 
 // Shared admin resources
-export { useAdminAppointments } from "./hooks/useAdminAppointments";
-export { AppointmentsList } from "./components/AppointmentsList";
-export type { Appointment, AppointmentFilters } from "@/features/appointments/services";
+export type { Appointment } from "@/features/appointments/services";
