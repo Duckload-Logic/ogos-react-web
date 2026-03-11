@@ -26,6 +26,7 @@ import Analytics from "@/features/analytics/pages/Analytics";
 import IIRProfile from "@/features/iir/pages/IIRProfile";
 import IIRForm from "@/features/iir/pages/IIRForm";
 import { CreateAppointment } from "@/features/appointments";
+import StatementPage from "@/features/consents/pages/StatementPage";
 
 // Super Admin Feature
 import {
@@ -241,6 +242,27 @@ export const routes: RouteObject[] = [
           <AuditLogs />
         </Layout>
       </ProtectedRoute>
+    ),
+  },
+
+  {
+    path: "/terms",
+    element: (
+      <Layout title="Terms and Conditions" showSidebar={false}>
+        <div className="prose max-w-none">
+          <StatementPage statementType="terms" />
+        </div>
+      </Layout>
+    ),
+  },
+  {
+    path: "/privacy",
+    element: (
+      <Layout title="Privacy Policy" showSidebar={false}>
+        <div className="prose max-w-none">
+          <StatementPage statementType="privacy" />
+        </div>
+      </Layout>
     ),
   },
 

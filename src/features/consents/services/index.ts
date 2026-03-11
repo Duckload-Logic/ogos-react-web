@@ -1,0 +1,1 @@
+export {consentService} from "./consent-service";
