@@ -797,7 +797,6 @@ export default function IIRForm() {
                     },
                   };
                   setLocalFormData(resetData);
-                  setCurrentSection(1);
                 }}
                 className="bg-destructive hover:bg-destructive/90 text-white"
               >
