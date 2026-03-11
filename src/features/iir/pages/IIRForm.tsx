@@ -67,6 +67,7 @@ export default function IIRForm() {
   const [isInitializing, setIsInitializing] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
   const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [consentAgreed, setConsentAgreed] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [validationErrorList, setValidationErrorList] = useState<string[]>([]);
   const [showValidationError, setShowValidationError] = useState(false);
@@ -313,6 +314,7 @@ export default function IIRForm() {
       return;
     }
 
+    setConsentAgreed(false);
     setShowSubmitConfirm(true);
   };
 
@@ -758,35 +760,48 @@ export default function IIRForm() {
 
         {/* Submit Confirmation Modal */}
         {showSubmitConfirm && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-md shadow-2xl">
-              <CardHeader className="bg-gray-50 pb-4">
-                <CardTitle className="text-2xl text-gray-900">
+          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 pointer-events-none">
+            <Card className="w-full max-w-md shadow-2xl bg-card border-border pointer-events-auto">
+              <CardHeader className="bg-card border-b border-border pb-4">
+                <CardTitle className="text-2xl text-foreground">
                   Confirm Submission
                 </CardTitle>
               </CardHeader>
               <CardContent className="space-y-6 pt-6">
-                <div className="space-y-2">
-                  <p className="text-gray-700 font-medium">
-                    Please confirm form submission
+                <div className="space-y-4">
+                  <p className="text-sm text-foreground">
+                    By clicking "I Agree", you consent to the collection, use, and processing of your personal data for legitimate purposes related to this service.
                   </p>
-                  <p className="text-sm text-gray-600">
-                    Once submitted, you will not be able to edit the form.
-                    Please review all information before confirming.
+                  <p className="text-sm text-foreground">
+                    Your information will be handled in accordance with our Privacy Policy and in compliance with the Data Privacy Act of 2012.
                   </p>
+                </div>
+                <div className="flex items-start gap-3">
+                  <input
+                    type="checkbox"
+                    id="consent-agree"
+                    checked={consentAgreed}
+                    onChange={(e) => setConsentAgreed(e.target.checked)}
+                    className="mt-1 rounded border-border cursor-pointer"
+                  />
+                  <label htmlFor="consent-agree" className="text-sm text-foreground cursor-pointer">
+                    I have read and understood the above, and I confirm that all information in my Individual Inventory Record is true and correct.
+                  </label>
                 </div>
                 <div className="flex gap-3 justify-end pt-4">
                   <Button
-                    variant="outline"
+                    variant="ghost"
                     onClick={() => setShowSubmitConfirm(false)}
+                    className="border border-border hover:bg-muted"
                   >
                     Cancel
                   </Button>
                   <Button
                     onClick={confirmSubmit}
-                    className="bg-green-600 hover:bg-green-700"
+                    disabled={!consentAgreed}
+                    className={consentAgreed ? "bg-destructive hover:bg-destructive/90 text-white" : "bg-gray-400 text-gray-600 cursor-not-allowed"}
                   >
-                    Confirm & Submit
+                    I Agree & Submit
                   </Button>
                 </div>
               </CardContent>
@@ -796,28 +811,44 @@ export default function IIRForm() {
 
         {/* Success Popup */}
         {showSuccessPopup && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-            <Card className="w-full max-w-md shadow-2xl text-center">
-              <CardHeader className="bg-green-50 py-8">
-                <div className="text-5xl mb-4">✅</div>
-                <CardTitle className="text-2xl text-green-900">
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 pointer-events-none">
+            <Card className="w-full max-w-md shadow-2xl pointer-events-auto bg-card border-border">
+              <CardHeader className="bg-card border-b border-border py-8 text-center">
+                <div className="flex justify-center mb-4">
+                  <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
+                    <svg
+                      className="w-10 h-10 text-white"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={3}
+                        d="M5 13l4 4L19 7"
+                      />
+                    </svg>
+                  </div>
+                </div>
+                <CardTitle className="text-2xl text-foreground">
                   Form Submitted!
                 </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-6 pt-6">
+              <CardContent className="space-y-6 pt-6 text-center">
                 <div className="space-y-2">
-                  <p className="text-gray-700 font-medium">
+                  <p className="text-foreground font-medium">
                     Your Individual Inventory Record has been successfully
                     submitted.
                   </p>
-                  <p className="text-sm text-gray-600">
+                  <p className="text-sm text-muted-foreground">
                     Thank you for completing the form. The information has been
                     saved and will be reviewed.
                   </p>
                 </div>
                 <Button
                   onClick={() => navigate("/student")}
-                  className="w-full bg-green-600 hover:bg-green-700"
+                  className="w-full bg-destructive hover:bg-destructive/90 text-white"
                 >
                   Return to Dashboard
                 </Button>
