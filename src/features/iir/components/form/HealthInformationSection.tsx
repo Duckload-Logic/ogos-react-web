@@ -190,7 +190,7 @@ export const HealthInformationSection = forwardRef<
                     <td className="py-2 px-3 text-sm">
                       <span className="text-foreground">{item.label}</span>
                       {errors[item.yesKey] && (
-                        <p className="text-xs text-red-500">{errors[item.yesKey]}</p>
+                        <p className="text-xs font-semibold text-red-600 mt-1">{errors[item.yesKey]}</p>
                       )}
                     </td>
                     <td className="py-2 px-3 text-center">
@@ -237,7 +237,7 @@ export const HealthInformationSection = forwardRef<
                         }`}
                       />
                       {errors[item.detailsKey] && (
-                        <p className="text-xs text-red-500 mt-1">{errors[item.detailsKey]}</p>
+                        <p className="text-xs font-semibold text-red-600 mt-1">{errors[item.detailsKey]}</p>
                       )}
                     </td>
                   </tr>
@@ -276,7 +276,7 @@ export const HealthInformationSection = forwardRef<
                     <td className="py-2 px-3 text-sm">
                       <span className="text-foreground">{type.label}</span>
                       {errors[`health.consultations.${type.type}.hasConsulted`] && (
-                        <p className="text-xs text-red-500">{errors[`health.consultations.${type.type}.hasConsulted`]}</p>
+                        <p className="text-xs font-semibold text-red-600 mt-1">{errors[`health.consultations.${type.type}.hasConsulted`]}</p>
                       )}
                     </td>
                     <td className="py-2 px-3 text-center">
@@ -331,7 +331,7 @@ export const HealthInformationSection = forwardRef<
                         }`}
                       />
                       {errors[`health.consultations.${type.type}.whenDate`] && (
-                        <p className="text-xs text-red-500 mt-1">{errors[`health.consultations.${type.type}.whenDate`]}</p>
+                        <p className="text-xs font-semibold text-red-600 mt-1">{errors[`health.consultations.${type.type}.whenDate`]}</p>
                       )}
                     </td>
                     <td className="py-2 px-3">
@@ -354,7 +354,7 @@ export const HealthInformationSection = forwardRef<
                         }`}
                       />
                       {errors[`health.consultations.${type.type}.forWhat`] && (
-                        <p className="text-xs text-red-500 mt-1">{errors[`health.consultations.${type.type}.forWhat`]}</p>
+                        <p className="text-xs font-semibold text-red-600 mt-1">{errors[`health.consultations.${type.type}.forWhat`]}</p>
                       )}
                     </td>
                   </tr>

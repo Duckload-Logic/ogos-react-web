@@ -18,6 +18,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HeroSection } from "@/components/ui/hero-section";
 import { AnimationStyles } from "@/components/ui/animations";
+import Toast from "@/components/ui/Toast";
 import {
   AlertCircle,
   Save,
@@ -71,11 +72,13 @@ export default function IIRForm() {
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [validationErrorList, setValidationErrorList] = useState<string[]>([]);
   const [showValidationError, setShowValidationError] = useState(false);
+  const [sectionsWithErrors, setSectionsWithErrors] = useState<number[]>([]);
   const [autoSaveStatus, setAutoSaveStatus] = useState<
     "idle" | "saving" | "saved"
   >("idle");
   const [isMobileNav, setIsMobileNav] = useState(window.innerWidth < 1024);
   const [lastSaved, setLastSaved] = useState<string>("");
+  const [toasts, setToasts] = useState<string[]>([]);
 
   useEffect(() => {
     const initializeFormData = () => {
@@ -161,6 +164,14 @@ export default function IIRForm() {
     } catch (err) {
       setAutoSaveStatus("idle");
     }
+  };
+
+  const addToast = (message: string, duration: number = 3000) => {
+    const id = Math.random();
+    setToasts((prev) => [...prev, message]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((_, i) => i !== prev.length - 1));
+    }, duration);
   };
 
   if (isInitializing) return <LoadingSpinner />;
@@ -266,54 +277,125 @@ export default function IIRForm() {
   };
 
   const handleSubmit = async () => {
-    // Validate all sections using their refs
+    // Always trigger validate() on the current section so inline field errors show
+    const currentSectionRefs: Record<number, any> = {
+      1: personalSectionRef,
+      2: educationSectionRef,
+      3: familySectionRef,
+      4: healthSectionRef,
+      5: interestsSectionRef,
+    };
+    currentSectionRefs[currentSection]?.current?.validate?.();
+
+    // First check: Use completion percentage as source of truth
+    // All sections must be 100% complete
+    const incompleteCompletionSections: number[] = [];
+    const incompleteCompletionMessages: string[] = [];
+    
+    for (let i = 1; i <= FORM_SECTIONS.length; i++) {
+      const completion = calculateSectionCompletion(i);
+      if (completion < 100) {
+        incompleteCompletionSections.push(i);
+        incompleteCompletionMessages.push(
+          `${FORM_SECTIONS[i - 1].title} — ${completion}% complete (required 100%)`
+        );
+      }
+    }
+    
+    // If any section is not 100% complete, block submission
+    if (incompleteCompletionSections.length > 0) {
+      setSectionsWithErrors(incompleteCompletionSections);
+      setValidationErrorList(incompleteCompletionMessages);
+      setShowValidationError(true);
+      addToast("Please complete all sections before submitting.");
+      
+      // Only navigate away if current section is not already the failing one
+      if (!incompleteCompletionSections.includes(currentSection)) {
+        setCurrentSection(incompleteCompletionSections[0]);
+      }
+      return;
+    }
+
+    // Second check: Validate all sections using their refs
     const errorMessages: string[] = [];
+    const sectionsWithValidationErrors: number[] = [];
     let hasErrors = false;
 
-    // Validate Personal Information
+    // Validate Personal Information (Section 1)
     if (personalSectionRef?.current?.validate) {
       const validation = personalSectionRef.current.validate();
       if (!validation.isValid) {
         hasErrors = true;
-        errorMessages.push("Personal Information has missing required fields");
+        sectionsWithValidationErrors.push(1);
+        errorMessages.push("I. Personal Information — missing required fields");
       }
     }
 
-    // Validate Education
+    // Validate Education (Section 2)
     if (educationSectionRef?.current?.validate) {
       const validation = educationSectionRef.current.validate();
       if (!validation.isValid) {
         hasErrors = true;
-        errorMessages.push(
-          "Educational Background has missing required fields",
-        );
+        sectionsWithValidationErrors.push(2);
+        errorMessages.push("II. Educational Background — missing required fields");
       }
     }
 
-    // Validate Family
+    // Validate Family (Section 3)
     if (familySectionRef?.current?.validate) {
       const validation = familySectionRef.current.validate();
       if (!validation.isValid) {
         hasErrors = true;
-        errorMessages.push("Family Background has missing required fields");
+        sectionsWithValidationErrors.push(3);
+        errorMessages.push("III. Family Background — missing required fields");
       }
     }
 
-    // Validate Health
+    // Validate Health (Section 4)
     if (healthSectionRef?.current?.validate) {
       const validation = healthSectionRef.current.validate();
       if (!validation.isValid) {
         hasErrors = true;
-        errorMessages.push("Health Information has missing required fields");
+        sectionsWithValidationErrors.push(4);
+        errorMessages.push("IV. Health Information — missing required fields");
+      }
+    }
+
+    // Validate Interests (Section 5)
+    if (interestsSectionRef?.current?.validate) {
+      const validation = interestsSectionRef.current.validate();
+      if (!validation.isValid) {
+        hasErrors = true;
+        sectionsWithValidationErrors.push(5);
+        errorMessages.push("V. Interests and Hobbies — missing required fields");
+      }
+    }
+
+    // Validate Test Results (Section 6)
+    if (testResultsSectionRef?.current?.validate) {
+      const validation = testResultsSectionRef.current.validate();
+      if (!validation.isValid) {
+        hasErrors = true;
+        sectionsWithValidationErrors.push(6);
+        errorMessages.push("VI. Test Results — missing required fields");
       }
     }
 
     if (hasErrors) {
+      setSectionsWithErrors(sectionsWithValidationErrors);
       setValidationErrorList(errorMessages);
       setShowValidationError(true);
+      addToast("Please fix errors before submitting.");
+      
+      // Only navigate away if current section has no errors
+      if (!sectionsWithValidationErrors.includes(currentSection)) {
+        setCurrentSection(sectionsWithValidationErrors[0]);
+      }
       return;
     }
 
+    // All validations passed, clear section errors and open confirmation dialog
+    setSectionsWithErrors([]);
     setConsentAgreed(false);
     setShowSubmitConfirm(true);
   };
@@ -326,11 +408,13 @@ export default function IIRForm() {
       if (localFormData?.id) {
         await submitFormAsync(localFormData.id);
       }
+      addToast("✓ Form submitted successfully!");
       setShowSuccessPopup(true);
       setTimeout(() => {
         navigate("/student");
       }, 3000);
     } catch (err: any) {
+      addToast("Failed to submit form. Please try again.");
       console.error("Error submitting form:", err);
     } finally {
       setIsSaving(false);
@@ -474,10 +558,14 @@ export default function IIRForm() {
         totalCount++;
         if (interests?.hobbies?.[1]?.hobbyName || interests?.hobbies?.["1"]?.hobbyName) filledCount++;
 
-        // At least one academic club checked
+        // At least one academic club checked (if 'Others' is selected, require specify to count)
         totalCount++;
-        const hasAcademic = interests?.academic?.mathClub || interests?.academic?.scienceClub ||
-          interests?.academic?.debatingClub || interests?.academic?.quizzersClub || interests?.academic?.othersChecked;
+        const hasAcademic =
+          interests?.academic?.mathClub ||
+          interests?.academic?.scienceClub ||
+          interests?.academic?.debatingClub ||
+          interests?.academic?.quizzersClub ||
+          (interests?.academic?.othersChecked && countFilledField(interests?.academic?.othersSpecify));
         if (hasAcademic) filledCount++;
 
         // Organization (single radio selection)
@@ -596,19 +684,30 @@ export default function IIRForm() {
           <div className="flex overflow-x-auto gap-2 pb-1">
             {FORM_SECTIONS.map((section) => {
               const status = getSectionStatus(section.id);
+              const hasError = sectionsWithErrors.includes(section.id);
               return (
                 <button
                   key={section.id}
-                  onClick={() => setCurrentSection(section.id)}
+                  onClick={() => {
+                    setCurrentSection(section.id);
+                    // Clear validation errors when navigating to a different section
+                    setSectionsWithErrors([]);
+                    setShowValidationError(false);
+                  }}
                   disabled={currentSection === section.id}
-                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors whitespace-nowrap ${
+                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors whitespace-nowrap relative ${
                     currentSection === section.id
                       ? "bg-primary text-primary-foreground shadow-md"
+                      : hasError
+                      ? "bg-card text-card-foreground border-2 border-destructive"
                       : "bg-card text-card-foreground border border-border hover:border-primary/30"
                   }`}
                 >
                   {section.title}
-                  {status === "complete" && (
+                  {hasError && (
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-destructive" />
+                  )}
+                  {status === "complete" && !hasError && (
                     <Check className="w-4 h-4 flex-shrink-0 text-green-500" />
                   )}
                 </button>
@@ -857,6 +956,9 @@ export default function IIRForm() {
           </div>
         )}
       </div>
+
+      {/* Toast Notifications */}
+      <Toast toasts={toasts} />
     </>
   );
 }

@@ -94,9 +94,14 @@ export const InterestsSection = forwardRef<
                 name="mathClub"
                 label="Math Club"
                 checked={interests?.academic?.mathClub || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.academic.mathClub", checked === true)
-                }
+                onCheckedChange={(checked) => {
+                  handleInputChange("interests.academic.mathClub", checked === true);
+                  if (checked === true) {
+                    // if user selects a named club, deselect "Others"
+                    handleInputChange("interests.academic.othersChecked", false);
+                    handleInputChange("interests.academic.othersSpecify", "");
+                  }
+                }}
               />
 
               <Checkbox square
@@ -104,9 +109,13 @@ export const InterestsSection = forwardRef<
                 name="scienceClub"
                 label="Science Club"
                 checked={interests?.academic?.scienceClub || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.academic.scienceClub", checked === true)
-                }
+                onCheckedChange={(checked) => {
+                  handleInputChange("interests.academic.scienceClub", checked === true);
+                  if (checked === true) {
+                    handleInputChange("interests.academic.othersChecked", false);
+                    handleInputChange("interests.academic.othersSpecify", "");
+                  }
+                }}
               />
 
               <div className="flex items-center gap-3 whitespace-nowrap">
@@ -115,9 +124,16 @@ export const InterestsSection = forwardRef<
                     type="checkbox"
                     checked={interests?.academic?.othersChecked || false}
                     onChange={(e) => {
-                      handleInputChange("interests.academic.othersChecked", e.target.checked);
-                      if (!e.target.checked) {
+                      const checked = e.target.checked;
+                      handleInputChange("interests.academic.othersChecked", checked);
+                      if (!checked) {
                         handleInputChange("interests.academic.othersSpecify", "");
+                      } else {
+                        // when Others is selected, deselect all named clubs
+                        handleInputChange("interests.academic.mathClub", false);
+                        handleInputChange("interests.academic.scienceClub", false);
+                        handleInputChange("interests.academic.debatingClub", false);
+                        handleInputChange("interests.academic.quizzersClub", false);
                       }
                     }}
                     className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
@@ -145,9 +161,13 @@ export const InterestsSection = forwardRef<
                 name="debatingClub"
                 label="Debating Club"
                 checked={interests?.academic?.debatingClub || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.academic.debatingClub", checked === true)
-                }
+                onCheckedChange={(checked) => {
+                  handleInputChange("interests.academic.debatingClub", checked === true);
+                  if (checked === true) {
+                    handleInputChange("interests.academic.othersChecked", false);
+                    handleInputChange("interests.academic.othersSpecify", "");
+                  }
+                }}
               />
 
               <Checkbox square
@@ -155,9 +175,13 @@ export const InterestsSection = forwardRef<
                 name="quizzersClub"
                 label="Quizzer's Club"
                 checked={interests?.academic?.quizzersClub || false}
-                onCheckedChange={(checked) =>
-                  handleInputChange("interests.academic.quizzersClub", checked === true)
-                }
+                onCheckedChange={(checked) => {
+                  handleInputChange("interests.academic.quizzersClub", checked === true);
+                  if (checked === true) {
+                    handleInputChange("interests.academic.othersChecked", false);
+                    handleInputChange("interests.academic.othersSpecify", "");
+                  }
+                }}
               />
             </div>
           </div>
@@ -172,8 +196,10 @@ export const InterestsSection = forwardRef<
                 handleInputChange("interests.academic.favoriteSubjects", val)
               }
               placeholder="Enter favorite subjects"
-              error={errors["interests.academic.favoriteSubjects"]}
             />
+            {errors["interests.academic.favoriteSubjects"] && (
+              <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.academic.favoriteSubjects"]}</p>
+            )}
             <InputField
               label="What is/are the subject/s you like least?"
               required
@@ -182,8 +208,10 @@ export const InterestsSection = forwardRef<
                 handleInputChange("interests.academic.leastLikedSubjects", val)
               }
               placeholder="Enter least liked subjects"
-              error={errors["interests.academic.leastLikedSubjects"]}
             />
+            {errors["interests.academic.leastLikedSubjects"] && (
+              <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.academic.leastLikedSubjects"]}</p>
+            )}
           </div>
         </div>
 
@@ -225,7 +253,7 @@ export const InterestsSection = forwardRef<
                   )}
                 </div>
                 {errors["interests.hobbies.0.hobbyName"] && (
-                  <p className="text-xs text-red-500 mt-1">{errors["interests.hobbies.0.hobbyName"]}</p>
+                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.hobbies.0.hobbyName"]}</p>
                 )}
               </div>
               <div>
@@ -274,7 +302,7 @@ export const InterestsSection = forwardRef<
                   )}
                 </div>
                 {errors["interests.hobbies.1.hobbyName"] && (
-                  <p className="text-xs text-red-500 mt-1">{errors["interests.hobbies.1.hobbyName"]}</p>
+                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.hobbies.1.hobbyName"]}</p>
                 )}
               </div>
               <div>
@@ -368,7 +396,7 @@ export const InterestsSection = forwardRef<
               />
             </div>
             {errors["interests.extraCurricular.organization"] && (
-              <p className="text-xs text-red-500 mt-2">{errors["interests.extraCurricular.organization"]}</p>
+              <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.extraCurricular.organization"]}</p>
             )}
           </div>
 
@@ -449,7 +477,7 @@ export const InterestsSection = forwardRef<
               </div>
             </div>
             {errors["interests.extraCurricular.occupationalPosition"] && (
-              <p className="text-xs text-red-500 mt-2">{errors["interests.extraCurricular.occupationalPosition"]}</p>
+              <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.extraCurricular.occupationalPosition"]}</p>
             )}
           </div>
         </div>
