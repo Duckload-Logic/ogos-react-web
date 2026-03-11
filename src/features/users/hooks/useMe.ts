@@ -4,7 +4,7 @@ import { User } from "../types/user";
 
 const ME_QUERY_KEY = "me";
 
-export function useMe() {
+export function useMe({ enabled = true }: { enabled?: boolean }) {
   return useQuery({
     queryKey: ["users", ME_QUERY_KEY],
     queryFn: async (): Promise<User> => {
