@@ -43,8 +43,22 @@ export const routes: RouteObject[] = [
   { path: "/", element: <Navigate to="/login" replace /> },
 
   // Public routes
-  { path: "/login", element: <Login /> },
-  { path: "/register", element: <Register /> },
+  {
+    path: "/login",
+    element: (
+      <Layout isLoggedIn={false}>
+        <Login />
+      </Layout>
+    ),
+  },
+  {
+    path: "/register",
+    element: (
+      <Layout isLoggedIn={false}>
+        <Register />
+      </Layout>
+    ),
+  },
 
   // Student routes
   {
@@ -249,7 +263,7 @@ export const routes: RouteObject[] = [
   {
     path: "/terms",
     element: (
-      <Layout title="Terms and Conditions" showSidebar={false}>
+      <Layout title="Terms and Conditions" isLoggedIn={false}>
         <div className="prose max-w-none">
           <StatementPage statementType="terms" />
         </div>
@@ -259,7 +273,7 @@ export const routes: RouteObject[] = [
   {
     path: "/privacy",
     element: (
-      <Layout title="Privacy Policy" showSidebar={false}>
+      <Layout title="Privacy Policy" isLoggedIn={false}>
         <div className="prose max-w-none">
           <StatementPage statementType="privacy" />
         </div>

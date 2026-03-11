@@ -57,7 +57,7 @@ const FORM_SECTIONS = [
 export default function IIRForm() {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { data: me } = useMe();
+  const { data: me } = useMe({});
   const userId = me?.id;
 
   const { saveDraft, isSavingDraft, saveDraftError } = useSaveIIRDraft();
@@ -205,11 +205,13 @@ export default function IIRForm() {
       for (let i = 0; i < path.length - 1; i++) {
         const key = path[i];
         const nextKey = path[i + 1];
-        
+
         // Check if next key is a numeric string (array index)
         if (!isNaN(Number(nextKey))) {
           // Keep arrays as arrays
-          current[key] = Array.isArray(current[key]) ? [...current[key]] : current[key];
+          current[key] = Array.isArray(current[key])
+            ? [...current[key]]
+            : current[key];
         } else {
           // Next key is a string property — always spread as object
           // Using [...array] would lose non-numeric string properties (e.g. relatedPersons.father)
@@ -302,24 +304,24 @@ export default function IIRForm() {
     // All sections must be 100% complete
     const incompleteCompletionSections: number[] = [];
     const incompleteCompletionMessages: string[] = [];
-    
+
     for (let i = 1; i <= FORM_SECTIONS.length; i++) {
       const completion = calculateSectionCompletion(i);
       if (completion < 100) {
         incompleteCompletionSections.push(i);
         incompleteCompletionMessages.push(
-          `${FORM_SECTIONS[i - 1].title} — ${completion}% complete (required 100%)`
+          `${FORM_SECTIONS[i - 1].title} — ${completion}% complete (required 100%)`,
         );
       }
     }
-    
+
     // If any section is not 100% complete, block submission
     if (incompleteCompletionSections.length > 0) {
       setSectionsWithErrors(incompleteCompletionSections);
       setValidationErrorList(incompleteCompletionMessages);
       setShowValidationError(true);
       addToast("Please complete all sections before submitting.");
-      
+
       // Only navigate away if current section is not already the failing one
       if (!incompleteCompletionSections.includes(currentSection)) {
         setCurrentSection(incompleteCompletionSections[0]);
@@ -348,7 +350,9 @@ export default function IIRForm() {
       if (!validation.isValid) {
         hasErrors = true;
         sectionsWithValidationErrors.push(2);
-        errorMessages.push("II. Educational Background — missing required fields");
+        errorMessages.push(
+          "II. Educational Background — missing required fields",
+        );
       }
     }
 
@@ -378,7 +382,9 @@ export default function IIRForm() {
       if (!validation.isValid) {
         hasErrors = true;
         sectionsWithValidationErrors.push(5);
-        errorMessages.push("V. Interests and Hobbies — missing required fields");
+        errorMessages.push(
+          "V. Interests and Hobbies — missing required fields",
+        );
       }
     }
 
@@ -397,7 +403,7 @@ export default function IIRForm() {
       setValidationErrorList(errorMessages);
       setShowValidationError(true);
       addToast("Please fix errors before submitting.");
-      
+
       // Only navigate away if current section has no errors
       if (!sectionsWithValidationErrors.includes(currentSection)) {
         setCurrentSection(sectionsWithValidationErrors[0]);
@@ -440,7 +446,10 @@ export default function IIRForm() {
         ...EMPTY_IIR_FORM.student,
         basicInfo: {
           firstName: me?.firstName || "",
-          middleName: me?.middleName && typeof me?.middleName === "string" ? me?.middleName : "",
+          middleName:
+            me?.middleName && typeof me?.middleName === "string"
+              ? me?.middleName
+              : "",
           lastName: me?.lastName || "",
           email: me?.email || "",
         },
@@ -468,31 +477,46 @@ export default function IIRForm() {
     let totalCount = 0;
 
     switch (sectionIndex) {
-      case 1: { // Personal Information
+      case 1: {
+        // Personal Information
         // Drive completion from the same schema used for validation
         const schemaFields = Object.keys(personalInformationValidationSchema);
-        const schemaErrors = validateObject({ student: localFormData?.student }, personalInformationValidationSchema);
+        const schemaErrors = validateObject(
+          { student: localFormData?.student },
+          personalInformationValidationSchema,
+        );
         totalCount = schemaFields.length;
         filledCount = schemaFields.length - Object.keys(schemaErrors).length;
         // If employed, include employer fields in completion
-        const isEmployed = (localFormData as any)?.student?.personalInfo?.isEmployed;
+        const isEmployed = (localFormData as any)?.student?.personalInfo
+          ?.isEmployed;
         if (isEmployed) {
           totalCount += 3; // employerName, employerAddress, employerContact
-          if ((localFormData as any)?.student?.personalInfo?.employerName) filledCount++;
-          if ((localFormData as any)?.student?.personalInfo?.employerAddress) filledCount++;
-          if ((localFormData as any)?.student?.personalInfo?.employerContact) filledCount++;
+          if ((localFormData as any)?.student?.personalInfo?.employerName)
+            filledCount++;
+          if ((localFormData as any)?.student?.personalInfo?.employerAddress)
+            filledCount++;
+          if ((localFormData as any)?.student?.personalInfo?.employerContact)
+            filledCount++;
         }
         break;
       }
 
-      case 2: { // Education
+      case 2: {
+        // Education
         // Nature of schooling
         totalCount++;
         if (localFormData?.education?.natureOfSchooling) filledCount++;
 
         // Mirror the requiredFields from EducationBackgroundSection.getCompletionLevel
         // There are 5 school levels displayed (indices 0-4); count all of them
-        const schoolFields = ["schoolName", "schoolAddress", "schoolType", "yearStarted", "yearCompleted"];
+        const schoolFields = [
+          "schoolName",
+          "schoolAddress",
+          "schoolType",
+          "yearStarted",
+          "yearCompleted",
+        ];
         const schools = localFormData?.education?.schools ?? [];
         const SCHOOL_LEVEL_COUNT = 5;
         for (let i = 0; i < SCHOOL_LEVEL_COUNT; i++) {
@@ -504,41 +528,65 @@ export default function IIRForm() {
         break;
       }
 
-      case 3: { // Family Background
+      case 3: {
+        // Family Background
         const bg = localFormData?.family?.background as any;
         const finance = localFormData?.family?.finance as any;
         const relatedPersons = localFormData?.family?.relatedPersons as any;
 
         // Parental status
-        const familyBgFields = ["parentalStatus", "numberOfChildren", "brothers", "sisters"];
+        const familyBgFields = [
+          "parentalStatus",
+          "numberOfChildren",
+          "brothers",
+          "sisters",
+        ];
         familyBgFields.forEach((field) => {
           totalCount++;
-          if (bg?.[field] !== undefined && bg?.[field] !== null && bg?.[field] !== "") filledCount++;
+          if (
+            bg?.[field] !== undefined &&
+            bg?.[field] !== null &&
+            bg?.[field] !== ""
+          )
+            filledCount++;
         });
 
         // natureOfResidence is an object of booleans — check at least one is true
         totalCount++;
         const residence = bg?.natureOfResidence;
-        if (residence && Object.values(residence).some((v) => v === true)) filledCount++;
+        if (residence && Object.values(residence).some((v) => v === true))
+          filledCount++;
 
         // Finance fields
         totalCount++;
         if (finance?.monthlyFamilyIncomeRange?.id) filledCount++;
         totalCount++;
-        if (finance?.weeklyAllowance && finance.weeklyAllowance !== "0" && finance.weeklyAllowance !== 0) filledCount++;
+        if (
+          finance?.weeklyAllowance &&
+          finance.weeklyAllowance !== "0" &&
+          finance.weeklyAllowance !== 0
+        )
+          filledCount++;
 
         // Track father and mother name fields individually
-        const personFields = ["name", "age", "educationalAttainment", "occupation"];
+        const personFields = [
+          "name",
+          "age",
+          "educationalAttainment",
+          "occupation",
+        ];
         ["father", "mother"].forEach((person) => {
           personFields.forEach((field) => {
             totalCount++;
-            if (countFilledField(relatedPersons?.[person]?.[field])) filledCount++;
+            if (countFilledField(relatedPersons?.[person]?.[field]))
+              filledCount++;
           });
         });
         break;
       }
 
-      case 4: { // Health Information
+      case 4: {
+        // Health Information
         const hr = localFormData?.health?.healthRecord as any;
 
         // Physical items: yes/no answer required; if yes, details field also required
@@ -581,7 +629,8 @@ export default function IIRForm() {
         break;
       }
 
-      case 5: { // Interests and Hobbies
+      case 5: {
+        // Interests and Hobbies
         const interests = localFormData?.interests as any;
 
         // Favorite and least liked subjects
@@ -592,9 +641,17 @@ export default function IIRForm() {
 
         // At least one hobby filled (check first two)
         totalCount++;
-        if (interests?.hobbies?.[0]?.hobbyName || interests?.hobbies?.["0"]?.hobbyName) filledCount++;
+        if (
+          interests?.hobbies?.[0]?.hobbyName ||
+          interests?.hobbies?.["0"]?.hobbyName
+        )
+          filledCount++;
         totalCount++;
-        if (interests?.hobbies?.[1]?.hobbyName || interests?.hobbies?.["1"]?.hobbyName) filledCount++;
+        if (
+          interests?.hobbies?.[1]?.hobbyName ||
+          interests?.hobbies?.["1"]?.hobbyName
+        )
+          filledCount++;
 
         // At least one academic club checked (if 'Others' is selected, require specify to count)
         totalCount++;
@@ -603,7 +660,8 @@ export default function IIRForm() {
           interests?.academic?.scienceClub ||
           interests?.academic?.debatingClub ||
           interests?.academic?.quizzersClub ||
-          (interests?.academic?.othersChecked && countFilledField(interests?.academic?.othersSpecify));
+          (interests?.academic?.othersChecked &&
+            countFilledField(interests?.academic?.othersSpecify));
         if (hasAcademic) filledCount++;
 
         // Organization (single radio selection)
@@ -613,7 +671,10 @@ export default function IIRForm() {
           filledCount++;
           if (org === "others") {
             totalCount++;
-            if (countFilledField(interests?.extraCurricular?.organizationOthers)) filledCount++;
+            if (
+              countFilledField(interests?.extraCurricular?.organizationOthers)
+            )
+              filledCount++;
           }
         }
 
@@ -624,14 +685,21 @@ export default function IIRForm() {
           filledCount++;
           if (occPos === "others") {
             totalCount++;
-            if (countFilledField(interests?.extraCurricular?.occupationalOthers)) filledCount++;
+            if (
+              countFilledField(interests?.extraCurricular?.occupationalOthers)
+            )
+              filledCount++;
           }
         }
         break;
       }
 
-      case 6: { // Test Results - count each individual field across 3 rows (5 fields each = 15 total)
-        const rows = Array.from({ length: 3 }, (_, i) => (localFormData?.testResults || [])[i] || {});
+      case 6: {
+        // Test Results - count each individual field across 3 rows (5 fields each = 15 total)
+        const rows = Array.from(
+          { length: 3 },
+          (_, i) => (localFormData?.testResults || [])[i] || {},
+        );
         totalCount = 15;
         filledCount = rows.reduce((acc: number, r: any) => {
           if (r?.date || r?.testDate) acc++;
@@ -737,8 +805,8 @@ export default function IIRForm() {
                     currentSection === section.id
                       ? "bg-primary text-primary-foreground shadow-md"
                       : hasError
-                      ? "bg-card text-card-foreground border-2 border-destructive"
-                      : "bg-card text-card-foreground border border-border hover:border-primary/30"
+                        ? "bg-card text-card-foreground border-2 border-destructive"
+                        : "bg-card text-card-foreground border border-border hover:border-primary/30"
                   }`}
                 >
                   {section.title}
@@ -754,126 +822,125 @@ export default function IIRForm() {
           </div>
 
           <div className="flex flex-col gap-2">
+            {/* Form Content Card */}
+            <Card className="border-0 shadow-sm bg-background">
+              <CardHeader className="bg-transparent border-b p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+                  <CardTitle className="text-base sm:text-lg md:text-xl">
+                    {currentSectionDef?.title}
+                  </CardTitle>
+                  <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1.5 rounded-full w-fit">
+                    {calculateSectionCompletion(currentSection)}% Complete
+                  </span>
+                </div>
+              </CardHeader>
+              <CardContent className="p-4 sm:p-6 md:p-8 pb-24">
+                {currentSection === 1 && localFormData?.student && (
+                  <PersonalInformationSection
+                    ref={personalSectionRef}
+                    studentInfo={localFormData.student}
+                    onChange={handleInputChange}
+                  />
+                )}
+                {currentSection === 2 && localFormData?.education && (
+                  <EducationBackgroundSection
+                    ref={educationSectionRef}
+                    education={localFormData.education}
+                    onChange={handleInputChange}
+                  />
+                )}
+                {currentSection === 3 && localFormData?.family && (
+                  <FamilyBackgroundSection
+                    ref={familySectionRef}
+                    family={localFormData.family}
+                    onChange={handleInputChange}
+                  />
+                )}
+                {currentSection === 4 && localFormData?.health && (
+                  <HealthInformationSection
+                    ref={healthSectionRef}
+                    health={localFormData.health}
+                    onChange={handleInputChange}
+                  />
+                )}
+                {currentSection === 5 && localFormData?.interests && (
+                  <InterestsSection
+                    ref={interestsSectionRef}
+                    interests={localFormData.interests}
+                    onChange={handleInputChange}
+                  />
+                )}
+                {currentSection === 6 && (
+                  <TestResultsSection
+                    ref={testResultsSectionRef}
+                    testResults={localFormData?.testResults || []}
+                    onChange={handleInputChange}
+                  />
+                )}
+              </CardContent>
+            </Card>
+          </div>
 
-              {/* Form Content Card */}
-              <Card className="border-0 shadow-sm bg-background">
-                <CardHeader className="bg-transparent border-b p-4 sm:p-6">
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                    <CardTitle className="text-base sm:text-lg md:text-xl">
-                      {currentSectionDef?.title}
-                    </CardTitle>
-                    <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1.5 rounded-full w-fit">
-                      {calculateSectionCompletion(currentSection)}% Complete
-                    </span>
-                  </div>
-                </CardHeader>
-                <CardContent className="p-4 sm:p-6 md:p-8 pb-24">
-                  {currentSection === 1 && localFormData?.student && (
-                    <PersonalInformationSection
-                      ref={personalSectionRef}
-                      studentInfo={localFormData.student}
-                      onChange={handleInputChange}
-                    />
-                  )}
-                  {currentSection === 2 && localFormData?.education && (
-                    <EducationBackgroundSection
-                      ref={educationSectionRef}
-                      education={localFormData.education}
-                      onChange={handleInputChange}
-                    />
-                  )}
-                  {currentSection === 3 && localFormData?.family && (
-                    <FamilyBackgroundSection
-                      ref={familySectionRef}
-                      family={localFormData.family}
-                      onChange={handleInputChange}
-                    />
-                  )}
-                  {currentSection === 4 && localFormData?.health && (
-                    <HealthInformationSection
-                      ref={healthSectionRef}
-                      health={localFormData.health}
-                      onChange={handleInputChange}
-                    />
-                  )}
-                  {currentSection === 5 && localFormData?.interests && (
-                    <InterestsSection
-                      ref={interestsSectionRef}
-                      interests={localFormData.interests}
-                      onChange={handleInputChange}
-                    />
-                  )}
-                  {currentSection === 6 && (
-                    <TestResultsSection
-                      ref={testResultsSectionRef}
-                      testResults={localFormData?.testResults || []}
-                      onChange={handleInputChange}
-                    />
-                  )}
-                </CardContent>
-              </Card>
-            </div>
+          {/* Form Navigation Buttons */}
+          <div className="sticky bottom-0 flex justify-between gap-3 bg-card p-4 border-t border-border shadow-lg flex-wrap z-20 rounded-2xl">
+            <Button
+              onClick={() => setShowResetConfirm(true)}
+              className="bg-destructive hover:bg-destructive/90 text-white"
+            >
+              Reset Form
+            </Button>
 
-            {/* Form Navigation Buttons */}
-            <div className="sticky bottom-0 flex justify-between gap-3 bg-card p-4 border-t border-border shadow-lg flex-wrap z-20 rounded-2xl">
+            <div className="flex gap-2 ml-auto">
               <Button
-                onClick={() => setShowResetConfirm(true)}
-                className="bg-destructive hover:bg-destructive/90 text-white"
+                variant="outline"
+                onClick={handlePreviousSection}
+                disabled={currentSection === 1 || isSaving}
+                className="flex items-center gap-2"
               >
-                Reset Form
+                <ChevronLeft className="h-4 w-4" />
+                Previous
               </Button>
 
-              <div className="flex gap-2 ml-auto">
+              {currentSection < FORM_SECTIONS.length && (
                 <Button
-                  variant="outline"
-                  onClick={handlePreviousSection}
-                  disabled={currentSection === 1 || isSaving}
-                  className="flex items-center gap-2"
+                  onClick={handleNextSection}
+                  disabled={isSaving}
+                  className="flex items-center gap-2 bg-destructive hover:bg-destructive/90"
                 >
-                  <ChevronLeft className="h-4 w-4" />
-                  Previous
+                  {isSaving ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                      Saving...
+                    </>
+                  ) : (
+                    <>
+                      Next
+                      <ChevronRight className="h-4 w-4" />
+                    </>
+                  )}
                 </Button>
-
-                {currentSection < FORM_SECTIONS.length && (
-                  <Button
-                    onClick={handleNextSection}
-                    disabled={isSaving}
-                    className="flex items-center gap-2 bg-destructive hover:bg-destructive/90"
-                  >
-                    {isSaving ? (
-                      <>
-                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                        Saving...
-                      </>
-                    ) : (
-                      <>
-                        Next
-                        <ChevronRight className="h-4 w-4" />
-                      </>
-                    )}
-                  </Button>
-                )}
-                {currentSection === FORM_SECTIONS.length && (
-                  <Button
-                    onClick={handleSubmit}
-                    disabled={isSaving}
-                    className="flex items-center gap-2 bg-destructive hover:bg-destructive/90"
-                  >
-                    {isSubmitting ? (
-                      <>
-                        <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                        Submitting...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="h-4 w-4" />
-                        Submit Form
-                      </>
-                    )}
-                  </Button>
-                )}
-              </div>
+              )}
+              {currentSection === FORM_SECTIONS.length && (
+                <Button
+                  onClick={handleSubmit}
+                  disabled={isSaving}
+                  className="flex items-center gap-2 bg-destructive hover:bg-destructive/90"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
+                      Submitting...
+                    </>
+                  ) : (
+                    <>
+                      <Save className="h-4 w-4" />
+                      Submit Form
+                    </>
+                  )}
+                </Button>
+              )}
             </div>
+          </div>
         </div>
 
         {/* Submit Confirmation Modal */}
@@ -888,10 +955,14 @@ export default function IIRForm() {
               <CardContent className="space-y-6 pt-6">
                 <div className="space-y-4">
                   <p className="text-sm text-foreground">
-                    By clicking "I Agree", you consent to the collection, use, and processing of your personal data for legitimate purposes related to this service.
+                    By clicking "I Agree", you consent to the collection, use,
+                    and processing of your personal data for legitimate purposes
+                    related to this service.
                   </p>
                   <p className="text-sm text-foreground">
-                    Your information will be handled in accordance with our Privacy Policy and in compliance with the Data Privacy Act of 2012.
+                    Your information will be handled in accordance with our
+                    Privacy Policy and in compliance with the Data Privacy Act
+                    of 2012.
                   </p>
                 </div>
                 <div className="flex items-start gap-3">
@@ -902,8 +973,13 @@ export default function IIRForm() {
                     onChange={(e) => setConsentAgreed(e.target.checked)}
                     className="mt-1 rounded border-border cursor-pointer"
                   />
-                  <label htmlFor="consent-agree" className="text-sm text-foreground cursor-pointer">
-                    I have read and understood the above, and I confirm that all information in my Individual Inventory Record is true and correct.
+                  <label
+                    htmlFor="consent-agree"
+                    className="text-sm text-foreground cursor-pointer"
+                  >
+                    I have read and understood the above, and I confirm that all
+                    information in my Individual Inventory Record is true and
+                    correct.
                   </label>
                 </div>
                 <div className="flex gap-3 justify-end pt-4">
@@ -917,7 +993,11 @@ export default function IIRForm() {
                   <Button
                     onClick={confirmSubmit}
                     disabled={!consentAgreed}
-                    className={consentAgreed ? "bg-destructive hover:bg-destructive/90 text-white" : "bg-gray-400 text-gray-600 cursor-not-allowed"}
+                    className={
+                      consentAgreed
+                        ? "bg-destructive hover:bg-destructive/90 text-white"
+                        : "bg-gray-400 text-gray-600 cursor-not-allowed"
+                    }
                   >
                     I Agree & Submit
                   </Button>
@@ -976,19 +1056,33 @@ export default function IIRForm() {
         )}
 
         {/* Reset Confirmation Modal */}
-        <AlertDialog open={showResetConfirm} onOpenChange={(open) => setShowResetConfirm(open)}>
+        <AlertDialog
+          open={showResetConfirm}
+          onOpenChange={(open) => setShowResetConfirm(open)}
+        >
           <AlertDialogContent>
             <AlertDialogHeader>
               <AlertDialogTitle>Reset Form</AlertDialogTitle>
               <AlertDialogDescription>
-                This will clear your current responses while preserving autofilled basic information. Are you sure you want to Reset?
+                This will clear your current responses while preserving
+                autofilled basic information. Are you sure you want to Reset?
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
               <AlertDialogCancel asChild>
-                <Button variant="ghost" className="border border-border hover:bg-muted">Cancel</Button>
+                <Button
+                  variant="ghost"
+                  className="border border-border hover:bg-muted"
+                >
+                  Cancel
+                </Button>
               </AlertDialogCancel>
-              <AlertDialogAction onClick={confirmReset} className="bg-destructive hover:bg-destructive/90 text-white">Reset</AlertDialogAction>
+              <AlertDialogAction
+                onClick={confirmReset}
+                className="bg-destructive hover:bg-destructive/90 text-white"
+              >
+                Reset
+              </AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
