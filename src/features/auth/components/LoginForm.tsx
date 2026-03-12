@@ -73,7 +73,11 @@ export default function LoginForm({
             disabled={isLoading}
             className="h-12 w-full rounded-2xl bg-primary text-sm font-semibold text-primary-foreground shadow-[0_14px_30px_-16px_rgba(220,38,38,0.55)] transition hover:bg-primary/90 sm:text-base"
           >
-            {isLoading ? <LoadingSpinner size="sm" /> : "Login"}
+            {isLoading ? (
+              <div className="h-4 w-4 rounded-full border-2 border-t-0 border-primary-foreground animate-spin" />
+            ) : (
+              "Login"
+            )}
           </Button>
 
           <Button
