@@ -17,7 +17,7 @@ import { useMe } from "@/features/users/hooks/useMe";
 export default function Login() {
   const navigate = useNavigate();
   const { login, isLoggingIn, loginError } = useLogin();
-  const { refetch } = useMe();
+  const { refetch } = useMe({});
 
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
