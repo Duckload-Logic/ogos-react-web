@@ -20,6 +20,17 @@ jobs:
         with:
           submodules: true
           lfs: false
+          
+      - name: Check if secret is set
+        run: |
+          if [ -z "$AZURE_STATIC_TOKEN" ]; then
+            echo "AZURE_STATIC_TOKEN is empty or not set"
+            exit 1
+          else
+            echo "AZURE_STATIC_TOKEN is set (length: ${#AZURE_STATIC_TOKEN})"
+          fi
+        env:
+          AZURE_STATIC_TOKEN: ${{ secrets.AZURE_STATIC_TOKEN }}
 
       - name: Build And Deploy
         id: builddeploy
