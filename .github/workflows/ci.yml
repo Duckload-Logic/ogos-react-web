@@ -1,0 +1,32 @@
+name: Frontend CI (TS/Vite)
+
+on:
+  pull_request:
+    branches: [ "main", "dev" ]
+  push:
+    branches: [ "dev" ]
+
+jobs:
+  lint-and-build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22.17.0'
+          cache: 'npm'
+
+      - name: Install Dependencies
+        run: npm ci
+
+      - name: Run Linter (ESLint)
+        run: npm run lint || echo "[CI-Lint] {ESLint}: Warnings/Errors found"
+
+      - name: Type Check (TSC)
+        run: npx tsc --noEmit || (echo "[CI-Build] {TSC}: Type error" && exit 1)
+
+      - name: Build Test (Vite)
+        run: npx vite build || (echo "[CI-Build] {Vite}: Build failed" && exit 1)
