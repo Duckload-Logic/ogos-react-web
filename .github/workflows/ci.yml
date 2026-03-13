@@ -23,7 +23,7 @@ jobs:
         run: npm ci
 
       - name: Run Linter (ESLint)
-        run: npm run lint || echo "[CI-Lint] {ESLint}: Warnings/Errors found"
+        run: npm run lint || echo "[CI-Lint] {ESLint}: Warnings found"
 
       - name: Type Check (TSC)
         run: npx tsc --noEmit || (echo "[CI-Build] {TSC}: Type error" && exit 1)
