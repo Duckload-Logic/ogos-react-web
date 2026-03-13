@@ -1,15 +1,16 @@
 import { useQuery } from "@tanstack/react-query";
-import { iirService } from "../services/service";
+import { GetStudents } from "../services/service";
+import { QUERY_KEYS } from "@/config/queryKeys";
 import { QueryParam } from "../types/reqParams";
 
-const STUDENTS_QUERY_KEY = "students infinite";
 const STUDENTS_PAGE_SIZE = 12;
 
-export function useIIRPagination(params: QueryParam) {
+export function useIIRPagination(
+  params: QueryParam,
+) {
   return useQuery({
     queryKey: [
-      STUDENTS_QUERY_KEY,
-      "infinite",
+      ...QUERY_KEYS.iir.inventory.all,
       params.courseId,
       params.search,
       params.genderId,
@@ -17,7 +18,7 @@ export function useIIRPagination(params: QueryParam) {
       params.page,
     ],
     queryFn: () =>
-      iirService.getStudents({
+      GetStudents({
         ...params,
         pageSize: STUDENTS_PAGE_SIZE,
       }),

@@ -19,7 +19,7 @@ import { STATUS_COLORS } from "@/config/constants";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useStatuses } from "@/features/appointments/hooks/useLookups";
-import { toISODateString } from "@/features/appointments/utils";
+import { format12HourTime, toISODateString } from "@/features/appointments/utils";
 import PortalShell from "../../../layout/PortalShell";
 
 export default function Dashboard() {
@@ -78,14 +78,6 @@ export default function Dashboard() {
   const handleView = (apt: Appointment) => {
     setSelectedAppointment(apt);
     setIsViewOpen(true);
-  };
-
-  const formatTime = (time: string) => {
-    const [hourStr, minute] = time.split(":");
-    let hour = parseInt(hourStr, 10);
-    const ampm = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12;
-    return `${hour}:${minute} ${ampm}`;
   };
 
   const quickActions = [
@@ -228,7 +220,7 @@ export default function Dashboard() {
 
                     <div className="flex items-center gap-2 text-primary text-sm">
                       <Clock className="size-4" />
-                      {formatTime(nextAppointment.timeSlot.time)}
+                      {format12HourTime(nextAppointment.timeSlot.time)}
                     </div>
 
                     <h3 className="text-xl font-bold">
@@ -338,7 +330,7 @@ export default function Dashboard() {
                       </td>
 
                       <td className="py-5 px-5 text-muted-foreground">
-                        {formatTime(apt.timeSlot.time)}
+                        {format12HourTime(apt.timeSlot.time)}
                       </td>
 
                       <td className="py-5 px-5 text-muted-foreground">

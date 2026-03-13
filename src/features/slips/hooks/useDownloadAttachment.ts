@@ -1,8 +1,10 @@
 import { useState } from "react";
-import { slipService } from "../services";
+import { GetSlipAttachmentDownload } from "../services";
 
 export function useDownloadAttachment() {
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(
+    false,
+  );
   const [error, setError] = useState<string | null>(null);
 
   const downloadAttachment = async (
@@ -13,10 +15,18 @@ export function useDownloadAttachment() {
     setIsDownloading(true);
     setError(null);
     try {
-      const blob = await slipService.downloadAttachment(slipId, attachmentId);
+      const blob = await GetSlipAttachmentDownload(
+        slipId,
+        attachmentId,
+        {
+          handlerName: 'useDownloadAttachment',
+          stepName: 'Download Attachment',
+        },
+      );
 
       if (!blob) {
-        const errorMsg = "Download failed: No response from server";
+        const errorMsg =
+          "Download failed: No response from server";
         setError(errorMsg);
         return;
       }
@@ -27,10 +37,11 @@ export function useDownloadAttachment() {
           const errorData = JSON.parse(text);
           const errorMsg =
             errorData.error ||
-            "Download failed: Server returned empty response";
+            "Download failed: Server returned empty";
           setError(errorMsg);
         } catch {
-          const errorMsg = "Download failed: Empty file received from server";
+          const errorMsg =
+            "Download failed: Empty file received";
           setError(errorMsg);
         }
         return;
@@ -41,21 +52,30 @@ export function useDownloadAttachment() {
       // Trigger the download
       const link = document.createElement("a");
       link.href = url;
-      link.setAttribute("download", fileName || `attachment-${attachmentId}`);
+      link.setAttribute(
+        "download",
+        fileName || `attachment-${attachmentId}`,
+      );
 
       document.body.appendChild(link);
-      console.log("[useDownloadAttachment] Triggering download click...");
+      console.log(
+        "[useDownloadAttachment] Triggering download",
+      );
       link.click();
 
-      // Cleanup: remove link and revoke the temporary URL to save memory
+      // Cleanup: remove link and revoke URL
       setTimeout(() => {
         link.parentNode?.removeChild(link);
         window.URL.revokeObjectURL(url);
-        console.log("[useDownloadAttachment] Cleanup completed");
+        console.log(
+          "[useDownloadAttachment] Cleanup completed",
+        );
       }, 100);
     } catch (err) {
       const errorMessage =
-        err instanceof Error ? err.message : "Failed to download attachment";
+        err instanceof Error
+          ? err.message
+          : "Failed to download attachment";
       setError(errorMessage);
     } finally {
       setIsDownloading(false);

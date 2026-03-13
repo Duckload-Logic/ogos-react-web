@@ -1,12 +1,15 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { slipService } from "../services";
+import { PostSlip } from "../services";
 
 export function useSubmitSlip() {
   const queryClient = useQueryClient();
 
   return useMutation({
     mutationFn: async (data: FormData) => {
-      return slipService.submitSlip(data);
+      return PostSlip(data, {
+        handlerName: 'useSubmitSlip',
+        stepName: 'Submit Slip',
+      });
     },
     onSuccess: () => {
       // Invalidate my slips query to refetch after submission

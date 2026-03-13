@@ -1,5 +1,5 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { slipService } from "../services";
+import { PatchSlipStatus } from "../services";
 
 export function useUpdateSlipStatus() {
   const queryClient = useQueryClient();
@@ -14,10 +14,13 @@ export function useUpdateSlipStatus() {
       status: string;
       adminNotes?: string;
     }) => {
-      return slipService.updateSlipStatus(id, status, adminNotes);
+      return PatchSlipStatus(id, status, adminNotes, {
+        handlerName: 'useUpdateSlipStatus',
+        stepName: 'Update Status',
+      });
     },
     onSuccess: () => {
-      // Invalidate all slips queries to refetch after status update
+      // Invalidate all slips queries to refetch
       queryClient.invalidateQueries({
         queryKey: ["slips"],
       });

@@ -1,37 +1,60 @@
-import { useQuery } from "@tanstack/react-query";
+/**
+ * Appointment Lookup Hooks
+ * Migrated to use generic useLookup factory
+ */
+
+import { useLookup, useLookupWithMeta } from "@/hooks/useLookup";
 import { appointmentService } from "@/features/appointments/services";
+import { QUERY_KEYS } from "@/config/queryKeys";
+import type {
+  AvailableTimeSlotView,
+  ConcernCategory,
+  AppointmentStatus,
+} from "../types";
 
-const APPOINTMENT_LOOKUPS_QUERY_KEY = "appointment-lookups";
-const APPOINTMENT_LOOKUPS_STALE_TIME = 60 * 60 * 1000; // 1 hour
-const APPOINTMENT_LOOKUPS_GC_TIME = 2 * 60 * 60 * 1000; // 2 hours
-
+/**
+ * Fetch available appointment slots for a given date
+ * Uses CACHE_TIMING.LONG (1 hour stale, 2 hours gc)
+ *
+ * @param date - Date to check availability
+ * @returns Query result with available slots
+ */
 export const useAvailableSlots = (date: Date | undefined) => {
-  return useQuery({
-    queryKey: ["available-slots", date],
-    queryFn: () => appointmentService.getAvailableSlots(date!),
-    enabled: !!date, // Only fetch when date is selected
-    staleTime: APPOINTMENT_LOOKUPS_STALE_TIME,
-    gcTime: APPOINTMENT_LOOKUPS_GC_TIME,
-    refetchOnWindowFocus: false,
-  });
+  return useLookup<AvailableTimeSlotView[]>(
+    QUERY_KEYS.appointments.lookups.slots(
+      date ? date.toISOString() : '',
+    ),
+    () => appointmentService.GetAvailableSlots(date),
+    { enabled: !!date },
+  );
 };
 
+/**
+ * Fetch appointment concern categories
+ * Uses CACHE_TIMING.LONG (1 hour stale, 2 hours gc)
+ *
+ * @returns Query result with categories
+ */
 export const useCategories = () => {
-  return useQuery({
-    queryKey: ["appointment-categories"],
-    queryFn: () => appointmentService.getCategories(),
-    staleTime: APPOINTMENT_LOOKUPS_STALE_TIME,
-    gcTime: APPOINTMENT_LOOKUPS_GC_TIME,
-    refetchOnWindowFocus: false,
-  });
+  return useLookupWithMeta<ConcernCategory[]>(
+    QUERY_KEYS.appointments.lookups.categories,
+    (config) => appointmentService.GetAppointmentCategories(config),
+    'GetAppointmentCategories',
+    'Fetch Categories',
+  );
 };
 
+/**
+ * Fetch appointment statuses
+ * Uses CACHE_TIMING.LONG (1 hour stale, 2 hours gc)
+ *
+ * @returns Query result with statuses
+ */
 export const useStatuses = () => {
-  return useQuery({
-    queryKey: ["appointment-statuses"],
-    queryFn: () => appointmentService.getStatuses(),
-    staleTime: APPOINTMENT_LOOKUPS_STALE_TIME,
-    gcTime: APPOINTMENT_LOOKUPS_GC_TIME,
-    refetchOnWindowFocus: false,
-  });
+  return useLookupWithMeta<AppointmentStatus[]>(
+    QUERY_KEYS.appointments.lookups.statuses,
+    (config) => appointmentService.GetAppointmentStatuses(config),
+    'GetAppointmentStatuses',
+    'Fetch Statuses',
+  );
 };

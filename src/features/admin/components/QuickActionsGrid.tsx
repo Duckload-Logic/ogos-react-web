@@ -11,7 +11,9 @@ interface QuickActionsGridProps {
   actions: QuickAction[];
 }
 
-export default function QuickActionsGrid({ actions }: QuickActionsGridProps) {
+export default function QuickActionsGrid({
+  actions,
+}: QuickActionsGridProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {actions.map((action) => (
@@ -22,11 +24,15 @@ export default function QuickActionsGrid({ actions }: QuickActionsGridProps) {
         >
           <div className="flex gap-3">
             <div className="text-primary">
-              {typeof action.icon === 'function' ? action.icon({size: 24}) : action.icon}
+              {action.icon}
             </div>
             <div>
-              <h3 className="font-semibold text-foreground">{action.title}</h3>
-              <p className="text-sm text-muted-foreground">{action.description}</p>
+              <h3 className="font-semibold text-foreground">
+                {action.title}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                {action.description}
+              </p>
             </div>
           </div>
         </Link>

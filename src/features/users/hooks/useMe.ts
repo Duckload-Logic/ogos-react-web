@@ -1,17 +1,33 @@
 import { useQuery } from "@tanstack/react-query";
 import { userService } from "../services/service";
+import { QUERY_KEYS } from "@/config/queryKeys";
+import { CACHE_TIMING } from "@/config/constants";
 import { User } from "../types/user";
 
-const ME_QUERY_KEY = "me";
-
-export function useMe({ enabled = true }: { enabled?: boolean }) {
+/**
+ * Fetch current authenticated user
+ * Configured to prevent multiple retries and maintain
+ * session across page refreshes
+ *
+ * @param enabled - Whether to enable the query
+ * @returns Query result with user data
+ */
+export function useMe({
+  enabled = true,
+}: {
+  enabled?: boolean;
+}) {
   return useQuery({
-    queryKey: ["users", ME_QUERY_KEY],
+    queryKey: QUERY_KEYS.users.me,
     queryFn: async (): Promise<User> => {
-      return await userService.getCurrentUser();
+      return await userService.GetMe({
+        handlerName: 'useMe',
+        stepName: 'Fetch Current User',
+      });
     },
-    enabled: !!localStorage.getItem("accessToken"),
+    enabled,
     retry: false,
-    staleTime: 0,
+    staleTime: Infinity,
+    gcTime: Infinity,
   });
 }

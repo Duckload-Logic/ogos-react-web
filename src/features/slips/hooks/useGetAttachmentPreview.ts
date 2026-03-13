@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
-import { slipService } from "../services";
+import { GetSlipAttachmentDownload } from "../services";
 
 export function useGetAttachmentPreview(
   slipId?: number,
   attachmentId?: number,
 ) {
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<
+    string | null
+  >(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -19,7 +21,14 @@ export function useGetAttachmentPreview(
       setIsLoading(true);
       setError(null);
       try {
-        const blob = await slipService.downloadAttachment(slipId, attachmentId);
+        const blob = await GetSlipAttachmentDownload(
+          slipId,
+          attachmentId,
+          {
+            handlerName: 'useGetAttachmentPreview',
+            stepName: 'Download Attachment',
+          },
+        );
 
         if (!blob || blob.size === 0) {
           throw new Error("Failed to load attachment");
@@ -28,7 +37,10 @@ export function useGetAttachmentPreview(
         const url = URL.createObjectURL(blob);
         setPreviewUrl(url);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Unknown error");
+        const msg = err instanceof Error
+          ? err.message
+          : "Unknown error";
+        setError(msg);
         setPreviewUrl(null);
       } finally {
         setIsLoading(false);
@@ -37,7 +49,7 @@ export function useGetAttachmentPreview(
 
     fetchPreview();
 
-    // Cleanup: revoke the object URL when component unmounts
+    // Cleanup: revoke the object URL when unmounts
     return () => {
       if (previewUrl) {
         URL.revokeObjectURL(previewUrl);

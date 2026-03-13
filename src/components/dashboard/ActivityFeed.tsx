@@ -1,16 +1,15 @@
 import { Clock, Tag } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { format12HourTime } from "@/features/appointments/utils";
 
 interface Props {
   appointment: any;
-  formatTime: (time: string) => string;
   onView: () => void;
 }
 
 export default function ActivityFeed({
   appointment,
-  formatTime,
   onView,
 }: Props) {
   return (
@@ -24,7 +23,7 @@ export default function ActivityFeed({
 
                 <span className="text-sm font-medium text-primary flex items-center gap-1">
                   <Clock className="size-3" />
-                  {formatTime(appointment.timeSlot.time)}
+                  {format12HourTime(appointment.timeSlot.time)}
                 </span>
               </div>
 

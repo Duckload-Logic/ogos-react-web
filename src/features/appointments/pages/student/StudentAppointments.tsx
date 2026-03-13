@@ -29,6 +29,7 @@ import { useStatuses } from "../../hooks/useLookups";
 import { StatusCount } from "../../types";
 import { useAppointmentsStats } from "../../hooks/useAppointments";
 import Pagination from "@/components/Pagination";
+import { format12HourTime } from "../../utils";
 
 export default function StudentAppointments() {
   const { data: appointmentStatuses = [] } = useStatuses();
@@ -60,13 +61,6 @@ export default function StudentAppointments() {
       day: "numeric",
       year: "numeric",
     });
-  };
-
-  const formatTime12hr = (time24: string) => {
-    const [hours, minutes] = time24.split(":").map(Number);
-    const period = hours >= 12 ? "PM" : "AM";
-    const hours12 = hours % 12 || 12;
-    return `${hours12}:${minutes.toString().padStart(2, "0")} ${period}`;
   };
 
   const getStatusColor = (colorKey: string) => {
@@ -244,7 +238,7 @@ export default function StudentAppointments() {
                           </div>
                           <div className="flex items-center gap-1.5">
                             <Clock className="w-3.5 h-3.5" />
-                            {formatTime12hr(appointment.timeSlot.time)}
+                            {format12HourTime(appointment.timeSlot.time)}
                           </div>
                         </div>
                       </div>

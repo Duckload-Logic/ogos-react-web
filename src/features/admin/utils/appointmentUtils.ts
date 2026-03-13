@@ -100,8 +100,13 @@ export const getAvailableStatusTransitions = (
  * @param appointment - Appointment object
  * @returns Boolean indicating if appointment can be rescheduled
  */
-export const canRescheduleAppointment = (appointment: Appointment): boolean => {
-  return ["Pending", "Approved", "Rescheduled"].includes(appointment.status);
+export const canRescheduleAppointment = (
+  appointment: Appointment,
+): boolean => {
+  const statusName = appointment.status?.name;
+  return ["Pending", "Approved", "Rescheduled"].includes(
+    statusName || "",
+  );
 };
 
 /**
@@ -109,8 +114,13 @@ export const canRescheduleAppointment = (appointment: Appointment): boolean => {
  * @param appointment - Appointment object
  * @returns Boolean indicating if appointment can be cancelled
  */
-export const canCancelAppointment = (appointment: Appointment): boolean => {
-  return ["Pending", "Approved", "Rescheduled"].includes(appointment.status);
+export const canCancelAppointment = (
+  appointment: Appointment,
+): boolean => {
+  const statusName = appointment.status?.name;
+  return ["Pending", "Approved", "Rescheduled"].includes(
+    statusName || "",
+  );
 };
 
 /**
@@ -118,31 +128,42 @@ export const canCancelAppointment = (appointment: Appointment): boolean => {
  * @param appointment - Appointment object
  * @returns Human-readable string (e.g., "in 2 hours")
  */
-export const getTimeUntilAppointment = (appointment: Appointment): string => {
+export const getTimeUntilAppointment = (
+  appointment: Appointment,
+): string => {
   try {
     const appointmentDateTime = new Date(
-      `${appointment.scheduledDate}T${appointment.scheduledTime}`
+      `${appointment.whenDate}T${appointment.timeSlot.time}`,
     );
     const now = new Date();
-    const diffMs = appointmentDateTime.getTime() - now.getTime();
+    const diffMs = appointmentDateTime.getTime() -
+      now.getTime();
 
     if (diffMs < 0) {
       return "Past due";
     }
 
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
+    const diffHours = Math.floor(
+      diffMs / (1000 * 60 * 60),
+    );
     const diffDays = Math.floor(diffHours / 24);
 
     if (diffDays > 0) {
-      return `in ${diffDays} day${diffDays > 1 ? "s" : ""}`;
+      return `in ${diffDays} day${
+        diffDays > 1 ? "s" : ""
+      }`;
     }
 
     if (diffHours > 0) {
-      return `in ${diffHours} hour${diffHours > 1 ? "s" : ""}`;
+      return `in ${diffHours} hour${
+        diffHours > 1 ? "s" : ""
+      }`;
     }
 
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    return `in ${diffMinutes} minute${diffMinutes > 1 ? "s" : ""}`;
+    return `in ${diffMinutes} minute${
+      diffMinutes > 1 ? "s" : ""
+    }`;
   } catch {
     return "Unknown";
   }
@@ -156,11 +177,15 @@ export const getTimeUntilAppointment = (appointment: Appointment): string => {
  */
 export const sortAppointments = (
   appointments: Appointment[],
-  ascending: boolean = true
+  ascending: boolean = true,
 ): Appointment[] => {
   return [...appointments].sort((a, b) => {
-    const dateA = new Date(`${a.scheduledDate}T${a.scheduledTime}`).getTime();
-    const dateB = new Date(`${b.scheduledDate}T${b.scheduledTime}`).getTime();
+    const dateA = new Date(
+      `${a.whenDate}T${a.timeSlot.time}`,
+    ).getTime();
+    const dateB = new Date(
+      `${b.whenDate}T${b.timeSlot.time}`,
+    ).getTime();
     return ascending ? dateA - dateB : dateB - dateA;
   });
 };
@@ -171,17 +196,17 @@ export const sortAppointments = (
  * @returns Object with appointments grouped by status
  */
 export const groupAppointmentsByStatus = (
-  appointments: Appointment[]
+  appointments: Appointment[],
 ): Record<string, Appointment[]> => {
   return appointments.reduce(
     (acc, appointment) => {
-      const status = appointment.status;
-      if (!acc[status]) {
-        acc[status] = [];
+      const statusName = appointment.status?.name || "Unknown";
+      if (!acc[statusName]) {
+        acc[statusName] = [];
       }
-      acc[status].push(appointment);
+      acc[statusName].push(appointment);
       return acc;
     },
-    {} as Record<string, Appointment[]>
+    {} as Record<string, Appointment[]>,
   );
 };

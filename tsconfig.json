@@ -15,7 +15,7 @@
     "isolatedModules": true,
     "noEmit": true,
     "baseUrl": ".",
-    "types": ["vite/client", "vite-plugin-svgr/client"],
+    "types": ["vite/client", "vite-plugin-svgr/client", "vitest/globals"],
     "paths": {
       "@/*": ["./src/*"]
     }
@@ -42,5 +42,5 @@
     "admin/pages/register/components/Reports.tsx",
     "admin/pages/register/components/ReviewSlips.tsx"
   ],
-  "exclude": ["node_modules", "dist"]
+  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.spec.tsx", "**/*.test.ts", "**/*.test.tsx"]
 }

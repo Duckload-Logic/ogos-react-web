@@ -17,15 +17,6 @@ export const formatDate = (date: string | Date): string => {
 };
 
 /**
- * Format time string to HH:MM format
- * @param timeStr - Time string (e.g., "14:30:00")
- * @returns Formatted time (e.g., "14:30")
- */
-export const formatTime = (timeStr: string): string => {
-  return timeStr.substring(0, 5);
-};
-
-/**
  * Get the Tailwind CSS classes for appointment status badge
  * @param status - Appointment status (Pending, Approved, Completed, Cancelled, Rescheduled)
  * @returns Tailwind CSS class string

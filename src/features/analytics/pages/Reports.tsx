@@ -3,6 +3,7 @@ import { Download, Eye } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { formatDate } from "@/features/schedules/utils/formatters";
 
 interface Report {
   id: string;
@@ -69,14 +70,6 @@ export default function Reports() {
       default:
         return "bg-gray-100 text-gray-800";
     }
-  };
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
   };
 
   return (

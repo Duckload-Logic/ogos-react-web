@@ -1,131 +1,329 @@
-import { apiClient } from "@/lib/api";
+/**
+ * Slip Service Layer
+ * Handles all slip-related API calls with consistent error logging
+ */
+
+import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
+import { API_ROUTES } from "@/config/apiRoutes";
 import { QueryParams } from "../types/params";
-import { decamelizeKeys } from "humps";
 
-const SLIP_LOOKUP_ROUTES = {
-  statuses: "/slips/lookups/statuses",
-  categories: "/slips/lookups/categories",
-};
-
-const SLIP_GET_ROUTES = {
-  all: "/slips",
-  urgent: "/slips/urgent",
-  mySlips: "/slips/me",
-  stats: "/slips/stats",
-  slip: (id: number) => `/slips/id/${id}`,
-  attachments: (id: number) => `/slips/id/${id}/attachments`,
-  download: (id: number, attachmentId: number) =>
-    `/slips/id/${id}/attachments/${attachmentId}`,
-};
-
-const SLIP_POST_ROUTES = {
-  submit: "/slips",
-};
-
-const SLIP_PATCH_ROUTES = {
-  updateStatus: (id: number) => `/slips/id/${id}/status`,
-};
-
-export const slipService = {
-  async getSlipStats(params?: QueryParams) {
-    const response = await apiClient.get(SLIP_GET_ROUTES.stats, {
-      params: decamelizeKeys(params),
-    });
-    return response.data;
-  },
-  async getSlipStatuses() {
-    const response = await apiClient.get(SLIP_LOOKUP_ROUTES.statuses);
-    return response.data;
-  },
-  async getSlipCategories() {
-    const response = await apiClient.get(SLIP_LOOKUP_ROUTES.categories);
-    return response.data;
-  },
-  async getMySlips({ params }: { params?: QueryParams } = {}) {
-    const response = await apiClient.get(SLIP_GET_ROUTES.mySlips, {
-      params: decamelizeKeys(params),
-    });
-    return response.data;
-  },
-  async getUrgentSlips(params?: QueryParams) {
-    const response = await apiClient.get(SLIP_GET_ROUTES.urgent, {
-      params: decamelizeKeys(params),
-    });
-    console.log(
-      "[slipService.getUrgentSlips] Request params:",
-      decamelizeKeys(params),
+/**
+ * Get slip statistics
+ * @param params - Query parameters
+ * @param config - Axios config with logging metadata
+ * @returns Slip statistics
+ */
+export async function GetSlipStats(
+  params?: QueryParams,
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.slips.stats,
+      { ...config, params },
     );
-    console.log("[slipService.getUrgentSlips] Response data:", response.data);
     return response.data;
-  },
-  async getAllSlips(params?: QueryParams) {
-    const response = await apiClient.get(SLIP_GET_ROUTES.all, {
-      params: decamelizeKeys(params),
-    });
-    console.log(
-      "[slipService.getAllSlips] Request params:",
-      decamelizeKeys(params),
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetSlipStats';
+    const stepName = config?.stepName || 'Fetch Stats';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
     );
-    console.log("[slipService.getAllSlips] Response data:", response.data);
+    throw error;
+  }
+}
+
+/**
+ * Get all slip statuses (lookup data)
+ * @param config - Axios config with logging metadata
+ * @returns Array of slip statuses
+ */
+export async function GetSlipStatuses(
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.slips.lookups.statuses,
+      config,
+    );
     return response.data;
-  },
-  async getSlipByID(id: number) {
-    const route = SLIP_GET_ROUTES.slip(id);
-    const response = await apiClient.get(route);
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetSlipStatuses';
+    const stepName = config?.stepName || 'Fetch Statuses';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get all slip categories (lookup data)
+ * @param config - Axios config with logging metadata
+ * @returns Array of slip categories
+ */
+export async function GetSlipCategories(
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.slips.lookups.categories,
+      config,
+    );
     return response.data;
-  },
-  async getSlipAttachments(id: number) {
-    const route = SLIP_GET_ROUTES.attachments(id);
-    const response = await apiClient.get(route);
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetSlipCategories';
+    const stepName = config?.stepName || 'Fetch Categories';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get current user's slips
+ * @param params - Query parameters
+ * @param config - Axios config with logging metadata
+ * @returns Paginated slip response
+ */
+export async function GetMySlips(
+  params?: QueryParams,
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.slips.mySlips,
+      { ...config, params },
+    );
     return response.data;
-  },
-  async submitSlip(data: FormData) {
-    const response = await apiClient.post(SLIP_POST_ROUTES.submit, data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetMySlips';
+    const stepName = config?.stepName || 'Fetch My Slips';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get urgent slips
+ * @param params - Query parameters
+ * @param config - Axios config with logging metadata
+ * @returns Array of urgent slips
+ */
+export async function GetUrgentSlips(
+  params?: QueryParams,
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.slips.urgent,
+      { ...config, params },
+    );
     return response.data;
-  },
-  async updateSlipStatus(id: number, status: string, adminNotes?: string) {
-    const route = SLIP_PATCH_ROUTES.updateStatus(id);
-    const payload: { status: string; adminNotes?: string } = { status };
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetUrgentSlips';
+    const stepName = config?.stepName || 'Fetch Urgent Slips';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get all slips with pagination
+ * @param params - Query parameters
+ * @param config - Axios config with logging metadata
+ * @returns Paginated slip response
+ */
+export async function GetAllSlips(
+  params?: QueryParams,
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.slips.all,
+      { ...config, params },
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetAllSlips';
+    const stepName = config?.stepName || 'Fetch All Slips';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get slip by ID
+ * @param id - Slip ID
+ * @param config - Axios config with logging metadata
+ * @returns Slip details
+ */
+export async function GetSlipById(
+  id: number,
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.slips.byId(id),
+      config,
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetSlipById';
+    const stepName = config?.stepName || 'Fetch Slip';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get slip attachments
+ * @param id - Slip ID
+ * @param config - Axios config with logging metadata
+ * @returns Array of attachments
+ */
+export async function GetSlipAttachments(
+  id: number,
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.slips.attachments(id),
+      config,
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetSlipAttachments';
+    const stepName = config?.stepName || 'Fetch Attachments';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Submit a new slip
+ * @param data - Form data with slip details
+ * @param config - Axios config with logging metadata
+ * @returns Created slip response
+ */
+export async function PostSlip(
+  data: FormData,
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.post(
+      API_ROUTES.slips.all,
+      data,
+      {
+        ...config,
+        headers: { 'Content-Type': 'multipart/form-data' },
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'PostSlip';
+    const stepName = config?.stepName || 'Submit Slip';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Update slip status
+ * @param id - Slip ID
+ * @param status - New status
+ * @param adminNotes - Optional admin notes
+ * @param config - Axios config with logging metadata
+ * @returns Updated slip response
+ */
+export async function PatchSlipStatus(
+  id: number,
+  status: string,
+  adminNotes?: string,
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const payload: { status: string; adminNotes?: string } = {
+      status,
+    };
     if (adminNotes !== undefined) {
       payload.adminNotes = adminNotes;
     }
-    const response = await apiClient.patch(route, payload);
-    return response.data;
-  },
-  async downloadAttachment(slipId: number, attachmentId: number) {
-    const route = SLIP_GET_ROUTES.download(slipId, attachmentId);
-    console.log(
-      `[slipService.downloadAttachment] Starting download from route: ${route}`,
+    const response = await apiClient.patch(
+      API_ROUTES.slips.updateStatus(id),
+      payload,
+      config,
     );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'PatchSlipStatus';
+    const stepName = config?.stepName || 'Update Status';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
 
-    try {
-      console.log(
-        "[slipService.downloadAttachment] Making axios request with responseType: blob",
-      );
+/**
+ * Download slip attachment
+ * @param slipId - Slip ID
+ * @param attachmentId - Attachment ID
+ * @param config - Axios config with logging metadata
+ * @returns Blob data for file download
+ */
+export async function GetSlipAttachmentDownload(
+  slipId: number,
+  attachmentId: number,
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.slips.downloadAttachment(slipId, attachmentId),
+      {
+        ...config,
+        responseType: 'blob',
+      },
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName ||
+      'GetSlipAttachmentDownload';
+    const stepName = config?.stepName || 'Download Attachment';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
 
-      const response = await apiClient.get(route, {
-        responseType: "blob",
-      });
-
-      console.log(
-        `[slipService.downloadAttachment] Response received - status: ${response.status}, size: ${response.data?.size || 0}, type: ${response.data?.type || "unknown"}`,
-      );
-
-      return response.data;
-    } catch (error: any) {
-      console.error("[slipService.downloadAttachment] Request failed:", {
-        status: error.response?.status,
-        statusText: error.response?.statusText,
-        url: error.config?.url,
-        method: error.config?.method,
-        responseType: error.config?.responseType,
-        headers: error.config?.headers,
-        message: error.message,
-        errorData: error.response?.data,
-      });
-      throw error;
-    }
-  },
+/**
+ * Legacy service object for backward compatibility
+ * Gradually migrate to direct function imports
+ */
+export const slipService = {
+  GetSlipStats,
+  GetSlipStatuses,
+  GetSlipCategories,
+  GetMySlips,
+  GetUrgentSlips,
+  GetAllSlips,
+  GetSlipById,
+  GetSlipAttachments,
+  PostSlip,
+  PatchSlipStatus,
+  GetSlipAttachmentDownload,
 };

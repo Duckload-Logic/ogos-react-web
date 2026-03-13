@@ -1,4 +1,10 @@
-import { apiClient } from "@/lib/api";
+/**
+ * Superadmin Service
+ * Handles API key management and system logs
+ */
+
+import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
+import { API_ROUTES } from "@/config/apiRoutes";
 import type {
   APIKey,
   CreateAPIKeyRequest,
@@ -8,60 +14,256 @@ import type {
   LogStats,
 } from "../types";
 
-const API_KEY_ROUTES = {
-  list: "/api-keys",
-  create: "/api-keys",
-  revoke: (id: number) => `/api-keys/${id}`,
+/**
+ * Get all API keys
+ * @param includeRevoked - Include revoked keys
+ * @param config - Optional axios config with metadata
+ * @returns Promise resolving to API keys list
+ */
+export const GetAPIKeys = async (
+  includeRevoked = false,
+  config?: AxiosConfigWithMeta,
+): Promise<APIKey[]> => {
+  try {
+    const { data } = await apiClient.get(
+      API_ROUTES.superadmin.apiKeys.list,
+      {
+        ...config,
+        params: { include_revoked: includeRevoked },
+      },
+    );
+    return data;
+  } catch (error) {
+    const handlerName = config?.handlerName ||
+      'GetAPIKeys';
+    const stepName = config?.stepName ||
+      'Fetch API Keys';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error}`,
+    );
+    throw error;
+  }
 };
 
-const LOG_ROUTES = {
-  all: "/system-logs",
-  audit: "/system-logs/audit",
-  system: "/system-logs/system",
-  security: "/system-logs/security",
-  stats: "/system-logs/stats",
-};
-
-export const superadminService = {
-  // API Key endpoints
-  async listAPIKeys(includeRevoked = false): Promise<APIKey[]> {
-    const response = await apiClient.get(API_KEY_ROUTES.list, {
-      params: { include_revoked: includeRevoked },
-    });
+/**
+ * Create new API key
+ * @param data - API key creation data
+ * @param config - Optional axios config with metadata
+ * @returns Promise resolving to created API key
+ */
+export const PostAPIKey = async (
+  data: CreateAPIKeyRequest,
+  config?: AxiosConfigWithMeta,
+): Promise<CreateAPIKeyResponse> => {
+  try {
+    const response = await apiClient.post(
+      API_ROUTES.superadmin.apiKeys.create,
+      data,
+      config,
+    );
     return response.data;
+  } catch (error) {
+    const handlerName = config?.handlerName ||
+      'PostAPIKey';
+    const stepName = config?.stepName ||
+      'Create API Key';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error}`,
+    );
+    throw error;
+  }
+};
+
+/**
+ * Revoke API key
+ * @param id - API key ID to revoke
+ * @param config - Optional axios config with metadata
+ * @returns Promise resolving when key is revoked
+ */
+export const DeleteAPIKey = async (
+  id: number,
+  config?: AxiosConfigWithMeta,
+): Promise<void> => {
+  try {
+    await apiClient.delete(
+      API_ROUTES.superadmin.apiKeys.revoke(id),
+      config,
+    );
+  } catch (error) {
+    const handlerName = config?.handlerName ||
+      'DeleteAPIKey';
+    const stepName = config?.stepName ||
+      'Revoke API Key';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error}`,
+    );
+    throw error;
+  }
+};
+
+/**
+ * Get security logs
+ * @param params - Query parameters for filtering
+ * @param config - Optional axios config with metadata
+ * @returns Promise resolving to security logs
+ */
+export const GetSecurityLogs = async (
+  params?: SystemLogsParams,
+  config?: AxiosConfigWithMeta,
+): Promise<SystemLogsResponse> => {
+  try {
+    const { data } = await apiClient.get(
+      API_ROUTES.superadmin.logs.security,
+      { ...config, params },
+    );
+    return data;
+  } catch (error) {
+    const handlerName = config?.handlerName ||
+      'GetSecurityLogs';
+    const stepName = config?.stepName ||
+      'Fetch Security Logs';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error}`,
+    );
+    throw error;
+  }
+};
+
+/**
+ * Get system logs
+ * @param params - Query parameters for filtering
+ * @param config - Optional axios config with metadata
+ * @returns Promise resolving to system logs
+ */
+export const GetSystemLogs = async (
+  params?: SystemLogsParams,
+  config?: AxiosConfigWithMeta,
+): Promise<SystemLogsResponse> => {
+  try {
+    const { data } = await apiClient.get(
+      API_ROUTES.superadmin.logs.system,
+      { ...config, params },
+    );
+    return data;
+  } catch (error) {
+    const handlerName = config?.handlerName ||
+      'GetSystemLogs';
+    const stepName = config?.stepName ||
+      'Fetch System Logs';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error}`,
+    );
+    throw error;
+  }
+};
+
+/**
+ * Get audit logs
+ * @param params - Query parameters for filtering
+ * @param config - Optional axios config with metadata
+ * @returns Promise resolving to audit logs
+ */
+export const GetAuditLogs = async (
+  params?: SystemLogsParams,
+  config?: AxiosConfigWithMeta,
+): Promise<SystemLogsResponse> => {
+  try {
+    const { data } = await apiClient.get(
+      API_ROUTES.superadmin.logs.audit,
+      { ...config, params },
+    );
+    return data;
+  } catch (error) {
+    const handlerName = config?.handlerName ||
+      'GetAuditLogs';
+    const stepName = config?.stepName ||
+      'Fetch Audit Logs';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error}`,
+    );
+    throw error;
+  }
+};
+
+/**
+ * Get log statistics
+ * @param startDate - Start date for filtering
+ * @param endDate - End date for filtering
+ * @param config - Optional axios config with metadata
+ * @returns Promise resolving to log statistics
+ */
+export const GetLogStats = async (
+  startDate?: string,
+  endDate?: string,
+  config?: AxiosConfigWithMeta,
+): Promise<LogStats[]> => {
+  try {
+    const { data } = await apiClient.get(
+      API_ROUTES.superadmin.logs.stats,
+      {
+        ...config,
+        params: {
+          start_date: startDate,
+          end_date: endDate,
+        },
+      },
+    );
+    return data;
+  } catch (error) {
+    const handlerName = config?.handlerName ||
+      'GetLogStats';
+    const stepName = config?.stepName ||
+      'Fetch Log Stats';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error}`,
+    );
+    throw error;
+  }
+};
+
+/**
+ * Legacy service object for backward compatibility
+ * @deprecated Use individual exported functions instead
+ */
+export const superadminService = {
+  async listAPIKeys(
+    includeRevoked = false,
+  ): Promise<APIKey[]> {
+    return GetAPIKeys(includeRevoked);
   },
 
-  async createAPIKey(data: CreateAPIKeyRequest): Promise<CreateAPIKeyResponse> {
-    const response = await apiClient.post(API_KEY_ROUTES.create, data);
-    return response.data;
+  async createAPIKey(
+    data: CreateAPIKeyRequest,
+  ): Promise<CreateAPIKeyResponse> {
+    return PostAPIKey(data);
   },
 
   async revokeAPIKey(id: number): Promise<void> {
-    await apiClient.delete(API_KEY_ROUTES.revoke(id));
+    return DeleteAPIKey(id);
   },
 
-  // Log endpoints
   async getSecurityLogs(
     params?: SystemLogsParams,
   ): Promise<SystemLogsResponse> {
-    const response = await apiClient.get(LOG_ROUTES.security, { params });
-    return response.data;
+    return GetSecurityLogs(params);
   },
 
-  async getSystemLogs(params?: SystemLogsParams): Promise<SystemLogsResponse> {
-    const response = await apiClient.get(LOG_ROUTES.system, { params });
-    return response.data;
+  async getSystemLogs(
+    params?: SystemLogsParams,
+  ): Promise<SystemLogsResponse> {
+    return GetSystemLogs(params);
   },
 
-  async getAuditLogs(params?: SystemLogsParams): Promise<SystemLogsResponse> {
-    const response = await apiClient.get(LOG_ROUTES.audit, { params });
-    return response.data;
+  async getAuditLogs(
+    params?: SystemLogsParams,
+  ): Promise<SystemLogsResponse> {
+    return GetAuditLogs(params);
   },
 
-  async getLogStats(startDate?: string, endDate?: string): Promise<LogStats[]> {
-    const response = await apiClient.get(LOG_ROUTES.stats, {
-      params: { start_date: startDate, end_date: endDate },
-    });
-    return response.data;
+  async getLogStats(
+    startDate?: string,
+    endDate?: string,
+  ): Promise<LogStats[]> {
+    return GetLogStats(startDate, endDate);
   },
 };

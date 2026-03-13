@@ -27,6 +27,8 @@ import { STATUS_COLORS } from "@/config/constants";
 import ActionConfirmModal from "./ActionConfirmationModal";
 import RescheduleModal from "./RescheduleModal";
 import { set } from "zod";
+import { format12HourTime } from "../utils";
+import { formatDate } from "@/features/schedules/utils/formatters";
 
 interface AppointmentViewModalProps {
   appointment: Appointment | null;
@@ -62,30 +64,6 @@ export default function AppointmentViewModal({
   const [showReschedule, setShowReschedule] = useState(false);
 
   if (!appointment) return null;
-
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "long",
-      day: "numeric",
-    });
-  };
-
-  const formatTime = (time: string) => {
-    const [hourStr, minute] = time.split(":");
-    let hour = parseInt(hourStr, 10);
-    const ampm = hour >= 12 ? "PM" : "AM";
-    hour = hour % 12 || 12;
-    return `${hour}:${minute} ${ampm}`;
-  };
-
-  const formatDateTime = (dateTimeStr?: string) => {
-    if (!dateTimeStr) return "—";
-    return new Date(dateTimeStr).toLocaleString("en-US", {
-      dateStyle: "medium",
-      timeStyle: "short",
-    });
-  };
 
   const fullName = [
     appointment.user?.firstName,
@@ -199,9 +177,9 @@ export default function AppointmentViewModal({
               <div className="border-t border-border pt-4 text-xs text-muted-foreground space-y-1">
                 {appointment.updatedAt &&
                 appointment.updatedAt !== appointment.createdAt ? (
-                  <p>Last updated: {formatDateTime(appointment.updatedAt)}</p>
+                  <p>Last updated: {formatDate(appointment.updatedAt)} at {format12HourTime(appointment.updatedAt)}</p>
                 ) : (
-                  <p>Created: {formatDateTime(appointment.createdAt)}</p>
+                  <p>Created: {formatDate(appointment.createdAt || "")} at {format12HourTime(appointment.createdAt || "")}</p>
                 )}
               </div>
             )}
@@ -252,7 +230,7 @@ export default function AppointmentViewModal({
                   </div>
                   <div className="flex items-center gap-2 text-foreground">
                     <Clock className="w-4 h-4 text-muted-foreground" />
-                    <span>{formatTime(appointment.timeSlot.time)}</span>
+                    <span>{format12HourTime(appointment.timeSlot.time)}</span>
                   </div>
                 </div>
               </div>

@@ -1,11 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { slipService } from "../services";
+import { GetAllSlips, GetMySlips } from "../services";
+import { QUERY_KEYS } from "@/config/queryKeys";
+import { CACHE_TIMING } from "@/config/constants";
 import { useMe } from "@/features/users/hooks/useMe";
 import { QueryParams } from "../types/params";
-
-const EXCUSE_SLIPS_QUERY_KEY = "excuse-slips";
-const EXCUSE_SLIPS_STALE_TIME = 5 * 60 * 1000; // 5 minutes
-const EXCUSE_SLIPS_GC_TIME = 30 * 60 * 1000; // 30 minutes
 
 export function useSlips({
   isAdmin = false,
@@ -13,13 +11,31 @@ export function useSlips({
 }: { isAdmin?: boolean; params?: QueryParams } = {}) {
   const { data: me } = useMe({});
   return useQuery({
-    queryKey: [EXCUSE_SLIPS_QUERY_KEY, me?.id, params, isAdmin],
+    queryKey: isAdmin
+      ? [
+          ...QUERY_KEYS.slips.all,
+          "admin",
+          params,
+        ]
+      : [
+          ...QUERY_KEYS.slips.mySlips,
+          me?.id,
+          params,
+        ],
     queryFn: isAdmin
-      ? () => slipService.getAllSlips(params)
-      : () => slipService.getMySlips({ params }),
-    staleTime: EXCUSE_SLIPS_STALE_TIME,
-    gcTime: EXCUSE_SLIPS_GC_TIME,
+      ? () =>
+          GetAllSlips(params, {
+            handlerName: 'useSlips',
+            stepName: 'Fetch All Slips',
+          })
+      : () =>
+          GetMySlips(params, {
+            handlerName: 'useSlips',
+            stepName: 'Fetch My Slips',
+          }),
+    staleTime: CACHE_TIMING.SHORT.staleTime,
+    gcTime: CACHE_TIMING.SHORT.gcTime,
     refetchOnWindowFocus: false,
-    enabled: !!me, // Only fetch if user data is available
+    enabled: !!me,
   });
 }

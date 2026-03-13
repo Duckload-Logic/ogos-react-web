@@ -2,17 +2,16 @@ import { Eye } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { STATUS_COLORS } from "@/config/constants";
+import { format12HourTime } from "@/features/appointments/utils";
 
 interface Props {
   appointments: any[];
-  formatTime: (time: string) => string;
   onView: (apt: any) => void;
   isLoading: boolean;
 }
 
 export default function QueueTable({
   appointments,
-  formatTime,
   onView,
   isLoading,
 }: Props) {
@@ -78,7 +77,7 @@ export default function QueueTable({
                     <td className="p-4">
                       <div className="flex flex-col">
                         <span className="text-sm font-medium">
-                          {formatTime(apt.timeSlot.time)}
+                          {format12HourTime(apt.timeSlot.time)}
                         </span>
 
                         <span className="text-xs text-muted-foreground">
