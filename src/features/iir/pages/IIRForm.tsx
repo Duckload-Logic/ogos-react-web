@@ -266,12 +266,8 @@ export default function IIRForm() {
 
     setIsSaving(true);
     try {
-      if (localFormData?.id) {
-        await saveSectionAsync({
-          iirID: localFormData.id,
-          data: localFormData,
-          section: FORM_SECTIONS[currentSection - 1]?.key,
-        });
+      if (localFormData) {
+        await saveSectionAsync(localFormData);
       }
       if (currentSection < FORM_SECTIONS.length) {
         setCurrentSection(currentSection + 1);
@@ -422,8 +418,8 @@ export default function IIRForm() {
     setIsSaving(true);
 
     try {
-      if (localFormData?.id) {
-        await submitFormAsync(localFormData.id);
+      if (localFormData) {
+        await submitFormAsync(localFormData);
       }
       addToast("✓ Form submitted successfully!");
       setShowSuccessPopup(true);

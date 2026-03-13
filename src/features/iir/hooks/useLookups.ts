@@ -1,146 +1,170 @@
-import { useQuery } from "@tanstack/react-query";
-import { iirService } from "../services/service";
+/**
+ * IIR Lookup Hooks
+ * Consolidated lookup hooks using the useLookupWithMeta factory
+ * Eliminates duplication and ensures consistent caching
+ */
 
-const RESOURCE_TYPES = {
-  COURSES: "courses",
-  GENDERS: "genders",
-  RELIGIONS: "religions",
-  PARENTAL_STATUS_TYPES: "parentalStatusTypes",
-  ENROLLMENT_REASONS: "enrollmentReasons",
-  INCOME_RANGES: "incomeRanges",
-  STUDENT_SUPPORT_TYPES: "studentSupportTypes",
-  SIBLING_SUPPORT_TYPES: "siblingSupportTypes",
-  CIVIL_STATUSES: "civilStatuses",
-  NATURE_OF_RESIDENCE_TYPES: "natureOfResidenceTypes",
-  STUDENT_RELATIONSHIP_TYPES: "studentRelationshipTypes",
-} as const;
+import { useLookupWithMeta } from "@/hooks/useLookup";
+import { QUERY_KEYS } from "@/config/queryKeys";
+import { CACHE_TIMING } from "@/config/constants";
+import { GetIIRLookup } from "../services/service";
 
-const DEFAULT_LOOKUP_QUERY_KEY = "defaultLookup";
-const DEFAULT_LOOKUP_STALE_TIME = 1000 * 60 * 60; // 1 hour
-const DEFAULT_LOOKUP_GC_TIME = 1000 * 60 * 60 * 24; // 24 hours
-
+/**
+ * Fetch courses lookup data
+ * @returns Query result with courses data
+ */
 export function useCourses() {
-  return useQuery({
-    queryKey: [DEFAULT_LOOKUP_QUERY_KEY, RESOURCE_TYPES.COURSES],
-    queryFn: async () => {
-      return iirService.getIIRLookup(RESOURCE_TYPES.COURSES);
-    },
-    staleTime: DEFAULT_LOOKUP_STALE_TIME,
-    gcTime: DEFAULT_LOOKUP_GC_TIME,
-  });
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.courses,
+    (config) => GetIIRLookup('courses', config),
+    'GetIIRLookup',
+    'Fetch Courses',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
 }
 
+/**
+ * Fetch genders lookup data
+ * @returns Query result with genders data
+ */
 export function useGenders() {
-  return useQuery({
-    queryKey: [DEFAULT_LOOKUP_QUERY_KEY, RESOURCE_TYPES.GENDERS],
-    queryFn: async () => {
-      return iirService.getIIRLookup(RESOURCE_TYPES.GENDERS);
-    },
-    staleTime: DEFAULT_LOOKUP_STALE_TIME,
-    gcTime: DEFAULT_LOOKUP_GC_TIME,
-  });
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.genders,
+    (config) => GetIIRLookup('genders', config),
+    'GetIIRLookup',
+    'Fetch Genders',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
 }
+
+/**
+ * Fetch civil statuses lookup data
+ * @returns Query result with civil statuses data
+ */
 export function useCivilStatuses() {
-  return useQuery({
-    queryKey: [DEFAULT_LOOKUP_QUERY_KEY, RESOURCE_TYPES.CIVIL_STATUSES],
-    queryFn: async () => {
-      return iirService.getIIRLookup(RESOURCE_TYPES.CIVIL_STATUSES);
-    },
-    staleTime: DEFAULT_LOOKUP_STALE_TIME,
-    gcTime: DEFAULT_LOOKUP_GC_TIME,
-  });
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.civilStatuses,
+    (config) => GetIIRLookup('civilStatuses', config),
+    'GetIIRLookup',
+    'Fetch Civil Statuses',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
 }
 
+/**
+ * Fetch religions lookup data
+ * @returns Query result with religions data
+ */
 export function useReligions() {
-  return useQuery({
-    queryKey: [DEFAULT_LOOKUP_QUERY_KEY, RESOURCE_TYPES.RELIGIONS],
-    queryFn: async () => {
-      return iirService.getIIRLookup(RESOURCE_TYPES.RELIGIONS);
-    },
-    staleTime: DEFAULT_LOOKUP_STALE_TIME,
-    gcTime: DEFAULT_LOOKUP_GC_TIME,
-  });
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.religions,
+    (config) => GetIIRLookup('religions', config),
+    'GetIIRLookup',
+    'Fetch Religions',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
 }
 
+/**
+ * Fetch parental status types lookup data
+ * @returns Query result with parental status types data
+ */
 export function useParentalStatusTypes() {
-  return useQuery({
-    queryKey: [DEFAULT_LOOKUP_QUERY_KEY, RESOURCE_TYPES.PARENTAL_STATUS_TYPES],
-    queryFn: async () => {
-      return iirService.getIIRLookup(RESOURCE_TYPES.PARENTAL_STATUS_TYPES);
-    },
-    staleTime: DEFAULT_LOOKUP_STALE_TIME,
-    gcTime: DEFAULT_LOOKUP_GC_TIME,
-  });
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.parentalStatusTypes,
+    (config) =>
+      GetIIRLookup('parentalStatusTypes', config),
+    'GetIIRLookup',
+    'Fetch Parental Status Types',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
 }
 
+/**
+ * Fetch enrollment reasons lookup data
+ * @returns Query result with enrollment reasons data
+ */
 export function useEnrollmentReasons() {
-  return useQuery({
-    queryKey: [DEFAULT_LOOKUP_QUERY_KEY, RESOURCE_TYPES.ENROLLMENT_REASONS],
-    queryFn: async () => {
-      return iirService.getIIRLookup(RESOURCE_TYPES.ENROLLMENT_REASONS);
-    },
-    staleTime: DEFAULT_LOOKUP_STALE_TIME,
-    gcTime: DEFAULT_LOOKUP_GC_TIME,
-  });
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.enrollmentReasons,
+    (config) =>
+      GetIIRLookup('enrollmentReasons', config),
+    'GetIIRLookup',
+    'Fetch Enrollment Reasons',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
 }
 
+/**
+ * Fetch income ranges lookup data
+ * @returns Query result with income ranges data
+ */
 export function useIncomeRanges() {
-  return useQuery({
-    queryKey: [DEFAULT_LOOKUP_QUERY_KEY, RESOURCE_TYPES.INCOME_RANGES],
-    queryFn: async () => {
-      return iirService.getIIRLookup(RESOURCE_TYPES.INCOME_RANGES);
-    },
-    staleTime: DEFAULT_LOOKUP_STALE_TIME,
-    gcTime: DEFAULT_LOOKUP_GC_TIME,
-  });
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.incomeRanges,
+    (config) => GetIIRLookup('incomeRanges', config),
+    'GetIIRLookup',
+    'Fetch Income Ranges',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
 }
 
+/**
+ * Fetch student support types lookup data
+ * @returns Query result with student support types data
+ */
 export function useStudentSupportTypes() {
-  return useQuery({
-    queryKey: [DEFAULT_LOOKUP_QUERY_KEY, RESOURCE_TYPES.STUDENT_SUPPORT_TYPES],
-    queryFn: async () => {
-      return iirService.getIIRLookup(RESOURCE_TYPES.STUDENT_SUPPORT_TYPES);
-    },
-    staleTime: DEFAULT_LOOKUP_STALE_TIME,
-    gcTime: DEFAULT_LOOKUP_GC_TIME,
-  });
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.studentSupportTypes,
+    (config) =>
+      GetIIRLookup('studentSupportTypes', config),
+    'GetIIRLookup',
+    'Fetch Student Support Types',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
 }
 
+/**
+ * Fetch sibling support types lookup data
+ * @returns Query result with sibling support types data
+ */
 export function useSiblingSupportTypes() {
-  return useQuery({
-    queryKey: [DEFAULT_LOOKUP_QUERY_KEY, RESOURCE_TYPES.SIBLING_SUPPORT_TYPES],
-    queryFn: async () => {
-      return iirService.getIIRLookup(RESOURCE_TYPES.SIBLING_SUPPORT_TYPES);
-    },
-    staleTime: DEFAULT_LOOKUP_STALE_TIME,
-    gcTime: DEFAULT_LOOKUP_GC_TIME,
-  });
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.siblingSupportTypes,
+    (config) =>
+      GetIIRLookup('siblingSupportTypes', config),
+    'GetIIRLookup',
+    'Fetch Sibling Support Types',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
 }
 
+/**
+ * Fetch student relationship types lookup data
+ * @returns Query result with student relationship types data
+ */
 export function useStudentRelationshipTypes() {
-  return useQuery({
-    queryKey: [
-      DEFAULT_LOOKUP_QUERY_KEY,
-      RESOURCE_TYPES.STUDENT_RELATIONSHIP_TYPES,
-    ],
-    queryFn: async () => {
-      return iirService.getIIRLookup(RESOURCE_TYPES.STUDENT_RELATIONSHIP_TYPES);
-    },
-    staleTime: DEFAULT_LOOKUP_STALE_TIME,
-    gcTime: DEFAULT_LOOKUP_GC_TIME,
-  });
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.studentRelationshipTypes,
+    (config) =>
+      GetIIRLookup('studentRelationshipTypes', config),
+    'GetIIRLookup',
+    'Fetch Student Relationship Types',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
 }
 
+/**
+ * Fetch nature of residence types lookup data
+ * @returns Query result with nature of residence types data
+ */
 export function useNatureOfResidenceTypes() {
-  return useQuery({
-    queryKey: [
-      DEFAULT_LOOKUP_QUERY_KEY,
-      RESOURCE_TYPES.NATURE_OF_RESIDENCE_TYPES,
-    ],
-    queryFn: async () => {
-      return iirService.getIIRLookup(RESOURCE_TYPES.NATURE_OF_RESIDENCE_TYPES);
-    },
-    staleTime: DEFAULT_LOOKUP_STALE_TIME,
-    gcTime: DEFAULT_LOOKUP_GC_TIME,
-  });
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.natureOfResidenceTypes,
+    (config) =>
+      GetIIRLookup('natureOfResidenceTypes', config),
+    'GetIIRLookup',
+    'Fetch Nature of Residence Types',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
 }

@@ -1,17 +1,20 @@
 import { useQuery } from "@tanstack/react-query";
 import { slipService } from "../services";
-
-const SLIP_ATTACHMENTS_QUERY_KEY = "slip-attachments";
-const SLIP_ATTACHMENTS_STALE_TIME = 10 * 60 * 1000; // 10 minutes
-const SLIP_ATTACHMENTS_GC_TIME = 30 * 60 * 1000; // 30 minutes
+import { QUERY_KEYS } from "@/config/queryKeys";
+import { CACHE_TIMING } from "@/config/constants";
 
 export function useGetSlipAttachments(slipId?: number) {
   return useQuery({
-    queryKey: [SLIP_ATTACHMENTS_QUERY_KEY, slipId],
-    queryFn: () => (slipId ? slipService.getSlipAttachments(slipId) : []),
+    queryKey: [
+      ...QUERY_KEYS.slips.attachments(slipId || 0),
+    ],
+    queryFn: () =>
+      slipId
+        ? slipService.GetSlipAttachments(slipId)
+        : [],
     enabled: !!slipId,
-    staleTime: SLIP_ATTACHMENTS_STALE_TIME,
-    gcTime: SLIP_ATTACHMENTS_GC_TIME,
+    staleTime: CACHE_TIMING.MEDIUM.staleTime,
+    gcTime: CACHE_TIMING.MEDIUM.gcTime,
     refetchOnWindowFocus: false,
   });
 }

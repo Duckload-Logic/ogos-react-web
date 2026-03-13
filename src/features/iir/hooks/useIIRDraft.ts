@@ -1,14 +1,16 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { iirService } from "../services/service";
+import { GetIIRDraft, PostIIRDraft } from "../services/service";
+import { QUERY_KEYS } from "@/config/queryKeys";
+import { CACHE_TIMING } from "@/config/constants";
 import { IIRForm } from "../types/IIRForm";
-
-const DRAFT_QUERY_KEY = "iirDraft";
 
 export function useGetIIRDraft() {
   const { data, isLoading, error } = useQuery({
-    queryKey: [DRAFT_QUERY_KEY, "me"],
+    queryKey: QUERY_KEYS.iir.draft,
     queryFn: () => {
-      return iirService.getIIRDraft() as Promise<IIRForm | null>;
+      return GetIIRDraft() as Promise<
+        IIRForm | null
+      >;
     },
     refetchOnWindowFocus: false,
     refetchOnReconnect: false,
@@ -25,9 +27,12 @@ export function useSaveIIRDraft() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (data: IIRForm) => iirService.saveIIRDraft(data),
+    mutationFn: (data: IIRForm) =>
+      PostIIRDraft(data),
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: [DRAFT_QUERY_KEY, "me"] });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.iir.draft,
+      });
     },
   });
 

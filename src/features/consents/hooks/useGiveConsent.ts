@@ -1,5 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { consentService } from "../services";
+import { PostConsent } from "../services";
+import { QUERY_KEYS } from "@/config/queryKeys";
 import { useMe } from "@/features/users/hooks/useMe";
 
 interface ConsentPayload {
@@ -12,12 +13,19 @@ export function useGiveConsent() {
   const { data: me } = useMe({});
 
   return useMutation({
-    mutationFn: async ({ type, docId }: ConsentPayload) => {
-      return consentService.giveConsent(type, docId);
+    mutationFn: async (
+      { type, docId }: ConsentPayload,
+    ) => {
+      return PostConsent(type, docId, {
+        handlerName: 'useGiveConsent',
+        stepName: 'Submit Consent',
+      });
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: ["userConsent", me?.id, variables.docId],
+        queryKey: QUERY_KEYS.consents.check(
+          variables.docId,
+        ),
       });
     },
   });

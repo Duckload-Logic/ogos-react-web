@@ -1,7 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/context";
-import { checkStudentOnboardingStatus } from "@/features/iir/services/service";
 import { AlertTriangle } from "lucide-react";
 import { useMe } from "@/features/users/hooks/useMe";
 import { useIIRForm } from "@/features/iir/hooks";

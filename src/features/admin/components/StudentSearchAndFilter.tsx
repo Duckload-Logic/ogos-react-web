@@ -7,7 +7,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@radix-ui/react-label";
-import { error } from "console";
 import { ChevronDownIcon, X } from "lucide-react";
 
 interface SearchFilterProps {

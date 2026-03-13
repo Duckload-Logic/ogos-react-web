@@ -1,17 +1,24 @@
-import { useQuery } from "@tanstack/react-query";
+/**
+ * Hook for fetching slip statuses
+ * Migrated to use generic useLookup factory
+ */
+
+import { useLookupWithMeta } from "@/hooks/useLookup";
 import { slipService } from "../services";
+import { QUERY_KEYS } from "@/config/queryKeys";
 import { SlipStatus } from "../types";
 
-const SLIP_STATUSES_QUERY_KEY = "slip-statuses";
-const SLIP_STATUSES_STALE_TIME = 60 * 60 * 1000; // 1 hour
-const SLIP_STATUSES_GC_TIME = 2 * 60 * 60 * 1000; // 2 hours
-
+/**
+ * Fetch all available slip statuses
+ * Uses CACHE_TIMING.LONG (1 hour stale, 2 hours gc)
+ *
+ * @returns Query result with slip statuses array
+ */
 export function useGetSlipStatuses() {
-  return useQuery<SlipStatus[]>({
-    queryKey: [SLIP_STATUSES_QUERY_KEY],
-    queryFn: () => slipService.getSlipStatuses(),
-    staleTime: SLIP_STATUSES_STALE_TIME,
-    gcTime: SLIP_STATUSES_GC_TIME,
-    refetchOnWindowFocus: false,
-  });
+  return useLookupWithMeta<SlipStatus[]>(
+    QUERY_KEYS.slips.lookups.statuses,
+    (config) => slipService.GetSlipStatuses(config),
+    'GetSlipStatuses',
+    'Fetch Statuses',
+  );
 }

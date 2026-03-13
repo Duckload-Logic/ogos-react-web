@@ -1,4 +1,10 @@
-import { apiClient } from "@/lib/api";
+/**
+ * Appointment Service Layer
+ * Handles all appointment-related API calls
+ */
+
+import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
+import { API_ROUTES } from "@/config/apiRoutes";
 import type {
   Appointment,
   CreateAppointmentRequest,
@@ -9,157 +15,325 @@ import type {
   StatusCount,
 } from "../types";
 import { QueryParam } from "../types/reqParams";
-import { decamelizeKeys } from "humps";
 import { DailyStatusCount } from "../types/calendar";
 import { toISODateString } from "../utils";
 
 // Re-export types for legacy imports
-export type { Appointment, CreateAppointmentRequest, AvailableTimeSlotView };
-
-const GET_APPOINTMENTS_ROUTES = {
-  me: "/appointments/me",
-  all: "/appointments",
-  appointment: (id: number) => `/appointments/id/${id}`,
-};
-
-const APPOINTMENT_LOOKUP_ROUTES = {
-  slots: "/appointments/lookups/slots",
-  categories: "/appointments/lookups/categories",
-  statuses: "/appointments/lookups/statuses",
-};
-
-const POST_APPOINTMENT_ROUTES = {
-  submit: "/appointments",
-};
-
-const PATCH_APPOINTMENT_ROUTES = {
-  updateStatus: (id: number) => `/appointments/id/${id}`,
-};
-
-const appointmentService = {
-  async getMyAppointments(
-    params: QueryParam,
-  ): Promise<PaginatedAppointmentsResponse> {
-    const response = await apiClient.get(GET_APPOINTMENTS_ROUTES.me, {
-      params: decamelizeKeys(params),
-    });
-    return response.data;
-  },
-  async getAllAppointments(
-    params?: QueryParam,
-  ): Promise<PaginatedAppointmentsResponse> {
-    const response = await apiClient.get(GET_APPOINTMENTS_ROUTES.all, {
-      params: decamelizeKeys(params),
-    });
-
-    return response.data;
-  },
-  async getAppointmentStats(params?: QueryParam): Promise<StatusCount[]> {
-    const response = await apiClient.get("/appointments/stats", {
-      params: decamelizeKeys(params),
-    });
-    return response.data;
-  },
-  async getCalendarStats(params: QueryParam): Promise<DailyStatusCount[]> {
-    const response = await apiClient.get("/appointments/calendar/stats", {
-      params: decamelizeKeys(params),
-    });
-    return response.data;
-  },
-  async getAppointmentById(id: number): Promise<Appointment> {
-    return apiClient.get(GET_APPOINTMENTS_ROUTES.appointment(id));
-  },
-  async getAvailableSlots(date?: Date): Promise<AvailableTimeSlotView[]> {
-    const params = date ? { date: toISODateString(date) } : {};
-    const response = await apiClient.get(APPOINTMENT_LOOKUP_ROUTES.slots, {
-      params: decamelizeKeys(params),
-    });
-    return response.data;
-  },
-  async getCategories(): Promise<ConcernCategory[]> {
-    const response = await apiClient.get(APPOINTMENT_LOOKUP_ROUTES.categories);
-    return response.data;
-  },
-  async getStatuses(): Promise<AppointmentStatus[]> {
-    const response = await apiClient.get(APPOINTMENT_LOOKUP_ROUTES.statuses);
-    return response.data;
-  },
-  async submitAppointment(data: Appointment) {
-    const response = await apiClient.post(POST_APPOINTMENT_ROUTES.submit, data);
-    return response.data;
-  },
-  async updateAppointmentStatus(id: number, status: AppointmentStatus) {
-    const response = await apiClient.patch(
-      PATCH_APPOINTMENT_ROUTES.updateStatus(id),
-      { status: status },
-    );
-    return response.data;
-  },
-  async updateAppointment(id: number, data: Appointment) {
-    console.log("Updating appointment with data:", data); // Debug log
-    const response = await apiClient.patch(
-      PATCH_APPOINTMENT_ROUTES.updateStatus(id),
-      data,
-    );
-    return response.data;
-  },
+export type {
+  Appointment,
+  CreateAppointmentRequest,
+  AvailableTimeSlotView,
 };
 
 /**
- * Legacy function aliases for backward compatibility
- * @todo Migrate consumers to use appointmentService methods
+ * Get current user's appointments
+ * @param params - Query parameters
+ * @param config - Axios config with logging metadata
+ * @returns Paginated appointments response
  */
+export async function GetMyAppointments(
+  params: QueryParam,
+  config?: AxiosConfigWithMeta,
+): Promise<PaginatedAppointmentsResponse> {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.appointments.myAppointments,
+      { ...config, params },
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetMyAppointments';
+    const stepName = config?.stepName || 'Fetch My Appointments';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
 
-/** @deprecated Use appointmentService.getAllAppointments instead */
-export const listAllAppointments = async (): Promise<Appointment[]> => {
-  // TODO: Implement when API is finalized
-  console.warn(
-    "[PLACEHOLDER] listAllAppointments called - awaiting API implementation",
-  );
-  return [];
+/**
+ * Get all appointments with pagination
+ * @param params - Query parameters
+ * @param config - Axios config with logging metadata
+ * @returns Paginated appointments response
+ */
+export async function GetAllAppointments(
+  params?: QueryParam,
+  config?: AxiosConfigWithMeta,
+): Promise<PaginatedAppointmentsResponse> {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.appointments.all,
+      { ...config, params },
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetAllAppointments';
+    const stepName = config?.stepName || 'Fetch All Appointments';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get appointment statistics
+ * @param params - Query parameters
+ * @param config - Axios config with logging metadata
+ * @returns Status count array
+ */
+export async function GetAppointmentStats(
+  params?: QueryParam,
+  config?: AxiosConfigWithMeta,
+): Promise<StatusCount[]> {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.appointments.stats,
+      { ...config, params },
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetAppointmentStats';
+    const stepName = config?.stepName || 'Fetch Stats';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get calendar statistics
+ * @param params - Query parameters
+ * @param config - Axios config with logging metadata
+ * @returns Daily status count array
+ */
+export async function GetCalendarStats(
+  params: QueryParam,
+  config?: AxiosConfigWithMeta,
+): Promise<DailyStatusCount[]> {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.appointments.calendarStats,
+      { ...config, params },
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetCalendarStats';
+    const stepName = config?.stepName || 'Fetch Calendar Stats';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get appointment by ID
+ * @param id - Appointment ID
+ * @param config - Axios config with logging metadata
+ * @returns Appointment details
+ */
+export async function GetAppointmentById(
+  id: number,
+  config?: AxiosConfigWithMeta,
+): Promise<Appointment> {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.appointments.byId(id),
+      config,
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetAppointmentById';
+    const stepName = config?.stepName || 'Fetch Appointment';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get available appointment slots
+ * @param date - Date to check availability
+ * @param config - Axios config with logging metadata
+ * @returns Available time slots
+ */
+export async function GetAvailableSlots(
+  date?: Date,
+  config?: AxiosConfigWithMeta,
+): Promise<AvailableTimeSlotView[]> {
+  try {
+    const params = date ? { date: toISODateString(date) } : {};
+    const response = await apiClient.get(
+      API_ROUTES.appointments.lookups.slots,
+      { ...config, params },
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'GetAvailableSlots';
+    const stepName = config?.stepName || 'Fetch Available Slots';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get appointment concern categories
+ * @param config - Axios config with logging metadata
+ * @returns Array of concern categories
+ */
+export async function GetAppointmentCategories(
+  config?: AxiosConfigWithMeta,
+): Promise<ConcernCategory[]> {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.appointments.lookups.categories,
+      config,
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName ||
+      'GetAppointmentCategories';
+    const stepName = config?.stepName || 'Fetch Categories';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Get appointment statuses
+ * @param config - Axios config with logging metadata
+ * @returns Array of appointment statuses
+ */
+export async function GetAppointmentStatuses(
+  config?: AxiosConfigWithMeta,
+): Promise<AppointmentStatus[]> {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.appointments.lookups.statuses,
+      config,
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName ||
+      'GetAppointmentStatuses';
+    const stepName = config?.stepName || 'Fetch Statuses';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Submit a new appointment
+ * @param data - Appointment data
+ * @param config - Axios config with logging metadata
+ * @returns Created appointment
+ */
+export async function PostAppointment(
+  data: Appointment,
+  config?: AxiosConfigWithMeta,
+): Promise<Appointment> {
+  try {
+    const response = await apiClient.post(
+      API_ROUTES.appointments.all,
+      data,
+      config,
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'PostAppointment';
+    const stepName = config?.stepName || 'Submit Appointment';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Update appointment status
+ * @param id - Appointment ID
+ * @param status - New status
+ * @param config - Axios config with logging metadata
+ * @returns Updated appointment
+ */
+export async function PatchAppointmentStatus(
+  id: number,
+  status: AppointmentStatus,
+  config?: AxiosConfigWithMeta,
+): Promise<Appointment> {
+  try {
+    const response = await apiClient.patch(
+      API_ROUTES.appointments.byId(id),
+      { status },
+      config,
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName ||
+      'PatchAppointmentStatus';
+    const stepName = config?.stepName || 'Update Status';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Update appointment details
+ * @param id - Appointment ID
+ * @param data - Updated appointment data
+ * @param config - Axios config with logging metadata
+ * @returns Updated appointment
+ */
+export async function PatchAppointment(
+  id: number,
+  data: Appointment,
+  config?: AxiosConfigWithMeta,
+): Promise<Appointment> {
+  try {
+    const response = await apiClient.patch(
+      API_ROUTES.appointments.byId(id),
+      data,
+      config,
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || 'PatchAppointment';
+    const stepName = config?.stepName || 'Update Appointment';
+    console.error(
+      `[${handlerName}] {${stepName}}: ${error.message}`,
+    );
+    throw error;
+  }
+}
+
+/**
+ * Legacy service object for backward compatibility
+ * Gradually migrate to direct function imports
+ */
+export const appointmentService = {
+  GetMyAppointments,
+  GetAllAppointments,
+  GetAppointmentStats,
+  GetCalendarStats,
+  GetAppointmentById,
+  GetAvailableSlots,
+  GetAppointmentCategories,
+  GetAppointmentStatuses,
+  PostAppointment,
+  PatchAppointmentStatus,
+  PatchAppointment,
 };
 
-/** @deprecated Use dedicated mutation instead */
-export const rescheduleAppointment = async (
-  _appointmentId: number,
-  _payload: CreateAppointmentRequest,
-): Promise<Appointment> => {
-  // TODO: Implement when API is finalized
-  console.warn(
-    "[PLACEHOLDER] rescheduleAppointment called - awaiting API implementation",
-  );
-  throw new Error("Not implemented - placeholder function");
-};
-
-/** @deprecated Use dedicated mutation instead */
-export const approveAppointment = async (
-  _appointmentId: number,
-): Promise<Appointment> => {
-  console.warn(
-    "[PLACEHOLDER] approveAppointment called - awaiting API implementation",
-  );
-  throw new Error("Not implemented - placeholder function");
-};
-
-/** @deprecated Use dedicated mutation instead */
-export const rejectAppointment = async (
-  _appointmentId: number,
-): Promise<Appointment> => {
-  console.warn(
-    "[PLACEHOLDER] rejectAppointment called - awaiting API implementation",
-  );
-  throw new Error("Not implemented - placeholder function");
-};
-
-/** @deprecated Use dedicated mutation instead */
-export const completeAppointment = async (
-  _appointmentId: number,
-): Promise<Appointment> => {
-  console.warn(
-    "[PLACEHOLDER] completeAppointment called - awaiting API implementation",
-  );
-  throw new Error("Not implemented - placeholder function");
-};
-
-export { appointmentService };
 export default appointmentService;

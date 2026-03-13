@@ -5,7 +5,7 @@
  * used throughout the appointments feature.
  */
 
-import { User } from "@/types";
+import { User } from "@/features/users/types/user";
 
 export interface TimeSlot {
   id: number;
@@ -52,7 +52,7 @@ export interface Appointment {
   whenDate: string;
   timeSlot: TimeSlot;
   appointmentCategory: ConcernCategory;
-  /** Status can be either an object or string depending on API version */
+  /** Status can be either an object or string */
   status?: AppointmentStatus;
   createdAt?: string;
   updatedAt?: string;
@@ -81,12 +81,17 @@ export interface UseAppointmentsReturn {
   error: string | null;
   success: string | null;
   isLoading: boolean;
-  fetchAppointments: (isMe?: boolean, status?: string) => Promise<void>;
+  fetchAppointments: (
+    isMe?: boolean,
+    status?: string,
+  ) => Promise<void>;
   fetchAvailableSlots: (date: string) => Promise<void>;
   createAppointment: (
     data: CreateAppointmentRequest,
   ) => Promise<Appointment | null>;
-  cancelAppointment: (appointment: Appointment) => Promise<boolean>;
+  cancelAppointment: (
+    appointment: Appointment,
+  ) => Promise<boolean>;
   clearError: () => void;
   clearSuccess: () => void;
 }

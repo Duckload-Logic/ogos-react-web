@@ -33,7 +33,7 @@ export default function Header({
         <img
           src={LOGO_SRC}
           alt="Logo"
-          className="w-10 h-10 rounded-full transition-transform duration-200 hover:scale-110"
+          className="w-12 h-12 rounded-full transition-transform duration-200 hover:scale-110"
         />
         <div className="flex flex-col text-xs">
           <p className="font-semibold">

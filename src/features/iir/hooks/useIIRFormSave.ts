@@ -1,22 +1,18 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { iirService } from "../services/service";
+import { PostIIRDraft, PostIIRSubmit } from "../services/service";
+import { IIRForm } from "../types/IIRForm";
 
 export function useIIRFormSave() {
   const queryClient = useQueryClient();
 
   const saveSectionMutation = useMutation({
-    mutationFn: async ({
-      iirID,
-      section,
-      data,
-    }: {
-      iirID: number;
-      section: string;
-      data: any;
-    }) => {
-      return iirService.saveSectionData(iirID, section, data);
+    mutationFn: async (data: IIRForm) => {
+      return PostIIRDraft(data, {
+        handlerName: 'useIIRFormSave',
+        stepName: 'Save Draft',
+      });
     },
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       // Invalidate the IIR form query to refetch
       queryClient.invalidateQueries({
         queryKey: ["iirForm"],
@@ -25,8 +21,11 @@ export function useIIRFormSave() {
   });
 
   const submitFormMutation = useMutation({
-    mutationFn: async (iirID: number) => {
-      return iirService.submitIIRForm(iirID);
+    mutationFn: async (iir: IIRForm) => {
+      return PostIIRSubmit(iir, {
+        handlerName: 'useIIRFormSave',
+        stepName: 'Submit Form',
+      });
     },
     onSuccess: () => {
       // Invalidate queries after successful submission

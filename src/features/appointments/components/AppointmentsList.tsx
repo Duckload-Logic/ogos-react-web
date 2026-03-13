@@ -6,6 +6,7 @@ import { CalendarX, Eye, Tag, User, CalendarDays, Clock } from "lucide-react";
 import { useMemo } from "react";
 import { SearchInput } from "@/components/form";
 import { format12HourTime } from "../utils";
+import { formatDate } from "@/features/schedules/utils/formatters";
 
 interface AppointmentsListProps {
   title?: string;
@@ -47,15 +48,7 @@ export default function AppointmentsList({
     });
     return map;
   }, [statusCounts]);
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      year: "numeric",
-      month: "short",
-      day: "numeric",
-    });
-  };
-
+  
   return (
     <Card
       className={`border border-border shadow-sm lg:col-span-3 flex flex-col ${className || ""}`}

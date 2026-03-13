@@ -1,6 +1,7 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AvailableTimeSlotView, TimeSlot } from "../types";
 import { Sun, Moon } from "lucide-react";
+import { format12HourTime } from "../utils";
 
 interface TimeSlotselectorProps {
   selectedDate: Date | undefined;
@@ -17,13 +18,6 @@ export default function TimeSlotSelector({
   loading,
   onTimeSelect,
 }: TimeSlotselectorProps) {
-  const formatTime12hr = (time24: string) => {
-    const [hours, minutes] = time24.split(":").map(Number);
-    const period = hours >= 12 ? "PM" : "AM";
-    const hours12 = hours % 12 || 12;
-    return `${hours12}:${minutes.toString().padStart(2, "0")} ${period}`;
-  };
-
   const getHour = (time24: string) => {
     return Number(time24.split(":")[0]);
   };
@@ -46,7 +40,7 @@ export default function TimeSlotSelector({
       aria-label={`Select ${slot.time}`}
       aria-pressed={selectedTime?.id === slot.id}
     >
-      {formatTime12hr(slot.time)}
+      {format12HourTime(slot.time)}
     </button>
   );
 

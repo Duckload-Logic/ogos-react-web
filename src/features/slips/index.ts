@@ -4,7 +4,11 @@
  */
 
 // Types
-export type { Slip, SlipStatus, SlipAttachment } from "./types";
+export type {
+  Slip,
+  SlipStatus,
+  SlipAttachment,
+} from "./types";
 
 // Query Hooks
 export {
@@ -16,11 +20,14 @@ export {
 } from "./hooks";
 
 // Mutation Hooks
-export { useSubmitSlip, useUpdateSlipStatus } from "./hooks";
+export {
+  useSubmitSlip,
+  useUpdateSlipStatus,
+} from "./hooks";
 
 // Services (re-export for legacy imports)
 export * from "./services";
 
 // Pages
-export { ReviewSlips } from "./pages/admin/ReviewSlips";
+export { default as ReviewSlips } from "./pages/admin/ReviewSlips";
 export { default as SlipLogs } from "./pages/admin/SlipLogs";

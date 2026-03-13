@@ -1,15 +1,47 @@
-import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { authService, LoginPayload } from "../services/index";
+/**
+ * Authentication Hook
+ * Handles login and logout with bootstrapper integration
+ */
 
+import {
+  useMutation,
+  useQueryClient,
+} from "@tanstack/react-query";
+import { PostLogin, LoginPayload } from "../services/index";
+import {
+  BootstrapApp,
+  ResetBootstrap,
+} from "@/services/bootstrapper";
+import { QUERY_KEYS } from "@/config/queryKeys";
+
+/**
+ * Login mutation hook
+ * Triggers bootstrap on successful login
+ *
+ * @returns Login mutation and state
+ */
 export function useLogin() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: ({ email, password }: LoginPayload) =>
-      authService.login({ email, password }),
-    onSuccess: () => {
-      // Invalidate user data so that useMe refetches
-      queryClient.invalidateQueries({ queryKey: ["users", "me"] });
+    mutationFn: (payload: LoginPayload) =>
+      PostLogin(payload),
+    onSuccess: async () => {
+      try {
+        // Trigger bootstrap to fetch critical data
+        await BootstrapApp();
+
+        // Invalidate user query to refetch
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.users.me,
+        });
+      } catch (error: any) {
+        console.error(
+          '[useLogin] {Bootstrap}: ' +
+          `${error.message}`,
+        );
+        throw error;
+      }
     },
   });
 
@@ -20,14 +52,36 @@ export function useLogin() {
   };
 }
 
+/**
+ * Logout mutation hook
+ * Clears bootstrap state and all cached queries
+ *
+ * @returns Logout mutation and state
+ */
 export function useLogout() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: () => authService.logout(),
+    mutationFn: () =>
+      import('../services/index').then(
+        (m) => m.PostLogout(),
+      ),
     onSuccess: () => {
-      // Clear all cached queries on logout
+      // Reset bootstrap state
+      ResetBootstrap();
+
+      // Clear all cached queries
       queryClient.clear();
+
+      console.log(
+        '[useLogout] {Cleanup}: Logout complete',
+      );
+    },
+    onError: (error: any) => {
+      console.error(
+        '[useLogout] {Logout}: ' +
+        `${error.message}`,
+      );
     },
   });
 

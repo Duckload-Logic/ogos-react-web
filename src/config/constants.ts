@@ -31,3 +31,64 @@ export const APP_CONFIG = {
   FORM_VALIDATION_DEBOUNCE: 300, // ms
   AUTO_SAVE_INTERVAL: 30000, // 30 seconds
 } as const;
+
+/**
+ * React Query Cache Timing Configuration
+ * Defines staleTime and gcTime for different data freshness needs.
+ * Usage: useQuery({ queryKey: [...], queryFn: ..., ...CACHE_TIMING.SHORT })
+ */
+export const CACHE_TIMING = {
+  /**
+   * SHORT: 5 minutes stale, 30 minutes garbage collection
+   * Use for: Frequently changing data (appointments, slips)
+   */
+  SHORT: {
+    staleTime: 5 * 60 * 1000,
+    gcTime: 30 * 60 * 1000,
+  } as const,
+
+  /**
+   * MEDIUM: 30 minutes stale, 1 hour garbage collection
+   * Use for: Moderately changing data (user preferences)
+   */
+  MEDIUM: {
+    staleTime: 30 * 60 * 1000,
+    gcTime: 60 * 60 * 1000,
+  } as const,
+
+  /**
+   * LONG: 1 hour stale, 2 hours garbage collection
+   * Use for: Stable reference data (statuses, categories, locations)
+   */
+  LONG: {
+    staleTime: 60 * 60 * 1000,
+    gcTime: 2 * 60 * 60 * 1000,
+  } as const,
+
+  /**
+   * NEVER: Never stale, never garbage collected
+   * Use for: Critical data that must always be fresh (user identity)
+   */
+  NEVER: {
+    staleTime: Infinity,
+    gcTime: Infinity,
+  } as const,
+
+  /**
+   * IIR_LOOKUPS: 12 hours stale, 24 hours garbage collection
+   * Use for: IIR reference data (courses, genders, religions, etc.)
+   */
+  IIR_LOOKUPS: {
+    staleTime: 12 * 60 * 60 * 1000,
+    gcTime: 24 * 60 * 60 * 1000,
+  } as const,
+
+  /**
+   * IIR_INVENTORY: 1 hour stale, 2 hours garbage collection
+   * Use for: IIR student records and inventory data
+   */
+  IIR_INVENTORY: {
+    staleTime: 60 * 60 * 1000,
+    gcTime: 2 * 60 * 60 * 1000,
+  } as const,
+} as const;
