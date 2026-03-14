@@ -35,7 +35,7 @@ export default function Header({
           alt="Logo"
           className="w-12 h-12 rounded-full transition-transform duration-200 hover:scale-110"
         />
-        <div className="flex flex-col text-xs">
+        <div className="md:flex flex-col text-xs hidden">
           <p className="font-semibold">
             Polytechnic University of the Philippines – Taguig
           </p>
@@ -46,7 +46,7 @@ export default function Header({
       </div>
 
       {isLoggedIn && (
-        <div className="text-center">
+        <div className="text-center md:block">
           <p className="text-sm font-medium">{title}</p>
           <p className="text-xs text-muted-foreground">
             Welcome back, {user?.firstName}
@@ -61,13 +61,15 @@ export default function Header({
         /> */}
         <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
         {isLoggedIn && (
-          <ProfileDropdown
-            firstName={user?.firstName}
-            lastName={user?.lastName}
-            roleLabel={getRoleLabel()}
-            profilePath="/admin/profile"
-            onLogout={handleLogout}
-          />
+          <div className="hidden md:block">
+            <ProfileDropdown
+              firstName={user?.firstName}
+              lastName={user?.lastName}
+              roleLabel={getRoleLabel()}
+              profilePath="/admin/profile"
+              onLogout={handleLogout}
+            />
+          </div>
         )}
       </div>
     </header>

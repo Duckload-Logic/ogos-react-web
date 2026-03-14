@@ -1,5 +1,4 @@
 import Header from "@/components/layout/Header";
-import Sidebar from "@/components/layout/Sidebar";
 import NotificationModal from "@/components/notifications/NotificationModal";
 import AppFooter from "@/components/common/AppFooter";
 import Toast from "@/components/ui/Toast";
@@ -14,18 +13,17 @@ import ConsentModal from "@/features/consents/components/ConsentModal";
 import { useGetLatestStatement } from "@/features/consents/hooks";
 import useCheckUserConsent from "@/features/consents/hooks/useCheckUserConsent";
 import { useGiveConsent } from "@/features/consents/hooks/useGiveConsent";
+import Navigation from "./Navigation";
 
 interface LayoutProps {
   children: React.ReactNode;
   title?: string;
-  showSidebar?: boolean;
   isLoggedIn?: boolean;
 }
 
 export default function Layout({
   children,
   title,
-  showSidebar = true,
   isLoggedIn = true,
 }: LayoutProps) {
   const { user, logout } = useAuth();
@@ -191,10 +189,13 @@ export default function Layout({
 
           <div className="flex min-h-0 flex-1 w-full">
             {isLoggedIn && (
-              <Sidebar
+              <Navigation
                 navigationItems={navigationItems}
                 location={location}
                 setIsHovered={setIsHovered}
+                user={user}
+                handleLogout={handleLogout}
+                roleLabel={getRoleLabel()}
               />
             )}
 
