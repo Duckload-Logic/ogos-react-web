@@ -9,7 +9,7 @@ interface Props {
   active: boolean;
 }
 
-export default function SidebarItem({ item, active }: Props) {
+export default function NavItem({ item, active }: Props) {
   return (
     <Link
       to={item.href}

@@ -3,15 +3,9 @@
  * Handles login and logout with bootstrapper integration
  */
 
-import {
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { PostLogin, LoginPayload } from "../services/index";
-import {
-  BootstrapApp,
-  ResetBootstrap,
-} from "@/services/bootstrapper";
+import { BootstrapApp, ResetBootstrap } from "@/services/bootstrapper";
 import { QUERY_KEYS } from "@/config/queryKeys";
 
 /**
@@ -24,22 +18,15 @@ export function useLogin() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: (payload: LoginPayload) =>
-      PostLogin(payload),
+    mutationFn: (payload: LoginPayload) => PostLogin(payload),
     onSuccess: async () => {
       try {
-        // Trigger bootstrap to fetch critical data
-        await BootstrapApp();
-
         // Invalidate user query to refetch
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.users.me,
         });
       } catch (error: any) {
-        console.error(
-          '[useLogin] {Bootstrap}: ' +
-          `${error.message}`,
-        );
+        console.error("[useLogin] {Bootstrap}: " + `${error.message}`);
         throw error;
       }
     },
@@ -62,10 +49,7 @@ export function useLogout() {
   const queryClient = useQueryClient();
 
   const mutation = useMutation({
-    mutationFn: () =>
-      import('../services/index').then(
-        (m) => m.PostLogout(),
-      ),
+    mutationFn: () => import("../services/index").then((m) => m.PostLogout()),
     onSuccess: () => {
       // Reset bootstrap state
       ResetBootstrap();
@@ -73,15 +57,10 @@ export function useLogout() {
       // Clear all cached queries
       queryClient.clear();
 
-      console.log(
-        '[useLogout] {Cleanup}: Logout complete',
-      );
+      console.log("[useLogout] {Cleanup}: Logout complete");
     },
     onError: (error: any) => {
-      console.error(
-        '[useLogout] {Logout}: ' +
-        `${error.message}`,
-      );
+      console.error("[useLogout] {Logout}: " + `${error.message}`);
     },
   });
 

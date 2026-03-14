@@ -1,8 +1,15 @@
 import { useEffect, useMemo, useRef } from "react";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCalendarStats } from "../hooks/useCalendar";
 import { DailyStatusCount } from "../types/calendar";
+import {
+  Dialog,
+  DialogTrigger,
+  DialogContent,
+  DialogTitle,
+} from "@radix-ui/react-dialog";
+import { Button } from "react-day-picker";
 
 interface Legend {
   color: string;
@@ -166,44 +173,94 @@ export default function AppointmentCalendar({
   }, [currentMonth, isDateDisabled, onMonthChange]);
 
   return (
-    <Card
-      className={`shadow-sm bg-card border border-border rounded-md h-fit ${className ?? ""}`}
-    >
-      {hasHeader && (
-        <CardHeader className="bg-gradient-to-r from-muted/50 to-muted border-b border-border rounded-md rounded-b-none">
-          <CardTitle className="text-xl text-foreground">{title}</CardTitle>
-        </CardHeader>
-      )}
-      <CardContent className="pt-6 bg-card rounded-md flex flex-col">
+    <>
+      {/* Mobile View: Modal Trigger */}
+      <div className="sm:hidden w-full">
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button
+              className="w-full flex justify-between items-center h-12 px-4
+              border-dashed border-2"
+            >
+              <div className="flex items-center gap-2">
+                <CalendarIcon className="w-4 h-4 text-primary" />
+                <span className="font-semibold">
+                  {selectedDate
+                    ? selectedDate.toLocaleDateString()
+                    : "Select Appointment Date"}
+                </span>
+              </div>
+              <span
+                className="text-xs text-muted-foreground bg-muted px-2
+              py-1 rounded"
+              >
+                Change
+              </span>
+            </Button>
+          </DialogTrigger>
+          <DialogContent
+            className="w-[95%] max-w-md p-0 overflow-hidden
+          rounded-2xl border-none"
+          >
+            <DialogTitle className="sr-only">Select Date</DialogTitle>
+            <CalendarContent />
+          </DialogContent>
+        </Dialog>
+      </div>
+
+      {/* Desktop View: Inline Card */}
+      <div className="hidden sm:block">
+        <Card
+          className={`shadow-sm bg-card border border-border h-fit
+        ${className ?? ""}`}
+        >
+          {hasHeader && (
+            <CardHeader
+              className="bg-gradient-to-r from-muted/50 to-muted
+            border-b border-border rounded-t-md"
+            >
+              <CardTitle className="text-xl text-foreground">{title}</CardTitle>
+            </CardHeader>
+          )}
+          <CardContent className="pt-6 bg-card rounded-b-md">
+            <CalendarContent />
+          </CardContent>
+        </Card>
+      </div>
+    </>
+  );
+
+  // Internal Component to avoid code duplication
+  function CalendarContent() {
+    return (
+      <div className="flex flex-col p-4 sm:p-0">
         {/* Month Navigation */}
         <div className="flex items-center justify-between mb-6">
           <button
             onClick={handlePrevMonth}
             className="p-2 hover:bg-muted rounded transition-colors"
-            aria-label="Previous month"
           >
-            <ChevronLeft className="w-5 h-5 text-foreground" />
+            <ChevronLeft className="w-5 h-5" />
           </button>
-          <h2 className="text-lg font-semibold min-w-40 text-center text-foreground">
+          <h2 className="text-lg font-semibold min-w-40 text-center">
             {monthName}
           </h2>
           <button
             onClick={handleNextMonth}
             className="p-2 hover:bg-muted rounded transition-colors"
-            aria-label="Next month"
           >
-            <ChevronRight className="w-5 h-5 text-foreground" />
+            <ChevronRight className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Calendar Grid - Desktop */}
-        <div className="hidden sm:block space-y-4 gap-2">
+        {/* Calendar Grid */}
+        <div className="space-y-4">
           {/* Day Headers */}
           <div className="grid grid-cols-7 text-center">
             {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
               <div
                 key={day}
-                className="font-semibold text-sm text-muted-foreground"
+                className="font-bold text-xs text-muted-foreground"
               >
                 {day}
               </div>
@@ -211,7 +268,7 @@ export default function AppointmentCalendar({
           </div>
 
           {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-2">
+          <div className="grid grid-cols-7 gap-1 sm:gap-2">
             {emptyDays.map((_, idx) => (
               <div key={`empty-${idx}`} className="p-1" />
             ))}
@@ -225,58 +282,35 @@ export default function AppointmentCalendar({
               const isDisabled = isDateDisabled(day);
 
               return (
-                <div
-                  key={day}
-                  className="relative group p-1 flex justify-center"
-                >
+                <div key={day} className="relative group flex justify-center">
                   <button
-                    onClick={() => handleDateClick(day)}
+                    onClick={() => {
+                      handleDateClick(day);
+                      // If on mobile, you might want logic to close modal here
+                    }}
                     disabled={isDisabled}
                     className={`
-                      size-12
-                      rounded-lg font-semibold transition-colors text-sm
-                      flex items-center justify-center
-                      focus:outline-none focus:ring-1 focus:ring-primary/50
-                      text-nowrap
-                      ${isDisabled ? "opacity-50 cursor-not-allowed" : "hover:ring-1 hover:ring-primary"}
-                      ${
-                        isSelected
-                          ? "bg-primary text-primary-foreground ring-1 ring-primary"
-                          : isDisabled
-                            ? "bg-muted/50 text-muted-foreground"
-                            : "bg-muted hover:bg-muted/80 text-foreground"
-                      }
-                      ${isToday ? "ring-1 ring-primary" : ""}
-                    `}
-                    aria-label={`${day} ${monthName}`}
-                    aria-pressed={isSelected}
+                    size-10 sm:size-12 rounded-xl font-semibold text-sm
+                    flex items-center justify-center transition-all text-nowrap
+                    ${
+                      isSelected
+                        ? "bg-primary text-primary-foreground scale-110 shadow-lg"
+                        : "bg-muted hover:bg-muted/80 text-foreground"
+                    }
+                    ${isDisabled ? "opacity-30 cursor-not-allowed" : ""}
+                    ${isToday && !isSelected ? "border-2 border-primary" : ""}
+                  `}
                   >
                     {day}
                   </button>
+                  {/* Admin Stats Dots */}
                   {isAdmin && statsMap[dateKey] && (
-                    <div className="absolute flex -space-x-1 transform -translate-y-1 justify-center pointer-events-none">
-                      {/* Pending is first in row-reverse order to be on top-right */}
-                      {statsMap[dateKey].RescheduledCount > 0 && (
-                        <div
-                          className="size-3 rounded-full bg-notice-background border-2 border-notice-foreground"
-                          title="Rescheduled"
-                        />
-                      )}
-
-                      {/* Scheduled is rendered second (middle) */}
-                      {statsMap[dateKey].ScheduledCount > 0 && (
-                        <div
-                          className="size-3 rounded-full bg-info-background border-2 border-info-foreground"
-                          title="Scheduled"
-                        />
-                      )}
-
-                      {/* Pending is rendered last (right-most, top of stack) */}
+                    <div className="absolute -bottom-1 flex gap-0.5">
                       {statsMap[dateKey].PendingCount > 0 && (
-                        <div
-                          className="size-3 rounded-full bg-warning-background border-2 border-warning-foreground"
-                          title="Pending"
-                        />
+                        <div className="size-1.5 rounded-full bg-warning" />
+                      )}
+                      {statsMap[dateKey].ScheduledCount > 0 && (
+                        <div className="size-1.5 rounded-full bg-info" />
                       )}
                     </div>
                   )}
@@ -286,84 +320,16 @@ export default function AppointmentCalendar({
           </div>
         </div>
 
-        {/* Mobile Calendar */}
-        <div
-          className="sm:hidden space-y-2"
-          onTouchStart={(e) => {
-            touchStartX.current = e.touches[0].clientX;
-          }}
-          onTouchEnd={(e) => {
-            if (touchStartX.current == null) return;
-            const dx = e.changedTouches[0].clientX - touchStartX.current;
-            const threshold = 50;
-            if (dx < -threshold) handleNextMonth();
-            else if (dx > threshold) handlePrevMonth();
-            touchStartX.current = null;
-          }}
-        >
-          {days.map((day) => {
-            const dateKey = formatDateKey(day);
-            const isBooked = bookedDates.has(dateKey);
-            const isToday = isCurrentMonth && day === todayDate;
-            const isSelected =
-              selectedDate?.getDate() === day &&
-              selectedDate.getMonth() === currentMonthIndex &&
-              selectedDate.getFullYear() === currentYear;
-            const isDisabled = isDateDisabled(day);
-
-            return (
-              <button
-                key={`mobile-${day}`}
-                onClick={() => handleDateClick(day)}
-                disabled={isDisabled}
-                className={`
-                  w-full flex items-center justify-between p-3 rounded-lg
-                  text-sm font-medium transition-colors
-                  ${isDisabled ? "opacity-50 cursor-not-allowed" : ""}
-                  ${
-                    isSelected
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground"
-                  }
-                  ${isToday ? "border-2 border-primary" : ""}
-                `}
-              >
-                <span>Day {day}</span>
-                <span className="text-xs">
-                  {isToday
-                    ? "Today"
-                    : isSelected
-                      ? "Selected"
-                      : isBooked
-                        ? "Booked"
-                        : isDisabled
-                          ? "Unavailable"
-                          : "Available"}
-                </span>
-              </button>
-            );
-          })}
-          <p className="text-center text-xs text-muted-foreground mt-2">
-            Swipe left/right to change month
-          </p>
-        </div>
-
         {/* Legend */}
-        <div className="mt-6 pt-6 border-t border-border flex flex-wrap gap-4 text-sm">
-          {isCurrentMonth && (
-            <div className="flex items-center gap-2">
-              <div className="w-4 h-4 rounded bg-muted border-2 border-primary" />
-              <span className="text-foreground">Today</span>
-            </div>
-          )}
+        <div className="mt-8 pt-4 border-t border-border flex flex-wrap gap-3">
           {displayLegends.map(({ color, label }) => (
-            <div key={label} className="flex items-center gap-2">
-              <div className={`w-4 h-4 rounded border-2 ${color}`} />
-              <span className="text-foreground">{label}</span>
+            <div key={label} className="flex items-center gap-2 text-xs">
+              <div className={`size-3 rounded-full border ${color}`} />
+              <span>{label}</span>
             </div>
           ))}
         </div>
-      </CardContent>
-    </Card>
-  );
+      </div>
+    );
+  }
 }
