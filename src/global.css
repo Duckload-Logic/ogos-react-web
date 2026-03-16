@@ -53,7 +53,7 @@
     --popover: 0 0% 99%;
     --popover-foreground: 224 12% 20%;
 
-    --primary: 0 72% 45%;
+    --primary: 0 100% 25.1%;
     --primary-foreground: 0 0% 100%;
     --primary-dark: 0 72% 35%;
 
@@ -116,7 +116,7 @@
     --popover: 0 0% 20%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 0 64% 55%;
+    --primary: 0 70.68% 37.45%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 45 93% 56%;
@@ -429,11 +429,21 @@
 
   /* Sidebar icon tilt animation */
   @keyframes sidebar-tilt {
-    0% { transform: rotate(0deg); }
-    25% { transform: rotate(-8deg); }
-    50% { transform: rotate(6deg); }
-    75% { transform: rotate(-4deg); }
-    100% { transform: rotate(0deg); }
+    0% {
+      transform: rotate(0deg);
+    }
+    25% {
+      transform: rotate(-8deg);
+    }
+    50% {
+      transform: rotate(6deg);
+    }
+    75% {
+      transform: rotate(-4deg);
+    }
+    100% {
+      transform: rotate(0deg);
+    }
   }
 
   .sidebar-icon-tilt:hover svg {
