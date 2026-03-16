@@ -28,18 +28,18 @@ export default function Header({
   isLoggedIn = true,
 }: HeaderProps) {
   return (
-    <header className="h-20 flex items-center justify-between px-6 border-b bg-background/80 backdrop-blur-lg sticky top-0 z-30">
-      <div className="flex items-center gap-3">
+    <header className="h-20 flex items-center justify-between px-6 bg-gradient-to-t from-primary/80 via-primary to-primary backdrop-blur-lg sticky top-0 z-30">
+      <div className="flex items-center gap-3 text-primary-foreground">
         <img
           src={LOGO_SRC}
           alt="Logo"
           className="w-12 h-12 rounded-full transition-transform duration-200 hover:scale-110"
         />
-        <div className="md:flex flex-col text-xs hidden">
+        <div className="md:flex flex-col text-xs hidden gap-1">
           <p className="font-semibold">
             Polytechnic University of the Philippines – Taguig
           </p>
-          <p className="text-muted-foreground">
+          <p className="text-primary-foreground/50">
             Online Guidance Office Services
           </p>
         </div>
@@ -47,8 +47,8 @@ export default function Header({
 
       {isLoggedIn && (
         <div className="text-center md:block">
-          <p className="text-sm font-medium">{title}</p>
-          <p className="text-xs text-muted-foreground">
+          <p className="text-sm text-primary-foreground font-medium">{title}</p>
+          <p className="text-xs text-primary-foreground/50">
             Welcome back, {user?.firstName}
           </p>
         </div>
