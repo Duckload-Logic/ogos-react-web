@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Settings, LogOut } from "lucide-react";
+import { Settings, LogOut, Gavel, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
@@ -55,14 +55,17 @@ export default function ProfileDropdown({
       {/* Trigger */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 p-2 rounded hover:bg-muted transition text-foreground"
+        className="flex items-center gap-2 p-2 rounded hover:bg-muted/30 transition text-foreground"
       >
         <Avatar className="h-7 w-7">
-          <AvatarFallback className="text-xs font-semibold">
-            {firstName?.charAt(0)}{lastName?.charAt(0)}
+          <AvatarFallback className="text-xs font-semibold text-primary-foreground">
+            {firstName?.charAt(0)}
+            {lastName?.charAt(0)}
           </AvatarFallback>
         </Avatar>
-        <span className="text-sm hidden md:block">{roleLabel}</span>
+        <span className="text-sm hidden md:block text-primary-foreground">
+          {roleLabel}
+        </span>
       </button>
 
       {open && (
@@ -70,7 +73,6 @@ export default function ProfileDropdown({
           onClick={(e) => e.stopPropagation()}
           className="absolute right-0 mt-2 w-72 bg-card text-card-foreground border border-border rounded-xl shadow-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 isolate"
         >
-
           {/* Profile Header */}
           <button
             onClick={() => {
@@ -82,7 +84,8 @@ export default function ProfileDropdown({
             <div className="flex items-center gap-3">
               <Avatar className="h-9 w-9">
                 <AvatarFallback className="font-semibold">
-                  {firstName?.charAt(0)}{lastName?.charAt(0)}
+                  {firstName?.charAt(0)}
+                  {lastName?.charAt(0)}
                 </AvatarFallback>
               </Avatar>
               <div>
@@ -95,9 +98,7 @@ export default function ProfileDropdown({
                     {section} • {studentNumber}
                   </p>
                 ) : (
-                  <p className="text-xs text-muted-foreground">
-                    {roleLabel}
-                  </p>
+                  <p className="text-xs text-muted-foreground">{roleLabel}</p>
                 )}
               </div>
             </div>
@@ -110,9 +111,7 @@ export default function ProfileDropdown({
               User Preferences
             </div>
 
-            <p className="text-xs text-muted-foreground mb-2">
-              Font Size
-            </p>
+            <p className="text-xs text-muted-foreground mb-2">Font Size</p>
 
             <div className="flex items-center justify-center gap-3 bg-muted rounded-lg py-2">
               <button
@@ -134,6 +133,23 @@ export default function ProfileDropdown({
               </button>
             </div>
           </div>
+          <a
+            href="https://www.pup.edu.ph/terms/"
+            target="_blank"
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-muted transition"
+          >
+            <Gavel size={16} />
+            <span>Terms of Service</span>
+          </a>
+
+          <a
+            href="https://www.pup.edu.ph/privacy/"
+            target="_blank"
+            className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-muted transition border-t border-border"
+          >
+            <ShieldCheck size={16} />
+            <span>Privacy Policy</span>
+          </a>
 
           {/* Logout */}
           <button

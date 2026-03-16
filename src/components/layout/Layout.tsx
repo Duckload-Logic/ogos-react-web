@@ -212,8 +212,6 @@ export default function Layout({
                 <main className="flex-1 bg-transparent p-4 md:p-8 animate-in fade-in slide-in-from-bottom-2">
                   {children}
                 </main>
-
-                <AppFooter />
               </div>
             </div>
           </div>
