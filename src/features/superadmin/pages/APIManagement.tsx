@@ -350,6 +350,12 @@ export default function APIManagement() {
                     <Copy size={14} />
                   )}
                 </Button>
+                
+                {copied && (
+                  <span className="text-xs text-emerald-500 ml-2">
+                    Copied!
+                  </span>
+                )}
               </div>
             </div>
           ) : (

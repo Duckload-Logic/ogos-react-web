@@ -161,7 +161,7 @@ export default function SuperAdminDashboard() {
                 className={`
                   group bg-card border-2 ${action.border}
                   p-5 rounded-lg transition-all duration-200
-                  hover:-translate-y-1 hover:shadow-md hover:bg-primary/5 hover:border-primary
+                  hover:shadow-sm transition-colors duration-150 hover:bg-primary/5 hover:border-primary
                   flex items-center gap-4
                 `}
               >

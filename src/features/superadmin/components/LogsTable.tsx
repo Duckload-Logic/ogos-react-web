@@ -94,9 +94,9 @@ export default function LogsTable({
     return p;
   }, [currentPage, debouncedSearch, actionFilter, startDate, endDate]);
 
-  const { data, isLoading, refetch } = useLogsHook(params);
+  const { data, isLoading, refetch, isFetching } = useLogsHook(params);
 
-  const logs = data?.logs ?? [];
+  const logs = useMemo(() => data?.logs ?? [], [data]);
   const totalPages = data?.totalPages ?? 1;
   const total = data?.total ?? 0;
 
@@ -113,6 +113,26 @@ export default function LogsTable({
 
   const formatAction = (action: string) =>
     action.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+
+  // HIGHLIGHT 
+  const highlightText = (text: string, query: string) => {
+    if (!query) return text;
+
+    const parts = text.split(new RegExp(`(${query})`, "gi"));
+
+    return parts.map((part, index) =>
+      part.toLowerCase() === query.toLowerCase() ? (
+        <span
+          key={index}
+          className="bg-yellow-200 dark:bg-yellow-500/20 text-black dark:text-yellow-200 px-1 rounded"
+        >
+          {part}
+        </span>
+      ) : (
+        part
+      )
+    );
+  };
 
   const handleReset = () => {
     setSearchTerm("");
@@ -137,11 +157,18 @@ export default function LogsTable({
             onClick={() => refetch()}
             className="gap-2"
           >
-            <RefreshCw size={14} />
+            <RefreshCw
+              size={14}
+              className={isFetching ? "animate-spin" : ""}
+            />
             Refresh
           </Button>
           <Button
-            variant="outline"
+            variant={
+              showFilters || actionFilter || startDate || endDate
+                ? "default"
+                : "outline"
+            }
             size="sm"
             onClick={() => setShowFilters(!showFilters)}
             className="gap-2"
@@ -177,32 +204,10 @@ export default function LogsTable({
                   ))}
                 </select>
               </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">
-                  Start Date
-                </label>
-                <Input
-                  type="date"
-                  value={startDate}
-                  onChange={(e) => {
-                    setStartDate(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">
-                  End Date
-                </label>
-                <Input
-                  type="date"
-                  value={endDate}
-                  onChange={(e) => {
-                    setEndDate(e.target.value);
-                    setCurrentPage(1);
-                  }}
-                />
-              </div>
+
+              <Input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} />
+              <Input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
+
               <div className="flex items-end">
                 <Button variant="ghost" size="sm" onClick={handleReset}>
                   Reset Filters
@@ -213,7 +218,7 @@ export default function LogsTable({
         </Card>
       )}
 
-      {/* Search & Table */}
+      {/* Table */}
       <Card>
         <CardHeader>
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
@@ -225,6 +230,7 @@ export default function LogsTable({
                 </Badge>
               )}
             </CardTitle>
+
             <div className="relative w-full sm:w-72">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
               <Input
@@ -234,32 +240,50 @@ export default function LogsTable({
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-9"
+                className={`pl-9 transition-colors ${
+                  searchTerm
+                    ? "border-primary/50 focus-visible:ring-primary"
+                    : ""
+                }`}
               />
             </div>
           </div>
         </CardHeader>
+
         <CardContent className="p-0">
           {isLoading ? (
-            <div className="flex items-center justify-center py-16">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            <div className="p-6 space-y-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="h-10 rounded-md bg-muted animate-pulse" />
+              ))}
             </div>
           ) : logs.length === 0 ? (
             <div className="text-center py-16 text-muted-foreground">
               <p className="font-medium">No log entries found</p>
               <p className="text-sm mt-1">
-                Try adjusting your filters or check back later
+                Try adjusting filters or clear them to see results
               </p>
+
+              {(actionFilter || startDate || endDate) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={handleReset}
+                  className="mt-3"
+                >
+                  Clear filters
+                </Button>
+              )}
             </div>
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead>
+                <thead className="sticky top-0 z-10 bg-background">
                   <tr className="border-b border-t text-left bg-muted/30">
-                    <th className="px-4 py-3 font-medium text-muted-foreground">
+                    <th className="px-4 py-3 font-medium text-muted-foreground whitespace-nowrap">
                       Timestamp
                     </th>
-                    <th className="px-4 py-3 font-medium text-muted-foreground">
+                    <th className="px-4 py-3 font-medium text-muted-foreground whitespace-nowrap">
                       Action
                     </th>
                     <th className="px-4 py-3 font-medium text-muted-foreground">
@@ -278,15 +302,17 @@ export default function LogsTable({
                     )}
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+
+                <tbody className="divide-y divide-border/60">
                   {logs.map((log: SystemLog) => (
                     <tr
                       key={log.id}
-                      className="hover:bg-muted/50 transition-colors"
+                      className="hover:bg-muted/60 hover:shadow-[inset_0_0_0_1px_rgba(0,0,0,0.03)] dark:hover:shadow-[inset_0_0_0_1px_rgba(255,255,255,0.05)] transition-colors duration-150"
                     >
-                      <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap">
+                      <td className="px-4 py-3 text-xs text-muted-foreground whitespace-nowrap font-mono">
                         {formatDate(log.createdAt)}
                       </td>
+
                       <td className="px-4 py-3">
                         <span
                           className={`inline-block text-xs font-medium px-2 py-1 rounded-md ${
@@ -297,15 +323,23 @@ export default function LogsTable({
                           {formatAction(log.action)}
                         </span>
                       </td>
-                      <td className="px-4 py-3 text-sm max-w-[320px] truncate">
-                        {log.message}
+
+                      <td className="px-4 py-3 text-sm max-w-[420px] line-clamp-2 leading-snug">
+                        {highlightText(log.message, debouncedSearch)}
                       </td>
+
                       <td className="px-4 py-3 text-xs text-muted-foreground">
-                        {log.userEmail || "—"}
+                        {log.userEmail
+                          ? highlightText(log.userEmail, debouncedSearch)
+                          : "—"}
                       </td>
+
                       <td className="px-4 py-3 text-xs text-muted-foreground">
-                        {log.targetEmail || "—"}
+                        {log.targetEmail
+                          ? highlightText(log.targetEmail, debouncedSearch)
+                          : "—"}
                       </td>
+
                       {showIPAddress && (
                         <td className="px-4 py-3">
                           <code className="text-xs bg-muted px-1.5 py-0.5 rounded">
