@@ -5,13 +5,13 @@ import { useSecurityLogs } from "../hooks";
 const SECURITY_ACTIONS = [
   "LOGIN_SUCCESS",
   "LOGIN_FAILED",
-  "LOGOUT",
-  "TOKEN_REFRESHED",
   "ACCESS_DENIED",
   "RATE_LIMIT_EXCEEDED",
   "INVALID_TOKEN",
-  "API_KEY_USED",
   "API_KEY_INVALID",
+  "LOGOUT",
+  "TOKEN_REFRESHED",
+  "API_KEY_USED",
 ];
 
 export default function SecurityLogs() {
@@ -19,7 +19,7 @@ export default function SecurityLogs() {
     <LogsTable
       title="Security Logs"
       icon={<Shield className="h-5 w-5" />}
-      description="Monitor authentication, access control, and security events"
+      description="Monitor authentication, authorization, and access-related security events."
       useLogsHook={useSecurityLogs}
       actionOptions={SECURITY_ACTIONS}
       showIPAddress

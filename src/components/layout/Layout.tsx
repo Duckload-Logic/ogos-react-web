@@ -30,13 +30,11 @@ export default function Layout({
   const location = useLocation();
   const navigate = useNavigate();
 
-  const { data: latestDocument, isLoading: isLatestDocumentLoading } =
-    useGetLatestStatement("terms");
+  const { data: latestDocument } = useGetLatestStatement("terms");
   const { data: userConsent, isLoading: isUserConsentLoading } =
     useCheckUserConsent(latestDocument?.id);
   const { mutate: giveConsent } = useGiveConsent();
 
-  // pages excluded from consent modal
   const excludedPaths = ["/terms", "/privacy"];
   const currentPath = location.pathname;
   const isExcluded = excludedPaths.includes(currentPath);
@@ -109,6 +107,7 @@ export default function Layout({
 
   const mustAcceptTerms =
     !isUserConsentLoading && userConsent?.accepted === false && !isExcluded;
+
   useEffect(() => {
     if (!user) return;
     setTermsOpen(mustAcceptTerms);
@@ -128,24 +127,19 @@ export default function Layout({
   }, [termsOpen]);
 
   const handleAcceptTerms = () => {
-    console.log("handleAcceptTerms called", {
-      user: user?.id,
-      docId: latestDocument?.id,
-    });
     if (!user || !latestDocument?.id) {
       triggerToast("Document not ready. Please try again.");
       return;
     }
+
     giveConsent(
       { type: "terms", docId: latestDocument.id },
       {
         onSuccess: () => {
-          console.log("Consent mutation succeeded");
           setTermsOpen(false);
           triggerToast("Terms and Conditions accepted.");
         },
-        onError: (error) => {
-          console.error("Consent mutation failed:", error);
+        onError: () => {
           triggerToast("Failed to accept terms. Please try again.");
         },
       },
@@ -154,7 +148,12 @@ export default function Layout({
 
   return (
     <ErrorBoundary>
-      <div className="flex h-screen flex-col overflow-hidden bg-background animate-in fade-in duration-300">
+      <div className="relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950">
+        <div className="pointer-events-none absolute inset-0">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.08),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.06),transparent_24%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.10),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.07),transparent_24%)]" />
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.14))] dark:bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.02))]" />
+        </div>
+
         {!userConsent?.accepted && (
           <ConsentModal
             open={termsOpen}
@@ -165,7 +164,7 @@ export default function Layout({
 
         <div
           ref={contentRef}
-          className={`flex min-h-0 flex-1 flex-col ${
+          className={`relative z-10 flex min-h-0 flex-1 flex-col ${
             termsOpen ? "pointer-events-none select-none blur-[3px]" : ""
           }`}
         >
@@ -187,7 +186,7 @@ export default function Layout({
             toasts={toasts}
           />
 
-          <div className="flex min-h-0 flex-1 w-full">
+          <div className="flex min-h-0 w-full flex-1">
             {isLoggedIn && (
               <Navigation
                 navigationItems={navigationItems}
@@ -201,15 +200,15 @@ export default function Layout({
 
             <div className="relative min-w-0 flex-1 overflow-hidden">
               {expanded && !termsOpen && (
-                <div className="absolute inset-0 z-0 bg-black/10 backdrop-blur-sm animate-in fade-in duration-200 pointer-events-none" />
+                <div className="pointer-events-none absolute inset-0 z-0 animate-in fade-in bg-black/10 backdrop-blur-sm duration-200" />
               )}
 
               <div
                 className={`relative z-10 flex h-full flex-col overflow-y-auto transition-all duration-300 ${
-                  expanded && !termsOpen ? "blur-sm" : ""
+                  expanded && !termsOpen ? "blur-[2px]" : ""
                 }`}
               >
-                <main className="flex-1 bg-transparent p-4 md:p-8 animate-in fade-in slide-in-from-bottom-2">
+                <main className="flex-1 bg-transparent px-3 py-3 md:px-4 md:py-4 xl:px-5 xl:py-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
                   {children}
                 </main>
 
