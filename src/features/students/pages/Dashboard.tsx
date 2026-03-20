@@ -62,7 +62,7 @@ export function Dashboard() {
   const { data: slipStats } = useGetSlipStats({});
   const { data: appointmentStats } = useAppointmentsStats({ params: {} });
 
-  const showForm = !!me && iir && !iir.isSubmitted;
+  // const showForm = !isIIRLoading && iir && !iir.isSubmitted;
 
   const totalSlips =
     slipStats?.reduce((sum: number, s: any) => sum + (s.count || 0), 0) || 0;
@@ -120,7 +120,7 @@ export function Dashboard() {
       />
 
       <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-10">
-        {showForm && (
+        {/* {showForm && (
           <Alert
             variant="destructive"
             className="animate-fade-in-up mb-6 border-l-4"
@@ -140,7 +140,7 @@ export function Dashboard() {
               </Button>
             </Link>
           </Alert>
-        )}
+        )} */}
 
         <div className="grid grid-cols-2 gap-4 mb-6">
           <StatsCard
@@ -172,10 +172,13 @@ export function Dashboard() {
           lastName={me?.lastName}
           middleName={me?.middleName}
           email={me?.email}
-          isFormIncomplete={showForm}
+          isFormIncomplete={
+            // showForm
+            true
+          }
         />
 
-        {!showForm && (
+        {/* {!showForm && (
           <Alert
             className="animate-fade-in-up border-l-4 border-green-500 bg-green-50 dark:bg-green-950/30 dark:border-green-600"
             style={{ animationDelay: "0.35s", animationFillMode: "both" }}
@@ -189,7 +192,7 @@ export function Dashboard() {
               and correct to the best of my knowledge.
             </AlertDescription>
           </Alert>
-        )}
+        )} */}
       </div>
     </PortalShell>
   );

@@ -1,11 +1,17 @@
 import { ChevronDownIcon, ChevronUpIcon, Check, Lock } from "lucide-react";
+import { required } from "node_modules/zod/v4/core/util.cjs";
 import { useEffect, useRef, useState } from "react";
+import { get } from "react-hook-form";
+import { string, any, boolean } from "zod";
 
 export default function DropdownField({
   label,
+  name,
   options,
+  identifier = "id",
   value,
   onChange,
+  onBlur,
   error,
   required = false,
   enabled = true,
@@ -16,9 +22,12 @@ export default function DropdownField({
   labelKey,
 }: {
   label: string;
+  name?: string;
   options: any[];
+  identifier?: any;
   value: any;
   onChange: (val: any) => void;
+  onBlur?: () => void;
   error?: string;
   required?: boolean;
   enabled?: boolean;
@@ -28,7 +37,7 @@ export default function DropdownField({
   formStyle?: boolean;
   labelKey?: string;
 }) {
-  const selectedOption = options.find((opt) => opt.id == value);
+  const selectedOption = options.find((opt) => opt[identifier] == value);
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
   const isFilled = selectedOption !== undefined;
@@ -46,6 +55,10 @@ export default function DropdownField({
         !dropdownRef.current.contains(event.target as Node)
       ) {
         setIsOpen(false);
+        // Trigger onBlur when clicking outside
+        if (onBlur) {
+          onBlur();
+        }
       }
     };
 
@@ -54,7 +67,7 @@ export default function DropdownField({
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, []);
+  }, [onBlur]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -85,27 +98,31 @@ export default function DropdownField({
             disabled={!enabled || loading}
             className={`flex w-full items-center justify-between px-3 py-2 h-10 text-left font-normal border rounded-md focus:ring-2 focus:ring-offset-0 outline-none transition-colors duration-200 text-foreground ${
               !enabled || loading
-                ? 'bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none'
+                ? "bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none"
                 : formStyle
                   ? isFilled
-                    ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                    : 'bg-card border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
-                  : 'bg-background border-border hover:border-primary focus:border-primary focus:ring-primary/20'
-            } ${
-              error ? "border-red-500" : ""
-            }`}
+                    ? "bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20"
+                    : "bg-card border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20"
+                  : "bg-background border-border hover:border-primary focus:border-primary focus:ring-primary/20"
+            } ${error ? "border-red-500" : ""}`}
             onClick={toggleDropdown}
           >
             <span
               className={`truncate ${
-                selectedOption ? "text-foreground font-medium" : "text-muted-foreground italic"
+                selectedOption
+                  ? "text-foreground font-medium"
+                  : "text-muted-foreground italic"
               }`}
             >
               {getLabel(selectedOption)}
             </span>
             <div className="flex items-center gap-2 flex-shrink-0">
               {!enabled && (
-                <Lock size={16} className="text-muted-foreground" strokeWidth={2} />
+                <Lock
+                  size={16}
+                  className="text-muted-foreground"
+                  strokeWidth={2}
+                />
               )}
               {enabled && isFilled && !error && formStyle && (
                 <Check size={16} className="text-green-500" strokeWidth={2.5} />
@@ -119,7 +136,9 @@ export default function DropdownField({
           </button>
         </div>
         {isOpen && (
-          <div className={`w-full min-w-[200px] max-h-[200px] overflow-y-auto absolute mt-1 border border-border rounded-md shadow-lg z-50 p-2 ${formStyle ? 'bg-card' : 'bg-background'}`}>
+          <div
+            className={`w-full min-w-[200px] max-h-[200px] overflow-y-auto absolute mt-1 border border-border rounded-md shadow-lg z-50 p-2 ${formStyle ? "bg-card" : "bg-background"}`}
+          >
             {options.length === 0 ? (
               <div className="px-2 py-1.5 text-sm text-muted-foreground">
                 No options available
@@ -130,14 +149,18 @@ export default function DropdownField({
 
                 return (
                   <button
-                    key={option.id}
+                    key={option[identifier]}
                     onClick={() => {
                       onChange(option[get]);
                       setIsOpen(false);
+                      // Trigger onBlur when selecting an option
+                      if (onBlur) {
+                        onBlur();
+                      }
                     }}
                     disabled={isOptionDisabled}
                     className={`w-full text-left px-3 py-2 text-sm hover:text-primary hover:bg-muted-foreground/30 rounded ${
-                      option.id === value
+                      option[identifier] === value
                         ? "bg-muted-foreground/10 text-primary font-medium"
                         : ""
                     } ${isOptionDisabled && "text-muted-foreground cursor-not-allowed"}`}
@@ -150,7 +173,9 @@ export default function DropdownField({
           </div>
         )}
       </div>
-      {error && <p className="text-xs font-semibold text-red-600 mt-1">{error}</p>}
+      {error && (
+        <p className="text-xs font-semibold text-red-600 mt-1">{error}</p>
+      )}
       {/* tooltip removed: showTooltip/tooltipRef were unused */}
     </div>
   );

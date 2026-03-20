@@ -29,7 +29,8 @@ export type {
  * Get current user's appointments
  * @param params - Query parameters
  * @param config - Axios config with logging metadata
- * @returns Paginated appointments response
+ * @returns Paginated appointments response with iirId
+ * @throws Error on 403 (Day One student) or other failures
  */
 export async function GetMyAppointments(
   params: QueryParam,
@@ -42,8 +43,24 @@ export async function GetMyAppointments(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetMyAppointments';
-    const stepName = config?.stepName || 'Fetch My Appointments';
+    const handlerName = config?.handlerName ||
+      'GetMyAppointments';
+
+    // Handle Day One student (403 Forbidden)
+    if (error.response?.status === 403) {
+      const stepName = config?.stepName ||
+        'Check IIR Profile';
+      console.error(
+        `[${handlerName}] {${stepName}}: ` +
+        `${error.response.data?.error}`,
+      );
+      throw new Error(
+        'Please complete your IIR profile',
+      );
+    }
+
+    const stepName = config?.stepName ||
+      'Fetch My Appointments';
     console.error(
       `[${handlerName}] {${stepName}}: ${error.message}`,
     );
@@ -234,12 +251,14 @@ export async function GetAppointmentStatuses(
 
 /**
  * Submit a new appointment
- * @param data - Appointment data
+ * @param data - Appointment creation request
+ *   (userId handled by middleware)
  * @param config - Axios config with logging metadata
- * @returns Created appointment
+ * @returns Created appointment response
+ * @throws Error on 403 (Day One student) or other failures
  */
 export async function PostAppointment(
-  data: Appointment,
+  data: CreateAppointmentRequest,
   config?: AxiosConfigWithMeta,
 ): Promise<Appointment> {
   try {
@@ -250,8 +269,24 @@ export async function PostAppointment(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'PostAppointment';
-    const stepName = config?.stepName || 'Submit Appointment';
+    const handlerName = config?.handlerName ||
+      'PostAppointment';
+
+    // Handle Day One student (403 Forbidden)
+    if (error.response?.status === 403) {
+      const stepName = config?.stepName ||
+        'Check IIR Profile';
+      console.error(
+        `[${handlerName}] {${stepName}}: ` +
+        `${error.response.data?.error}`,
+      );
+      throw new Error(
+        'Please complete your IIR profile',
+      );
+    }
+
+    const stepName = config?.stepName ||
+      'Submit Appointment';
     console.error(
       `[${handlerName}] {${stepName}}: ${error.message}`,
     );

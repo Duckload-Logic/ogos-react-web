@@ -7,22 +7,22 @@ import { useIIRForm } from "@/features/iir/hooks";
 import { useIIRStatus } from "@/features/iir/hooks";
 import { AnimationStyles } from "@/components/ui/animations";
 
-interface PDSGateProps {
+interface IIRGateProps {
   children: React.ReactNode;
   allowOnGuidancePage?: boolean;
 }
 
 /**
- * PDSGate Component
+ * IIRGate Component
  * Restricts access to student services until PDS form is completed
  * Only allows access to /student/form (PDS form page)
  * Redirects to /student if PDS is not yet filled
  */
-export const PDSGate = ({
+export const IIRGate = ({
   children,
   allowOnGuidancePage = false,
-}: PDSGateProps) => {
-  const { data: iirRecord, isLoading: isIIRLoading } = useIIRStatus();
+}: IIRGateProps) => {
+  const { data: isSubmitted, isLoading: isIIRLoading } = useIIRStatus();
 
   if (isIIRLoading) {
     return (
@@ -36,7 +36,7 @@ export const PDSGate = ({
   }
 
   // If PDS is not completed and this is not the form page
-  if (!iirRecord?.isSubmitted && !allowOnGuidancePage) {
+  if (!isSubmitted && !allowOnGuidancePage) {
     return (
       <div className="relative">
         {/* Blurred background content */}
@@ -55,8 +55,8 @@ export const PDSGate = ({
               Access Restricted
             </h2>
             <p className="text-muted-foreground text-center mb-6">
-              You must complete your Personal Data Sheet (PDS) form first to
-              access this service.
+              You must complete your student Individual Inventory Record (IIR)
+              form first to access this service.
             </p>
             <a
               href="/student/form"
@@ -73,4 +73,4 @@ export const PDSGate = ({
   return <>{children}</>;
 };
 
-export default PDSGate;
+export default IIRGate;

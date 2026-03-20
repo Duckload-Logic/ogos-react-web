@@ -29,6 +29,7 @@ import {
   SlipStepProgress,
 } from "@/features/slips/components";
 import { AnimationStyles } from "@/components/ui/animations";
+import type { CreateSlipRequest } from "@/features/slips/types/slip";
 
 interface FormData {
   dateOfAbsence: string;
@@ -124,32 +125,27 @@ export default function SubmitSlip() {
   const handleSubmit = async () => {
     if (!isFormValid) return;
 
-    const formDataToSend = new FormData();
-    formDataToSend.append(
-      "dateOfAbsence",
-      new Date(formData.dateOfAbsence).toISOString().split("T")[0],
-    );
-    formDataToSend.append(
-      "dateNeeded",
-      new Date(formData.dateNeeded).toISOString().split("T")[0],
-    );
-    formDataToSend.append("reason", formData.reason);
-    formDataToSend.append("categoryId", String(formData.categoryId));
+    const payload: CreateSlipRequest = {
+      reason: formData.reason,
+      dateOfAbsence: new Date(
+        formData.dateOfAbsence,
+      ).toISOString().split("T")[0],
+      dateNeeded: new Date(
+        formData.dateNeeded,
+      ).toISOString().split("T")[0],
+      categoryId: formData.categoryId,
+    };
 
-    // Add all files with proper naming
-    formData.files.excuseLetter.forEach((file) => {
-      formDataToSend.append("files", file);
-    });
-    formData.files.parentId.forEach((file) => {
-      formDataToSend.append("files", file);
-    });
-    formData.files.medicalCert.forEach((file) => {
-      formDataToSend.append("files", file);
-    });
-
-    submitSlip(formDataToSend, {
+    submitSlip(payload, {
       onSuccess: () => {
         navigate("/student/slips");
+      },
+      onError: (error: any) => {
+        if (
+          error.message?.includes('IIR profile')
+        ) {
+          navigate('/iir-form');
+        }
       },
     });
   };

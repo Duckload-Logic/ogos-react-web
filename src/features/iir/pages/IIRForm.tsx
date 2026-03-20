@@ -1,17 +1,14 @@
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "@/context";
 import { useMe } from "@/features/users/hooks/useMe";
 import {
-  useIIRForm,
   useIIRFormSave,
   useSaveIIRDraft,
   useGetIIRDraft,
+  useTouchedState,
 } from "@/features/iir/hooks";
 import { IIRForm as IIRFormType } from "@/features/iir/types/IIRForm";
 import { EMPTY_IIR_FORM } from "@/features/iir/constants";
-import { validateObject } from "@/services/validationSchema";
-import { personalInformationValidationSchema } from "@/features/iir/config/personalInfoValidationSchema";
 import { LoadingSpinner } from "@/components/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
@@ -42,9 +39,27 @@ import {
   FamilyBackgroundSection,
   HealthInformationSection,
   InterestsSection,
-  TestResultsSection,
-  SectionContainer,
+  // LegalConsentDialog,
+  // FormErrorModal,
+  // SectionProgress,
 } from "@/features/iir/components/form";
+import {
+  updateNestedField,
+  getOverallCompletion,
+  getSectionStatus,
+  createResetFormData,
+  initializeFormData,
+  calculateSectionCompletion,
+  validateAllSections,
+  validateSection,
+} from "@/features/iir/utils/form";
+import {
+  FormErrorModal,
+  groupErrorsBySection,
+} from "@/features/iir/components/form/FormErrorModal";
+import { completeIIRForm } from "../tests/test";
+import { SectionProgress } from "../components/form/SectionProgress";
+import LegalConsentDialog from "../components/form/LegalConsentDialog";
 
 const FORM_SECTIONS = [
   { title: "I. Personal Information", id: 1, key: "personal" },
@@ -56,14 +71,16 @@ const FORM_SECTIONS = [
 
 export default function IIRForm() {
   const navigate = useNavigate();
-  const { user } = useAuth();
   const { data: me } = useMe({});
-  const userId = me?.id;
 
-  const { saveDraft, isSavingDraft, saveDraftError } = useSaveIIRDraft();
+  const { saveDraft, clearDraft, lastSaved } = useSaveIIRDraft();
   const { draft, isLoadingDraft, draftError } = useGetIIRDraft();
 
-  const { saveSectionAsync, submitFormAsync, isSubmitting } = useIIRFormSave();
+  const { submitFormAsync, isSubmitting } = useIIRFormSave();
+
+  // Touched state management
+  const { markFieldTouched, markAllTouched, shouldShowError, resetTouched } =
+    useTouchedState();
 
   const hasInitialized = useRef(false);
   const personalSectionRef = useRef<any>(null);
@@ -71,114 +88,112 @@ export default function IIRForm() {
   const familySectionRef = useRef<any>(null);
   const healthSectionRef = useRef<any>(null);
   const interestsSectionRef = useRef<any>(null);
-  const testResultsSectionRef = useRef<any>(null);
 
   const [currentSection, setCurrentSection] = useState(1);
+  const [visitedSections, setVisitedSections] = useState<number[]>([1]);
   const [localFormData, setLocalFormData] = useState<IIRFormType | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [showSubmitConfirm, setShowSubmitConfirm] = useState(false);
+  const [showLegalConsentDialog, setShowLegalConsentDialog] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
-  const [consentAgreed, setConsentAgreed] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [validationErrorList, setValidationErrorList] = useState<string[]>([]);
   const [showValidationError, setShowValidationError] = useState(false);
   const [sectionsWithErrors, setSectionsWithErrors] = useState<number[]>([]);
-  const [autoSaveStatus, setAutoSaveStatus] = useState<
-    "idle" | "saving" | "saved"
-  >("idle");
-  const [isMobileNav, setIsMobileNav] = useState(window.innerWidth < 1024);
-  const [lastSaved, setLastSaved] = useState<string>("");
+  const [showDraftPrompt, setShowDraftPrompt] = useState(false);
+  const [draftData, setDraftData] = useState<IIRFormType | null>(null);
   const [toasts, setToasts] = useState<string[]>([]);
 
+  // Modal error state
+  const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
+  const [groupedErrors, setGroupedErrors] = useState({});
+  const [totalErrors, setTotalErrors] = useState(0);
+
+  const [lastChangeTimestamp, setLastChangeTimestamp] = useState(0);
+
+  const handleInputChange = useCallback((fieldPath: string, value: any) => {
+    const path = fieldPath.split(".");
+    setLocalFormData((prev) => updateNestedField(prev, path, value));
+    setLastChangeTimestamp(Date.now());
+  }, []);
+
   useEffect(() => {
-    const initializeFormData = () => {
+    const initializeForm = () => {
       if (isLoadingDraft || !me || hasInitialized.current) return;
 
-      const baseData = draft || EMPTY_IIR_FORM;
-
-      const initializedData = {
-        ...baseData,
-        student: {
-          ...baseData.student,
-          basicInfo: {
-            ...baseData.student?.basicInfo,
-            firstName: me?.firstName || "",
-            middleName:
-              me?.middleName && typeof me?.middleName === "string"
-                ? me?.middleName
-                : "",
-            lastName: me?.lastName || "",
-            email: me?.email || "",
-          },
-          personalInfo: {
-            ...baseData.student?.personalInfo,
-          },
-          addresses: baseData.student?.addresses || {},
-        },
-        education: baseData.education || { schools: [] },
-        family: baseData.family || {
-          background: {},
-          relatedPersons: {},
-          finance: {},
-        },
-        health: baseData.health || { healthRecord: {}, consultations: [] },
-        interests: baseData.interests || {},
-        testResults: baseData.testResults || [],
-      };
+      const initializedData = initializeFormData(
+        // draft ?? null
+        completeIIRForm,
+        EMPTY_IIR_FORM,
+        me,
+      );
       setLocalFormData(initializedData);
       setIsInitializing(false);
       hasInitialized.current = true;
     };
 
-    initializeFormData();
+    initializeForm();
   }, [isLoadingDraft, me]);
 
   useEffect(() => {
     if (isInitializing || !localFormData) return;
 
     const saveTimer = setTimeout(() => {
-      if (
-        Object.keys(localFormData || {}).length > 0 &&
-        JSON.stringify(localFormData) !== JSON.stringify(draft)
-      ) {
-        autoSave();
-      }
+      autoSave();
     }, 1000);
 
     return () => clearTimeout(saveTimer);
-  }, [localFormData, currentSection, draft]);
+  }, [localFormData, lastChangeTimestamp]);
 
-  // Handle window resize for responsive navigation
   useEffect(() => {
-    const handleResize = () => {
-      setIsMobileNav(window.innerWidth < 1024);
-    };
+    if (!visitedSections.includes(currentSection)) {
+      setVisitedSections((prev) => [...prev, currentSection]);
+    }
+  }, [currentSection, visitedSections]);
 
-    window.addEventListener("resize", handleResize);
-    return () => window.removeEventListener("resize", handleResize);
-  }, []);
+  useEffect(() => {
+    const localDraftStr = localStorage.getItem(`iir_draft-student_${me?.id}`);
+    if (localDraftStr) {
+      try {
+        const parsed = JSON.parse(localDraftStr) as IIRFormType;
+        if (
+          parsed.student?.basicInfo?.lastName ||
+          parsed.student?.basicInfo?.firstName ||
+          (parsed.family?.relatedPersons &&
+            parsed.family.relatedPersons.length > 0)
+        ) {
+          setDraftData(parsed);
+          setShowDraftPrompt(true);
+        }
+      } catch (e) {
+        clearDraft();
+      }
+    }
+  }, [clearDraft]);
+
+  const handleRestoreDraft = () => {
+    if (draftData) {
+      setLocalFormData(draftData);
+    }
+    setShowDraftPrompt(false);
+  };
+
+  const handleDiscardDraft = () => {
+    clearDraft();
+    setShowDraftPrompt(false);
+  };
 
   const autoSave = async () => {
     if (!localFormData) return;
 
-    setAutoSaveStatus("saving");
     try {
       await saveDraft(localFormData);
-      console.debug("Auto-saved draft data:", localFormData);
-      setAutoSaveStatus("saved");
-      const now = new Date();
-      setLastSaved(
-        now.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }),
-      );
-      setTimeout(() => setAutoSaveStatus("idle"), 2000);
     } catch (err) {
-      setAutoSaveStatus("idle");
+      console.error("[AutoSave] Error saving draft:", err);
     }
   };
 
   const addToast = (message: string, duration: number = 3000) => {
-    const id = Math.random();
     setToasts((prev) => [...prev, message]);
     setTimeout(() => {
       setToasts((prev) => prev.filter((_, i) => i !== prev.length - 1));
@@ -198,76 +213,28 @@ export default function IIRForm() {
     );
   }
 
-  const updateNestedField = (path: string[], value: any) => {
-    setLocalFormData((prev) => {
-      if (!prev) return prev;
-      let current = prev as any;
-      for (let i = 0; i < path.length - 1; i++) {
-        const key = path[i];
-        const nextKey = path[i + 1];
-
-        // Check if next key is a numeric string (array index)
-        if (!isNaN(Number(nextKey))) {
-          // Keep arrays as arrays
-          current[key] = Array.isArray(current[key])
-            ? [...current[key]]
-            : current[key];
-        } else {
-          // Next key is a string property — always spread as object
-          // Using [...array] would lose non-numeric string properties (e.g. relatedPersons.father)
-          current[key] = { ...current[key] };
-        }
-        current = current[key];
-      }
-      current[path[path.length - 1]] = value;
-      return { ...prev };
-    });
-  };
-
-  const handleInputChange = (fieldPath: string, value: any) => {
-    const path = fieldPath.split(".");
-    updateNestedField(path, value);
-  };
-
   const handleNextSection = async () => {
     // Validate current section using its ref
-    let sectionRef: any = null;
-    let errorMessages: string[] = [];
+    const sectionRefs: Record<number, any> = {
+      1: personalSectionRef,
+      2: educationSectionRef,
+      3: familySectionRef,
+      4: healthSectionRef,
+      5: interestsSectionRef,
+    };
 
-    switch (currentSection) {
-      case 1:
-        sectionRef = personalSectionRef;
-        break;
-      case 2:
-        sectionRef = educationSectionRef;
-        break;
-      case 3:
-        sectionRef = familySectionRef;
-        break;
-      case 4:
-        sectionRef = healthSectionRef;
-        break;
-      case 5:
-        sectionRef = interestsSectionRef;
-        break;
-      case 6:
-        sectionRef = testResultsSectionRef;
-        break;
-    }
-
-    if (sectionRef?.current?.validate) {
-      const validation = sectionRef.current.validate();
-      if (!validation.isValid) {
-        setValidationErrorList(Object.values(validation.errors));
-        setShowValidationError(true);
-        return;
-      }
+    const validation = validateSection(sectionRefs[currentSection]);
+    if (!validation.isValid) {
+      console.debug("Validation errors:", validation.errors);
+      setValidationErrorList(Object.values(validation.errors));
+      setShowValidationError(true);
+      return;
     }
 
     setIsSaving(true);
     try {
       if (localFormData) {
-        await saveSectionAsync(localFormData);
+        await saveDraft(localFormData);
       }
       if (currentSection < FORM_SECTIONS.length) {
         setCurrentSection(currentSection + 1);
@@ -286,6 +253,9 @@ export default function IIRForm() {
   };
 
   const handleSubmit = async () => {
+    // Mark all fields as touched so validation errors show
+    markAllTouched();
+
     // Always trigger validate() on the current section so inline field errors show
     const currentSectionRefs: Record<number, any> = {
       1: personalSectionRef,
@@ -296,435 +266,103 @@ export default function IIRForm() {
     };
     currentSectionRefs[currentSection]?.current?.validate?.();
 
-    // First check: Use completion percentage as source of truth
-    // All sections must be 100% complete
-    const incompleteCompletionSections: number[] = [];
-    const incompleteCompletionMessages: string[] = [];
+    // Validate all sections
+    const sectionRefs: Record<number, any> = {
+      1: personalSectionRef,
+      2: educationSectionRef,
+      3: familySectionRef,
+      4: healthSectionRef,
+      5: interestsSectionRef,
+    };
 
-    for (let i = 1; i <= FORM_SECTIONS.length; i++) {
-      const completion = calculateSectionCompletion(i);
-      if (completion < 100) {
-        incompleteCompletionSections.push(i);
-        incompleteCompletionMessages.push(
-          `${FORM_SECTIONS[i - 1].title} — ${completion}% complete (required 100%)`,
-        );
-      }
-    }
+    const validationResult = validateAllSections(
+      sectionRefs,
+      FORM_SECTIONS,
+      (sectionIndex) =>
+        calculateSectionCompletion(sectionIndex, localFormData ?? null),
+      currentSection,
+    );
 
-    // If any section is not 100% complete, block submission
-    if (incompleteCompletionSections.length > 0) {
-      setSectionsWithErrors(incompleteCompletionSections);
-      setValidationErrorList(incompleteCompletionMessages);
+    if (validationResult.hasErrors) {
+      setSectionsWithErrors(validationResult.sectionsWithErrors);
+      setValidationErrorList(validationResult.errorMessages);
       setShowValidationError(true);
-      addToast("Please complete all sections before submitting.");
 
-      // Only navigate away if current section is not already the failing one
-      if (!incompleteCompletionSections.includes(currentSection)) {
-        setCurrentSection(incompleteCompletionSections[0]);
+      const raw = validationResult.rawErrors || {};
+      const total = Object.keys(raw).length;
+
+      if (total > 0) {
+        setGroupedErrors(groupErrorsBySection(raw));
+        setTotalErrors(total);
+        setIsErrorModalOpen(true);
+      } else if (validationResult.incompleteCompletionSections.length > 0) {
+        addToast("Please complete all sections before submitting.");
+        if (
+          !validationResult.incompleteCompletionSections.includes(
+            currentSection,
+          )
+        ) {
+          setCurrentSection(validationResult.incompleteCompletionSections[0]);
+        }
+      } else {
+        addToast("Please fix errors before submitting.");
+        if (!validationResult.sectionsWithErrors.includes(currentSection)) {
+          setCurrentSection(validationResult.sectionsWithErrors[0]);
+        }
       }
       return;
     }
 
-    // Second check: Validate all sections using their refs
-    const errorMessages: string[] = [];
-    const sectionsWithValidationErrors: number[] = [];
-    let hasErrors = false;
-
-    // Validate Personal Information (Section 1)
-    if (personalSectionRef?.current?.validate) {
-      const validation = personalSectionRef.current.validate();
-      if (!validation.isValid) {
-        hasErrors = true;
-        sectionsWithValidationErrors.push(1);
-        errorMessages.push("I. Personal Information — missing required fields");
-      }
-    }
-
-    // Validate Education (Section 2)
-    if (educationSectionRef?.current?.validate) {
-      const validation = educationSectionRef.current.validate();
-      if (!validation.isValid) {
-        hasErrors = true;
-        sectionsWithValidationErrors.push(2);
-        errorMessages.push(
-          "II. Educational Background — missing required fields",
-        );
-      }
-    }
-
-    // Validate Family (Section 3)
-    if (familySectionRef?.current?.validate) {
-      const validation = familySectionRef.current.validate();
-      if (!validation.isValid) {
-        hasErrors = true;
-        sectionsWithValidationErrors.push(3);
-        errorMessages.push("III. Family Background — missing required fields");
-      }
-    }
-
-    // Validate Health (Section 4)
-    if (healthSectionRef?.current?.validate) {
-      const validation = healthSectionRef.current.validate();
-      if (!validation.isValid) {
-        hasErrors = true;
-        sectionsWithValidationErrors.push(4);
-        errorMessages.push("IV. Health Information — missing required fields");
-      }
-    }
-
-    // Validate Interests (Section 5)
-    if (interestsSectionRef?.current?.validate) {
-      const validation = interestsSectionRef.current.validate();
-      if (!validation.isValid) {
-        hasErrors = true;
-        sectionsWithValidationErrors.push(5);
-        errorMessages.push(
-          "V. Interests and Hobbies — missing required fields",
-        );
-      }
-    }
-
-    // Validate Test Results (Section 6)
-    if (testResultsSectionRef?.current?.validate) {
-      const validation = testResultsSectionRef.current.validate();
-      if (!validation.isValid) {
-        hasErrors = true;
-        sectionsWithValidationErrors.push(6);
-        errorMessages.push("VI. Test Results — missing required fields");
-      }
-    }
-
-    if (hasErrors) {
-      setSectionsWithErrors(sectionsWithValidationErrors);
-      setValidationErrorList(errorMessages);
-      setShowValidationError(true);
-      addToast("Please fix errors before submitting.");
-
-      // Only navigate away if current section has no errors
-      if (!sectionsWithValidationErrors.includes(currentSection)) {
-        setCurrentSection(sectionsWithValidationErrors[0]);
-      }
-      return;
-    }
-
-    // All validations passed, clear section errors and open confirmation dialog
+    // All validations passed, clear section errors and open legal consent dialog
     setSectionsWithErrors([]);
-    setConsentAgreed(false);
-    setShowSubmitConfirm(true);
+    setShowValidationError(false);
+    setShowLegalConsentDialog(true);
   };
 
-  const confirmSubmit = async () => {
-    setShowSubmitConfirm(false);
+  const handleLegalConsentAccept = async () => {
+    if (!localFormData) {
+      addToast("Form data is missing. Please try again.");
+      return;
+    }
+
     setIsSaving(true);
 
     try {
-      if (localFormData) {
-        await submitFormAsync(localFormData);
-      }
+      // Submit to backend (service handles transformation via normalizeIIRPayload)
+      await submitFormAsync(localFormData);
+
+      // Cleanup local draft on successful final submission
+      clearDraft();
+
+      // Success
+      setShowLegalConsentDialog(false);
       addToast("✓ Form submitted successfully!");
       setShowSuccessPopup(true);
+
       setTimeout(() => {
         navigate("/student");
       }, 3000);
     } catch (err: any) {
-      addToast("Failed to submit form. Please try again.");
       console.error("Error submitting form:", err);
+      const errorMessage =
+        err?.response?.data?.error ||
+        "Failed to submit form. Please try again.";
+      addToast(errorMessage);
     } finally {
       setIsSaving(false);
     }
   };
 
+  const handleLegalConsentCancel = () => {
+    setShowLegalConsentDialog(false);
+  };
+
   const confirmReset = () => {
-    // preserve autofilled basicInfo
-    const resetData = {
-      ...EMPTY_IIR_FORM,
-      student: {
-        ...EMPTY_IIR_FORM.student,
-        basicInfo: {
-          firstName: me?.firstName || "",
-          middleName:
-            me?.middleName && typeof me?.middleName === "string"
-              ? me?.middleName
-              : "",
-          lastName: me?.lastName || "",
-          email: me?.email || "",
-        },
-      },
-    };
+    const resetData = createResetFormData(EMPTY_IIR_FORM, me);
     setLocalFormData(resetData);
     setShowResetConfirm(false);
+    resetTouched(); // Clear touched state on reset
     addToast("Form reset.");
-  };
-
-  // Calculate section completion percentage
-  const calculateSectionCompletion = (sectionIndex: number): number => {
-    // Only count these specific leaf fields, not nested object structures
-    const countFilledField = (val: any): boolean => {
-      if (val === null || val === undefined || val === "") return false;
-      if (typeof val === "object") {
-        if (Array.isArray(val)) return val.length > 0;
-        // For objects, check if they have an id (indicating it's been selected)
-        return val?.id !== undefined && val?.id !== null && val?.id !== "";
-      }
-      return true;
-    };
-
-    let filledCount = 0;
-    let totalCount = 0;
-
-    switch (sectionIndex) {
-      case 1: {
-        // Personal Information
-        // Drive completion from the same schema used for validation
-        const schemaFields = Object.keys(personalInformationValidationSchema);
-        const schemaErrors = validateObject(
-          { student: localFormData?.student },
-          personalInformationValidationSchema,
-        );
-        totalCount = schemaFields.length;
-        filledCount = schemaFields.length - Object.keys(schemaErrors).length;
-        // If employed, include employer fields in completion
-        const isEmployed = (localFormData as any)?.student?.personalInfo
-          ?.isEmployed;
-        if (isEmployed) {
-          totalCount += 3; // employerName, employerAddress, employerContact
-          if ((localFormData as any)?.student?.personalInfo?.employerName)
-            filledCount++;
-          if ((localFormData as any)?.student?.personalInfo?.employerAddress)
-            filledCount++;
-          if ((localFormData as any)?.student?.personalInfo?.employerContact)
-            filledCount++;
-        }
-        break;
-      }
-
-      case 2: {
-        // Education
-        // Nature of schooling
-        totalCount++;
-        if (localFormData?.education?.natureOfSchooling) filledCount++;
-
-        // Mirror the requiredFields from EducationBackgroundSection.getCompletionLevel
-        // There are 5 school levels displayed (indices 0-4); count all of them
-        const schoolFields = [
-          "schoolName",
-          "schoolAddress",
-          "schoolType",
-          "yearStarted",
-          "yearCompleted",
-        ];
-        const schools = localFormData?.education?.schools ?? [];
-        const SCHOOL_LEVEL_COUNT = 5;
-        for (let i = 0; i < SCHOOL_LEVEL_COUNT; i++) {
-          schoolFields.forEach((field) => {
-            totalCount++;
-            if (countFilledField((schools[i] as any)?.[field])) filledCount++;
-          });
-        }
-        break;
-      }
-
-      case 3: {
-        // Family Background
-        const bg = localFormData?.family?.background as any;
-        const finance = localFormData?.family?.finance as any;
-        const relatedPersons = localFormData?.family?.relatedPersons as any;
-
-        // Parental status
-        const familyBgFields = [
-          "parentalStatus",
-          "numberOfChildren",
-          "brothers",
-          "sisters",
-        ];
-        familyBgFields.forEach((field) => {
-          totalCount++;
-          if (
-            bg?.[field] !== undefined &&
-            bg?.[field] !== null &&
-            bg?.[field] !== ""
-          )
-            filledCount++;
-        });
-
-        // natureOfResidence is an object of booleans — check at least one is true
-        totalCount++;
-        const residence = bg?.natureOfResidence;
-        if (residence && Object.values(residence).some((v) => v === true))
-          filledCount++;
-
-        // Finance fields
-        totalCount++;
-        if (finance?.monthlyFamilyIncomeRange?.id) filledCount++;
-        totalCount++;
-        if (
-          finance?.weeklyAllowance &&
-          finance.weeklyAllowance !== "0" &&
-          finance.weeklyAllowance !== 0
-        )
-          filledCount++;
-
-        // Track father and mother name fields individually
-        const personFields = [
-          "name",
-          "age",
-          "educationalAttainment",
-          "occupation",
-        ];
-        ["father", "mother"].forEach((person) => {
-          personFields.forEach((field) => {
-            totalCount++;
-            if (countFilledField(relatedPersons?.[person]?.[field]))
-              filledCount++;
-          });
-        });
-        break;
-      }
-
-      case 4: {
-        // Health Information
-        const hr = localFormData?.health?.healthRecord as any;
-
-        // Physical items: yes/no answer required; if yes, details field also required
-        const physicalItems = [
-          { bool: "visionHasProblem", detail: "visionDetails" },
-          { bool: "hearingHasProblem", detail: "hearingDetails" },
-          { bool: "speechHasProblem", detail: "speechDetails" },
-          { bool: "generalHealthHasProblem", detail: "generalHealthDetails" },
-        ];
-        physicalItems.forEach(({ bool, detail }) => {
-          totalCount++;
-          if (hr?.[bool] !== undefined) {
-            filledCount++;
-            if (hr[bool] === true) {
-              // YES selected — require the details field too
-              totalCount++;
-              if (countFilledField(hr?.[detail])) filledCount++;
-            }
-          }
-        });
-
-        // Consultations: yes/no required per type; if yes, whenDate + forWhat also required
-        const consultations = localFormData?.health?.consultations ?? [];
-        const consultationTypes = ["Psychiatrist", "Psychologist", "Counselor"];
-        consultationTypes.forEach((type) => {
-          totalCount++;
-          const record = Array.isArray(consultations)
-            ? consultations.find((c: any) => c?.professionalType === type)
-            : null;
-          if (record?.hasConsulted !== undefined) {
-            filledCount++;
-            if (record.hasConsulted === true) {
-              // YES selected — require whenDate and forWhat too
-              totalCount += 2;
-              if (countFilledField(record?.whenDate)) filledCount++;
-              if (countFilledField(record?.forWhat)) filledCount++;
-            }
-          }
-        });
-        break;
-      }
-
-      case 5: {
-        // Interests and Hobbies
-        const interests = localFormData?.interests as any;
-
-        // Favorite and least liked subjects
-        totalCount++;
-        if (interests?.academic?.favoriteSubjects) filledCount++;
-        totalCount++;
-        if (interests?.academic?.leastLikedSubjects) filledCount++;
-
-        // At least one hobby filled (check first two)
-        totalCount++;
-        if (
-          interests?.hobbies?.[0]?.hobbyName ||
-          interests?.hobbies?.["0"]?.hobbyName
-        )
-          filledCount++;
-        totalCount++;
-        if (
-          interests?.hobbies?.[1]?.hobbyName ||
-          interests?.hobbies?.["1"]?.hobbyName
-        )
-          filledCount++;
-
-        // At least one academic club checked (if 'Others' is selected, require specify to count)
-        totalCount++;
-        const hasAcademic =
-          interests?.academic?.mathClub ||
-          interests?.academic?.scienceClub ||
-          interests?.academic?.debatingClub ||
-          interests?.academic?.quizzersClub ||
-          (interests?.academic?.othersChecked &&
-            countFilledField(interests?.academic?.othersSpecify));
-        if (hasAcademic) filledCount++;
-
-        // Organization (single radio selection)
-        totalCount++;
-        const org = interests?.extraCurricular?.organization;
-        if (org) {
-          filledCount++;
-          if (org === "others") {
-            totalCount++;
-            if (
-              countFilledField(interests?.extraCurricular?.organizationOthers)
-            )
-              filledCount++;
-          }
-        }
-
-        // Occupational position in organization
-        totalCount++;
-        const occPos = interests?.extraCurricular?.occupationalPosition;
-        if (occPos) {
-          filledCount++;
-          if (occPos === "others") {
-            totalCount++;
-            if (
-              countFilledField(interests?.extraCurricular?.occupationalOthers)
-            )
-              filledCount++;
-          }
-        }
-        break;
-      }
-
-      case 6: {
-        // Test Results - count each individual field across 3 rows (5 fields each = 15 total)
-        const rows = Array.from(
-          { length: 3 },
-          (_, i) => (localFormData?.testResults || [])[i] || {},
-        );
-        totalCount = 15;
-        filledCount = rows.reduce((acc: number, r: any) => {
-          if (r?.date || r?.testDate) acc++;
-          if (r?.nameOfTest || r?.testName) acc++;
-          if (r?.rs !== undefined && r?.rs !== "" && r?.rs !== null) acc++;
-          if (r?.pr !== undefined && r?.pr !== "" && r?.pr !== null) acc++;
-          if (r?.description) acc++;
-          return acc;
-        }, 0);
-        break;
-      }
-    }
-
-    return totalCount > 0 ? Math.round((filledCount / totalCount) * 100) : 0;
-  };
-
-  const getOverallCompletion = (): number => {
-    let totalPercentage = 0;
-    for (let i = 1; i <= FORM_SECTIONS.length; i++) {
-      totalPercentage += calculateSectionCompletion(i);
-    }
-    return Math.round(totalPercentage / FORM_SECTIONS.length);
-  };
-
-  const getSectionStatus = (sectionIndex: number) => {
-    const percentage = calculateSectionCompletion(sectionIndex);
-    if (percentage === 100) return "complete";
-    if (percentage > 0) return "partial";
-    return "empty";
   };
 
   const currentSectionDef = FORM_SECTIONS.find((s) => s.id === currentSection);
@@ -747,75 +385,78 @@ export default function IIRForm() {
               Overall Completion
             </h3>
             <span className="text-lg font-bold text-destructive">
-              {getOverallCompletion()}%
+              {getOverallCompletion(
+                localFormData ?? null,
+                FORM_SECTIONS.length,
+                (sectionIndex) =>
+                  calculateSectionCompletion(
+                    sectionIndex,
+                    localFormData ?? null,
+                  ),
+              )}
+              %
             </span>
           </div>
           <div className="w-full bg-gray-300 rounded-sm h-2.5 overflow-hidden">
             <div
               className="bg-destructive h-full transition-all duration-300"
-              style={{ width: `${getOverallCompletion()}%` }}
+              style={{
+                width: `${getOverallCompletion(
+                  localFormData ?? null,
+                  FORM_SECTIONS.length,
+                  (sectionIndex) =>
+                    calculateSectionCompletion(
+                      sectionIndex,
+                      localFormData ?? null,
+                    ),
+                )}%`,
+              }}
             />
           </div>
-          {lastSaved && (
-            <div className="text-sm text-muted-foreground">
-              Last saved: {lastSaved}
-            </div>
-          )}
         </div>
 
-        {/* Validation Errors */}
-        {showValidationError && validationErrorList.length > 0 && (
-          <Alert variant="destructive" className="mb-6 border-2">
-            <AlertCircle className="h-5 w-5" />
-            <AlertDescription className="ml-2">
-              <div className="font-semibold mb-2">
-                Please fix the following errors:
-              </div>
-              <ul className="list-disc list-inside space-y-1 text-sm">
-                {validationErrorList.map((error, idx) => (
-                  <li key={idx}>{error}</li>
-                ))}
-              </ul>
-            </AlertDescription>
+        {/* Draft Restore Prompt */}
+        {showDraftPrompt && (
+          <Alert className="mb-6 border-blue-200 bg-blue-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <AlertCircle className="h-5 w-5 text-blue-500" />
+              <AlertDescription className="text-blue-700 font-medium">
+                We found an unsaved draft. Would you like to restore it?
+              </AlertDescription>
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" size="sm" onClick={handleDiscardDraft}>
+                Discard
+              </Button>
+              <Button
+                size="sm"
+                className="bg-blue-600 hover:bg-blue-700 text-white"
+                onClick={handleRestoreDraft}
+              >
+                Restore
+              </Button>
+            </div>
           </Alert>
         )}
 
         {/* Main Layout: Horizontal Section Nav + Form Content */}
-        <div className="flex flex-col gap-6">
-          {/* Horizontal Section Navigation */}
-          <div className="flex overflow-x-auto gap-2 pb-1">
-            {FORM_SECTIONS.map((section) => {
-              const status = getSectionStatus(section.id);
-              const hasError = sectionsWithErrors.includes(section.id);
-              return (
-                <button
-                  key={section.id}
-                  onClick={() => {
-                    setCurrentSection(section.id);
-                    // Clear validation errors when navigating to a different section
-                    setSectionsWithErrors([]);
-                    setShowValidationError(false);
-                  }}
-                  disabled={currentSection === section.id}
-                  className={`flex-shrink-0 flex items-center gap-2 px-4 py-2.5 rounded-lg font-medium text-sm transition-colors whitespace-nowrap relative ${
-                    currentSection === section.id
-                      ? "bg-primary text-primary-foreground shadow-md"
-                      : hasError
-                        ? "bg-card text-card-foreground border-2 border-destructive"
-                        : "bg-card text-card-foreground border border-border hover:border-primary/30"
-                  }`}
-                >
-                  {section.title}
-                  {hasError && (
-                    <AlertCircle className="w-4 h-4 flex-shrink-0 text-destructive" />
-                  )}
-                  {status === "complete" && !hasError && (
-                    <Check className="w-4 h-4 flex-shrink-0 text-green-500" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
+        <div className="flex flex-col gap-6 relative w-full">
+          <SectionProgress
+            sections={FORM_SECTIONS}
+            currentSection={currentSection}
+            sectionsWithErrors={sectionsWithErrors}
+            visitedSections={visitedSections}
+            onNavigate={(id: number) => {
+              setCurrentSection(id);
+              setSectionsWithErrors([]);
+              setShowValidationError(false);
+            }}
+            calculateCompletion={(sectionIndex: number) =>
+              calculateSectionCompletion(sectionIndex, localFormData ?? null)
+            }
+            onToast={addToast}
+            lastSaved={lastSaved}
+          />
 
           <div className="flex flex-col gap-2">
             {/* Form Content Card */}
@@ -826,7 +467,11 @@ export default function IIRForm() {
                     {currentSectionDef?.title}
                   </CardTitle>
                   <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1.5 rounded-full w-fit">
-                    {calculateSectionCompletion(currentSection)}% Complete
+                    {calculateSectionCompletion(
+                      currentSection,
+                      localFormData ?? null,
+                    )}
+                    % Complete
                   </span>
                 </div>
               </CardHeader>
@@ -836,6 +481,8 @@ export default function IIRForm() {
                     ref={personalSectionRef}
                     studentInfo={localFormData.student}
                     onChange={handleInputChange}
+                    onFieldBlur={markFieldTouched}
+                    shouldShowError={shouldShowError}
                   />
                 )}
                 {currentSection === 2 && localFormData?.education && (
@@ -843,6 +490,8 @@ export default function IIRForm() {
                     ref={educationSectionRef}
                     education={localFormData.education}
                     onChange={handleInputChange}
+                  // onFieldBlur={markFieldTouched}
+                  // shouldShowError={shouldShowError}
                   />
                 )}
                 {currentSection === 3 && localFormData?.family && (
@@ -850,6 +499,8 @@ export default function IIRForm() {
                     ref={familySectionRef}
                     family={localFormData.family}
                     onChange={handleInputChange}
+                    onFieldBlur={markFieldTouched}
+                    shouldShowError={shouldShowError}
                   />
                 )}
                 {currentSection === 4 && localFormData?.health && (
@@ -857,6 +508,8 @@ export default function IIRForm() {
                     ref={healthSectionRef}
                     health={localFormData.health}
                     onChange={handleInputChange}
+                  // onFieldBlur={markFieldTouched}
+                  // shouldShowError={shouldShowError}
                   />
                 )}
                 {currentSection === 5 && localFormData?.interests && (
@@ -864,13 +517,8 @@ export default function IIRForm() {
                     ref={interestsSectionRef}
                     interests={localFormData.interests}
                     onChange={handleInputChange}
-                  />
-                )}
-                {currentSection === 6 && (
-                  <TestResultsSection
-                    ref={testResultsSectionRef}
-                    testResults={localFormData?.testResults || []}
-                    onChange={handleInputChange}
+                  // onFieldBlur={markFieldTouched}
+                  // shouldShowError={shouldShowError}
                   />
                 )}
               </CardContent>
@@ -939,69 +587,13 @@ export default function IIRForm() {
           </div>
         </div>
 
-        {/* Submit Confirmation Modal */}
-        {showSubmitConfirm && (
-          <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4 pointer-events-none">
-            <Card className="w-full max-w-md shadow-2xl bg-card border-border pointer-events-auto">
-              <CardHeader className="bg-card border-b border-border pb-4">
-                <CardTitle className="text-2xl text-foreground">
-                  Confirm Submission
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6 pt-6">
-                <div className="space-y-4">
-                  <p className="text-sm text-foreground">
-                    By clicking "I Agree", you consent to the collection, use,
-                    and processing of your personal data for legitimate purposes
-                    related to this service.
-                  </p>
-                  <p className="text-sm text-foreground">
-                    Your information will be handled in accordance with our
-                    Privacy Policy and in compliance with the Data Privacy Act
-                    of 2012.
-                  </p>
-                </div>
-                <div className="flex items-start gap-3">
-                  <input
-                    type="checkbox"
-                    id="consent-agree"
-                    checked={consentAgreed}
-                    onChange={(e) => setConsentAgreed(e.target.checked)}
-                    className="mt-1 rounded border-border cursor-pointer"
-                  />
-                  <label
-                    htmlFor="consent-agree"
-                    className="text-sm text-foreground cursor-pointer"
-                  >
-                    I have read and understood the above, and I confirm that all
-                    information in my Individual Inventory Record is true and
-                    correct.
-                  </label>
-                </div>
-                <div className="flex gap-3 justify-end pt-4">
-                  <Button
-                    variant="ghost"
-                    onClick={() => setShowSubmitConfirm(false)}
-                    className="border border-border hover:bg-muted"
-                  >
-                    Cancel
-                  </Button>
-                  <Button
-                    onClick={confirmSubmit}
-                    disabled={!consentAgreed}
-                    className={
-                      consentAgreed
-                        ? "bg-destructive hover:bg-destructive/90 text-white"
-                        : "bg-gray-400 text-gray-600 cursor-not-allowed"
-                    }
-                  >
-                    I Agree & Submit
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        )}
+        {/* Legal Consent Dialog */}
+        <LegalConsentDialog
+          open={showLegalConsentDialog}
+          onAccept={handleLegalConsentAccept}
+          onCancel={handleLegalConsentCancel}
+          isSubmitting={isSaving}
+        />
 
         {/* Success Popup */}
         {showSuccessPopup && (
@@ -1083,6 +675,14 @@ export default function IIRForm() {
           </AlertDialogContent>
         </AlertDialog>
       </div>
+
+      <FormErrorModal
+        isOpen={isErrorModalOpen}
+        onClose={() => setIsErrorModalOpen(false)}
+        groupedErrors={groupedErrors}
+        totalErrors={totalErrors}
+        onNavigateToSection={(id) => setCurrentSection(id)}
+      />
 
       {/* Toast Notifications */}
       <Toast toasts={toasts} />

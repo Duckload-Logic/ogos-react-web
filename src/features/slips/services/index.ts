@@ -6,6 +6,11 @@
 import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
 import { API_ROUTES } from "@/config/apiRoutes";
 import { QueryParams } from "../types/params";
+import type {
+  Slip,
+  CreateSlipRequest,
+  PaginatedSlipsResponse,
+} from "../types/slip";
 
 /**
  * Get slip statistics
@@ -85,12 +90,13 @@ export async function GetSlipCategories(
  * Get current user's slips
  * @param params - Query parameters
  * @param config - Axios config with logging metadata
- * @returns Paginated slip response
+ * @returns Paginated slip response with iirId
+ * @throws Error on 403 (Day One student) or other failures
  */
 export async function GetMySlips(
   params?: QueryParams,
   config?: AxiosConfigWithMeta,
-) {
+): Promise<PaginatedSlipsResponse> {
   try {
     const response = await apiClient.get(
       API_ROUTES.slips.mySlips,
@@ -99,6 +105,20 @@ export async function GetMySlips(
     return response.data;
   } catch (error: any) {
     const handlerName = config?.handlerName || 'GetMySlips';
+
+    // Handle Day One student (403 Forbidden)
+    if (error.response?.status === 403) {
+      const stepName = config?.stepName ||
+        'Check IIR Profile';
+      console.error(
+        `[${handlerName}] {${stepName}}: ` +
+        `${error.response.data?.error}`,
+      );
+      throw new Error(
+        'Please complete your IIR profile',
+      );
+    }
+
     const stepName = config?.stepName || 'Fetch My Slips';
     console.error(
       `[${handlerName}] {${stepName}}: ${error.message}`,
@@ -213,26 +233,39 @@ export async function GetSlipAttachments(
 
 /**
  * Submit a new slip
- * @param data - Form data with slip details
+ * @param data - Slip creation request
+ *   (userId handled by middleware)
  * @param config - Axios config with logging metadata
  * @returns Created slip response
+ * @throws Error on 403 (Day One student) or other failures
  */
 export async function PostSlip(
-  data: FormData,
+  data: CreateSlipRequest,
   config?: AxiosConfigWithMeta,
-) {
+): Promise<Slip> {
   try {
     const response = await apiClient.post(
       API_ROUTES.slips.all,
       data,
-      {
-        ...config,
-        headers: { 'Content-Type': 'multipart/form-data' },
-      },
+      config,
     );
     return response.data;
   } catch (error: any) {
     const handlerName = config?.handlerName || 'PostSlip';
+
+    // Handle Day One student (403 Forbidden)
+    if (error.response?.status === 403) {
+      const stepName = config?.stepName ||
+        'Check IIR Profile';
+      console.error(
+        `[${handlerName}] {${stepName}}: ` +
+        `${error.response.data?.error}`,
+      );
+      throw new Error(
+        'Please complete your IIR profile',
+      );
+    }
+
     const stepName = config?.stepName || 'Submit Slip';
     console.error(
       `[${handlerName}] {${stepName}}: ${error.message}`,

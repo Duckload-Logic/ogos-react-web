@@ -1,7 +1,10 @@
-﻿import { forwardRef, useImperativeHandle, useState } from "react";
-import { Check } from "lucide-react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { InputField, Checkbox } from "@/components/form";
+import { validateObject } from "@/services/validationSchema";
+import { interestsValidationSchema } from "@/features/iir/config/interestsValidationSchema";
+import { useActivityOptions } from "@/features/iir/hooks/useLookups";
+import { Activity, Hobby, SubjectPreference } from "@/features/iir/types/IIRForm";
 
 interface FormErrors {
   [key: string]: string;
@@ -19,40 +22,10 @@ export const InterestsSection = forwardRef<
   }
 >(function InterestsSection({ interests, onChange }, ref) {
   const [errors, setErrors] = useState<FormErrors>({});
+  const { data: activityOptions = [] } = useActivityOptions();
 
   const validate = (): { isValid: boolean; errors: FormErrors } => {
-    const sectionErrors: FormErrors = {};
-
-    const favSubjects = (interests?.academic?.favoriteSubjects || "").trim();
-    if (!favSubjects) {
-      sectionErrors["interests.academic.favoriteSubjects"] = "Favorite subjects are required";
-    } else if (favSubjects.length < 2) {
-      sectionErrors["interests.academic.favoriteSubjects"] = "Must be at least 2 characters";
-    }
-
-    const leastLiked = (interests?.academic?.leastLikedSubjects || "").trim();
-    if (!leastLiked) {
-      sectionErrors["interests.academic.leastLikedSubjects"] = "Least liked subjects are required";
-    } else if (leastLiked.length < 2) {
-      sectionErrors["interests.academic.leastLikedSubjects"] = "Must be at least 2 characters";
-    }
-
-    if (!(interests?.hobbies?.[0]?.hobbyName || "").trim()) {
-      sectionErrors["interests.hobbies.0.hobbyName"] = "First hobby is required";
-    }
-
-    if (!(interests?.hobbies?.[1]?.hobbyName || "").trim()) {
-      sectionErrors["interests.hobbies.1.hobbyName"] = "Second hobby is required";
-    }
-
-    if (!interests?.extraCurricular?.organization) {
-      sectionErrors["interests.extraCurricular.organization"] = "Please select an organization";
-    }
-
-    if (!interests?.extraCurricular?.occupationalPosition) {
-      sectionErrors["interests.extraCurricular.occupationalPosition"] = "Please select an occupational position";
-    }
-
+    const sectionErrors = validateObject({ interests }, interestsValidationSchema);
     setErrors(sectionErrors);
     return {
       isValid: Object.keys(sectionErrors).length === 0,
@@ -77,409 +50,358 @@ export const InterestsSection = forwardRef<
     clearError(fieldPath);
   };
 
+  // Activity Constants updated for casing
+  const ACADEMIC_CLUBS = ["Math Club", "Science Club", "Debating Club", "Quizzer's Club"];
+  const EXTRA_CURRICULAR_ORGS = ["Athletics", "Religious Organizations", "Glee Club", "Dramatics", "Chess Club", "Scouting"];
+  const ROLE_OPTIONS = ["Officer", "Member"];
+
+  // Helper for case-insensitive and flexible name matching
+  const namesMatch = (name1: string = "", name2: string = "") =>
+    (name1 || "").toLowerCase().trim() === (name2 || "").toLowerCase().trim();
+
+  const isOtherName = (name: string = "") => {
+    const n = (name || "").toLowerCase().trim();
+    return n === "others" || n === "other" || n.includes("others") || n.includes("other");
+  };
+
+  const categoryMatches = (optCategory: string = "", isAcademic: boolean) => {
+    const cat = (optCategory || "").toLowerCase();
+    if (!cat || cat === "both") return true; // Flexible fallback or "both"
+    return isAcademic ? cat.includes("academic") : !cat.includes("academic");
+  };
+
+  // Activity Handlers
+  const toggleActivity = (name: string, isAcademic: boolean, isOther: boolean = false) => {
+    const currentActivities = [...(interests?.activities || [])];
+
+    // Check if the activity is already selected (Academic matching logic depends on isAcademic flag)
+    const existingIndex = currentActivities.findIndex(a => {
+      const optName = a.activityOption.name;
+      const optCategory = a.activityOption.category;
+
+      if (isOther) {
+        if (!isOtherName(optName)) return false;
+        // If categories are present in both, they must match
+        if (optCategory) return categoryMatches(optCategory, isAcademic);
+        // Fallback to our internal flag for consistency
+        return !!a.activityOption.isAcademic === isAcademic;
+      }
+      return namesMatch(optName, name);
+    });
+
+    if (existingIndex > -1) {
+      currentActivities.splice(existingIndex, 1);
+    } else {
+      // Find the option in the lookup data more flexibly
+      // First try to find by name AND category (best match)
+      let option = activityOptions.find((opt: any) => {
+        const nameMatch = isOther ? isOtherName(opt.name) : namesMatch(opt.name, name);
+        if (!nameMatch) return false;
+        if (opt.category) return categoryMatches(opt.category, isAcademic);
+        return true;
+      });
+
+      // Fallback: Just find by name if category wasn't specific enough
+      if (!option) {
+        option = activityOptions.find((opt: any) =>
+          isOther ? isOtherName(opt.name) : namesMatch(opt.name, name)
+        );
+      }
+
+      if (option) {
+        currentActivities.push({
+          activityOption: { ...option, isAcademic },
+          otherSpecification: "",
+          role: interests?._tempRole || "",
+          roleSpecification: (interests?._tempRole || "").includes("Others")
+            ? (interests?._tempRoleSpecification || "")
+            : "",
+        });
+      }
+    }
+    handleInputChange("interests.activities", currentActivities);
+  };
+
+  const isActivityChecked = (name: string, isAcademic?: boolean, isOther: boolean = false) => {
+    return !!(interests?.activities || []).some((a: Activity) => {
+      const optName = a.activityOption.name;
+      const optCategory = a.activityOption.category;
+
+      if (isOther) {
+        if (!isOtherName(optName)) return false;
+        if (optCategory) return categoryMatches(optCategory, isAcademic || false);
+        return !!a.activityOption.isAcademic === isAcademic;
+      }
+      return namesMatch(optName, name);
+    });
+  };
+
+  const getOtherSpecification = (isAcademic: boolean) => {
+    return (interests?.activities || []).find((a: Activity) => {
+      const optName = a.activityOption.name;
+      const optCategory = a.activityOption.category;
+      if (!isOtherName(optName)) return false;
+      if (optCategory) return categoryMatches(optCategory, isAcademic);
+      return !!a.activityOption.isAcademic === isAcademic;
+    })?.otherSpecification || "";
+  };
+
+  const updateOtherSpecification = (isAcademic: boolean, value: string) => {
+    const currentActivities = [...(interests?.activities || [])];
+    const index = currentActivities.findIndex(a => {
+      const optName = a.activityOption.name;
+      const optCategory = a.activityOption.category;
+      if (!isOtherName(optName)) return false;
+      if (optCategory) return categoryMatches(optCategory, isAcademic);
+      return !!a.activityOption.isAcademic === isAcademic;
+    });
+    if (index > -1) {
+      currentActivities[index] = { ...currentActivities[index], otherSpecification: value };
+      handleInputChange("interests.activities", currentActivities);
+    }
+  };
+
+  const toggleRole = (role: string) => {
+    const currentRoles = (interests?._tempRole || "").split(", ").filter(Boolean);
+    const index = currentRoles.findIndex((r: string) => namesMatch(r, role));
+    let newRoles = [...currentRoles];
+
+    if (index > -1) {
+      newRoles.splice(index, 1);
+    } else {
+      newRoles.push(role);
+    }
+
+    const roleStr = newRoles.join(", ");
+    handleInputChange("interests._tempRole", roleStr);
+
+    const currentActivities = (interests?.activities || []).map((a: Activity) => ({
+      ...a,
+      role: roleStr
+    }));
+    handleInputChange("interests.activities", currentActivities);
+  };
+
+  const isRoleChecked = (role: string) => {
+    return (interests?._tempRole || "").split(", ").some((r: string) => namesMatch(r, role));
+  };
+
+  const getHobby = (rank: number) =>
+    interests?.hobbies?.find((h: Hobby) => h.priorityRank === rank)?.hobbyName || "";
+
+  const updateHobby = (rank: number, name: string) => {
+    const currentHobbies = [...(interests?.hobbies || [])];
+    const index = currentHobbies.findIndex((h: Hobby) => h.priorityRank === rank);
+
+    if (index > -1) {
+      if (!name) {
+        currentHobbies.splice(index, 1);
+      } else {
+        currentHobbies[index] = { ...currentHobbies[index], hobbyName: name, priorityRank: rank };
+      }
+    } else if (name) {
+      currentHobbies.push({ hobbyName: name, priorityRank: rank });
+    }
+
+    handleInputChange("interests.hobbies", currentHobbies);
+  };
+
+  const getSubjects = (isFavorite: boolean) =>
+    interests?.subjectPreferences
+      ?.filter((s: SubjectPreference) => s.isFavorite === isFavorite)
+      ?.map((s: SubjectPreference) => s.subjectName)
+      ?.join(", ") || "";
+
+  const updateSubjects = (isFavorite: boolean, subjectsStr: string) => {
+    const otherPreferences = (interests?.subjectPreferences || [])
+      .filter((s: SubjectPreference) => s.isFavorite !== isFavorite);
+
+    const newPreferences = subjectsStr.split(",")
+      .map(s => s.trim())
+      .filter(s => s !== "")
+      .map(s => ({ subjectName: s, isFavorite }));
+
+    handleInputChange("interests.subjectPreferences", [...otherPreferences, ...newPreferences]);
+  };
+
   return (
     <Card className="bg-card border border-border">
       <CardContent className="pt-6">
-        {/* A. Academic */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-card-foreground mb-4">
-            A. Academic
-          </h3>
-
-          {/* Academic Clubs Checkboxes - 3 column grid */}
-          <div className="mb-6">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <Checkbox square
-                id="mathClub"
-                name="mathClub"
-                label="Math Club"
-                checked={interests?.academic?.mathClub || false}
-                onCheckedChange={(checked) => {
-                  handleInputChange("interests.academic.mathClub", checked === true);
-                  if (checked === true) {
-                    // if user selects a named club, deselect "Others"
-                    handleInputChange("interests.academic.othersChecked", false);
-                    handleInputChange("interests.academic.othersSpecify", "");
-                  }
-                }}
-              />
-
-              <Checkbox square
-                id="scienceClub"
-                name="scienceClub"
-                label="Science Club"
-                checked={interests?.academic?.scienceClub || false}
-                onCheckedChange={(checked) => {
-                  handleInputChange("interests.academic.scienceClub", checked === true);
-                  if (checked === true) {
-                    handleInputChange("interests.academic.othersChecked", false);
-                    handleInputChange("interests.academic.othersSpecify", "");
-                  }
-                }}
-              />
-
-              <div className="flex items-center gap-3 whitespace-nowrap">
-                <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                  <input
-                    type="checkbox"
-                    checked={interests?.academic?.othersChecked || false}
-                    onChange={(e) => {
-                      const checked = e.target.checked;
-                      handleInputChange("interests.academic.othersChecked", checked);
-                      if (!checked) {
-                        handleInputChange("interests.academic.othersSpecify", "");
-                      } else {
-                        // when Others is selected, deselect all named clubs
-                        handleInputChange("interests.academic.mathClub", false);
-                        handleInputChange("interests.academic.scienceClub", false);
-                        handleInputChange("interests.academic.debatingClub", false);
-                        handleInputChange("interests.academic.quizzersClub", false);
-                      }
-                    }}
-                    className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                  />
-                  <div className="h-full w-full rounded border border-card-foreground bg-card transition-all duration-200 peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600" />
-                  <Check className="absolute h-3 w-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
-                </div>
-                <span className="text-sm text-foreground flex-shrink-0">Others:</span>
-                <input
-                  type="text"
-                  value={interests?.academic?.othersSpecify || ""}
-                  onChange={(e) =>
-                    handleInputChange("interests.academic.othersSpecify", e.target.value)
-                  }
-                  placeholder="specify"
-                  className="px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm w-32 flex-shrink-0 bg-card text-foreground"
-                  disabled={!interests?.academic?.othersChecked}
-                />
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <Checkbox square
-                id="debatingClub"
-                name="debatingClub"
-                label="Debating Club"
-                checked={interests?.academic?.debatingClub || false}
-                onCheckedChange={(checked) => {
-                  handleInputChange("interests.academic.debatingClub", checked === true);
-                  if (checked === true) {
-                    handleInputChange("interests.academic.othersChecked", false);
-                    handleInputChange("interests.academic.othersSpecify", "");
-                  }
-                }}
-              />
-
-              <Checkbox square
-                id="quizzersClub"
-                name="quizzersClub"
-                label="Quizzer's Club"
-                checked={interests?.academic?.quizzersClub || false}
-                onCheckedChange={(checked) => {
-                  handleInputChange("interests.academic.quizzersClub", checked === true);
-                  if (checked === true) {
-                    handleInputChange("interests.academic.othersChecked", false);
-                    handleInputChange("interests.academic.othersSpecify", "");
-                  }
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Subject Preference Text Fields */}
-          <div className="space-y-4">
-            <InputField
-              label="What is/are your favorite subject/s?"
-              required
-              value={interests?.academic?.favoriteSubjects || ""}
-              onChange={(val) =>
-                handleInputChange("interests.academic.favoriteSubjects", val)
-              }
-              placeholder="Enter favorite subjects"
-            />
-            {errors["interests.academic.favoriteSubjects"] && (
-              <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.academic.favoriteSubjects"]}</p>
-            )}
-            <InputField
-              label="What is/are the subject/s you like least?"
-              required
-              value={interests?.academic?.leastLikedSubjects || ""}
-              onChange={(val) =>
-                handleInputChange("interests.academic.leastLikedSubjects", val)
-              }
-              placeholder="Enter least liked subjects"
-            />
-            {errors["interests.academic.leastLikedSubjects"] && (
-              <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.academic.leastLikedSubjects"]}</p>
-            )}
-          </div>
-        </div>
-
-        {/* Divider */}
-        <div className="border-t border-border my-8"></div>
-
-        {/* B. Extra-Curricular */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold text-card-foreground mb-4">
-            B. Extra-Curricular
-          </h3>
-
-          {/* Hobbies Section */}
-          <div className="mb-6">
-            <p className="text-sm font-medium text-foreground mb-4">
-              What are your hobbies? Write them in the order of your preferences.
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="space-y-12">
+          {/* A. Academic Section */}
+          <section>
+            <div className="space-y-8">
               <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  1.
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={interests?.hobbies?.[0]?.hobbyName || ""}
-                    onChange={(e) =>
-                      handleInputChange("interests.hobbies.0.hobbyName", e.target.value)
-                    }
-                    placeholder="Hobby"
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                       (!interests?.hobbies?.[0]?.hobbyName || errors["interests.hobbies.0.hobbyName"])
-                        ? 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                        : 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                      }`}
-                  />
-                  {interests?.hobbies?.[0]?.hobbyName && (
-                    <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
-                  )}
-                </div>
-                {errors["interests.hobbies.0.hobbyName"] && (
-                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.hobbies.0.hobbyName"]}</p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  3.
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={interests?.hobbies?.[2]?.hobbyName || ""}
-                    onChange={(e) =>
-                      handleInputChange("interests.hobbies.2.hobbyName", e.target.value)
-                    }
-                    placeholder="Hobby"
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                        interests?.hobbies?.[2]?.hobbyName
-                          ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                          : 'bg-card border-border focus:border-border focus:ring-ring/20'
-                    }`}
-                  />
-                  {interests?.hobbies?.[2]?.hobbyName && (
-                    <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
-                  )}
-                </div>
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  2.
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={interests?.hobbies?.[1]?.hobbyName || ""}
-                    onChange={(e) =>
-                      handleInputChange("interests.hobbies.1.hobbyName", e.target.value)
-                    }
-                    placeholder="Hobby"
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                       (!interests?.hobbies?.[1]?.hobbyName || errors["interests.hobbies.1.hobbyName"])
-                        ? 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                        : 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                      }`}
-                  />
-                  {interests?.hobbies?.[1]?.hobbyName && (
-                    <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
-                  )}
-                </div>
-                {errors["interests.hobbies.1.hobbyName"] && (
-                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.hobbies.1.hobbyName"]}</p>
-                )}
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">
-                  4.
-                </label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={interests?.hobbies?.[3]?.hobbyName || ""}
-                    onChange={(e) =>
-                      handleInputChange("interests.hobbies.3.hobbyName", e.target.value)
-                    }
-                    placeholder="Hobby"
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                        interests?.hobbies?.[3]?.hobbyName
-                          ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                          : 'bg-card border-border focus:border-border focus:ring-ring/20'
-                    }`}
-                  />
-                  {interests?.hobbies?.[3]?.hobbyName && (
-                    <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Organizations Section */}
-          <div className="mb-6">
-            <p className="text-sm font-medium text-foreground mb-4">
-              Which of the following organizations have you participated in and which interest you most? (Please specify)
-            </p>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              {[
-                { value: "athletics", label: "Athletics" },
-                { value: "religiousOrganization", label: "Religious Organization" },
-                { value: "gleeClub", label: "Glee Club" },
-                { value: "dramatics", label: "Dramatics" },
-                { value: "chessClub", label: "Chess Club" },
-                { value: "scouting", label: "Scouting" },
-              ].map((opt) => (
-                <label key={opt.value} className="flex items-center gap-3 cursor-pointer">
-                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                    <input
-                      type="radio"
-                      name="organization"
-                      value={opt.value}
-                      checked={interests?.extraCurricular?.organization === opt.value}
-                      onChange={() => {
-                        handleInputChange("interests.extraCurricular.organization", opt.value);
-                        handleInputChange("interests.extraCurricular.organizationOthers", "");
-                      }}
-                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-6">
+                  A. Academic (School Clubs / Organizations)
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                  {ACADEMIC_CLUBS.map((club, idx) => (
+                    <Checkbox
+                      key={club}
+                      id={`academic-club-${idx}`}
+                      name="academic_clubs"
+                      label={club}
+                      checked={isActivityChecked(club)}
+                      onCheckedChange={() => toggleActivity(club, true)}
                     />
-                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                  ))}
+                  <Checkbox
+                    id="academic-others-check"
+                    name="academic_clubs"
+                    label="Others, please specify"
+                    checked={isActivityChecked("Others", true, true)}
+                    onCheckedChange={() => toggleActivity("Others", true, true)}
+                  />
+                </div>
+                {isActivityChecked("Others", true, true) && (
+                  <div className="max-w-md animate-in fade-in slide-in-from-top-2 duration-200 mt-4 px-4 border-l-2 border-red-500/20">
+                    <InputField
+                      label="Please specify:"
+                      name="academic_others_input"
+                      value={getOtherSpecification(true)}
+                      onChange={(val) => updateOtherSpecification(true, val)}
+                      placeholder="e.g. Journalism Club"
+                    />
                   </div>
-                  <span className="text-sm text-foreground">{opt.label}</span>
-                </label>
-              ))}
-            </div>
+                )}
+              </div>
 
-            {/* Others - Separate row */}
-            <div className="flex items-center gap-3 whitespace-nowrap">
-              <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                <input
-                  type="radio"
-                  name="organization"
-                  value="others"
-                  checked={interests?.extraCurricular?.organization === "others"}
-                  onChange={() => {
-                    handleInputChange("interests.extraCurricular.organization", "others");
-                    handleInputChange("interests.extraCurricular.organizationOthers", "");
-                  }}
-                  className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-border/40">
+                <InputField
+                  label="What is/are your favorite subject/s?"
+                  name="favoriteSubjects"
+                  value={getSubjects(true)}
+                  onChange={(val) => updateSubjects(true, val)}
+                  placeholder="e.g. Mathematics, Science"
+                  error={errors["interests.academic.favoriteSubjects"]}
                 />
-                <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-              </div>
-              <span className="text-sm text-foreground flex-shrink-0">Others, please specify</span>
-              <input
-                type="text"
-                value={interests?.extraCurricular?.organizationOthers || ""}
-                onChange={(e) =>
-                  handleInputChange("interests.extraCurricular.organizationOthers", e.target.value)
-                }
-                placeholder="specify"
-                className="px-3 py-1 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm w-32 flex-shrink-0 bg-card text-foreground"
-                disabled={interests?.extraCurricular?.organization !== "others"}
-              />
-            </div>
-            {errors["interests.extraCurricular.organization"] && (
-              <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.extraCurricular.organization"]}</p>
-            )}
-          </div>
 
-          {/* Occupational Position */}
-          <div className="mb-8">
-            <p className="text-sm font-medium text-foreground mb-4">
-              Occupational position in the organization:
-            </p>
-            <div className="flex items-center gap-6">
-              <label className="flex items-center gap-3 cursor-pointer">
-                <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                  <input
-                    type="radio"
-                    name="occupationalPosition"
-                    value="officer"
-                    checked={interests?.extraCurricular?.occupationalPosition === "officer"}
-                    onChange={() =>
-                      handleInputChange("interests.extraCurricular.occupationalPosition", "officer")
-                    }
-                    className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                  />
-                  <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                  <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                </div>
-                <span className="text-sm text-foreground">Officer</span>
-              </label>
-
-              <label className="flex items-center gap-3 cursor-pointer">
-                <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                  <input
-                    type="radio"
-                    name="occupationalPosition"
-                    value="member"
-                    checked={interests?.extraCurricular?.occupationalPosition === "member"}
-                    onChange={() =>
-                      handleInputChange("interests.extraCurricular.occupationalPosition", "member")
-                    }
-                    className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                  />
-                  <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                  <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                </div>
-                <span className="text-sm text-foreground">Member</span>
-              </label>
-
-              <div className="flex items-center gap-3">
-                <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                  <input
-                    type="radio"
-                    name="occupationalPosition"
-                    value="others"
-                    checked={interests?.extraCurricular?.occupationalPosition === "others"}
-                    onChange={() =>
-                      handleInputChange("interests.extraCurricular.occupationalPosition", "others")
-                    }
-                    className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                  />
-                  <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                  <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                </div>
-                <div className="flex items-center gap-2">
-                  <span className="text-sm text-foreground">Others, please specify</span>
-                  <input
-                    type="text"
-                    value={interests?.extraCurricular?.occupationalOthers || ""}
-                    onChange={(e) =>
-                      handleInputChange("interests.extraCurricular.occupationalOthers", e.target.value)
-                    }
-                    placeholder="specify"
-                    disabled={interests?.extraCurricular?.occupationalPosition !== "others"}
-                    className={`px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
-                      interests?.extraCurricular?.occupationalPosition === "others"
-                        ? "border-border bg-card focus:border-border focus:ring-ring/20"
-                        : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
-                    }`}
-                  />
-                </div>
+                <InputField
+                  label="What is/are the subject/s you like least?"
+                  name="leastLikedSubjects"
+                  value={getSubjects(false)}
+                  onChange={(val) => updateSubjects(false, val)}
+                  placeholder="e.g. History, Physical Education"
+                  error={errors["interests.academic.leastLikedSubjects"]}
+                />
               </div>
             </div>
-            {errors["interests.extraCurricular.occupationalPosition"] && (
-              <p className="text-xs font-semibold text-red-600 mt-1">{errors["interests.extraCurricular.occupationalPosition"]}</p>
-            )}
-          </div>
+          </section>
+
+          {/* B. Extra-Curricular Section */}
+          <section className="pt-8 border-t border-border/60">
+            <div className="space-y-10">
+              <div>
+                <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
+                  B. Extra-Curricular (Hobbies)
+                </h4>
+                <p className="text-sm text-muted-foreground mb-6 italic">
+                  What are your hobbies? Write them in the order of your preferences.
+                </p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
+                  {[1, 2, 3, 4].map((rank) => (
+                    <InputField
+                      key={rank}
+                      name={`hobby-${rank}`}
+                      label={`${rank}. ${rank <= 2 ? "(Required)" : ""}`}
+                      value={getHobby(rank)}
+                      onChange={(val) => updateHobby(rank, val)}
+                      placeholder={`Hobby #${rank}`}
+                      error={rank <= 2 ? errors[`interests.hobbies.${rank - 1}.hobbyName`] : undefined}
+                      required={rank <= 2}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              <div className="pt-10 border-t border-border/40 relative">
+                {errors["interests.activities"] && (
+                  <p className="absolute top-4 right-0 text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded">{errors["interests.activities"]}</p>
+                )}
+                <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider opacity-80 mb-6 font-medium">
+                  Which organizations have you participated in?
+                </h4>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                  {EXTRA_CURRICULAR_ORGS.map((org, idx) => (
+                    <Checkbox
+                      key={org}
+                      id={`extra-org-${idx}`}
+                      name="extra_orgs"
+                      label={org}
+                      checked={isActivityChecked(org)}
+                      onCheckedChange={() => toggleActivity(org, false)}
+                    />
+                  ))}
+                  <Checkbox
+                    id="extra-others-check"
+                    name="extra_orgs"
+                    label="Others, please specify"
+                    checked={isActivityChecked("Others", false, true)}
+                    onCheckedChange={() => toggleActivity("Others", false, true)}
+                  />
+                </div>
+
+                {isActivityChecked("Others", false, true) && (
+                  <div className="max-w-md mb-10 animate-in fade-in slide-in-from-top-2 duration-200 px-4 border-l-2 border-red-500/20">
+                    <InputField
+                      label="Please specify:"
+                      name="org_others_input"
+                      value={getOtherSpecification(false)}
+                      onChange={(val) => updateOtherSpecification(false, val)}
+                      placeholder="e.g. Red Cross Youth"
+                    />
+                  </div>
+                )}
+
+                <div className="mt-12 p-8 rounded-2xl border border-border bg-muted/5">
+                  <h5 className="text-xs font-bold text-foreground uppercase tracking-widest opacity-60 mb-8">
+                    Occupational position in the organization:
+                  </h5>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                    {ROLE_OPTIONS.map((role, idx) => (
+                      <Checkbox
+                        key={role}
+                        id={`role-${idx}`}
+                        name="occupational_role"
+                        label={role}
+                        checked={isRoleChecked(role)}
+                        onCheckedChange={() => toggleRole(role)}
+                      />
+                    ))}
+
+                    <div className="md:col-span-1 lg:col-span-2 space-y-6">
+                      <Checkbox
+                        id="role-others-check"
+                        name="occupational_role"
+                        label="Others, please specify"
+                        checked={isRoleChecked("Others")}
+                        onCheckedChange={() => toggleRole("Others")}
+                      />
+                      {isRoleChecked("Others") && (
+                        <div className="animate-in fade-in slide-in-from-top-2 duration-200 mt-2">
+                          <InputField
+                            label=""
+                            name="role_others_input"
+                            value={interests?._tempRoleSpecification || ""}
+                            onChange={(val) => handleInputChange("interests._tempRoleSpecification", val)}
+                            onBlur={() => {
+                              const currentActivities = (interests?.activities || []).map((a: Activity) => ({
+                                ...a,
+                                roleSpecification: interests?._tempRoleSpecification
+                              }));
+                              handleInputChange("interests.activities", currentActivities);
+                            }}
+                            placeholder="Specify role"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
         </div>
       </CardContent>
     </Card>

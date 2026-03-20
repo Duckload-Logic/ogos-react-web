@@ -4,7 +4,7 @@
  */
 
 export { ProtectedRoute } from "./ProtectedRoute";
-export { PDSGate } from "./PDSGate";
+export { IIRGate } from "./IIRGate";
 
 // Re-export UI components for convenience
 export * from "./ui/button";

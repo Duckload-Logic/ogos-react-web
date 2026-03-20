@@ -1,6 +1,6 @@
 import { RouteObject, Navigate } from "react-router-dom";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { PDSGate } from "@/components/PDSGate";
+import { IIRGate } from "@/components/IIRGate";
 
 // Shared
 import Layout from "@/components/layout/Layout";
@@ -65,9 +65,11 @@ export const routes: RouteObject[] = [
     path: "/student/home",
     element: (
       <ProtectedRoute requiredRole="student">
+        <IIRGate>
         <Layout title="Services">
           <StudentDashboard />
         </Layout>
+        </IIRGate>
       </ProtectedRoute>
     ),
   },
@@ -75,11 +77,11 @@ export const routes: RouteObject[] = [
     path: "/student/appointments",
     element: (
       <ProtectedRoute requiredRole="student">
-        <PDSGate>
+        <IIRGate>
           <Layout title="View Appointments">
             <StudentAppointments />
           </Layout>
-        </PDSGate>
+        </IIRGate>
       </ProtectedRoute>
     ),
   },
@@ -97,11 +99,11 @@ export const routes: RouteObject[] = [
     path: "/student/slips",
     element: (
       <ProtectedRoute requiredRole="student">
-        <PDSGate>
+        <IIRGate>
           <Layout title="My Admission Slips">
             <StudentSlips />
           </Layout>
-        </PDSGate>
+        </IIRGate>
       </ProtectedRoute>
     ),
   },
@@ -109,9 +111,9 @@ export const routes: RouteObject[] = [
     path: "/student/slips/submit",
     element: (
       <ProtectedRoute requiredRole="student">
-        <PDSGate>
+        <IIRGate>
           <SubmitSlip />
-        </PDSGate>
+        </IIRGate>
       </ProtectedRoute>
     ),
   },
@@ -281,7 +283,12 @@ export const routes: RouteObject[] = [
     ),
   },
 
+  // OAuth callback route (public, no layout)
+  {
+    path: "/auth/callback",
+    element: <Callback />,
+  },
+
   // 404
   { path: "*", element: <NotFound /> },
-  { path: "/callback", element: <Callback /> },
 ];

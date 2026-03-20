@@ -24,7 +24,7 @@ export const EMPTY_IIR_FORM: IIRForm = {
   },
   education: {
     natureOfSchooling: "",
-    interruptedDetails: {} as any,
+    interruptedDetails: null,
     schools: [],
   },
   family: {
@@ -41,6 +41,5 @@ export const EMPTY_IIR_FORM: IIRForm = {
     subjectPreferences: [],
     hobbies: [],
   },
-  testResults: [],
-  significantNotes: [],
+  // testResults: [],
 };

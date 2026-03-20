@@ -282,35 +282,58 @@ export default function AppointmentCalendar({
               const isDisabled = isDateDisabled(day);
 
               return (
-                <div key={day} className="relative group flex justify-center">
+                <div
+                  key={day}
+                  className="relative group p-1 flex justify-center"
+                >
                   <button
-                    onClick={() => {
-                      handleDateClick(day);
-                      // If on mobile, you might want logic to close modal here
-                    }}
+                    onClick={() => handleDateClick(day)}
                     disabled={isDisabled}
                     className={`
-                    size-10 sm:size-12 rounded-xl font-semibold text-sm
-                    flex items-center justify-center transition-all text-nowrap
-                    ${
-                      isSelected
-                        ? "bg-primary text-primary-foreground scale-110 shadow-lg"
-                        : "bg-muted hover:bg-muted/80 text-foreground"
-                    }
-                    ${isDisabled ? "opacity-30 cursor-not-allowed" : ""}
-                    ${isToday && !isSelected ? "border-2 border-primary" : ""}
-                  `}
+                      size-12
+                      rounded-lg font-semibold transition-colors text-sm
+                      flex items-center justify-center
+                      focus:outline-none focus:ring-1 focus:ring-primary/50
+                      text-nowrap
+                      ${isDisabled ? "opacity-50 cursor-not-allowed" : "hover:ring-1 hover:ring-primary"}
+                      ${
+                        isSelected
+                          ? "bg-primary text-primary-foreground ring-1 ring-primary"
+                          : isDisabled
+                            ? "bg-muted/50 text-muted-foreground"
+                            : "bg-muted hover:bg-muted/80 text-foreground"
+                      }
+                      ${isToday ? "ring-1 ring-primary" : ""}
+                    `}
+                    aria-label={`${day} ${monthName}`}
+                    aria-pressed={isSelected}
                   >
                     {day}
                   </button>
-                  {/* Admin Stats Dots */}
                   {isAdmin && statsMap[dateKey] && (
-                    <div className="absolute -bottom-1 flex gap-0.5">
-                      {statsMap[dateKey].PendingCount > 0 && (
-                        <div className="size-1.5 rounded-full bg-warning" />
+                    <div className="absolute flex -space-x-1 transform -translate-y-1 justify-center pointer-events-none">
+                      {/* Pending is first in row-reverse order to be on top-right */}
+                      {statsMap[dateKey].RescheduledCount > 0 && (
+                        <div
+                          className="size-3 rounded-full bg-notice-background border-2 border-notice-foreground"
+                          title="Rescheduled"
+                        />
                       )}
+
+                      {/* Scheduled is rendered second (middle) */}
                       {statsMap[dateKey].ScheduledCount > 0 && (
-                        <div className="size-1.5 rounded-full bg-info" />
+                        <div
+                          className="size-3 rounded-full bg-info-background border-2 border-info-foreground"
+                          title="Scheduled"
+                        />
+                      )}
+
+                      {/* Pending is rendered last (right-most, top of stack) */}
+                      {statsMap[dateKey].PendingCount > 0 && (
+                        <div
+                          className="size-3 rounded-full bg-warning-background border-2 border-warning-foreground"
+                          title="Pending"
+                        />
                       )}
                     </div>
                   )}

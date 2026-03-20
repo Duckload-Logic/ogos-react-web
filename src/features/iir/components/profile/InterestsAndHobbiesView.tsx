@@ -20,7 +20,7 @@ export default function InterestsHobbiesView({
 
   const preferredSubjects = data?.subjectPreferences || [];
   const hobbies = [...(data?.hobbies || [])].sort(
-    (a: Hobby, b: Hobby) => (a.priorityRanking || 0) - (b.priorityRanking || 0),
+    (a: Hobby, b: Hobby) => (a.priorityRank || 0) - (b.priorityRank || 0),
   );
 
   return (
@@ -58,7 +58,7 @@ export default function InterestsHobbiesView({
         <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
           {hobbies.length > 0 ? (
             hobbies.map((hobby: any) => (
-              <CardBlock key={hobby.id} title={`Rank ${hobby.priorityRanking}`}>
+              <CardBlock key={hobby.id} title={`Rank ${hobby.priorityRank}`}>
                 <div className="flex items-center gap-3">
                   <Trophy className="h-4 w-4 text-primary" />
                   <span className="text-sm font-semibold text-card-foreground">

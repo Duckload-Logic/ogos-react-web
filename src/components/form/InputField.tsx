@@ -2,12 +2,15 @@ import { Info, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
 export default function InputField({
+  className = "",
+  name,
   label,
   min,
   max,
   type = "text",
   value,
   onChange,
+  onBlur,
   error,
   placeholder,
   required = false,
@@ -16,32 +19,35 @@ export default function InputField({
   info = "",
   prefix,
 }: {
+  className?: string;
+  name?: string;
   label: string;
   min?: string;
   max?: string;
   type?: string;
   value: any;
   onChange: (val: string) => void;
+  onBlur?: () => void;
   error?: string;
   placeholder?: string;
   required?: boolean;
   isTextarea?: boolean;
   inputMode?:
-    | "search"
-    | "none"
-    | "text"
-    | "tel"
-    | "url"
-    | "email"
-    | "numeric"
-    | "decimal";
+  | "search"
+  | "none"
+  | "text"
+  | "tel"
+  | "url"
+  | "email"
+  | "numeric"
+  | "decimal";
   disabled?: boolean;
   info?: string;
   prefix?: string;
 }) {
   return (
-    <div className="space-y-2">
-      <div className="text-sm font-medium text-card-foreground flex items-start gap-1">
+    <div className={`space-y-2 ${className}`}>
+      <div className="text-sm font-medium text-card-foreground flex max-h-10 items-start gap-1">
         {info && <CustomTooltip content={info} />}
         <span>{label}</span>
         {required && <span className="text-red-500">*</span>}
@@ -59,6 +65,7 @@ export default function InputField({
             type={type}
             value={value}
             onChange={(e) => onChange(e.target.value)}
+            onBlur={onBlur}
             placeholder={placeholder}
             inputMode={inputMode}
             disabled={disabled}
@@ -67,26 +74,31 @@ export default function InputField({
               outline-none transition-colors duration-200
               placeholder:text-muted-foreground
               focus:ring-offset-0 text-foreground
-              ${
-                disabled
-                  ? 'bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none'
-                  : value
-                    ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                    : required
-                      ? 'bg-card border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20'
-                      : 'bg-card border-border'
+              ${disabled
+                ? "bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none"
+                : (value !== undefined && value !== null && value !== "")
+                  ? "bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20"
+                  : required
+                    ? "bg-card border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20"
+                    : "bg-card border-border"
               }
             `}
             min={min}
             max={max}
           />
-          {!disabled && value && (
-            <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
+          {!disabled && (value !== undefined && value !== null && value !== "") && (
+            <Check
+              size={18}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500"
+              strokeWidth={2.5}
+            />
           )}
         </div>
       </div>
       {info && <p className="text-xs text-muted-foreground">{info}</p>}
-      {error && <p className="text-xs font-semibold text-red-600 mt-1">{error}</p>}
+      {error && (
+        <p className="text-xs font-thin text-red-600 mt-1">{error}</p>
+      )}
     </div>
   );
 }

@@ -1,12 +1,17 @@
-﻿import { forwardRef, useImperativeHandle, useState, useRef } from "react";
+import { forwardRef, useImperativeHandle, useState, useRef } from "react";
 import { Card, CardContent } from "@/components/ui/card";
 import { InputField, Checkbox, RadioField } from "@/components/form";
 import { Check } from "lucide-react";
+import { validateObject, isFieldRequired } from "@/services/validationSchema";
+import { familyValidationSchema } from "@/features/iir/config/familyValidationSchema";
 import {
   useIncomeRanges,
   useNatureOfResidenceTypes,
   useParentalStatusTypes,
+  useSiblingSupportTypes,
+  useStudentSupportTypes,
 } from "../../hooks";
+import { ParentalStatus } from "../../types/IIRForm";
 
 interface FormErrors {
   [key: string]: string;
@@ -21,143 +26,29 @@ export const FamilyBackgroundSection = forwardRef<
   {
     family: any;
     onChange: (path: string, value: any) => void;
+    onFieldBlur?: (fieldPath: string) => void;
+    shouldShowError?: (fieldPath: string) => boolean;
   }
->(function FamilyBackgroundSection({ family, onChange }, ref) {
+>(function FamilyBackgroundSection(
+  { family, onChange, onFieldBlur, shouldShowError },
+  ref,
+) {
   const { data: parentalStatusOptions } = useParentalStatusTypes();
   const { data: natureOfResidenceOptions } = useNatureOfResidenceTypes();
   const { data: monthlyFamilyIncomeRanges } = useIncomeRanges();
+  const { data: siblingSupportTypesOptions } = useSiblingSupportTypes();
+  const { data: studentSupportTypesOptions } = useStudentSupportTypes();
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [otherTouched, setOtherTouched] = useState(false);
   const otherInputRef = useRef<HTMLInputElement | null>(null);
 
+  const FATHER_IDX = 0;
+  const MOTHER_IDX = 1;
+  const GUARDIAN_IDX = 2;
+
   const validate = (): { isValid: boolean; errors: FormErrors } => {
-    const sectionErrors: FormErrors = {};
-
-    // Parental status
-    if (!family?.background?.parentalStatus) {
-      sectionErrors["family.background.parentalStatus"] = "Parental status is required";
-    }
-
-    // Family members
-    const persons = [
-      { key: "father", label: "Father" },
-      { key: "mother", label: "Mother" },
-      { key: "guardian", label: "Guardian" },
-    ] as const;
-
-    persons.forEach(({ key, label }) => {
-      const person = family?.relatedPersons?.[key] || {};
-
-      const name = (person?.name || "").trim();
-      if (!name) {
-        sectionErrors[`family.relatedPersons.${key}.name`] = `${label} name is required`;
-      } else if (name.length < 2) {
-        sectionErrors[`family.relatedPersons.${key}.name`] = `${label} name must be at least 2 characters`;
-      }
-
-      const age = person?.age;
-      if (age === undefined || age === null || age === "" || Number(age) === 0) {
-        sectionErrors[`family.relatedPersons.${key}.age`] = `${label} age is required`;
-      } else {
-        const ageNum = Number(age);
-        if (isNaN(ageNum) || !Number.isInteger(ageNum) || ageNum <= 0) {
-          sectionErrors[`family.relatedPersons.${key}.age`] = `${label} age must be a positive whole number`;
-        }
-      }
-
-      const educ = (person?.educationalAttainment || "").trim();
-      if (!educ) {
-        sectionErrors[`family.relatedPersons.${key}.educationalAttainment`] = `${label} educational attainment is required`;
-      } else if (educ.length < 2) {
-        sectionErrors[`family.relatedPersons.${key}.educationalAttainment`] = `${label} educational attainment must be at least 2 characters`;
-      }
-
-      const occ = (person?.occupation || "").trim();
-      if (!occ) {
-        sectionErrors[`family.relatedPersons.${key}.occupation`] = `${label} occupation is required`;
-      } else if (occ.length < 2) {
-        sectionErrors[`family.relatedPersons.${key}.occupation`] = `${label} occupation must be at least 2 characters`;
-      }
-
-      if (!(person?.employerName || "").trim()) {
-        sectionErrors[`family.relatedPersons.${key}.employerName`] = `${label} employer name is required`;
-      }
-
-      if (!(person?.employerAddress || "").trim()) {
-        sectionErrors[`family.relatedPersons.${key}.employerAddress`] = `${label} employer address is required`;
-      }
-
-      if (person?.isLiving === undefined || person?.isLiving === null) {
-        sectionErrors[`family.relatedPersons.${key}.isLiving`] = `${label} status (Living/Deceased) is required`;
-      }
-    });
-
-    // Finance
-    if (!family?.finance?.monthlyFamilyIncomeRange?.id) {
-      sectionErrors["family.finance.monthlyFamilyIncomeRange"] = "Monthly family income range is required";
-    }
-    if (family?.finance?.monthlyFamilyIncomeRange?.id === "others") {
-      if (!(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "").trim()) {
-        sectionErrors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] = "Please specify the income range";
-      }
-    }
-
-    const wa = family?.finance?.weeklyAllowance;
-    if (wa === undefined || wa === null || wa === "" || Number(wa) === 0) {
-      sectionErrors["family.finance.weeklyAllowance"] = "Weekly allowance is required";
-    } else if (isNaN(Number(wa)) || Number(wa) <= 0) {
-      sectionErrors["family.finance.weeklyAllowance"] = "Weekly allowance must be a positive number";
-    }
-
-    // Sibling counts
-    if (family?.background?.numberOfChildren === undefined || family?.background?.numberOfChildren === null || family?.background?.numberOfChildren === "") {
-      sectionErrors["family.background.numberOfChildren"] = "Number of children is required";
-    }
-    if (family?.background?.brothers === undefined || family?.background?.brothers === null || family?.background?.brothers === "") {
-      sectionErrors["family.background.brothers"] = "Number of brothers is required";
-    }
-    if (family?.background?.sisters === undefined || family?.background?.sisters === null || family?.background?.sisters === "") {
-      sectionErrors["family.background.sisters"] = "Number of sisters is required";
-    }
-    if (family?.background?.employedSiblings === undefined || family?.background?.employedSiblings === null || family?.background?.employedSiblings === "") {
-      sectionErrors["family.background.employedSiblings"] = "Number of gainfully employed is required";
-    }
-    if (!(family?.background?.ordinalPosition || "").trim()) {
-      sectionErrors["family.background.ordinalPosition"] = "Ordinal position is required";
-    }
-
-    // Living situation
-    if (!family?.background?.quietPlaceToStudy) {
-      sectionErrors["family.background.quietPlaceToStudy"] = "Please indicate if you have a quiet place to study";
-    }
-    if (!family?.background?.sharesRoom) {
-      sectionErrors["family.background.sharesRoom"] = "Please indicate if you share your room";
-    }
-
-    // Nature of Residence (at least one)
-    const hasResidence = family?.background?.natureOfResidence &&
-      Object.values(family.background.natureOfResidence).some(Boolean);
-    if (!hasResidence) {
-      sectionErrors["family.background.natureOfResidence"] = "Please select at least one nature of residence";
-    }
-
-    // Financing source (at least one)
-    const hasFinancingSource = family?.background?.financingSource &&
-      Object.values(family.background.financingSource).some(Boolean);
-    if (!hasFinancingSource) {
-      sectionErrors["family.background.financingSource"] = "Please select at least one financing source";
-    }
-
-    // Sibling support (required only if there are employed siblings)
-    if (Number(family?.background?.employedSiblings) > 0) {
-      const hasSiblingSupport = family?.background?.siblingSupport &&
-        Object.values(family.background.siblingSupport).some(Boolean);
-      if (!hasSiblingSupport) {
-        sectionErrors["family.background.siblingSupport"] = "Please indicate how employed siblings are providing support";
-      }
-    }
-
+    const sectionErrors = validateObject({ family }, familyValidationSchema);
     setErrors(sectionErrors);
     return {
       isValid: Object.keys(sectionErrors).length === 0,
@@ -182,6 +73,25 @@ export const FamilyBackgroundSection = forwardRef<
     clearError(fieldPath);
   };
 
+  /**
+   * Helper to determine if error should be displayed for a field
+   * Only show error if field is touched (or form submitted) AND has an error
+   */
+  const getFieldError = (fieldPath: string): string | undefined => {
+    const hasError = errors[fieldPath];
+    const showError = shouldShowError ? shouldShowError(fieldPath) : true;
+    return hasError && showError ? errors[fieldPath] : undefined;
+  };
+
+  /**
+   * Handle blur event for a field
+   */
+  const handleFieldBlur = (fieldPath: string) => {
+    if (onFieldBlur) {
+      onFieldBlur(fieldPath);
+    }
+  };
+
   return (
     <Card className="bg-card border border-border">
       <CardContent className="pt-6">
@@ -191,12 +101,13 @@ export const FamilyBackgroundSection = forwardRef<
             I. Parental Status
           </h3>
           <div className="space-y-2">
-            <div className="text-sm font-medium text-card-foreground flex items-start gap-1">
-            </div>
+            <div className="text-sm font-medium text-card-foreground flex items-start gap-1"></div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {parentalStatusOptions?.map((option: any) => {
                 const isOther = option.name?.toLowerCase() === "other";
-                const isSelected = String(family?.background?.parentalStatus) === String(option.id);
+                const isSelected =
+                  String((family?.background?.parentalStatus as any)?.id || "") ===
+                  String(option.id);
 
                 if (isOther && isSelected) {
                   return (
@@ -208,20 +119,28 @@ export const FamilyBackgroundSection = forwardRef<
                           value={option.id}
                           checked={true}
                           onChange={(e) =>
-                            handleInputChange("family.background.parentalStatus", e.target.value)
+                            handleInputChange(
+                              "family.background.parentalStatus",
+                              { id: Number(e.target.value) },
+                            )
                           }
                           className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
                         />
                         <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
                         <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
                       </div>
-                      <span className="text-sm text-foreground whitespace-nowrap">Other, please specify:</span>
+                      <span className="text-sm text-foreground whitespace-nowrap">
+                        Other, please specify:
+                      </span>
                       <input
                         type="text"
                         placeholder="specify"
                         value={family?.background?.parentalStatusOther || ""}
                         onChange={(e) =>
-                          handleInputChange("family.background.parentalStatusOther", e.target.value)
+                          handleInputChange(
+                            "family.background.parentalStatusOther",
+                            e.target.value,
+                          )
                         }
                         className="flex-1 px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:border-border focus:ring-ring/20 text-sm bg-card text-foreground"
                       />
@@ -229,7 +148,10 @@ export const FamilyBackgroundSection = forwardRef<
                   );
                 } else if (isOther) {
                   return (
-                    <label key={option.id} className="flex items-center gap-3 group cursor-pointer">
+                    <label
+                      key={option.id}
+                      className="flex items-center gap-3 group cursor-pointer"
+                    >
                       <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
                         <input
                           type="radio"
@@ -237,7 +159,10 @@ export const FamilyBackgroundSection = forwardRef<
                           value={option.id}
                           checked={false}
                           onChange={(e) =>
-                            handleInputChange("family.background.parentalStatus", e.target.value)
+                            handleInputChange(
+                              "family.background.parentalStatus",
+                              { id: Number(e.target.value) },
+                            )
                           }
                           className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
                         />
@@ -251,7 +176,10 @@ export const FamilyBackgroundSection = forwardRef<
                   );
                 } else {
                   return (
-                    <label key={option.id} className="flex items-center gap-3 group cursor-pointer">
+                    <label
+                      key={option.id}
+                      className="flex items-center gap-3 group cursor-pointer"
+                    >
                       <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
                         <input
                           type="radio"
@@ -259,7 +187,10 @@ export const FamilyBackgroundSection = forwardRef<
                           value={option.id}
                           checked={isSelected}
                           onChange={(e) =>
-                            handleInputChange("family.background.parentalStatus", e.target.value)
+                            handleInputChange(
+                              "family.background.parentalStatus",
+                              { id: Number(e.target.value) },
+                            )
                           }
                           className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
                         />
@@ -275,7 +206,9 @@ export const FamilyBackgroundSection = forwardRef<
               })}
             </div>
             {errors["family.background.parentalStatus"] && (
-              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.parentalStatus"]}</p>
+              <p className="text-xs font-semibold text-red-600 mt-1">
+                {errors["family.background.parentalStatus"]}
+              </p>
             )}
           </div>
         </div>
@@ -299,14 +232,25 @@ export const FamilyBackgroundSection = forwardRef<
                   { id: "yes", name: "Yes" },
                   { id: "no", name: "No" },
                 ]}
-                value={family?.background?.quietPlaceToStudy || ""}
+                value={
+                  family?.background?.haveQuietPlaceToStudy === true
+                    ? "yes"
+                    : family?.background?.haveQuietPlaceToStudy === false
+                      ? "no"
+                      : ""
+                }
                 onChange={(val) =>
-                  handleInputChange("family.background.quietPlaceToStudy", val)
+                  handleInputChange(
+                    "family.background.haveQuietPlaceToStudy",
+                    val === "yes",
+                  )
                 }
                 columns={2}
               />
-              {errors["family.background.quietPlaceToStudy"] && (
-                <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.quietPlaceToStudy"]}</p>
+              {errors["family.background.haveQuietPlaceToStudy"] && (
+                <p className="text-xs font-semibold text-red-600 mt-1">
+                  {errors["family.background.haveQuietPlaceToStudy"]}
+                </p>
               )}
             </div>
 
@@ -320,22 +264,36 @@ export const FamilyBackgroundSection = forwardRef<
                   { id: "yes", name: "Yes" },
                   { id: "no", name: "No" },
                 ]}
-                value={family?.background?.sharesRoom || ""}
+                value={
+                  family?.background?.isSharingRoom === true
+                    ? "yes"
+                    : family?.background?.isSharingRoom === false
+                      ? "no"
+                      : ""
+                }
                 onChange={(val) =>
-                  handleInputChange("family.background.sharesRoom", val)
+                  handleInputChange(
+                    "family.background.isSharingRoom",
+                    val === "yes",
+                  )
                 }
                 columns={2}
               />
-              {errors["family.background.sharesRoom"] && (
-                <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.sharesRoom"]}</p>
+              {errors["family.background.isSharingRoom"] && (
+                <p className="text-xs font-semibold text-red-600 mt-1">
+                  {errors["family.background.isSharingRoom"]}
+                </p>
               )}
-              {family?.background?.sharesRoom === "yes" && (
+              {family?.background?.isSharingRoom === true && (
                 <div className="mt-4">
                   <InputField
                     label="Share room with whom?"
                     value={family?.background?.roomSharingDetails || ""}
                     onChange={(val) =>
-                      handleInputChange("family.background.roomSharingDetails", val)
+                      handleInputChange(
+                        "family.background.roomSharingDetails",
+                        val,
+                      )
                     }
                     placeholder="e.g., Sister, Brother"
                   />
@@ -347,112 +305,45 @@ export const FamilyBackgroundSection = forwardRef<
               <h4 className="font-semibold text-foreground mb-4">
                 Nature of Residence
               </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <Checkbox square
-                  id="residence-family"
-                  label="Family Home"
-                  name="residence-family"
-                  checked={
-                    family?.background?.natureOfResidence?.familyHome || false
-                  }
-                  onCheckedChange={(checked) =>
-                    handleInputChange(
-                      "family.background.natureOfResidence.familyHome",
-                      checked === true
-                    )
-                  }
-                />
-                <Checkbox square
-                  id="residence-bed"
-                  label="Bed Spacer"
-                  name="residence-bed"
-                  checked={
-                    family?.background?.natureOfResidence?.bedSpacer || false
-                  }
-                  onCheckedChange={(checked) =>
-                    handleInputChange(
-                      "family.background.natureOfResidence.bedSpacer",
-                      checked === true
-                    )
-                  }
-                />
-                <Checkbox square
-                  id="residence-relative"
-                  label="Relative's House"
-                  name="residence-relative"
-                  checked={
-                    family?.background?.natureOfResidence?.relativesHouse ||
-                    false
-                  }
-                  onCheckedChange={(checked) =>
-                    handleInputChange(
-                      "family.background.natureOfResidence.relativesHouse",
-                      checked === true
-                    )
-                  }
-                />
-                <Checkbox square
-                  id="residence-rented"
-                  label="Rented Apartment"
-                  name="residence-rented"
-                  checked={
-                    family?.background?.natureOfResidence?.rentedApartment ||
-                    false
-                  }
-                  onCheckedChange={(checked) =>
-                    handleInputChange(
-                      "family.background.natureOfResidence.rentedApartment",
-                      checked === true
-                    )
-                  }
-                />
-                <Checkbox square
-                  id="residence-dorm"
-                  label="Dormitory"
-                  name="residence-dorm"
-                  checked={
-                    family?.background?.natureOfResidence?.dorm || false
-                  }
-                  onCheckedChange={(checked) =>
-                    handleInputChange(
-                      "family.background.natureOfResidence.dorm",
-                      checked === true
-                    )
-                  }
-                />
-                <Checkbox square
-                  id="residence-married"
-                  label="House of Married Brother/Sister"
-                  name="residence-married"
-                  checked={
-                    family?.background?.natureOfResidence
-                      ?.housOfMarriedSibling || false
-                  }
-                  onCheckedChange={(checked) =>
-                    handleInputChange(
-                      "family.background.natureOfResidence.housOfMarriedSibling",
-                      checked === true
-                    )
-                  }
-                />
-                <Checkbox square
-                  id="residence-shared"
-                  label="Shares Apartment with Friends"
-                  name="residence-shared"
-                  checked={
-                    family?.background?.natureOfResidence?.sharesWithFriends ||
-                    false
-                  }
-                  onCheckedChange={(checked) =>
-                    handleInputChange(
-                      "family.background.natureOfResidence.sharesWithFriends",
-                      checked === true
-                    )
-                  }
-                />
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-4 gap-x-6">
+                {natureOfResidenceOptions?.map((option: any) => {
+                  const isSelected =
+                    String((family?.background?.natureOfResidence as any)?.id || "") ===
+                    String(option.id);
+
+                  return (
+                    <label
+                      key={option.id}
+                      className="flex items-center gap-3 group cursor-pointer"
+                    >
+                      <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                        <input
+                          type="radio"
+                          name="natureOfResidence"
+                          value={option.id}
+                          checked={isSelected}
+                          onChange={(e) =>
+                            handleInputChange(
+                              "family.background.natureOfResidence",
+                              { id: Number(e.target.value) },
+                            )
+                          }
+                          className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                        />
+                        <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                        <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                      </div>
+                      <span className="text-sm text-foreground group-hover:text-primary transition-colors duration-200">
+                        {option.name || option.text || option.code}
+                      </span>
+                    </label>
+                  );
+                })}
               </div>
               {errors["family.background.natureOfResidence"] && (
-                <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.natureOfResidence"]}</p>
+                <p className="text-xs font-semibold text-red-600 mt-1">
+                  {errors["family.background.natureOfResidence"]}
+                </p>
               )}
             </div>
           </div>
@@ -470,626 +361,851 @@ export const FamilyBackgroundSection = forwardRef<
           <div className="p-4 bg-background dark:bg-muted rounded-lg border border-border">
             {/* Father Sub-section */}
             <div className="mb-6">
-            <h4 className="font-semibold text-foreground mb-4">Father</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <InputField
-                label="Name"
-                value={family?.relatedPersons?.father?.name || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.father.name", val)
-                }
-                placeholder="Father's name"
-                required
-                error={errors["family.relatedPersons.father.name"]}
-              />
-              <InputField
-                label="Age"
-                type="text"
-                inputMode="numeric"
-                value={family?.relatedPersons?.father?.age || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.father.age", val.replace(/[^0-9]/g, ""))
-                }
-                placeholder="Age"
-                required
-                error={errors["family.relatedPersons.father.age"]}
-              />
-              <InputField
-                label="Educational Attainment"
-                value={family?.relatedPersons?.father?.educationalAttainment || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.father.educationalAttainment", val)
-                }
-                placeholder="e.g., College Graduate"
-                required
-                error={errors["family.relatedPersons.father.educationalAttainment"]}
-              />
-              <InputField
-                label="Occupation"
-                value={family?.relatedPersons?.father?.occupation || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.father.occupation", val)
-                }
-                placeholder="e.g., Engineer"
-                required
-                error={errors["family.relatedPersons.father.occupation"]}
-              />
-              <InputField
-                label="Name of Employer"
-                value={family?.relatedPersons?.father?.employerName || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.father.employerName", val)
-                }
-                placeholder="Company name"
-                required
-                error={errors["family.relatedPersons.father.employerName"]}
-              />
-              <InputField
-                label="Address of Employer"
-                value={family?.relatedPersons?.father?.employerAddress || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.father.employerAddress", val)
-                }
-                placeholder="Company address"
-                required
-                error={errors["family.relatedPersons.father.employerAddress"]}
-              />
-            </div>
-            <div className="flex gap-6">
-              <label className="text-sm font-medium text-card-foreground">Status:</label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                    <input
-                      type="radio"
-                      name="father-status"
-                      value="living"
-                      checked={family?.relatedPersons?.father?.isLiving === true}
-                      onChange={() =>
-                        handleInputChange("family.relatedPersons.father.isLiving", true)
-                      }
-                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                  </div>
-                  <span className="text-sm">Living</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                    <input
-                      type="radio"
-                      name="father-status"
-                      value="deceased"
-                      checked={family?.relatedPersons?.father?.isLiving === false}
-                      onChange={() =>
-                        handleInputChange("family.relatedPersons.father.isLiving", false)
-                      }
-                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                  </div>
-                  <span className="text-sm">Deceased</span>
-                </label>
+              <h4 className="font-semibold text-foreground mb-4">Father</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4 col-span-2">
+                  <InputField
+                    label="First Name"
+                    value={family?.relatedPersons?.[FATHER_IDX].firstName || ""}
+                    onChange={(val) =>
+                      handleInputChange(
+                        `family.relatedPersons.${FATHER_IDX}.firstName`,
+                        val,
+                      )
+                    }
+                    onBlur={() =>
+                      handleFieldBlur(
+                        `family.relatedPersons.${FATHER_IDX}.firstName`,
+                      )
+                    }
+                    placeholder="Father's name"
+                    required
+                    error={getFieldError(
+                      `family.relatedPersons.${FATHER_IDX}.firstName`,
+                    )}
+                  />
+                  <InputField
+                    label="Middle Name"
+                    value={
+                      family?.relatedPersons?.[FATHER_IDX].middleName || ""
+                    }
+                    onChange={(val) =>
+                      handleInputChange(
+                        `family.relatedPersons.${FATHER_IDX}.middleName`,
+                        val,
+                      )
+                    }
+                    onBlur={() =>
+                      handleFieldBlur(
+                        `family.relatedPersons.${FATHER_IDX}.middleName`,
+                      )
+                    }
+                    placeholder="Father's name"
+                    error={getFieldError(
+                      `family.relatedPersons.${FATHER_IDX}.middleName`,
+                    )}
+                  />
+                  <InputField
+                    label="Last Name"
+                    value={family?.relatedPersons?.[FATHER_IDX].lastName || ""}
+                    onChange={(val) =>
+                      handleInputChange(
+                        `family.relatedPersons.${FATHER_IDX}.lastName`,
+                        val,
+                      )
+                    }
+                    onBlur={() =>
+                      handleFieldBlur(
+                        `family.relatedPersons.${FATHER_IDX}.lastName`,
+                      )
+                    }
+                    placeholder="Father's name"
+                    required
+                    error={getFieldError(
+                      `family.relatedPersons.${FATHER_IDX}.lastName`,
+                    )}
+                  />
+                </div>
+                <InputField
+                  label="Date of Birth"
+                  type="text"
+                  inputMode="numeric"
+                  value={family?.relatedPersons?.[FATHER_IDX].dateOfBirth || ""}
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${FATHER_IDX}.dateOfBirth`,
+                      val.replace(/[^0-9]/g, ""),
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(
+                      `family.relatedPersons.${FATHER_IDX}.dateOfBirth`,
+                    )
+                  }
+                  placeholder="Date of Birth"
+                  required
+                  error={getFieldError(
+                    `family.relatedPersons.${FATHER_IDX}.dateOfBirth`,
+                  )}
+                />
+                <InputField
+                  label="Educational Attainment"
+                  value={
+                    family?.relatedPersons?.[FATHER_IDX].educationalLevel || ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${FATHER_IDX}.educationalLevel`,
+                      val,
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(
+                      `family.relatedPersons.${FATHER_IDX}.educationalLevel`,
+                    )
+                  }
+                  placeholder="e.g., College Graduate"
+                  required
+                  error={getFieldError(
+                    `family.relatedPersons.${FATHER_IDX}.educationalLevel`,
+                  )}
+                />
+                <InputField
+                  label="Occupation"
+                  value={family?.relatedPersons?.[FATHER_IDX].occupation || ""}
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${FATHER_IDX}.occupation`,
+                      val,
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(
+                      `family.relatedPersons.${FATHER_IDX}.occupation`,
+                    )
+                  }
+                  placeholder="e.g., Engineer"
+                  required
+                  error={getFieldError(
+                    `family.relatedPersons.${FATHER_IDX}.occupation`,
+                  )}
+                />
+                <InputField
+                  label="Name of Employer"
+                  value={
+                    family?.relatedPersons?.[FATHER_IDX].employerName || ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${FATHER_IDX}.employerName`,
+                      val,
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(
+                      `family.relatedPersons.${FATHER_IDX}.employerName`,
+                    )
+                  }
+                  placeholder="Company name"
+                  required
+                  error={getFieldError(
+                    `family.relatedPersons.${FATHER_IDX}.employerName`,
+                  )}
+                />
+                <InputField
+                  label="Address of Employer"
+                  className="col-span-2"
+                  value={
+                    family?.relatedPersons?.[FATHER_IDX].employerAddress || ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${FATHER_IDX}.employerAddress`,
+                      val,
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(
+                      `family.relatedPersons.${FATHER_IDX}.employerAddress`,
+                    )
+                  }
+                  placeholder="Company address"
+                  error={getFieldError(
+                    `family.relatedPersons.${FATHER_IDX}.employerAddress`,
+                  )}
+                />
               </div>
-            </div>
-            {errors["family.relatedPersons.father.isLiving"] && (
-              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.relatedPersons.father.isLiving"]}</p>
-            )}
+              <div className="flex gap-6">
+                <label className="text-sm font-medium text-card-foreground">
+                  Status:
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                      <input
+                        type="radio"
+                        name="father-status"
+                        value="living"
+                        checked={
+                          family?.relatedPersons?.[FATHER_IDX].isLiving === true
+                        }
+                        onChange={() =>
+                          handleInputChange(
+                            `family.relatedPersons.${FATHER_IDX}.isLiving`,
+                            true,
+                          )
+                        }
+                        className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                      <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                    </div>
+                    <span className="text-sm">Living</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                      <input
+                        type="radio"
+                        name="father-status"
+                        value="deceased"
+                        checked={
+                          family?.relatedPersons?.[FATHER_IDX].isLiving ===
+                          false
+                        }
+                        onChange={() =>
+                          handleInputChange(
+                            `family.relatedPersons.${FATHER_IDX}.isLiving`,
+                            false,
+                          )
+                        }
+                        className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                      <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                    </div>
+                    <span className="text-sm">Deceased</span>
+                  </label>
+                </div>
+              </div>
+              {errors[`family.relatedPersons.${FATHER_IDX}.isLiving`] && (
+                <p className="text-xs font-semibold text-red-600 mt-1">
+                  {errors[`family.relatedPersons.${FATHER_IDX}.isLiving`]}
+                </p>
+              )}
             </div>
             <div className="mb-6">
-            <h4 className="font-semibold text-foreground mb-4">Mother</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <InputField
-                label="Name"
-                value={family?.relatedPersons?.mother?.name || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.mother.name", val)
-                }
-                placeholder="Mother's name"
-                required
-                error={errors["family.relatedPersons.mother.name"]}
-              />
-              <InputField
-                label="Age"
-                type="text"
-                inputMode="numeric"
-                value={family?.relatedPersons?.mother?.age || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.mother.age", val.replace(/[^0-9]/g, ""))
-                }
-                placeholder="Age"
-                required
-                error={errors["family.relatedPersons.mother.age"]}
-              />
-              <InputField
-                label="Educational Attainment"
-                value={family?.relatedPersons?.mother?.educationalAttainment || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.mother.educationalAttainment", val)
-                }
-                placeholder="e.g., College Graduate"
-                required
-                error={errors["family.relatedPersons.mother.educationalAttainment"]}
-              />
-              <InputField
-                label="Occupation"
-                value={family?.relatedPersons?.mother?.occupation || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.mother.occupation", val)
-                }
-                placeholder="e.g., Engineer"
-                required
-                error={errors["family.relatedPersons.mother.occupation"]}
-              />
-              <InputField
-                label="Name of Employer"
-                value={family?.relatedPersons?.mother?.employerName || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.mother.employerName", val)
-                }
-                placeholder="Company name"
-                required
-                error={errors["family.relatedPersons.mother.employerName"]}
-              />
-              <InputField
-                label="Address of Employer"
-                value={family?.relatedPersons?.mother?.employerAddress || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.mother.employerAddress", val)
-                }
-                placeholder="Company address"
-                required
-                error={errors["family.relatedPersons.mother.employerAddress"]}
-              />
-            </div>
-            <div className="flex gap-6">
-              <label className="text-sm font-medium text-card-foreground">Status:</label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                    <input
-                      type="radio"
-                      name="mother-status"
-                      value="living"
-                      checked={family?.relatedPersons?.mother?.isLiving === true}
-                      onChange={() =>
-                        handleInputChange("family.relatedPersons.mother.isLiving", true)
-                      }
-                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                  </div>
-                  <span className="text-sm">Living</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                    <input
-                      type="radio"
-                      name="mother-status"
-                      value="deceased"
-                      checked={family?.relatedPersons?.mother?.isLiving === false}
-                      onChange={() =>
-                        handleInputChange("family.relatedPersons.mother.isLiving", false)
-                      }
-                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                  </div>
-                  <span className="text-sm">Deceased</span>
-                </label>
+              <h4 className="font-semibold text-foreground mb-4">Mother</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 col-span-2 gap-4">
+                  <InputField
+                    label="First Name"
+                    value={family?.relatedPersons?.[MOTHER_IDX].firstName || ""}
+                    onChange={(val) =>
+                      handleInputChange(
+                        `family.relatedPersons.${MOTHER_IDX}.firstName`,
+                        val,
+                      )
+                    }
+                    placeholder="Mother's first name"
+                    required
+                    error={
+                      errors[`family.relatedPersons.${MOTHER_IDX}.firstName`]
+                    }
+                  />
+                  <InputField
+                    label="Middle Name"
+                    value={
+                      family?.relatedPersons?.[MOTHER_IDX].middleName || ""
+                    }
+                    onChange={(val) =>
+                      handleInputChange(
+                        `family.relatedPersons.${MOTHER_IDX}.middleName`,
+                        val,
+                      )
+                    }
+                    placeholder="Mother's middle name"
+                    required
+                    error={
+                      errors[`family.relatedPersons.${MOTHER_IDX}.middleName`]
+                    }
+                  />
+                  <InputField
+                    label="Last Name"
+                    value={family?.relatedPersons?.[MOTHER_IDX].lastName || ""}
+                    onChange={(val) =>
+                      handleInputChange(
+                        `family.relatedPersons.${MOTHER_IDX}.lastName`,
+                        val,
+                      )
+                    }
+                    placeholder="Mother's last name"
+                    required
+                    error={
+                      errors[`family.relatedPersons.${MOTHER_IDX}.lastName`]
+                    }
+                  />
+                </div>
+                <InputField
+                  label="Date of Birth"
+                  type="text"
+                  inputMode="numeric"
+                  value={family?.relatedPersons?.[MOTHER_IDX].dateOfBirth || ""}
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${MOTHER_IDX}.dateOfBirth`,
+                      val.replace(/[^0-9]/g, ""),
+                    )
+                  }
+                  placeholder="Date of Birth"
+                  required
+                  error={
+                    errors[`family.relatedPersons.${MOTHER_IDX}.dateOfBirth`]
+                  }
+                />
+                <InputField
+                  label="Educational Attainment"
+                  value={
+                    family?.relatedPersons?.[MOTHER_IDX].educationalLevel || ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${MOTHER_IDX}.educationalLevel`,
+                      val,
+                    )
+                  }
+                  placeholder="e.g., College Graduate"
+                  required
+                  error={
+                    errors[
+                    `family.relatedPersons.${MOTHER_IDX}.educationalLevel`
+                    ]
+                  }
+                />
+                <InputField
+                  label="Occupation"
+                  value={family?.relatedPersons?.[MOTHER_IDX].occupation || ""}
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${MOTHER_IDX}.occupation`,
+                      val,
+                    )
+                  }
+                  placeholder="e.g., Engineer"
+                  required
+                  error={
+                    errors[`family.relatedPersons.${MOTHER_IDX}.occupation`]
+                  }
+                />
+                <InputField
+                  label="Name of Employer"
+                  value={
+                    family?.relatedPersons?.[MOTHER_IDX].employerName || ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${MOTHER_IDX}.employerName`,
+                      val,
+                    )
+                  }
+                  required={isFieldRequired(familyValidationSchema, `family.relatedPersons.${MOTHER_IDX}.employerName`)}
+                  placeholder="Company name"
+                  error={
+                    errors[`family.relatedPersons.${MOTHER_IDX}.employerName`]
+                  }
+                />
+                <InputField
+                  label="Address of Employer"
+                  className="col-span-2"
+                  value={
+                    family?.relatedPersons?.[MOTHER_IDX].employerAddress || ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${MOTHER_IDX}.employerAddress`,
+                      val,
+                    )
+                  }
+                  placeholder="Company address"
+                  error={
+                    errors[
+                    `family.relatedPersons.${MOTHER_IDX}.employerAddress`
+                    ]
+                  }
+                />
               </div>
-            </div>
-            {errors["family.relatedPersons.mother.isLiving"] && (
-              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.relatedPersons.mother.isLiving"]}</p>
-            )}
+              <div className="flex gap-6">
+                <label className="text-sm font-medium text-card-foreground">
+                  Status:
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                      <input
+                        type="radio"
+                        name="mother-status"
+                        value="living"
+                        checked={
+                          family?.relatedPersons?.[MOTHER_IDX].isLiving === true
+                        }
+                        onChange={() =>
+                          handleInputChange(
+                            `family.relatedPersons.${MOTHER_IDX}.isLiving`,
+                            true,
+                          )
+                        }
+                        className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                      <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                    </div>
+                    <span className="text-sm">Living</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                      <input
+                        type="radio"
+                        name="mother-status"
+                        value="deceased"
+                        checked={
+                          family?.relatedPersons?.[MOTHER_IDX].isLiving ===
+                          false
+                        }
+                        onChange={() =>
+                          handleInputChange(
+                            `family.relatedPersons.${MOTHER_IDX}.isLiving`,
+                            false,
+                          )
+                        }
+                        className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                      <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                    </div>
+                    <span className="text-sm">Deceased</span>
+                  </label>
+                </div>
+              </div>
+              {errors[`family.relatedPersons.${MOTHER_IDX}.isLiving`] && (
+                <p className="text-xs font-semibold text-red-600 mt-1">
+                  {errors[`family.relatedPersons.${MOTHER_IDX}.isLiving`]}
+                </p>
+              )}
             </div>
 
             <div className="border-t border-border my-6"></div>
 
             {/* Guardian Sub-section */}
             <div className="mb-6">
-            <h4 className="font-semibold text-foreground mb-4">Guardian</h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-              <InputField
-                label="Name"
-                value={family?.relatedPersons?.guardian?.name || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.guardian.name", val)
-                }
-                placeholder="Guardian's name"
-                required
-                error={errors["family.relatedPersons.guardian.name"]}
-              />
-              <InputField
-                label="Age"
-                type="text"
-                inputMode="numeric"
-                value={family?.relatedPersons?.guardian?.age || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.guardian.age", val.replace(/[^0-9]/g, ""))
-                }
-                placeholder="Age"
-                required
-                error={errors["family.relatedPersons.guardian.age"]}
-              />
-              <InputField
-                label="Educational Attainment"
-                value={family?.relatedPersons?.guardian?.educationalAttainment || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.guardian.educationalAttainment", val)
-                }
-                placeholder="e.g., College Graduate"
-                required
-                error={errors["family.relatedPersons.guardian.educationalAttainment"]}
-              />
-              <InputField
-                label="Occupation"
-                value={family?.relatedPersons?.guardian?.occupation || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.guardian.occupation", val)
-                }
-                placeholder="e.g., Engineer"
-                required
-                error={errors["family.relatedPersons.guardian.occupation"]}
-              />
-              <InputField
-                label="Name of Employer"
-                value={family?.relatedPersons?.guardian?.employerName || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.guardian.employerName", val)
-                }
-                placeholder="Company name"
-                required
-                error={errors["family.relatedPersons.guardian.employerName"]}
-              />
-              <InputField
-                label="Address of Employer"
-                value={family?.relatedPersons?.guardian?.employerAddress || ""}
-                onChange={(val) =>
-                  handleInputChange("family.relatedPersons.guardian.employerAddress", val)
-                }
-                placeholder="Company address"
-                required
-                error={errors["family.relatedPersons.guardian.employerAddress"]}
-              />
-            </div>
-            <div className="flex gap-6">
-              <label className="text-sm font-medium text-card-foreground">Status:</label>
-              <div className="flex gap-4">
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                    <input
-                      type="radio"
-                      name="guardian-status"
-                      value="living"
-                      checked={family?.relatedPersons?.guardian?.isLiving === true}
-                      onChange={() =>
-                        handleInputChange("family.relatedPersons.guardian.isLiving", true)
-                      }
-                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                  </div>
-                  <span className="text-sm">Living</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                    <input
-                      type="radio"
-                      name="guardian-status"
-                      value="deceased"
-                      checked={family?.relatedPersons?.guardian?.isLiving === false}
-                      onChange={() =>
-                        handleInputChange("family.relatedPersons.guardian.isLiving", false)
-                      }
-                      className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                    />
-                    <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                    <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-                  </div>
-                  <span className="text-sm">Deceased</span>
-                </label>
+              <h4 className="font-semibold text-foreground mb-4">Guardian</h4>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                <div className="grid grid-cols-1 md:grid-cols-3 col-span-2 gap-4">
+                  <InputField
+                    label="First Name"
+                    value={
+                      family?.relatedPersons?.[GUARDIAN_IDX].firstName || ""
+                    }
+                    onChange={(val) =>
+                      handleInputChange(
+                        `family.relatedPersons.${GUARDIAN_IDX}.firstName`,
+                        val,
+                      )
+                    }
+                    onBlur={() =>
+                      handleFieldBlur(
+                        `family.relatedPersons.${GUARDIAN_IDX}.firstName`,
+                      )
+                    }
+                    placeholder="Guardian's first name"
+                    required
+                    error={getFieldError(
+                      `family.relatedPersons.${GUARDIAN_IDX}.firstName`,
+                    )}
+                  />
+                  <InputField
+                    label="Middle Name"
+                    value={
+                      family?.relatedPersons?.[GUARDIAN_IDX].middleName || ""
+                    }
+                    onChange={(val) =>
+                      handleInputChange(
+                        `family.relatedPersons.${GUARDIAN_IDX}.middleName`,
+                        val,
+                      )
+                    }
+                    onBlur={() =>
+                      handleFieldBlur(
+                        `family.relatedPersons.${GUARDIAN_IDX}.middleName`,
+                      )
+                    }
+                    placeholder="Guardian's middle name"
+                    error={getFieldError(
+                      `family.relatedPersons.${GUARDIAN_IDX}.middleName`,
+                    )}
+                  />
+                  <InputField
+                    label="Last Name"
+                    value={
+                      family?.relatedPersons?.[GUARDIAN_IDX].lastName || ""
+                    }
+                    onChange={(val) =>
+                      handleInputChange(
+                        `family.relatedPersons.${GUARDIAN_IDX}.lastName`,
+                        val,
+                      )
+                    }
+                    onBlur={() =>
+                      handleFieldBlur(
+                        `family.relatedPersons.${GUARDIAN_IDX}.lastName`,
+                      )
+                    }
+                    placeholder="Guardian's last name"
+                    required
+                    error={getFieldError(
+                      `family.relatedPersons.${GUARDIAN_IDX}.lastName`,
+                    )}
+                  />
+                </div>
+                <InputField
+                  label="Date of Birth"
+                  type="text"
+                  inputMode="numeric"
+                  value={
+                    family?.relatedPersons?.[GUARDIAN_IDX].dateOfBirth || ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
+                      String(val).replace(/[^0-9]/g, ""),
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(
+                      `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
+                    )
+                  }
+                  placeholder="Date of Birth"
+                  required
+                  error={getFieldError(
+                    `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
+                  )}
+                />
+                <InputField
+                  label="Educational Attainment"
+                  value={
+                    family?.relatedPersons?.[GUARDIAN_IDX].educationalLevel ||
+                    ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${GUARDIAN_IDX}.educationalLevel`,
+                      val,
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(
+                      `family.relatedPersons.${GUARDIAN_IDX}.educationalLevel`,
+                    )
+                  }
+                  placeholder="e.g., College Graduate"
+                  required
+                  error={getFieldError(
+                    `family.relatedPersons.${GUARDIAN_IDX}.educationalLevel`,
+                  )}
+                />
+                <InputField
+                  label="Occupation"
+                  value={
+                    family?.relatedPersons?.[GUARDIAN_IDX].occupation || ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${GUARDIAN_IDX}.occupation`,
+                      val,
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(
+                      `family.relatedPersons.${GUARDIAN_IDX}.occupation`,
+                    )
+                  }
+                  placeholder="e.g., Engineer"
+                  required
+                  error={getFieldError(
+                    `family.relatedPersons.${GUARDIAN_IDX}.occupation`,
+                  )}
+                />
+                <InputField
+                  label="Name of Employer"
+                  value={
+                    family?.relatedPersons?.[GUARDIAN_IDX].employerName || ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${GUARDIAN_IDX}.employerName`,
+                      val,
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(
+                      `family.relatedPersons.${GUARDIAN_IDX}.employerName`,
+                    )
+                  }
+                  placeholder="Company name"
+                  required
+                  error={getFieldError(
+                    `family.relatedPersons.${GUARDIAN_IDX}.employerName`,
+                  )}
+                />
+                <InputField
+                  label="Address of Employer"
+                  className="col-span-2"
+                  value={
+                    family?.relatedPersons?.[GUARDIAN_IDX].employerAddress || ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${GUARDIAN_IDX}.employerAddress`,
+                      val,
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(
+                      `family.relatedPersons.${GUARDIAN_IDX}.employerAddress`,
+                    )
+                  }
+                  placeholder="Company address"
+                  error={getFieldError(
+                    `family.relatedPersons.${GUARDIAN_IDX}.employerAddress`,
+                  )}
+                />
               </div>
-            </div>
-            {errors["family.relatedPersons.guardian.isLiving"] && (
-              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.relatedPersons.guardian.isLiving"]}</p>
-            )}
+              <div className="flex gap-6">
+                <label className="text-sm font-medium text-card-foreground">
+                  Status:
+                </label>
+                <div className="flex gap-4">
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                      <input
+                        type="radio"
+                        name="guardian-status"
+                        value="living"
+                        checked={
+                          family?.relatedPersons?.[GUARDIAN_IDX].isLiving ===
+                          true
+                        }
+                        onChange={() =>
+                          handleInputChange(
+                            `family.relatedPersons.${GUARDIAN_IDX}.isLiving`,
+                            true,
+                          )
+                        }
+                        className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                      <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                    </div>
+                    <span className="text-sm">Living</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer">
+                    <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+                      <input
+                        type="radio"
+                        name="guardian-status"
+                        value="deceased"
+                        checked={
+                          family?.relatedPersons?.[GUARDIAN_IDX].isLiving ===
+                          false
+                        }
+                        onChange={() =>
+                          handleInputChange(
+                            `family.relatedPersons.${GUARDIAN_IDX}.isLiving`,
+                            false,
+                          )
+                        }
+                        className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
+                      />
+                      <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
+                      <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
+                    </div>
+                    <span className="text-sm">Deceased</span>
+                  </label>
+                </div>
+              </div>
+              {errors[`family.relatedPersons.${GUARDIAN_IDX}.isLiving`] && (
+                <p className="text-xs font-semibold text-red-600 mt-1">
+                  {errors[`family.relatedPersons.${GUARDIAN_IDX}.isLiving`]}
+                </p>
+              )}
             </div>
 
             <div className="border-t border-border my-6"></div>
 
             {/* Family Information Fields */}
             <div className="mb-6">
-            <h4 className="font-semibold text-foreground mb-4">Sibling Information</h4>
-            {/* Row 1: 3 columns */}
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Children (incl. yourself)</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="0"
-                    value={family?.background?.numberOfChildren || ""}
-                    onChange={(e) =>
-                      handleInputChange("family.background.numberOfChildren", e.target.value.replace(/[^0-9]/g, ""))
-                    }
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                      family?.background?.numberOfChildren
-                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                    }`}
-                  />
-                  {!!family?.background?.numberOfChildren && (
-                    <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
-                  )}
-                </div>
-                {errors["family.background.numberOfChildren"] && (
-                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.numberOfChildren"]}</p>
-                )}
-              </div>
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Brothers</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="0"
-                    value={family?.background?.brothers || ""}
-                    onChange={(e) =>
-                      handleInputChange("family.background.brothers", e.target.value.replace(/[^0-9]/g, ""))
-                    }
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                      family?.background?.brothers
-                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                    }`}
-                  />
-                  {!!family?.background?.brothers && (
-                    <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
-                  )}
-                </div>
-                {errors["family.background.brothers"] && (
-                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.brothers"]}</p>
-                )}
-              </div>
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Sisters</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="0"
-                    value={family?.background?.sisters || ""}
-                    onChange={(e) =>
-                      handleInputChange("family.background.sisters", e.target.value.replace(/[^0-9]/g, ""))
-                    }
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                      family?.background?.sisters
-                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                    }`}
-                  />
-                  {!!family?.background?.sisters && (
-                    <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
-                  )}
-                </div>
-                {errors["family.background.sisters"] && (
-                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.sisters"]}</p>
-                )}
+              <h4 className="font-semibold text-foreground mb-4">
+                Sibling Information
+              </h4>
+              {/* 4 columns */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <InputField
+                  label="Number of Brothers"
+                  value={family?.background?.brothers ?? ""}
+                  type="number"
+                  inputMode="numeric"
+                  required={isFieldRequired(familyValidationSchema, "family.background.brothers")}
+                  onChange={function (val: string): void {
+                    const cleanVal = val.replace(/[^0-9]/g, "");
+                    handleInputChange(
+                      "family.background.brothers",
+                      cleanVal === "" ? null : Number(cleanVal),
+                    );
+                  }}
+                  onBlur={() => handleFieldBlur("family.background.brothers")}
+                  error={getFieldError("family.background.brothers")}
+                />
+                <InputField
+                  label="Number of Sisters"
+                  value={family?.background?.sisters ?? ""}
+                  type="number"
+                  inputMode="numeric"
+                  required={isFieldRequired(familyValidationSchema, "family.background.sisters")}
+                  onChange={function (val: string): void {
+                    const cleanVal = val.replace(/[^0-9]/g, "");
+                    handleInputChange(
+                      "family.background.sisters",
+                      cleanVal === "" ? null : Number(cleanVal),
+                    );
+                  }}
+                  onBlur={() => handleFieldBlur("family.background.sisters")}
+                  error={getFieldError("family.background.sisters")}
+                />
+                <InputField
+                  label="Number of Employed Siblings"
+                  value={family?.background?.employedSiblings ?? ""}
+                  type="number"
+                  inputMode="numeric"
+                  required={isFieldRequired(familyValidationSchema, "family.background.employedSiblings")}
+                  onChange={function (val: string): void {
+                    const cleanVal = val.replace(/[^0-9]/g, "");
+                    handleInputChange(
+                      "family.background.employedSiblings",
+                      cleanVal === "" ? null : Number(cleanVal),
+                    );
+                  }}
+                  onBlur={() =>
+                    handleFieldBlur("family.background.employedSiblings")
+                  }
+                  error={getFieldError("family.background.employedSiblings")}
+                />
+                <InputField
+                  label="Ordinal Position Among Siblings"
+                  value={family?.background?.ordinalPosition ?? ""}
+                  type="text" // [Inference] Better for custom regex filtering
+                  inputMode="numeric"
+                  required={isFieldRequired(familyValidationSchema, "family.background.ordinalPosition")}
+                  onChange={(val) => {
+                    const cleanVal = val.replace(/[^0-9]/g, "");
+                    handleInputChange(
+                      "family.background.ordinalPosition",
+                      cleanVal === "" ? null : Number(cleanVal),
+                    );
+                  }}
+                  onBlur={() =>
+                    handleFieldBlur("family.background.ordinalPosition")
+                  }
+                  error={getFieldError("family.background.ordinalPosition")}
+                />
               </div>
             </div>
-            {/* Row 2: 2 columns */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-foreground h-10 flex items-center">No. of Gainfully Employed</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    inputMode="numeric"
-                    placeholder="0"
-                    value={family?.background?.employedSiblings || ""}
-                    onChange={(e) =>
-                      handleInputChange("family.background.employedSiblings", e.target.value.replace(/[^0-9]/g, ""))
-                    }
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                      family?.background?.employedSiblings
-                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                    }`}
-                  />
-                  {!!family?.background?.employedSiblings && (
-                    <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
-                  )}
-                </div>
-                {errors["family.background.employedSiblings"] && (
-                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.employedSiblings"]}</p>
-                )}
-              </div>
-              <div className="flex flex-col">
-                <label className="text-sm font-medium text-foreground h-10 flex items-center">Ordinal Position</label>
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="e.g., 1st"
-                    value={family?.background?.ordinalPosition || ""}
-                    onChange={(e) =>
-                      handleInputChange("family.background.ordinalPosition", e.target.value)
-                    }
-                    className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 transition-colors duration-200 ${
-                      family?.background?.ordinalPosition
-                        ? 'bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20'
-                        : 'bg-card border-red-500 focus:border-red-500 focus:ring-red-500/20'
-                    }`}
-                  />
-                  {!!family?.background?.ordinalPosition && (
-                    <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
-                  )}
-                </div>
-                {errors["family.background.ordinalPosition"] && (
-                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.ordinalPosition"]}</p>
-                )}
-              </div>
-            </div>
-            </div>
-            </div>
+          </div>
 
-            <div className="border-t border-border my-6"></div>
+          <div className="border-t border-border my-6"></div>
 
-            {/* Sibling Support Section */}
-            <div className="mb-4">
+          {/* Sibling Support Section */}
+          <div className="mb-4">
             <h4 className="text-foreground mb-3">
-              Is your brother/sister who is gainfully employed providing support to your:
+              Is your brother/sister who is gainfully employed providing support
+              to your:
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              <Checkbox square
-                id="sibling-support-family"
-                label="Family"
-                name="sibling-support-family"
-                checked={
-                  family?.background?.siblingSupport?.family || false
-                }
-                onCheckedChange={(checked) =>
-                  handleInputChange(
-                    "family.background.siblingSupport.family",
-                    checked === true
-                  )
-                }
-              />
-              <Checkbox square
-                id="sibling-support-studies"
-                label="Your studies"
-                name="sibling-support-studies"
-                checked={
-                  family?.background?.siblingSupport?.studies || false
-                }
-                onCheckedChange={(checked) =>
-                  handleInputChange(
-                    "family.background.siblingSupport.studies",
-                    checked === true
-                  )
-                }
-              />
-              <Checkbox square
-                id="sibling-support-own-family"
-                label="His/Her Own Family"
-                name="sibling-support-own-family"
-                checked={
-                  family?.background?.siblingSupport?.ownFamily || false
-                }
-                onCheckedChange={(checked) =>
-                  handleInputChange(
-                    "family.background.siblingSupport.ownFamily",
-                    checked === true
-                  )
-                }
-              />
+              {siblingSupportTypesOptions?.map((option: any) => {
+                const isChecked = family?.background?.siblingSupportTypes?.some(
+                  (item: any) => String(item.id) === String(option.id)
+                );
+
+                return (
+                  <Checkbox
+                    key={option.id}
+                    square
+                    id={`sibling-support-${option.id}`}
+                    label={option.name || option.text || option.code}
+                    name={`sibling-support-${option.id}`}
+                    checked={isChecked || false}
+                    onCheckedChange={(checked) => {
+                      const currentTypes = family?.background?.siblingSupportTypes || [];
+                      let newTypes;
+                      if (checked) {
+                        newTypes = [...currentTypes, { id: Number(option.id) }];
+                      } else {
+                        newTypes = currentTypes.filter(
+                          (item: any) => String(item.id) !== String(option.id)
+                        );
+                      }
+                      handleInputChange("family.background.siblingSupportTypes", newTypes);
+                    }}
+                  />
+                );
+              })}
             </div>
-            {errors["family.background.siblingSupport"] && (
-              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.siblingSupport"]}</p>
+            {errors["family.background.siblingSupportTypes"] && (
+              <p className="text-xs font-semibold text-red-600 mt-1">
+                {errors["family.background.siblingSupportTypes"]}
+              </p>
             )}
-            </div>
+          </div>
 
-            <div className="border-t border-border my-6"></div>
+          <div className="border-t border-border my-6"></div>
 
-            {/* Who Finances Your Schooling Section */}
-            <div className="mb-6">
+          {/* Who Finances Your Schooling Section */}
+          <div className="mb-6">
             <h4 className="font-semibold text-foreground mb-4">
               Who finances your schooling?
             </h4>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <Checkbox square
-                id="finance-parents"
-                label="Parents"
-                name="finance-parents"
-                checked={
-                  family?.background?.financingSource?.parents || false
-                }
-                onCheckedChange={(checked) =>
-                  handleInputChange(
-                    "family.background.financingSource.parents",
-                    checked === true
-                  )
-                }
-              />
-              <Checkbox square
-                id="finance-spouse"
-                label="Spouse"
-                name="finance-spouse"
-                checked={
-                  family?.background?.financingSource?.spouse || false
-                }
-                onCheckedChange={(checked) =>
-                  handleInputChange(
-                    "family.background.financingSource.spouse",
-                    checked === true
-                  )
-                }
-              />
-              <Checkbox square
-                id="finance-sibling"
-                label="Brother/Sister"
-                name="finance-sibling"
-                checked={
-                  family?.background?.financingSource?.sibling || false
-                }
-                onCheckedChange={(checked) =>
-                  handleInputChange(
-                    "family.background.financingSource.sibling",
-                    checked === true
-                  )
-                }
-              />
-              <Checkbox square
-                id="finance-scholarship"
-                label="Scholarship"
-                name="finance-scholarship"
-                checked={
-                  family?.background?.financingSource?.scholarship || false
-                }
-                onCheckedChange={(checked) =>
-                  handleInputChange(
-                    "family.background.financingSource.scholarship",
-                    checked === true
-                  )
-                }
-              />
-              <Checkbox square
-                id="finance-relatives"
-                label="Relatives"
-                name="finance-relatives"
-                checked={
-                  family?.background?.financingSource?.relatives || false
-                }
-                onCheckedChange={(checked) =>
-                  handleInputChange(
-                    "family.background.financingSource.relatives",
-                    checked === true
-                  )
-                }
-              />
-              <Checkbox square
-                id="finance-self"
-                label="Self-supporting/Working Student"
-                name="finance-self"
-                checked={
-                  family?.background?.financingSource?.selfSupporting || false
-                }
-                onCheckedChange={(checked) =>
-                  handleInputChange(
-                    "family.background.financingSource.selfSupporting",
-                    checked === true
-                  )
-                }
-              />
+              {studentSupportTypesOptions?.map((option: any) => {
+                const isChecked = family?.finance?.financialSupportTypes?.some(
+                  (item: any) => String(item.id) === String(option.id)
+                );
+
+                return (
+                  <Checkbox
+                    key={option.id}
+                    square
+                    id={`finance-${option.id}`}
+                    label={option.name || option.text || option.code}
+                    name={`finance-${option.id}`}
+                    checked={isChecked || false}
+                    onCheckedChange={(checked) => {
+                      const currentTypes = family?.finance?.financialSupportTypes || [];
+                      let newTypes;
+                      if (checked) {
+                        newTypes = [...currentTypes, { id: Number(option.id) }];
+                      } else {
+                        newTypes = currentTypes.filter(
+                          (item: any) => String(item.id) !== String(option.id)
+                        );
+                      }
+                      handleInputChange("family.finance.financialSupportTypes", newTypes);
+                    }}
+                  />
+                );
+              })}
             </div>
-            {errors["family.background.financingSource"] && (
-              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.background.financingSource"]}</p>
+            {errors["family.finance.financialSupportTypes"] && (
+              <p className="text-xs font-semibold text-red-600 mt-1">
+                {errors["family.finance.financialSupportTypes"]}
+              </p>
             )}
           </div>
         </div>
@@ -1118,7 +1234,7 @@ export const FamilyBackgroundSection = forwardRef<
                   if (val !== "others") {
                     handleInputChange(
                       "family.finance.monthlyFamilyIncomeRange.otherSpecification",
-                      ""
+                      "",
                     );
                     setOtherTouched(false);
                   } else {
@@ -1130,10 +1246,11 @@ export const FamilyBackgroundSection = forwardRef<
                   w-full px-3 py-2 border rounded-md bg-card text-sm
                   appearance-none cursor-pointer transition-all duration-200
                   focus:outline-none focus:ring-2 focus:ring-offset-0 text-foreground
-                  ${
-                    family?.finance?.monthlyFamilyIncomeRange?.id
-                      ? "border-green-500 font-medium hover:border-green-600 focus:border-green-500 focus:ring-green-500/20"
-                      : "border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20"
+                  ${(family?.finance?.monthlyFamilyIncomeRange?.id !== undefined &&
+                    family?.finance?.monthlyFamilyIncomeRange?.id !== null &&
+                    family?.finance?.monthlyFamilyIncomeRange?.id !== "")
+                    ? "border-green-500 font-medium hover:border-green-600 focus:border-green-500 focus:ring-green-500/20"
+                    : "border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20"
                   }
                 `}
               >
@@ -1145,37 +1262,64 @@ export const FamilyBackgroundSection = forwardRef<
                 ))}
                 <option value="others">Others</option>
               </select>
-              {!!family?.finance?.monthlyFamilyIncomeRange?.id && (
-                <Check size={18} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500" strokeWidth={2.5} />
-              )}
+              {(family?.finance?.monthlyFamilyIncomeRange?.id !== undefined &&
+                family?.finance?.monthlyFamilyIncomeRange?.id !== null &&
+                family?.finance?.monthlyFamilyIncomeRange?.id !== "") && (
+                  <Check
+                    size={18}
+                    className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500"
+                    strokeWidth={2.5}
+                  />
+                )}
             </div>
             {errors["family.finance.monthlyFamilyIncomeRange"] && (
-              <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.finance.monthlyFamilyIncomeRange"]}</p>
+              <p className="text-xs font-semibold text-red-600 mt-1">
+                {errors["family.finance.monthlyFamilyIncomeRange"]}
+              </p>
             )}
 
             {family?.finance?.monthlyFamilyIncomeRange?.id === "others" && (
               <div className="mt-4">
-                <p className="text-sm text-muted-foreground mb-2">Selected "Others" — please specify income range below.</p>
+                <p className="text-sm text-muted-foreground mb-2">
+                  Selected "Others" — please specify income range below.
+                </p>
                 <input
                   ref={otherInputRef}
                   type="text"
                   placeholder="Enter income range"
-                  value={family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || ""}
+                  value={
+                    family?.finance?.monthlyFamilyIncomeRange
+                      ?.otherSpecification || ""
+                  }
                   onChange={(e) =>
                     handleInputChange(
                       "family.finance.monthlyFamilyIncomeRange.otherSpecification",
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   onBlur={() => setOtherTouched(true)}
-                  className={`flex-1 ml-0 mt-2 px-3 py-2 border rounded-md text-sm bg-card focus:outline-none ${
-                    otherTouched && !(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "")
-                      ? "border-red-500 focus:ring-red-500/20"
-                      : "border-border"
-                  }`}
+                  className={`flex-1 ml-0 mt-2 px-3 py-2 border rounded-md text-sm bg-card focus:outline-none ${otherTouched &&
+                    !(
+                      family?.finance?.monthlyFamilyIncomeRange
+                        ?.otherSpecification || ""
+                    )
+                    ? "border-red-500 focus:ring-red-500/20"
+                    : "border-border"
+                    }`}
                 />
-                {(otherTouched && !(family?.finance?.monthlyFamilyIncomeRange?.otherSpecification || "")) || errors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] ? (
-                  <p className="text-xs font-semibold text-red-600 mt-1">{errors["family.finance.monthlyFamilyIncomeRange.otherSpecification"] || "Please provide an income range."}</p>
+                {(otherTouched &&
+                  !(
+                    family?.finance?.monthlyFamilyIncomeRange
+                      ?.otherSpecification || ""
+                  )) ||
+                  errors[
+                  "family.finance.monthlyFamilyIncomeRange.otherSpecification"
+                  ] ? (
+                  <p className="text-xs font-semibold text-red-600 mt-1">
+                    {errors[
+                      "family.finance.monthlyFamilyIncomeRange.otherSpecification"
+                    ] || "Please provide an income range."}
+                  </p>
                 ) : null}
               </div>
             )}
@@ -1187,12 +1331,27 @@ export const FamilyBackgroundSection = forwardRef<
               type="text"
               inputMode="decimal"
               placeholder="Enter amount"
-              value={family?.finance?.weeklyAllowance || ""}
-              onChange={(val) =>
-                handleInputChange("family.finance.weeklyAllowance", val.replace(/[^0-9.]/g, ""))
+              value={family?.finance?.weeklyAllowance ?? ""}
+              onChange={(val: any) =>
+                handleInputChange(
+                  "family.finance.weeklyAllowance",
+                  String(val).replace(/[^0-9.]/g, ""),
+                )
               }
-              error={errors["family.finance.weeklyAllowance"]}
-              required
+              onBlur={() => {
+                const wa = family?.finance?.weeklyAllowance;
+                if (wa !== undefined && wa !== null && wa !== "") {
+                  handleInputChange(
+                    "family.finance.weeklyAllowance",
+                    Number(wa),
+                  );
+                } else if (wa === "") {
+                  handleInputChange("family.finance.weeklyAllowance", null);
+                }
+                handleFieldBlur("family.finance.weeklyAllowance");
+              }}
+              error={getFieldError("family.finance.weeklyAllowance")}
+              required={isFieldRequired(familyValidationSchema, "family.finance.weeklyAllowance")}
             />
           </div>
         </div>

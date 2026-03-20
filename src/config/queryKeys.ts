@@ -13,24 +13,23 @@ export const QUERY_KEYS = {
    * User-related query keys
    */
   users: {
-    all: ['users'] as const,
-    me: ['users', 'me'] as const,
-    byId: (id: string) => ['users', 'me', id] as const,
+    all: ["users"] as const,
+    me: ["users", "me"] as const,
+    byId: (id: string) => ["users", "me", id] as const,
   },
 
   /**
    * Slip-related query keys
    */
   slips: {
-    all: ['slips'] as const,
-    mySlips: ['slips', 'me'] as const,
-    stats: ['slips', 'stats'] as const,
-    byId: (id: number) => ['slips', 'id', id] as const,
-    attachments: (id: number) =>
-      ['slips', 'id', id, 'attachments'] as const,
+    all: ["slips"] as const,
+    mySlips: ["slips", "me"] as const,
+    stats: ["slips", "stats"] as const,
+    byId: (id: number) => ["slips", "id", id] as const,
+    attachments: (id: number) => ["slips", "id", id, "attachments"] as const,
     lookups: {
-      statuses: ['slips', 'lookups', 'statuses'] as const,
-      categories: ['slips', 'lookups', 'categories'] as const,
+      statuses: ["slips", "lookups", "statuses"] as const,
+      categories: ["slips", "lookups", "categories"] as const,
     },
   },
 
@@ -38,15 +37,15 @@ export const QUERY_KEYS = {
    * Appointment-related query keys
    */
   appointments: {
-    all: ['appointments'] as const,
-    myAppointments: ['appointments', 'me'] as const,
-    stats: ['appointments', 'stats'] as const,
-    byId: (id: number) => ['appointments', 'id', id] as const,
+    all: ["appointments"] as const,
+    myAppointments: ["appointments", "me"] as const,
+    stats: ["appointments", "stats"] as const,
+    byId: (id: number) => ["appointments", "id", id] as const,
     lookups: {
-      statuses: ['appointments', 'lookups', 'statuses'] as const,
-      categories: ['appointments', 'lookups', 'categories'] as const,
+      statuses: ["appointments", "lookups", "statuses"] as const,
+      categories: ["appointments", "lookups", "categories"] as const,
       slots: (date: string) =>
-        ['appointments', 'lookups', 'slots', date] as const,
+        ["appointments", "lookups", "slots", date] as const,
     },
   },
 
@@ -54,31 +53,33 @@ export const QUERY_KEYS = {
    * Location-related query keys
    */
   locations: {
-    regions: ['locations', 'regions'] as const,
-    cities: (regionId: number) =>
-      ['locations', 'cities', regionId] as const,
-    barangays: (cityId: number) =>
-      ['locations', 'barangays', cityId] as const,
+    regions: ["locations", "regions"] as const,
+    provinces: (regionCode: string) =>
+      ["locations", "provinces", regionCode] as const,
+    citiesByRegion: (regionCode: string) =>
+      ["locations", "cities", regionCode] as const,
+    citiesByProvince: (provinceCode: string) =>
+      ["locations", "cities", provinceCode] as const,
+    barangays: (cityCode: string) =>
+      ["locations", "barangays", cityCode] as const,
   },
 
   /**
    * Consent-related query keys
    */
   consents: {
-    latest: (type: string) =>
-      ['consents', 'latest', type] as const,
+    latest: (type: string) => ["consents", "latest", type] as const,
     latestContent: (type: string) =>
-      ['consents', 'latest', type, 'content'] as const,
-    check: (docId: number) =>
-      ['consents', 'check', docId] as const,
+      ["consents", "latest", type, "content"] as const,
+    check: (docId: number) => ["consents", "check", docId] as const,
   },
 
   /**
    * Analytics-related query keys
    */
   analytics: {
-    all: ['analytics'] as const,
-    reports: ['analytics', 'reports'] as const,
+    all: ["analytics"] as const,
+    reports: ["analytics", "reports"] as const,
   },
 
   /**
@@ -86,36 +87,44 @@ export const QUERY_KEYS = {
    */
   iir: {
     lookups: {
-      courses: ['iir', 'lookups', 'courses'] as const,
-      genders: ['iir', 'lookups', 'genders'] as const,
-      religions: ['iir', 'lookups', 'religions'] as const,
-      parentalStatusTypes:
-        ['iir', 'lookups', 'parental-status-types'] as const,
-      enrollmentReasons:
-        ['iir', 'lookups', 'enrollment-reasons'] as const,
-      incomeRanges:
-        ['iir', 'lookups', 'income-ranges'] as const,
-      studentSupportTypes:
-        ['iir', 'lookups', 'student-support-types'] as const,
-      siblingSupportTypes:
-        ['iir', 'lookups', 'sibling-support-types'] as const,
-      civilStatuses:
-        ['iir', 'lookups', 'civil-statuses'] as const,
-      natureOfResidenceTypes:
-        ['iir', 'lookups', 'nature-of-residence-types'] as const,
-      studentRelationshipTypes:
-        ['iir', 'lookups', 'student-relationship-types'] as const,
+      courses: ["iir", "lookups", "courses"] as const,
+      genders: ["iir", "lookups", "genders"] as const,
+      religions: ["iir", "lookups", "religions"] as const,
+      parentalStatusTypes: ["iir", "lookups", "parental-status-types"] as const,
+      enrollmentReasons: ["iir", "lookups", "enrollment-reasons"] as const,
+      incomeRanges: ["iir", "lookups", "income-ranges"] as const,
+      studentSupportTypes: ["iir", "lookups", "student-support-types"] as const,
+      siblingSupportTypes: ["iir", "lookups", "sibling-support-types"] as const,
+      civilStatuses: ["iir", "lookups", "civil-statuses"] as const,
+      natureOfResidenceTypes: [
+        "iir",
+        "lookups",
+        "nature-of-residence-types",
+      ] as const,
+      studentRelationshipTypes: [
+        "iir",
+        "lookups",
+        "student-relationship-types",
+      ] as const,
+      activityOptions: ["iir", "lookups", "activity-options"] as const,
     },
     inventory: {
-      all: ['iir', 'inventory', 'all'] as const,
+      all: ["iir", "inventory", "all"] as const,
       byUserId: (userId: number) =>
-        ['iir', 'inventory', 'user', userId] as const,
-      byIirId: (iirId: number) =>
-        ['iir', 'inventory', 'iir', iirId] as const,
+        ["iir", "inventory", "user", userId] as const,
+      byIirId: (iirId: number) => ["iir", "inventory", "iir", iirId] as const,
       profile: (iirId: number) =>
-        ['iir', 'inventory', 'profile', iirId] as const,
+        ["iir", "inventory", "profile", iirId] as const,
     },
-    draft: ['iir', 'draft'] as const,
+    draft: ["iir", "draft"] as const,
+  },
+
+  /**
+   * Notes-related query keys
+   */
+  notes: {
+    all: ["notes"] as const,
+    byIirId: (iirId: number) => ["notes", "iir", iirId] as const,
   },
 
   /**
@@ -123,14 +132,13 @@ export const QUERY_KEYS = {
    */
   superadmin: {
     apiKeys: (includeRevoked: boolean) =>
-      ['superadmin', 'api-keys', includeRevoked] as const,
+      ["superadmin", "api-keys", includeRevoked] as const,
     securityLogs: (params?: any) =>
-      ['superadmin', 'security-logs', params] as const,
+      ["superadmin", "security-logs", params] as const,
     systemLogs: (params?: any) =>
-      ['superadmin', 'system-logs', params] as const,
-    auditLogs: (params?: any) =>
-      ['superadmin', 'audit-logs', params] as const,
+      ["superadmin", "system-logs", params] as const,
+    auditLogs: (params?: any) => ["superadmin", "audit-logs", params] as const,
     logStats: (startDate?: string, endDate?: string) =>
-      ['superadmin', 'log-stats', startDate, endDate] as const,
+      ["superadmin", "log-stats", startDate, endDate] as const,
   },
 } as const;

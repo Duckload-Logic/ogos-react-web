@@ -168,3 +168,17 @@ export function useNatureOfResidenceTypes() {
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
+
+/**
+ * Fetch activity options lookup data
+ * @returns Query result with activity options data
+ */
+export function useActivityOptions() {
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.activityOptions,
+    (config) => GetIIRLookup('activityOptions', config),
+    'GetIIRLookup',
+    'Fetch Activity Options',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
+}

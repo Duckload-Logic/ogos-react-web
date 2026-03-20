@@ -5,21 +5,6 @@ import { IIRForm } from "../types/IIRForm";
 export function useIIRFormSave() {
   const queryClient = useQueryClient();
 
-  const saveSectionMutation = useMutation({
-    mutationFn: async (data: IIRForm) => {
-      return PostIIRDraft(data, {
-        handlerName: 'useIIRFormSave',
-        stepName: 'Save Draft',
-      });
-    },
-    onSuccess: () => {
-      // Invalidate the IIR form query to refetch
-      queryClient.invalidateQueries({
-        queryKey: ["iirForm"],
-      });
-    },
-  });
-
   const submitFormMutation = useMutation({
     mutationFn: async (iir: IIRForm) => {
       return PostIIRSubmit(iir, {
@@ -36,10 +21,6 @@ export function useIIRFormSave() {
   });
 
   return {
-    saveSection: saveSectionMutation.mutate,
-    saveSectionAsync: saveSectionMutation.mutateAsync,
-    isSavingSection: saveSectionMutation.isPending,
-    saveSectionError: saveSectionMutation.error,
     submitForm: submitFormMutation.mutate,
     submitFormAsync: submitFormMutation.mutateAsync,
     isSubmitting: submitFormMutation.isPending,
