@@ -52,7 +52,8 @@ export default function ConsentModal({
             Your information will be handled in accordance with our{" "}
             <a
               className="font-bold text-primary hover:text-primary/60"
-              href="/privacy"
+              target="_blank"
+              href="https://www.pup.edu.ph/privacy"
             >
               Privacy Policy
             </a>{" "}
@@ -106,7 +107,8 @@ export default function ConsentModal({
               I agree and acknowledge the{" "}
               <a
                 className="font-bold text-primary hover:text-primary/60"
-                href="/terms"
+                target="_blank"
+                href="https://www.pup.edu.ph/terms"
               >
                 Terms of Service
               </a>

@@ -19,25 +19,21 @@ const toNumber = (value: unknown): number => {
 
 const normalizeIIRPayload = (iir: IIRForm) => {
   const activities = Array.isArray(iir.interests?.activities)
-    ? iir.interests.activities.flatMap((activity) => {
-        const options = Array.isArray(activity.activityOptions)
-          ? activity.activityOptions
-          : [];
-
-        return options.map((option) => ({
-          id: activity.id,
-          activityOption: option,
-          role: activity.role,
-        }));
-      })
+    ? iir.interests.activities.map((activity) => ({
+      id: activity.id,
+      activityOption: activity.activityOption,
+      otherSpecification: activity.otherSpecification,
+      role: activity.role,
+      roleSpecification: activity.roleSpecification,
+    }))
     : [];
 
   const schools = Array.isArray(iir.education?.schools)
     ? iir.education.schools.map((school) => ({
-        ...school,
-        yearStarted: toNumber(school.yearStarted),
-        yearCompleted: toNumber(school.yearCompleted),
-      }))
+      ...school,
+      yearStarted: toNumber(school.yearStarted),
+      yearCompleted: toNumber(school.yearCompleted),
+    }))
     : [];
 
   const addresses = Array.isArray(iir.student?.addresses)
@@ -84,15 +80,12 @@ const normalizeIIRPayload = (iir: IIRForm) => {
         : [],
       hobbies: Array.isArray(iir.interests?.hobbies)
         ? iir.interests.hobbies.map((hobby) => ({
-            ...hobby,
-            priorityRank: toNumber(hobby.priorityRanking),
-          }))
+          ...hobby,
+          priorityRank: toNumber(hobby.priorityRank),
+        }))
         : [],
     },
-    testResults: Array.isArray(iir.testResults) ? iir.testResults : [],
-    significantNotes: Array.isArray(iir.significantNotes)
-      ? iir.significantNotes
-      : [],
+    // testResults: Array.isArray(iir.testResults) ? iir.testResults : []
   };
 };
 
@@ -142,6 +135,7 @@ const LOOKUP_GET_ROUTES = {
     API_ROUTES.iir.lookups.natureOfResidenceTypes,
   studentRelationshipTypes:
     API_ROUTES.iir.lookups.studentRelationshipTypes,
+  activityOptions: API_ROUTES.iir.lookups.activityOptions,
 };
 
 const INVENTORY_GET_ROUTES = {

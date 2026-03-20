@@ -5,7 +5,11 @@ import {
   TimeSlotSelector,
   AppointmentDetailsForm,
 } from "@/features/appointments/components";
-import { Appointment, TimeSlot } from "@/features/appointments";
+import {
+  Appointment,
+  TimeSlot,
+  CreateAppointmentRequest,
+} from "@/features/appointments";
 import AppointmentCalendar from "@/features/appointments/components/AppointmentCalendar";
 import {
   CalendarDays,
@@ -278,8 +282,35 @@ export default function CreateAppointment() {
                   }));
                 }}
                 onSubmit={async () => {
-                  submit(appointmentFormData);
-                  navigate("/student/appointments");
+                  const payload: CreateAppointmentRequest = {
+                    reason: appointmentFormData.reason,
+                    whenDate:
+                      appointmentFormData.whenDate,
+                    timeSlot: {
+                      id: appointmentFormData.timeSlot.id,
+                    },
+                    appointmentCategory: {
+                      id: appointmentFormData
+                        .appointmentCategory.id,
+                    },
+                  };
+
+                  submit(payload, {
+                    onSuccess: () => {
+                      navigate(
+                        "/student/appointments",
+                      );
+                    },
+                    onError: (error: any) => {
+                      if (
+                        error.message?.includes(
+                          'IIR profile',
+                        )
+                      ) {
+                        navigate('/iir-form');
+                      }
+                    },
+                  });
                 }}
                 isLoading={isLoading}
                 isSubmitting={isSubmitting}

@@ -29,6 +29,10 @@ export default function Layout({
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [sessionAccepted, setSessionAccepted] = useState(() => {
+    // Check if they accepted during THIS specific browser session
+    return sessionStorage.getItem("session_consent_accepted") === "true";
+  });
 
   const { data: latestDocument } = useGetLatestStatement("terms");
   const { data: userConsent, isLoading: isUserConsentLoading } =
@@ -38,6 +42,11 @@ export default function Layout({
   const excludedPaths = ["/terms", "/privacy"];
   const currentPath = location.pathname;
   const isExcluded = excludedPaths.includes(currentPath);
+  const mustAcceptTerms = !sessionAccepted && !isExcluded && !!user;
+
+  useEffect(() => {
+    setTermsOpen(mustAcceptTerms);
+  }, [mustAcceptTerms]);
 
   const [darkMode, setDarkMode] = useState(() => {
     const saved = localStorage.getItem("theme");
@@ -105,14 +114,6 @@ export default function Layout({
   const currentRole =
     user?.role?.id === 2 || user?.role?.id === 3 ? "admin" : "student";
 
-  const mustAcceptTerms =
-    !isUserConsentLoading && userConsent?.accepted === false && !isExcluded;
-
-  useEffect(() => {
-    if (!user) return;
-    setTermsOpen(mustAcceptTerms);
-  }, [user, mustAcceptTerms]);
-
   useEffect(() => {
     const node = contentRef.current;
     if (!node) return;
@@ -127,23 +128,22 @@ export default function Layout({
   }, [termsOpen]);
 
   const handleAcceptTerms = () => {
-    if (!user || !latestDocument?.id) {
-      triggerToast("Document not ready. Please try again.");
+    if (!user) {
+      triggerToast("");
       return;
     }
 
-    giveConsent(
-      { type: "terms", docId: latestDocument.id },
-      {
-        onSuccess: () => {
-          setTermsOpen(false);
-          triggerToast("Terms and Conditions accepted.");
-        },
-        onError: () => {
-          triggerToast("Failed to accept terms. Please try again.");
-        },
-      },
-    );
+    try {
+      sessionStorage.setItem("session_consent_accepted", "true");
+
+      setSessionAccepted(true);
+      setTermsOpen(false);
+
+      triggerToast("Terms and Conditions accepted.");
+    } catch (err) {
+      console.error("[Layout] Consent Update: ", err);
+      triggerToast("Failed to accept terms. Please try again.");
+    }
   };
 
   return (

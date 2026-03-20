@@ -24,7 +24,7 @@ export default function Checkbox({
   square?: boolean;
 }) {
   return (
-    <div>
+    <div className={className}>
       <div className="flex items-center gap-3 group">
         <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
           <input
@@ -52,7 +52,9 @@ export default function Checkbox({
           {label}
         </label>
       </div>
-      {info && <p className="text-xs text-muted-foreground mt-1 ml-7">{info}</p>}
+      {info && (
+        <p className="text-xs text-muted-foreground mt-1 ml-7">{info}</p>
+      )}
     </div>
   );
 }

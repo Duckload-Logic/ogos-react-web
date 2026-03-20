@@ -5,6 +5,11 @@
 
 import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
 import { API_ROUTES } from "@/config/apiRoutes";
+import type {
+  IDPAuthorizeResponse,
+  IDPTokenExchangeRequest,
+  IDPTokenExchangeResponse,
+} from "../types/idp";
 
 export interface LoginPayload {
   email: string;
@@ -45,6 +50,55 @@ export interface UserProfile {
 }
 
 /**
+ * Fetches the IDP authorization URL for OAuth 2.0 flow
+ * @param config - Optional axios config with metadata
+ * @returns Promise resolving to authorization URL response
+ * @throws Error if request fails
+ */
+export const GetIDPAuthorize = async (
+  config?: AxiosConfigWithMeta,
+): Promise<IDPAuthorizeResponse> => {
+  try {
+    const { data } = await apiClient.get(
+      API_ROUTES.auth.idpAuthorizeUrl,
+      config,
+    );
+    return data;
+  } catch (error) {
+    console.error(
+      `[GetIDPAuthorize] {Fetch Auth URL}: ${error}`,
+    );
+    throw error;
+  }
+};
+
+/**
+ * Exchanges authorization code for access tokens
+ * @param payload - Authorization code and state from IDP
+ * @param config - Optional axios config with metadata
+ * @returns Promise resolving to token exchange response
+ * @throws Error if exchange fails
+ */
+export const PostIDPTokenExchange = async (
+  payload: IDPTokenExchangeRequest,
+  config?: AxiosConfigWithMeta,
+): Promise<IDPTokenExchangeResponse> => {
+  try {
+    const { data } = await apiClient.post(
+      API_ROUTES.auth.idpToken,
+      payload,
+      config,
+    );
+    return data;
+  } catch (error) {
+    console.error(
+      `[PostIDPTokenExchange] {Token Exchange}: ${error}`,
+    );
+    throw error;
+  }
+};
+
+/**
  * Post login request
  * @param payload - Email and password credentials
  * @param config - Optional axios config with metadata
@@ -62,12 +116,9 @@ export const PostLogin = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'PostLogin';
-    const stepName = config?.stepName || 'Login';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "PostLogin";
+    const stepName = config?.stepName || "Login";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -90,13 +141,9 @@ export const PostRegister = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'PostRegister';
-    const stepName = config?.stepName ||
-      'Register';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "PostRegister";
+    const stepName = config?.stepName || "Register";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -110,19 +157,12 @@ export const GetCurrentUser = async (
   config?: AxiosConfigWithMeta,
 ): Promise<UserProfile> => {
   try {
-    const { data } = await apiClient.get(
-      API_ROUTES.users.me,
-      config,
-    );
+    const { data } = await apiClient.get(API_ROUTES.users.me, config);
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'GetCurrentUser';
-    const stepName = config?.stepName ||
-      'Fetch User';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "GetCurrentUser";
+    const stepName = config?.stepName || "Fetch User";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -136,18 +176,11 @@ export const PostLogout = async (
   config?: AxiosConfigWithMeta,
 ): Promise<void> => {
   try {
-    await apiClient.post(
-      API_ROUTES.auth.logout,
-      {},
-      config,
-    );
+    await apiClient.post(API_ROUTES.auth.logout, {}, config);
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'PostLogout';
-    const stepName = config?.stepName || 'Logout';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "PostLogout";
+    const stepName = config?.stepName || "Logout";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -157,15 +190,11 @@ export const PostLogout = async (
  * @deprecated Use individual exported functions instead
  */
 export const authService = {
-  async login(
-    payload: LoginPayload,
-  ): Promise<LoginResponse> {
+  async login(payload: LoginPayload): Promise<LoginResponse> {
     return PostLogin(payload);
   },
 
-  async register(
-    payload: RegisterPayload,
-  ): Promise<RegisterResponse> {
+  async register(payload: RegisterPayload): Promise<RegisterResponse> {
     return PostRegister(payload);
   },
 

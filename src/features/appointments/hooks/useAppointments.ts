@@ -6,6 +6,7 @@ import {
   Appointment,
   AppointmentStatus,
   StatusCount,
+  CreateAppointmentRequest,
   type PaginatedAppointmentsResponse,
 } from "../types";
 import { QueryParam } from "../types/reqParams";
@@ -69,14 +70,14 @@ export const useAppointmentsStats = (
 
 export function useSubmitAppointment() {
   const queryClient = useQueryClient();
-  const { data: me } = useMe({});
 
   return useMutation({
-    mutationFn: (data: Appointment) =>
+    mutationFn: (data: CreateAppointmentRequest) =>
       appointmentService.PostAppointment(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.appointments.myAppointments,
+        queryKey:
+          QUERY_KEYS.appointments.myAppointments,
       });
     },
   });

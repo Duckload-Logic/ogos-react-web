@@ -9,11 +9,11 @@ export function useIIRStatus() {
   const userId = me?.id;
 
   return useQuery({
-    queryKey: QUERY_KEYS.iir.inventory.byUserId(
-      userId || 0,
-    ),
+    queryKey: QUERY_KEYS.iir.inventory.byUserId(userId || 0),
     queryFn: async () => {
-      return await GetIIRByUserId(userId || 0);
+      const iirRecord = await GetIIRByUserId(userId || 0);
+      console.debug("Fetched IIR Record:", iirRecord);
+      return iirRecord?.isSubmitted;
     },
     enabled: !!userId,
     staleTime: CACHE_TIMING.MEDIUM.staleTime,

@@ -44,8 +44,13 @@ export interface PaginatedAppointmentsResponse {
   totalPages: number;
 }
 
+/**
+ * Appointment response from API
+ * Includes iirId instead of userId
+ */
 export interface Appointment {
   id?: number;
+  iirId?: number;
   user?: User;
   reason: string;
   adminNotes?: string;
@@ -60,14 +65,13 @@ export interface Appointment {
 
 /**
  * Request payload for creating/updating appointments
- * @todo Finalize structure when API is complete
+ * userId is handled by middleware
  */
 export interface CreateAppointmentRequest {
   reason: string;
-  scheduledDate: string;
-  scheduledTime: string;
-  concernCategory: string;
-  status?: string;
+  whenDate: string;
+  timeSlot: { id: number };
+  appointmentCategory: { id: number };
 }
 
 /**

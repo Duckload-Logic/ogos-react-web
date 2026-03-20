@@ -1,5 +1,7 @@
-﻿import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import { Card, CardContent } from "@/components/ui/card";
+import { validateObject, isFieldRequired } from "@/services/validationSchema";
+import { healthValidationSchema } from "@/features/iir/config/healthValidationSchema";
 
 interface FormErrors {
   [key: string]: string;
@@ -19,44 +21,13 @@ export const HealthInformationSection = forwardRef<
   const [errors, setErrors] = useState<FormErrors>({});
 
   const validate = (): { isValid: boolean; errors: FormErrors } => {
-    const sectionErrors: FormErrors = {};
+    // Helper to map consultations by type for easy access in rules
+    const _consultations = (health?.consultations || []).reduce((acc: any, c: any) => {
+      acc[c.professionalType] = c;
+      return acc;
+    }, {});
 
-    // Physical items – each YES/NO must be answered; if YES, details are required
-    const physicalFields = [
-      { yesKey: "visionHasProblem", detailKey: "visionDetails", label: "Vision" },
-      { yesKey: "hearingHasProblem", detailKey: "hearingDetails", label: "Hearing" },
-      { yesKey: "speechHasProblem", detailKey: "speechDetails", label: "Speech" },
-      { yesKey: "generalHealthHasProblem", detailKey: "generalHealthDetails", label: "General Health" },
-    ];
-
-    physicalFields.forEach(({ yesKey, detailKey, label }) => {
-      const hasProblem = health?.healthRecord?.[yesKey];
-      if (hasProblem === undefined || hasProblem === null) {
-        sectionErrors[`health.healthRecord.${yesKey}`] = `${label}: Please select Yes or No`;
-      } else if (hasProblem === true) {
-        if (!(health?.healthRecord?.[detailKey] || "").trim()) {
-          sectionErrors[`health.healthRecord.${detailKey}`] = `${label}: Please specify the problem`;
-        }
-      }
-    });
-
-    // Consultation items – each YES/NO must be answered; if YES, whenDate and forWhat are required
-    ["Psychiatrist", "Psychologist", "Counselor"].forEach((type) => {
-      const consultation = Array.isArray(health?.consultations)
-        ? health.consultations.find((c: any) => c.professionalType === type)
-        : null;
-      if (!consultation || consultation.hasConsulted === undefined || consultation.hasConsulted === null) {
-        sectionErrors[`health.consultations.${type}.hasConsulted`] = `${type}: Please select Yes or No`;
-      } else if (consultation.hasConsulted === true) {
-        if (!(consultation.whenDate || "").trim()) {
-          sectionErrors[`health.consultations.${type}.whenDate`] = `${type}: Please specify when`;
-        }
-        if (!(consultation.forWhat || "").trim()) {
-          sectionErrors[`health.consultations.${type}.forWhat`] = `${type}: Please specify reason`;
-        }
-      }
-    });
-
+    const sectionErrors = validateObject({ health, _consultations }, healthValidationSchema);
     setErrors(sectionErrors);
     return {
       isValid: Object.keys(sectionErrors).length === 0,
@@ -111,6 +82,10 @@ export const HealthInformationSection = forwardRef<
     }
 
     onChange("health.consultations", consultations);
+    
+    // Clear the specific error for this field
+    const errorField = `_consultations.${professionalType}.${field === "consulted" ? "hasConsulted" : field}`;
+    clearError(errorField);
   };
 
   // Array of physical health items for A. Physical
@@ -147,12 +122,12 @@ export const HealthInformationSection = forwardRef<
 
   // Array of psychological consultation types
   const professionalTypes = ["Psychiatrist", "Psychologist", "Counselor"];
-  
+
   const consultationTypes = professionalTypes.map((type) => {
     const consultation = Array.isArray(health?.consultations)
       ? health.consultations.find((c: any) => c.professionalType === type)
       : null;
-    
+
     return {
       label: type,
       type: type,
@@ -185,10 +160,11 @@ export const HealthInformationSection = forwardRef<
                 </tr>
               </thead>
               <tbody>
-                  {physicalItems.map((item, idx) => (
+                {physicalItems.map((item, idx) => (
                   <tr key={idx} className="border-b border-border">
                     <td className="py-2 px-3 text-sm">
                       <span className="text-foreground">{item.label}</span>
+                      {isFieldRequired(healthValidationSchema, item.yesKey) && <span className="text-red-500"> *</span>}
                       {errors[item.yesKey] && (
                         <p className="text-xs font-semibold text-red-600 mt-1">{errors[item.yesKey]}</p>
                       )}
@@ -225,19 +201,19 @@ export const HealthInformationSection = forwardRef<
                       <input
                         type="text"
                         placeholder="Specify"
+                        required={isFieldRequired(healthValidationSchema, item.detailsKey)}
                         disabled={item.yesValue !== true}
                         value={item.yesValue === true ? item.detailsValue : ""}
                         onChange={(e) =>
                           handleInputChange(item.detailsKey, e.target.value)
                         }
-                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
-                          item.yesValue === true
-                            ? "border-border bg-card focus:border-border focus:ring-ring/20"
-                            : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
-                        }`}
+                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${item.yesValue === true
+                          ? "border-border bg-card focus:border-border focus:ring-ring/20"
+                          : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
+                          }`}
                       />
                       {errors[item.detailsKey] && (
-                        <p className="text-xs font-semibold text-red-600 mt-1">{errors[item.detailsKey]}</p>
+                        <p className="text-xs font-normal text-red-600 mt-1">{errors[item.detailsKey]}</p>
                       )}
                     </td>
                   </tr>
@@ -275,8 +251,9 @@ export const HealthInformationSection = forwardRef<
                   <tr key={idx} className="border-b border-border">
                     <td className="py-2 px-3 text-sm">
                       <span className="text-foreground">{type.label}</span>
-                      {errors[`health.consultations.${type.type}.hasConsulted`] && (
-                        <p className="text-xs font-semibold text-red-600 mt-1">{errors[`health.consultations.${type.type}.hasConsulted`]}</p>
+                      {isFieldRequired(healthValidationSchema, `_consultations.${type.type}.hasConsulted`) && <span className="text-red-500"> *</span>}
+                      {errors[`_consultations.${type.type}.hasConsulted`] && (
+                        <p className="text-xs font-thin text-red-600 mt-1">{errors[`_consultations.${type.type}.hasConsulted`]}</p>
                       )}
                     </td>
                     <td className="py-2 px-3 text-center">
@@ -314,7 +291,7 @@ export const HealthInformationSection = forwardRef<
                     <td className="py-2 px-3">
                       <input
                         type="text"
-                        placeholder="Date/When"
+                        placeholder="Date/When" required={isFieldRequired(healthValidationSchema, `_consultations.${type.type}.whenDate`)}
                         disabled={type.consulted !== true}
                         value={type.when}
                         onChange={(e) =>
@@ -324,20 +301,20 @@ export const HealthInformationSection = forwardRef<
                             e.target.value
                           )
                         }
-                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
-                          type.consulted === true
-                            ? "border-border bg-card focus:border-border focus:ring-ring/20"
-                            : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
-                        }`}
+                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${type.consulted === true
+                          ? "border-border bg-card focus:border-border focus:ring-ring/20"
+                          : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
+                          }`}
                       />
-                      {errors[`health.consultations.${type.type}.whenDate`] && (
-                        <p className="text-xs font-semibold text-red-600 mt-1">{errors[`health.consultations.${type.type}.whenDate`]}</p>
+                      {errors[`_consultations.${type.type}.whenDate`] && (
+                        <p className="text-xs font-thin text-red-600 mt-1">{errors[`_consultations.${type.type}.whenDate`]}</p>
                       )}
                     </td>
                     <td className="py-2 px-3">
                       <input
                         type="text"
                         placeholder="Specify"
+                        required={isFieldRequired(healthValidationSchema, `_consultations.${type.type}.forWhat`)}
                         disabled={type.consulted !== true}
                         value={type.consulted === true ? type.forWhat : ""}
                         onChange={(e) =>
@@ -347,14 +324,13 @@ export const HealthInformationSection = forwardRef<
                             e.target.value
                           )
                         }
-                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${
-                          type.consulted === true
-                            ? "border-border bg-card focus:border-border focus:ring-ring/20"
-                            : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
-                        }`}
+                        className={`w-full px-3 py-1 border rounded-md focus:outline-none focus:ring-2 text-sm transition-colors ${type.consulted === true
+                          ? "border-border bg-card focus:border-border focus:ring-ring/20"
+                          : "border-border bg-card opacity-50 text-foreground cursor-not-allowed"
+                          }`}
                       />
-                      {errors[`health.consultations.${type.type}.forWhat`] && (
-                        <p className="text-xs font-semibold text-red-600 mt-1">{errors[`health.consultations.${type.type}.forWhat`]}</p>
+                      {errors[`_consultations.${type.type}.forWhat`] && (
+                        <p className="text-xs font-thin text-red-600 mt-1">{errors[`_consultations.${type.type}.forWhat`]}</p>
                       )}
                     </td>
                   </tr>

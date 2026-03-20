@@ -13,7 +13,7 @@ export const API_ROUTES = Object.freeze({
    * User-related endpoints
    */
   users: Object.freeze({
-    me: '/users/me',
+    me: "/users/me",
     byId: (id: string) => `/users/${id}`,
   }),
 
@@ -21,60 +21,66 @@ export const API_ROUTES = Object.freeze({
    * Slip (Excuse Slip) related endpoints
    */
   slips: Object.freeze({
-    all: '/slips',
-    mySlips: '/slips/me',
-    urgent: '/slips/urgent',
-    stats: '/slips/stats',
+    all: "/slips",
+    mySlips: "/slips/me",
+    urgent: "/slips/urgent",
+    stats: "/slips/stats",
     byId: (id: number) => `/slips/id/${id}`,
-    attachments: (id: number) =>
-      `/slips/id/${id}/attachments`,
+    attachments: (id: number) => `/slips/id/${id}/attachments`,
     downloadAttachment: (id: number, attachmentId: number) =>
       `/slips/id/${id}/attachments/${attachmentId}`,
     lookups: Object.freeze({
-      statuses: '/slips/lookups/statuses',
-      categories: '/slips/lookups/categories',
+      statuses: "/slips/lookups/statuses",
+      categories: "/slips/lookups/categories",
     }),
-    updateStatus: (id: number) =>
-      `/slips/id/${id}/status`,
+    updateStatus: (id: number) => `/slips/id/${id}/status`,
   }),
 
   /**
    * Appointment related endpoints
    */
   appointments: Object.freeze({
-    all: '/appointments',
-    myAppointments: '/appointments/me',
-    stats: '/appointments/stats',
-    calendarStats: '/appointments/calendar/stats',
+    all: "/appointments",
+    myAppointments: "/appointments/me",
+    stats: "/appointments/stats",
+    calendarStats: "/appointments/calendar/stats",
     byId: (id: number) => `/appointments/id/${id}`,
     lookups: Object.freeze({
-      statuses: '/appointments/lookups/statuses',
-      categories: '/appointments/lookups/categories',
-      slots: '/appointments/lookups/slots',
+      statuses: "/appointments/lookups/statuses",
+      categories: "/appointments/lookups/categories",
+      slots: "/appointments/lookups/slots",
     }),
+  }),
+
+  /**
+   * Significant Notes related endpoints
+   */
+  notes: Object.freeze({
+    all: "/notes",
+    byIirId: (iirId: number) => `/notes/user/id/${iirId}`,
   }),
 
   /**
    * Location related endpoints
    */
   locations: Object.freeze({
-    regions: '/locations/regions',
-    cities: (regionId: number) =>
-      `/locations/regions/${regionId}/cities`,
-    barangays: (cityId: number) =>
-      `/locations/cities/${cityId}/barangays`,
+    regions: "/locations/regions",
+    provinces: (regionCode: string) =>
+      `/locations/regions/${regionCode}/provinces`,
+    citiesByRegion: (regionCode: string) =>
+      `/locations/regions/${regionCode}/cities`,
+    citiesByProvince: (provinceCode: string) =>
+      `/locations/provinces/${provinceCode}/cities`,
+    barangays: (cityCode: string) => `/locations/cities/${cityCode}/barangays`,
   }),
 
   /**
    * Consent related endpoints
    */
   consents: Object.freeze({
-    latest: (type: string) =>
-      `/consents/latest/${type}`,
-    latestContent: (type: string) =>
-      `/consents/latest/${type}/content`,
-    checkConsent: (docId: number) =>
-      `/consents/check/doc/${docId}`,
+    latest: (type: string) => `/consents/latest/${type}`,
+    latestContent: (type: string) => `/consents/latest/${type}/content`,
+    checkConsent: (docId: number) => `/consents/check/doc/${docId}`,
     giveConsent: (type: string, docId: number) =>
       `/consents/${type}/doc/${docId}`,
   }),
@@ -83,18 +89,20 @@ export const API_ROUTES = Object.freeze({
    * Analytics related endpoints
    */
   analytics: Object.freeze({
-    all: '/analytics',
-    reports: '/analytics/reports',
+    all: "/analytics",
+    reports: "/analytics/reports",
   }),
 
   /**
    * Authentication related endpoints
    */
   auth: Object.freeze({
-    login: '/auth/login',
-    logout: '/auth/logout',
-    refresh: '/auth/refresh',
-    register: '/auth/register',
+    login: "/auth/login",
+    logout: "/auth/logout",
+    refresh: "/auth/refresh",
+    register: "/auth/register",
+    idpAuthorizeUrl: "/auth/idp/authorize-url",
+    idpToken: "/auth/idp/token",
   }),
 
   /**
@@ -102,30 +110,24 @@ export const API_ROUTES = Object.freeze({
    */
   iir: Object.freeze({
     lookups: Object.freeze({
-      courses: '/students/lookups/courses',
-      genders: '/students/lookups/genders',
-      religions: '/students/lookups/religions',
-      parentalStatusTypes:
-        '/students/lookups/parental-status-types',
-      enrollmentReasons:
-        '/students/lookups/enrollment-reasons',
-      incomeRanges: '/students/lookups/income-ranges',
-      studentSupportTypes:
-        '/students/lookups/support-types',
-      siblingSupportTypes:
-        '/students/lookups/support-types/siblings',
-      civilStatuses: '/students/lookups/civil-statuses',
-      natureOfResidenceTypes:
-        '/students/lookups/nature-of-residence-types',
-      studentRelationshipTypes:
-        '/students/lookups/student-relationship-types',
+      courses: "/students/lookups/courses",
+      genders: "/students/lookups/genders",
+      religions: "/students/lookups/religions",
+      parentalStatusTypes: "/students/lookups/parental-status-types",
+      enrollmentReasons: "/students/lookups/enrollment-reasons",
+      incomeRanges: "/students/lookups/income-ranges",
+      studentSupportTypes: "/students/lookups/support-types",
+      siblingSupportTypes: "/students/lookups/support-types/siblings",
+      civilStatuses: "/students/lookups/civil-statuses",
+      natureOfResidenceTypes: "/students/lookups/nature-of-residence-types",
+      studentRelationshipTypes: "/students/lookups/student-relationship-types",
+      activityOptions: "/students/lookups/activity-options",
     }),
     inventory: Object.freeze({
-      all: '/students/inventory/records',
+      all: "/students/inventory/records",
       byUserId: (userId: number) =>
         `/students/inventory/records/user/${userId}`,
-      byIirId: (iirId: number) =>
-        `/students/inventory/records/iir/${iirId}`,
+      byIirId: (iirId: number) => `/students/inventory/records/iir/${iirId}`,
       profile: (iirId: number) =>
         `/students/inventory/records/iir/${iirId}/profile`,
       enrollmentReasons: (iirId: number) =>
@@ -158,27 +160,26 @@ export const API_ROUTES = Object.freeze({
         `/students/inventory/records/iir/${iirId}/significant-notes`,
     }),
     draft: Object.freeze({
-      save: '/students/inventory/records/iir/draft',
-      submit: '/students/inventory/records/iir/draft',
+      save: "/students/inventory/records/iir/draft",
+      submit: "/students/inventory/records/iir/draft",
     }),
-    submit: '/students/inventory/records/iir',
-    checkOnboarding: (userId: number) =>
-      `/students/record/${userId}`,
+    submit: "/students/inventory/records/iir",
+    checkOnboarding: (userId: number) => `/students/record/${userId}`,
   }),
   /**
    * Superadmin related endpoints
    */
   superadmin: Object.freeze({
     apiKeys: Object.freeze({
-      list: '/api-keys',
-      create: '/api-keys',
+      list: "/api-keys",
+      create: "/api-keys",
       revoke: (id: number) => `/api-keys/${id}`,
     }),
     logs: Object.freeze({
-      security: '/system-logs/security',
-      system: '/system-logs/system',
-      audit: '/system-logs/audit',
-      stats: '/system-logs/stats',
+      security: "/system-logs/security",
+      system: "/system-logs/system",
+      audit: "/system-logs/audit",
+      stats: "/system-logs/stats",
     }),
   }),
 });

@@ -18,8 +18,13 @@ export interface SlipStats {
   count: number;
 }
 
+/**
+ * Slip response from API
+ * Includes iirId instead of userId
+ */
 export interface Slip {
   id?: number;
+  iirId?: number;
   user?: User;
   reason: string;
   dateOfAbsence: string;
@@ -31,10 +36,32 @@ export interface Slip {
   updatedAt?: string;
 }
 
+/**
+ * Request payload for creating a slip
+ * userId is handled by middleware
+ */
+export interface CreateSlipRequest {
+  reason: string;
+  dateOfAbsence: string;
+  dateNeeded: string;
+  categoryId: number;
+}
+
 export interface SlipAttachment {
   id: number;
   slipId: number;
   fileName: string;
   fileUrl: string;
   uploadedAt: string;
+}
+
+/**
+ * Paginated response for student slips
+ */
+export interface PaginatedSlipsResponse {
+  slips: Slip[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
 }

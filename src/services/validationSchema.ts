@@ -4,7 +4,8 @@
  */
 
 export type ValidationRule = {
-  validate: (value: any) => boolean;
+  type?: string;
+  validate: (value: any, rootData?: any) => boolean;
   message: string;
 };
 
@@ -17,21 +18,26 @@ export type FieldValidationSchema = {
  */
 export const commonRules = {
   required: (fieldName: string = "This field"): ValidationRule => ({
+    type: "required",
     validate: (value: any) => {
       if (typeof value === "string") {
         return value?.trim().length > 0;
       }
       if (typeof value === "object" && value !== null) {
-        return value.id !== undefined && value.id !== null && value.id !== 0 && value.id !== "";
+        return (
+          (value.id !== undefined && value.id !== null && value.id !== "") ||
+          (value.code !== undefined && value.code !== null && value.code !== "")
+        );
       }
-      return value !== undefined && value !== null && Boolean(value);
+      return value !== undefined && value !== null && value !== "";
     },
     message: `${fieldName} is required`,
   }),
 
   email: (): ValidationRule => ({
     validate: (value: any) => {
-      if (!value || typeof value !== "string") return true;
+      if (value === undefined || value === null || value === "") return true;
+      if (typeof value !== "string") return false;
       return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
     },
     message: "Enter a valid email address",
@@ -39,7 +45,7 @@ export const commonRules = {
 
   minLength: (length: number): ValidationRule => ({
     validate: (value: any) => {
-      if (!value) return true;
+      if (value === undefined || value === null || value === "") return true;
       return String(value).trim().length >= length;
     },
     message: `Must be at least ${length} characters`,
@@ -47,7 +53,7 @@ export const commonRules = {
 
   maxLength: (length: number): ValidationRule => ({
     validate: (value: any) => {
-      if (!value) return true;
+      if (value === undefined || value === null || value === "") return true;
       return String(value).length <= length;
     },
     message: `Cannot exceed ${length} characters`,
@@ -127,15 +133,40 @@ export const commonRules = {
 
   phone: (): ValidationRule => ({
     validate: (value: any) => {
-      if (!value) return true;
-      return /^09\d{9}$/.test(String(value));
+      if (value === undefined || value === null || value === "") return true;
+      return /^(09|\+639)\d{9}$/.test(String(value));
     },
-    message: "Must be a valid Philippine mobile number (09XXXXXXXXX, 11 digits)",
+    message: "Must be a valid Philippine mobile number (e.g. 09XXXXXXXXX or +639XXXXXXXXX)",
+  }),
+
+  telephone: (): ValidationRule => ({
+    validate: (value: any) => {
+      if (value === undefined || value === null || value === "") return true;
+      const clean = String(value).replace(/[\s\-\(\)]/g, '');
+      return /^\d{7,}$/.test(clean);
+    },
+    message: "Telephone number must have at least 7 digits",
+  }),
+
+  nameFormat: (): ValidationRule => ({
+    validate: (value: any) => {
+      if (value === undefined || value === null || value === "") return true;
+      return /^[a-zA-Z\s\-\.]+$/.test(String(value));
+    },
+    message: "Must contain only letters, spaces, hyphens, or periods",
+  }),
+
+  studentNumber: (): ValidationRule => ({
+    validate: (value: any) => {
+      if (value === undefined || value === null || value === "") return true;
+      return /^\d{4}-\d{5}-TG-[01]$/.test(String(value));
+    },
+    message: "Format must be YYYY-XXXXX-TG-0 or YYYY-XXXXX-TG-1",
   }),
 
   pattern: (pattern: RegExp, message: string): ValidationRule => ({
     validate: (value: any) => {
-      if (!value) return true;
+      if (value === undefined || value === null || value === "") return true;
       return pattern.test(String(value));
     },
     message,
@@ -148,9 +179,10 @@ export const commonRules = {
 export const validateField = (
   value: any,
   rules: ValidationRule[],
+  rootData?: any,
 ): string | null => {
   for (const rule of rules) {
-    if (!rule.validate(value)) {
+    if (!rule.validate(value, rootData)) {
       return rule.message;
     }
   }
@@ -168,7 +200,7 @@ export const validateObject = (
 
   Object.entries(schema).forEach(([fieldPath, rules]) => {
     const value = getValueByPath(data, fieldPath);
-    const error = validateField(value, rules);
+    const error = validateField(value, rules, data);
     if (error) {
       errors[fieldPath] = error;
     }
@@ -181,6 +213,19 @@ export const validateObject = (
  * Helper function to get nested object values by path
  * e.g., "student.basicInfo.firstName" -> data.student.basicInfo.firstName
  */
-const getValueByPath = (obj: any, path: string): any => {
+export const getValueByPath = (obj: any, path: string): any => {
   return path.split(".").reduce((current, part) => current?.[part], obj);
 };
+
+/**
+ * Checks if a specific field has the 'required' rule in the schema.
+ */
+export const isFieldRequired = (
+  schema: FieldValidationSchema,
+  fieldPath: string,
+): boolean => {
+  const rules = schema[fieldPath];
+  if (!rules) return false;
+  return rules.some((rule) => rule.type === "required");
+};
+

@@ -70,29 +70,41 @@ export interface SubjectPreference {
 export interface Hobby {
   id?: number;
   hobbyName: string;
-  priorityRanking: number;
+  priorityRank: number;
 }
 
 export interface Region {
-  id: number;
+  id?: number;
+  code: string;
   name?: string;
+}
+
+export interface Province {
+  id?: number;
+  code: string;
+  name?: string;
+  regionCode?: string;
 }
 
 export interface City {
-  id: number;
+  id?: number;
+  code: string;
   name?: string;
-  regionId?: number;
+  provinceCode?: string;
+  regionCode?: string;
 }
 
 export interface Barangay {
-  id: number;
+  id?: number;
+  code: string;
   name?: string;
-  cityId?: number;
+  cityCode?: string;
 }
 
 export interface Address {
   id?: number;
   region: Region;
+  province: Province | null;
   city: City;
   barangay: Barangay;
   streetDetail: string;
@@ -123,6 +135,7 @@ export interface EmergencyContact {
 
 export interface PersonalInfo {
   id?: number;
+  suffix: string;
   studentNumber: string;
   gender: Gender;
   civilStatus: CivilStatus;
@@ -141,7 +154,6 @@ export interface PersonalInfo {
   isEmployed: boolean;
   employerName: string | null;
   employerAddress: string | null;
-  employerContact: string | null;
   emergencyContact: EmergencyContact;
 }
 
@@ -217,8 +229,10 @@ export interface ConsultationRecord {
 
 export interface Activity {
   id?: number;
-  activityOptions: ActivityOption[];
+  activityOption: ActivityOption;
+  otherSpecification: string | null;
   role: string;
+  roleSpecification: string | null;
 }
 
 export interface TestResult {
@@ -230,11 +244,30 @@ export interface TestResult {
   description: string;
 }
 
+/**
+ * Significant note response from API
+ * Includes iirId and optional bridge fields
+ */
 export interface SignificantNote {
   id?: number;
-  noteDate: string;
-  incidentDescription: string;
+  iirId?: number;
+  note: string;
   remarks: string;
+  appointmentId?: number;
+  admissionSlipId?: number;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+/**
+ * Request payload for creating a significant note
+ * userId is handled by middleware
+ */
+export interface CreateNoteRequest {
+  note: string;
+  remarks: string;
+  appointmentId?: number;
+  admissionSlipId?: number;
 }
 
 export interface StudentSection {
@@ -274,6 +307,6 @@ export interface IIRForm {
   family: FamilySection;
   health: HealthSection;
   interests: InterestsSection;
-  testResults: TestResult[];
-  significantNotes?: SignificantNote[];
+  // testResults: TestResult[];
+  // significantNotes?: SignificantNote[];
 }
