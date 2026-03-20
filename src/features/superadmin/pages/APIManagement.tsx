@@ -8,6 +8,9 @@ import {
   Eye,
   EyeOff,
   AlertTriangle,
+  Sparkles,
+  ShieldCheck,
+  Ban,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -97,193 +100,259 @@ export default function APIManagement() {
     });
   };
 
+  const statCards = [
+    {
+      label: "Active Keys",
+      value: activeKeys.length,
+      icon: ShieldCheck,
+      iconClass:
+        "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    },
+    {
+      label: "Revoked Keys",
+      value: revokedKeys.length,
+      icon: Ban,
+      iconClass:
+        "bg-red-500/10 text-red-600 dark:text-red-400 border-red-500/20",
+    },
+    {
+      label: "Total Keys",
+      value: keys.length,
+      icon: Key,
+      iconClass: "bg-primary/10 text-primary border-primary/20",
+    },
+  ];
+
   return (
-    <div className="max-w-[1600px] mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold">API Key Management</h1>
-          <p className="text-sm text-muted-foreground">
-            Create and manage API keys for external integrations
-          </p>
+    <div className="mx-auto w-full max-w-[1700px] space-y-5">
+      {/* Hero */}
+      <section className="relative overflow-hidden rounded-[20px] border border-white/20 bg-white/50 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.10),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.08),transparent_28%)]" />
+
+        <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+          <div className="space-y-3">
+            <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+              <Sparkles className="h-3.5 w-3.5" />
+              Integration Access Control
+            </div>
+
+            <div className="space-y-2">
+              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                API Key Management
+              </h1>
+              <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
+                Create and manage API keys for external integrations while
+                keeping access secure and easy to monitor.
+              </p>
+            </div>
+          </div>
+
+          <Button
+            onClick={() => setIsCreateOpen(true)}
+            className="h-10 gap-2 rounded-xl px-4 shadow-sm"
+          >
+            <Plus size={16} />
+            Create API Key
+          </Button>
         </div>
-        <Button onClick={() => setIsCreateOpen(true)} className="gap-2">
-          <Plus size={16} />
-          Create API Key
-        </Button>
-      </div>
+      </section>
 
       {/* Overview Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <Card>
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Active Keys
-                </p>
-                <p className="text-3xl font-bold">{activeKeys.length}</p>
-              </div>
-              <div className="h-10 w-10 rounded-lg bg-emerald-500/10 flex items-center justify-center">
-                <Key className="size-5 text-emerald-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Revoked Keys
-                </p>
-                <p className="text-3xl font-bold">{revokedKeys.length}</p>
-              </div>
-              <div className="h-10 w-10 rounded-lg bg-red-500/10 flex items-center justify-center">
-                <Trash2 className="size-5 text-red-500" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                  Total Keys
-                </p>
-                <p className="text-3xl font-bold">{keys.length}</p>
-              </div>
-              <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                <Key className="size-5 text-primary" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        {statCards.map((card) => {
+          const Icon = card.icon;
+
+          return (
+            <Card
+              key={card.label}
+              className="rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]"
+            >
+              <CardContent className="p-5">
+                <div className="flex items-start justify-between gap-4">
+                  <div className="space-y-2">
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                      {card.label}
+                    </p>
+                    <p className="text-4xl font-bold tracking-tight tabular-nums text-foreground">
+                      {card.value}
+                    </p>
+                  </div>
+
+                  <div
+                    className={`flex h-11 w-11 items-center justify-center rounded-xl border backdrop-blur-md ${card.iconClass}`}
+                  >
+                    <Icon className="h-5 w-5" />
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })}
+      </section>
 
       {/* Keys Table */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <CardTitle className="flex items-center gap-2">
-              <Key className="h-5 w-5" />
-              API Keys
-            </CardTitle>
-            <label className="flex items-center gap-2 text-sm cursor-pointer">
+      <Card className="overflow-hidden rounded-[20px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
+        <CardHeader className="border-b border-white/20 pb-4 dark:border-white/10">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+                <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/30 bg-white/70 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+                  <Key className="h-5 w-5" />
+                </span>
+                API Keys
+              </CardTitle>
+              <p className="mt-2 text-sm text-muted-foreground">
+                Manage active credentials, scopes, and revocations.
+              </p>
+            </div>
+
+            <label className="inline-flex items-center gap-3 rounded-xl border border-white/30 bg-white/60 px-4 py-2 text-sm backdrop-blur-md cursor-pointer dark:border-white/10 dark:bg-white/[0.05]">
               <input
                 type="checkbox"
                 checked={includeRevoked}
                 onChange={(e) => setIncludeRevoked(e.target.checked)}
                 className="rounded border-border"
               />
-              Show revoked
+              Show revoked keys
             </label>
           </div>
         </CardHeader>
-        <CardContent>
+
+        <CardContent className="p-0">
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
+            <div className="space-y-3 p-6">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="h-12 animate-pulse rounded-xl bg-white/50 dark:bg-white/[0.05]"
+                />
+              ))}
             </div>
           ) : keys.length === 0 ? (
-            <div className="text-center py-12 text-muted-foreground">
-              <Key className="mx-auto mb-3 h-10 w-10 opacity-30" />
-              <p className="font-medium">No API keys found</p>
-              <p className="text-sm">
-                Create your first API key to get started
+            <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+                <Key className="h-6 w-6 text-muted-foreground" />
+              </div>
+              <p className="text-lg font-semibold text-foreground">
+                No API keys yet
               </p>
+              <p className="mt-2 max-w-md text-sm text-muted-foreground">
+                Create your first API key to start integrating external services
+                securely.
+              </p>
+              <Button
+                onClick={() => setIsCreateOpen(true)}
+                className="mt-5 h-10 rounded-xl px-4"
+              >
+                <Plus className="mr-2 h-4 w-4" />
+                Create API Key
+              </Button>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full text-sm">
+              <table className="w-full min-w-[1100px] text-sm">
                 <thead>
-                  <tr className="border-b text-left">
-                    <th className="pb-3 font-medium text-muted-foreground">
+                  <tr className="border-b border-white/20 bg-white/55 text-left backdrop-blur-md dark:border-white/10 dark:bg-white/[0.03]">
+                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       Name
                     </th>
-                    <th className="pb-3 font-medium text-muted-foreground">
+                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       Key Prefix
                     </th>
-                    <th className="pb-3 font-medium text-muted-foreground">
+                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       Scopes
                     </th>
-                    <th className="pb-3 font-medium text-muted-foreground">
+                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       Status
                     </th>
-                    <th className="pb-3 font-medium text-muted-foreground">
+                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       Last Used
                     </th>
-                    <th className="pb-3 font-medium text-muted-foreground">
+                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       Expires
                     </th>
-                    <th className="pb-3 font-medium text-muted-foreground">
+                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       Created
                     </th>
-                    <th className="pb-3 font-medium text-muted-foreground text-right">
+                    <th className="px-5 py-4 text-right text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
                       Actions
                     </th>
                   </tr>
                 </thead>
-                <tbody className="divide-y">
+
+                <tbody>
                   {keys.map((apiKey) => (
                     <tr
                       key={apiKey.id}
-                      className="hover:bg-muted/50 transition-colors"
+                      className="border-b border-white/10 transition-colors duration-150 hover:bg-white/35 dark:hover:bg-white/[0.03]"
                     >
-                      <td className="py-3 font-medium">{apiKey.name}</td>
-                      <td className="py-3">
-                        <code className="text-xs bg-muted px-2 py-1 rounded">
+                      <td className="px-5 py-4">
+                        <div className="font-medium text-foreground">
+                          {apiKey.name}
+                        </div>
+                      </td>
+
+                      <td className="px-5 py-4">
+                        <code className="rounded-lg border border-white/20 bg-white/55 px-2.5 py-1 text-xs text-foreground dark:border-white/10 dark:bg-white/[0.04]">
                           {apiKey.keyPrefix}...
                         </code>
                       </td>
-                      <td className="py-3">
+
+                      <td className="px-5 py-4">
                         {apiKey.scopes && apiKey.scopes.length > 0 ? (
-                          <div className="flex flex-wrap gap-1">
+                          <div className="flex flex-wrap gap-1.5">
                             {apiKey.scopes.map((scope) => (
                               <Badge
                                 key={scope}
                                 variant="secondary"
-                                className="text-xs"
+                                className="rounded-full border border-white/20 bg-white/60 text-xs dark:border-white/10 dark:bg-white/[0.05]"
                               >
                                 {scope}
                               </Badge>
                             ))}
                           </div>
                         ) : (
-                          <span className="text-muted-foreground text-xs">
-                            All
+                          <span className="text-xs text-muted-foreground">
+                            All scopes
                           </span>
                         )}
                       </td>
-                      <td className="py-3">
+
+                      <td className="px-5 py-4">
                         <Badge
-                          variant={apiKey.isActive ? "default" : "destructive"}
-                          className="text-xs"
+                          className={
+                            apiKey.isActive
+                              ? "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400"
+                              : "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400"
+                          }
                         >
                           {apiKey.isActive ? "Active" : "Revoked"}
                         </Badge>
                       </td>
-                      <td className="py-3 text-xs text-muted-foreground">
+
+                      <td className="px-5 py-4 text-xs text-muted-foreground">
                         {apiKey.lastUsedAt
                           ? formatDate(apiKey.lastUsedAt)
                           : "Never"}
                       </td>
-                      <td className="py-3 text-xs text-muted-foreground">
+
+                      <td className="px-5 py-4 text-xs text-muted-foreground">
                         {apiKey.expiresAt
                           ? formatDate(apiKey.expiresAt)
                           : "Never"}
                       </td>
-                      <td className="py-3 text-xs text-muted-foreground">
+
+                      <td className="px-5 py-4 text-xs text-muted-foreground">
                         {formatDate(apiKey.createdAt)}
                       </td>
-                      <td className="py-3 text-right">
+
+                      <td className="px-5 py-4 text-right">
                         {apiKey.isActive && (
                           <Button
                             variant="ghost"
                             size="sm"
                             onClick={() => setRevokeTarget(apiKey)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                            className="rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
                           >
                             <Trash2 size={14} />
                           </Button>
@@ -309,7 +378,7 @@ export default function APIManagement() {
           }
         }}
       >
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg border-white/20 bg-white/80 backdrop-blur-2xl dark:border-white/10 dark:bg-neutral-900/90">
           <DialogHeader>
             <DialogTitle>
               {createdKey ? "API Key Created" : "Create New API Key"}
@@ -323,40 +392,47 @@ export default function APIManagement() {
 
           {createdKey ? (
             <div className="space-y-4">
-              <div className="bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800 rounded-lg p-4">
+              <div className="rounded-xl border border-amber-500/20 bg-amber-500/10 p-4">
                 <div className="flex items-start gap-2">
-                  <AlertTriangle className="h-5 w-5 text-amber-600 mt-0.5 flex-shrink-0" />
+                  <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
                   <p className="text-sm text-amber-800 dark:text-amber-200">
                     Make sure to copy this key now. You will not be able to see
                     it again.
                   </p>
                 </div>
               </div>
-              <div className="flex items-center gap-2 min-w-0">
-                <code className="flex-1 min-w-0 text-xs bg-muted p-3 rounded-md break-all font-mono overflow-x-auto">
+
+              <div className="flex min-w-0 items-center gap-2">
+                <code className="flex-1 min-w-0 break-all rounded-xl border border-white/20 bg-white/60 p-3 font-mono text-xs dark:border-white/10 dark:bg-white/[0.04]">
                   {showKey ? createdKey : "•".repeat(40)}
                 </code>
+
                 <Button
                   variant="outline"
                   size="icon"
                   onClick={() => setShowKey(!showKey)}
+                  className="rounded-xl"
                 >
                   {showKey ? <EyeOff size={14} /> : <Eye size={14} />}
                 </Button>
-                <Button variant="outline" size="icon" onClick={handleCopyKey}>
+
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={handleCopyKey}
+                  className="rounded-xl"
+                >
                   {copied ? (
                     <Check size={14} className="text-emerald-500" />
                   ) : (
                     <Copy size={14} />
                   )}
                 </Button>
-                
-                {copied && (
-                  <span className="text-xs text-emerald-500 ml-2">
-                    Copied!
-                  </span>
-                )}
               </div>
+
+              {copied && (
+                <span className="text-xs text-emerald-500">Copied!</span>
+              )}
             </div>
           ) : (
             <div className="space-y-4">
@@ -367,8 +443,10 @@ export default function APIManagement() {
                   placeholder="e.g., Production API Key"
                   value={newKeyName}
                   onChange={(e) => setNewKeyName(e.target.value)}
+                  className="rounded-xl"
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="keyScopes">
                   Scopes{" "}
@@ -381,8 +459,10 @@ export default function APIManagement() {
                   placeholder="e.g., read:students, write:appointments"
                   value={newKeyScopes}
                   onChange={(e) => setNewKeyScopes(e.target.value)}
+                  className="rounded-xl"
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="keyExpiry">
                   Expiration Date{" "}
@@ -393,6 +473,7 @@ export default function APIManagement() {
                   type="datetime-local"
                   value={newKeyExpiry}
                   onChange={(e) => setNewKeyExpiry(e.target.value)}
+                  className="rounded-xl"
                 />
               </div>
             </div>
@@ -406,6 +487,7 @@ export default function APIManagement() {
                   setCreatedKey(null);
                   setShowKey(false);
                 }}
+                className="rounded-xl"
               >
                 Done
               </Button>
@@ -413,6 +495,7 @@ export default function APIManagement() {
               <Button
                 onClick={handleCreate}
                 disabled={!newKeyName.trim() || createMutation.isPending}
+                className="rounded-xl"
               >
                 {createMutation.isPending ? "Creating..." : "Create Key"}
               </Button>
@@ -426,7 +509,7 @@ export default function APIManagement() {
         open={!!revokeTarget}
         onOpenChange={(open) => !open && setRevokeTarget(null)}
       >
-        <AlertDialogContent>
+        <AlertDialogContent className="border-white/20 bg-white/85 backdrop-blur-2xl dark:border-white/10 dark:bg-neutral-900/92">
           <AlertDialogHeader>
             <AlertDialogTitle>Revoke API Key</AlertDialogTitle>
             <AlertDialogDescription>
@@ -436,10 +519,10 @@ export default function APIManagement() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleRevoke}
-              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               {revokeMutation.isPending ? "Revoking..." : "Revoke Key"}
             </AlertDialogAction>
