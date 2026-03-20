@@ -82,11 +82,15 @@ export default function APIManagement() {
     setRevokeTarget(null);
   };
 
-  const handleCopyKey = () => {
-    if (createdKey) {
-      navigator.clipboard.writeText(createdKey);
+  const handleCopyKey = async () => {
+    if (!createdKey) return;
+
+    try {
+      await navigator.clipboard.writeText(createdKey);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    } catch (error) {
+      console.error("Failed to copy API key:", error);
     }
   };
 
@@ -125,7 +129,6 @@ export default function APIManagement() {
 
   return (
     <div className="mx-auto w-full max-w-[1700px] space-y-5">
-      {/* Hero */}
       <section className="relative overflow-hidden rounded-[20px] border border-white/20 bg-white/50 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.10),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.08),transparent_28%)]" />
 
@@ -157,7 +160,6 @@ export default function APIManagement() {
         </div>
       </section>
 
-      {/* Overview Stats */}
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         {statCards.map((card) => {
           const Icon = card.icon;
@@ -190,7 +192,6 @@ export default function APIManagement() {
         })}
       </section>
 
-      {/* Keys Table */}
       <Card className="overflow-hidden rounded-[20px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
         <CardHeader className="border-b border-white/20 pb-4 dark:border-white/10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -206,7 +207,7 @@ export default function APIManagement() {
               </p>
             </div>
 
-            <label className="inline-flex items-center gap-3 rounded-xl border border-white/30 bg-white/60 px-4 py-2 text-sm backdrop-blur-md cursor-pointer dark:border-white/10 dark:bg-white/[0.05]">
+            <label className="inline-flex cursor-pointer items-center gap-3 rounded-xl border border-white/30 bg-white/60 px-4 py-2 text-sm backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
               <input
                 type="checkbox"
                 checked={includeRevoked}
@@ -367,7 +368,6 @@ export default function APIManagement() {
         </CardContent>
       </Card>
 
-      {/* Create API Key Dialog */}
       <Dialog
         open={isCreateOpen}
         onOpenChange={(open) => {
@@ -378,7 +378,7 @@ export default function APIManagement() {
           }
         }}
       >
-        <DialogContent className="sm:max-w-lg border-white/20 bg-white/80 backdrop-blur-2xl dark:border-white/10 dark:bg-neutral-900/90">
+        <DialogContent className="border-white/20 bg-white/80 backdrop-blur-2xl dark:border-white/10 dark:bg-neutral-900/90 sm:max-w-lg">
           <DialogHeader>
             <DialogTitle>
               {createdKey ? "API Key Created" : "Create New API Key"}
@@ -403,7 +403,7 @@ export default function APIManagement() {
               </div>
 
               <div className="flex min-w-0 items-center gap-2">
-                <code className="flex-1 min-w-0 break-all rounded-xl border border-white/20 bg-white/60 p-3 font-mono text-xs dark:border-white/10 dark:bg-white/[0.04]">
+                <code className="flex min-w-0 flex-1 break-all rounded-xl border border-white/20 bg-white/60 p-3 font-mono text-xs dark:border-white/10 dark:bg-white/[0.04]">
                   {showKey ? createdKey : "•".repeat(40)}
                 </code>
 
@@ -431,7 +431,13 @@ export default function APIManagement() {
               </div>
 
               {copied && (
-                <span className="text-xs text-emerald-500">Copied!</span>
+                <span
+                  role="status"
+                  aria-live="polite"
+                  className="text-xs text-emerald-500"
+                >
+                  Copied!
+                </span>
               )}
             </div>
           ) : (
@@ -504,7 +510,6 @@ export default function APIManagement() {
         </DialogContent>
       </Dialog>
 
-      {/* Revoke Confirmation */}
       <AlertDialog
         open={!!revokeTarget}
         onOpenChange={(open) => !open && setRevokeTarget(null)}

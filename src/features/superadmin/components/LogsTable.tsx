@@ -156,7 +156,6 @@ export default function LogsTable({
 
   return (
     <div className="mx-auto w-full max-w-[1700px] space-y-5">
-      {/* Hero */}
       <section className="relative overflow-hidden rounded-[20px] border border-white/20 bg-white/50 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6">
         <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.08),transparent_22%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.08),transparent_24%)]" />
 
@@ -208,7 +207,6 @@ export default function LogsTable({
         </div>
       </section>
 
-      {/* Filters */}
       {showFilters && (
         <Card className="rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
           <CardContent className="p-5">
@@ -235,12 +233,16 @@ export default function LogsTable({
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <label
+                  htmlFor="start-date"
+                  className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                >
                   Start Date
                 </label>
                 <div className="relative">
                   <CalendarRange className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
+                    id="start-date"
                     type="date"
                     value={startDate}
                     onChange={(e) => {
@@ -253,12 +255,16 @@ export default function LogsTable({
               </div>
 
               <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                <label
+                  htmlFor="end-date"
+                  className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                >
                   End Date
                 </label>
                 <div className="relative">
                   <CalendarRange className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                   <Input
+                    id="end-date"
                     type="date"
                     value={endDate}
                     onChange={(e) => {
@@ -285,7 +291,6 @@ export default function LogsTable({
         </Card>
       )}
 
-      {/* Table shell */}
       <Card className="overflow-hidden rounded-[20px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
         <CardHeader className="border-b border-white/20 pb-4 dark:border-white/10">
           <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
@@ -330,7 +335,7 @@ export default function LogsTable({
               {Array.from({ length: 6 }).map((_, i) => (
                 <div
                   key={i}
-                  className="h-11 rounded-xl bg-white/50 animate-pulse dark:bg-white/[0.05]"
+                  className="h-11 animate-pulse rounded-xl bg-white/50 dark:bg-white/[0.05]"
                 />
               ))}
             </div>
