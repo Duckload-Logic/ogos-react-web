@@ -23,8 +23,8 @@ export interface SlipStats {
  * Includes iirId instead of userId
  */
 export interface Slip {
-  id?: number;
-  iirId?: number;
+  id?: string;
+  iirId?: string;
   user?: User;
   reason: string;
   dateOfAbsence: string;
