@@ -1,13 +1,24 @@
-import { ChevronDownIcon, ChevronUpIcon, Check, Lock } from "lucide-react";
-import { required } from "node_modules/zod/v4/core/util.cjs";
-import { useEffect, useRef, useState } from "react";
-import { get } from "react-hook-form";
-import { string, any, boolean } from "zod";
+import { Check, Lock, ChevronDown } from "lucide-react";
+import { useState } from "react";
+import { cn } from "@/lib/utils";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
 
 export default function DropdownField({
   label,
   name,
-  options,
+  options = [],
   identifier = "id",
   value,
   onChange,
@@ -37,9 +48,8 @@ export default function DropdownField({
   formStyle?: boolean;
   labelKey?: string;
 }) {
-  const selectedOption = options.find((opt) => opt[identifier] == value);
-  const [isOpen, setIsOpen] = useState(false);
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const [open, setOpen] = useState(false);
+  const selectedOption = options.find((opt) => String(opt[identifier]) === String(value));
   const isFilled = selectedOption !== undefined;
 
   const getLabel = (option: any) => {
@@ -48,135 +58,108 @@ export default function DropdownField({
     return option.code || option.name || option.text || option || "";
   };
 
-  useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target as Node)
-      ) {
-        setIsOpen(false);
-        // Trigger onBlur when clicking outside
-        if (onBlur) {
-          onBlur();
-        }
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [onBlur]);
-
-  useEffect(() => {
-    const handleKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        setIsOpen(false);
-      }
-    };
-
-    document.addEventListener("keydown", handleKeyDown);
-    return () => document.removeEventListener("keydown", handleKeyDown);
-  }, []);
-
-  const toggleDropdown = () => {
-    setIsOpen(!isOpen);
+  const handleSelect = (optionValue: string) => {
+    const selected = options.find((opt) => String(opt[identifier]) === optionValue);
+    if (selected) {
+      onChange(selected[get]);
+      setOpen(false);
+      if (onBlur) onBlur();
+    }
   };
 
   return (
     <div className="space-y-2 relative">
-      <div className={`text-sm font-medium text-foreground`}>
+      <div className="text-sm font-medium text-foreground">
         <span className="truncate">{label}</span>
-
-        {/* The asterisk stays fixed to the right of the truncated text */}
         {required && <span className="text-red-500 flex-shrink-0"> *</span>}
       </div>
-      <div ref={dropdownRef} className="relative rounded">
-        <div className="w-full">
+
+      <Popover open={open} onOpenChange={setOpen}>
+        <PopoverTrigger asChild>
           <button
             disabled={!enabled || loading}
-            className={`flex w-full items-center justify-between px-3 py-2 h-10 text-left font-normal border rounded-md focus:ring-2 focus:ring-offset-0 outline-none transition-colors duration-200 text-foreground ${
+            className={cn(
+              "flex w-full items-center justify-between px-4 py-2.5 h-11 text-left text-sm font-medium tracking-tight border rounded-xl outline-none transition-all duration-200 text-foreground shadow-sm",
               !enabled || loading
-                ? "bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none"
+                ? "bg-muted/50 border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-60"
                 : formStyle
                   ? isFilled
-                    ? "bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20"
-                    : "bg-card border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20"
-                  : "bg-background border-border hover:border-primary focus:border-primary focus:ring-primary/20"
-            } ${error ? "border-red-500" : ""}`}
-            onClick={toggleDropdown}
+                    ? "bg-muted/20 border-primary/30 focus:bg-glass-bg/100 dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
+                    : "bg-muted/20 border-destructive/20 hover:border-destructive/40 focus:border-destructive/50 focus:ring-2 focus:ring-destructive/5"
+                  : "bg-muted/20 border-glass-border/40 hover:border-glass-border/60 focus:bg-glass-bg/100 dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm",
+              error && "border-destructive/50"
+            )}
           >
-            <span
-              className={`truncate ${
-                selectedOption
-                  ? "text-foreground font-medium"
-                  : "text-muted-foreground italic"
-              }`}
-            >
-              {getLabel(selectedOption)}
+            <span className={cn(
+              "truncate flex-1",
+              !selectedOption && "text-muted-foreground/50 italic font-normal"
+            )}>
+              {selectedOption ? getLabel(selectedOption) : `Select ${label}`}
             </span>
-            <div className="flex items-center gap-2 flex-shrink-0">
+
+            <div className="flex items-center gap-2 flex-shrink-0 ml-2">
               {!enabled && (
                 <Lock
-                  size={16}
-                  className="text-muted-foreground"
+                  size={14}
+                  className="text-muted-foreground/60"
                   strokeWidth={2}
                 />
               )}
               {enabled && isFilled && !error && formStyle && (
-                <Check size={16} className="text-green-500" strokeWidth={2.5} />
+                <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary animate-in zoom-in duration-300">
+                  <Check size={12} strokeWidth={3} />
+                </div>
               )}
-              {enabled && (
-                <ChevronDownIcon
-                  className={`ml-2 size-4 opacity-50 ${isOpen ? "transition-transform rotate-180 duration-300" : "rotate-0 transition-transform duration-300"}`}
-                />
-              )}
+              <ChevronDown className={cn(
+                "size-4 opacity-40 transition-transform duration-300",
+                open && "rotate-180"
+              )} />
             </div>
           </button>
-        </div>
-        {isOpen && (
-          <div
-            className={`w-full min-w-[200px] max-h-[200px] overflow-y-auto absolute mt-1 border border-border rounded-md shadow-lg z-50 p-2 ${formStyle ? "bg-card" : "bg-background"}`}
-          >
-            {options.length === 0 ? (
-              <div className="px-2 py-1.5 text-sm text-muted-foreground">
-                No options available
-              </div>
-            ) : (
-              options.map((option) => {
-                const isOptionDisabled = option.isEnabled === false || !enabled;
-
-                return (
-                  <button
-                    key={option[identifier]}
-                    onClick={() => {
-                      onChange(option[get]);
-                      setIsOpen(false);
-                      // Trigger onBlur when selecting an option
-                      if (onBlur) {
-                        onBlur();
-                      }
-                    }}
-                    disabled={isOptionDisabled}
-                    className={`w-full text-left px-3 py-2 text-sm hover:text-primary hover:bg-muted-foreground/30 rounded ${
-                      option[identifier] === value
-                        ? "bg-muted-foreground/10 text-primary font-medium"
-                        : ""
-                    } ${isOptionDisabled && "text-muted-foreground cursor-not-allowed"}`}
+        </PopoverTrigger>
+        <PopoverContent
+          className={cn(
+            "p-0 z-50 overflow-hidden rounded-xl border-glass-border",
+            formStyle ? "bg-card" : "bg-background"
+          )}
+          align="start"
+          sideOffset={8}
+        >
+          <Command className={formStyle ? "bg-card" : "bg-background"}>
+            <CommandInput placeholder={`Search ${label.toLowerCase()}...`} className="h-11" />
+            <CommandList className={cn(
+              "max-h-[250px] overflow-y-auto p-1",
+              formStyle ? "bg-card" : "bg-background"
+            )}>
+              <CommandEmpty>No {label.toLowerCase()} found.</CommandEmpty>
+              <CommandGroup>
+                {options.map((option) => (
+                  <CommandItem
+                    key={String(option[identifier])}
+                    value={getLabel(option)} // Search by label
+                    onSelect={() => handleSelect(String(option[identifier]))}
+                    className={cn(
+                      "flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer transition-colors mb-0.5",
+                      String(option[identifier]) === String(value)
+                        ? "bg-primary/10 text-primary font-bold"
+                        : "hover:bg-primary/5 text-foreground"
+                    )}
                   >
-                    {getLabel(option)}
-                  </button>
-                );
-              })
-            )}
-          </div>
-        )}
-      </div>
+                    <span className="truncate">{getLabel(option)}</span>
+                    {String(option[identifier]) === String(value) && (
+                      <Check className="size-4 flex-shrink-0" />
+                    )}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </Command>
+        </PopoverContent>
+      </Popover>
+
       {error && (
         <p className="text-xs font-semibold text-red-600 mt-1">{error}</p>
       )}
-      {/* tooltip removed: showTooltip/tooltipRef were unused */}
     </div>
   );
 }

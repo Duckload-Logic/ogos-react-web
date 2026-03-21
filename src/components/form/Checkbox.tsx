@@ -40,10 +40,10 @@ export default function Checkbox({
             className={`peer absolute h-full w-full opacity-0 cursor-pointer z-10  ${className}`}
           />
           <div
-            className={`h-full w-full ${square ? "rounded" : "rounded-full"} border border-card-foreground bg-card transition-all duration-200
-            peer-checked:bg-red-600 peer-checked:border-red-600 peer-hover:border-red-600`}
+            className={`h-full w-full ${square ? "rounded-md" : "rounded-full"} border border-white/30 bg-white/40 transition-all duration-200
+            peer-checked:bg-primary peer-checked:border-primary peer-hover:border-primary dark:border-white/10 dark:bg-white/[0.04]`}
           />
-          <Check className="absolute h-3 w-3 text-white pointer-events-none opacity-0 peer-checked:opacity-100 transition-opacity" />
+          <Check className="absolute h-3 w-3 text-white pointer-events-none scale-50 opacity-0 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-200" />
         </div>
         <label
           htmlFor={id}
