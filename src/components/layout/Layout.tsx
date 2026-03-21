@@ -164,9 +164,8 @@ export default function Layout({
 
         <div
           ref={contentRef}
-          className={`relative z-10 flex min-h-0 flex-1 flex-col ${
-            termsOpen ? "pointer-events-none select-none blur-[3px]" : ""
-          }`}
+          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${termsOpen ? "pointer-events-none select-none opacity-40 grayscale-[0.5]" : ""
+            }`}
         >
           <Header
             title={title}
@@ -199,18 +198,21 @@ export default function Layout({
             )}
 
             <div className="relative min-w-0 flex-1 overflow-hidden">
+              {/* The Overlay: Handle both the dark tint and the blur here */}
               {expanded && !termsOpen && (
-                <div className="pointer-events-none absolute inset-0 z-0 animate-in fade-in bg-black/10 backdrop-blur-sm duration-200" />
+                <div
+                  className="pointer-events-none absolute inset-0 z-20
+                 bg-black/20 animate-in
+                 fade-in duration-200"
+                />
               )}
 
               <div
-                className={`relative z-10 flex h-full flex-col overflow-y-auto transition-all duration-300 ${
-                  expanded && !termsOpen ? "blur-[2px]" : ""
-                }`}
-              >
-                <main className="flex-1 bg-transparent px-3 py-3 md:px-4 md:py-4 xl:px-5 xl:py-5 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  {children}
-                </main>
+                className="absolute inset-0 z-0 bg-[url('/src/assets/images/bg.png')]
+               bg-cover bg-center bg-no-repeat opacity-[0.15] dark:opacity-10 transform-gpu"
+              />
+              <div className="relative z-10 flex h-full flex-col overflow-x-hidden overflow-y-auto">
+                <main className="flex-1 p-2 md:p-6 lg:p-8">{children}</main>
               </div>
             </div>
           </div>
