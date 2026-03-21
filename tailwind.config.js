@@ -60,7 +60,14 @@ export default {
         notice: {
           background: 'hsl(var(--notice-background))',
           foreground: 'hsl(var(--notice-foreground))'
+        },
+        glass: {
+          bg: 'hsl(var(--glass-bg) / <alpha-value>)',
+          border: 'hsl(var(--glass-border) / <alpha-value>)',
         }
+      },
+      backdropBlur: {
+        glass: 'var(--glass-blur)',
       },
       borderRadius: {
         lg: 'var(--radius)',
