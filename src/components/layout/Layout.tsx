@@ -34,15 +34,11 @@ export default function Layout({
     return sessionStorage.getItem("session_consent_accepted") === "true";
   });
 
-  const { data: latestDocument } = useGetLatestStatement("terms");
-  const { data: userConsent, isLoading: isUserConsentLoading } =
-    useCheckUserConsent(latestDocument?.id);
-  const { mutate: giveConsent } = useGiveConsent();
-
   const excludedPaths = ["/terms", "/privacy"];
   const currentPath = location.pathname;
   const isExcluded = excludedPaths.includes(currentPath);
-  const mustAcceptTerms = !sessionAccepted && !isExcluded && !!user;
+  const mustAcceptTerms =
+    !sessionAccepted && !isExcluded && !!user && !isLoggedIn;
 
   useEffect(() => {
     setTermsOpen(mustAcceptTerms);
@@ -154,7 +150,7 @@ export default function Layout({
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.14))] dark:bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.02))]" />
         </div>
 
-        {!userConsent?.accepted && (
+        {mustAcceptTerms && (
           <ConsentModal
             open={termsOpen}
             role={currentRole}
@@ -164,8 +160,11 @@ export default function Layout({
 
         <div
           ref={contentRef}
-          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${termsOpen ? "pointer-events-none select-none opacity-40 grayscale-[0.5]" : ""
-            }`}
+          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${
+            termsOpen
+              ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
+              : ""
+          }`}
         >
           <Header
             title={title}
