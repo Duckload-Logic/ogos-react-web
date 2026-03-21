@@ -122,8 +122,8 @@ export default function IIRForm() {
       if (isLoadingDraft || !me || hasInitialized.current) return;
 
       const initializedData = initializeFormData(
-        // draft ?? null
-        completeIIRForm,
+        draft ?? null,
+        // completeIIRForm,
         EMPTY_IIR_FORM,
         me,
       );
@@ -366,81 +366,69 @@ export default function IIRForm() {
   };
 
   const currentSectionDef = FORM_SECTIONS.find((s) => s.id === currentSection);
-
   return (
-    <>
+    <div className="min-h-screen transition-colors duration-500">
       <AnimationStyles />
-      <HeroSection
-        greeting="Student Form"
-        title="Individual Inventory Record"
-        subtitle="Complete your student profile information for PUP Guidance Services"
-      />
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 py-6">
-        {/* Simple Progress Card */}
-        <div className="mb-8 space-y-2">
-          <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-foreground text-sm">
-              Overall Completion
-            </h3>
-            <span className="text-lg font-bold text-destructive">
-              {getOverallCompletion(
-                localFormData ?? null,
-                FORM_SECTIONS.length,
-                (sectionIndex) =>
-                  calculateSectionCompletion(
-                    sectionIndex,
-                    localFormData ?? null,
-                  ),
-              )}
-              %
-            </span>
-          </div>
-          <div className="w-full bg-gray-300 rounded-sm h-2.5 overflow-hidden">
-            <div
-              className="bg-destructive h-full transition-all duration-300"
-              style={{
-                width: `${getOverallCompletion(
-                  localFormData ?? null,
-                  FORM_SECTIONS.length,
-                  (sectionIndex) =>
-                    calculateSectionCompletion(
-                      sectionIndex,
-                      localFormData ?? null,
-                    ),
-                )}%`,
-              }}
-            />
-          </div>
+      {/* Premium Glass Header */}
+      <div className="relative pt-16 pb-24 overflow-hidden">
+        <div className="absolute top-0 left-1/2 -tranneutral-x-1/2 w-full max-w-5xl h-full -z-10 blur-[120px] opacity-70" />
+        <div className="max-w-4xl mx-auto text-center animate-in fade-in zoom-in-95 duration-700">
+          <span className="inline-block px-4 py-1.5 mb-6 text-[11px] font-bold uppercase tracking-[0.2em] text-primary bg-primary/10 rounded-full border border-primary/20 backdrop-blur-md">
+            Student Profile Portal
+          </span>
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-[900] tracking-tight text-neutral-900 dark:text-white mb-6">
+            Individual Inventory <span className="text-primary">Record</span>
+          </h1>
+          <p className="text-neutral-600 dark:text-neutral-400 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
+            Fill out your student information with confidence. Your data is
+            protected and used solely for academic and guidance purposes.
+          </p>
         </div>
+      </div>
 
-        {/* Draft Restore Prompt */}
-        {showDraftPrompt && (
-          <Alert className="mb-6 border-blue-200 bg-blue-50/50 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <AlertCircle className="h-5 w-5 text-blue-500" />
-              <AlertDescription className="text-blue-700 font-medium">
-                We found an unsaved draft. Would you like to restore it?
-              </AlertDescription>
+      {/* Main Content Container */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-10">
+        <div className="flex flex-col gap-10 w-full">
+          {/* Draft Restore Prompt */}
+          {showDraftPrompt && (
+            <div className="animate-in slide-in-from-top-4 duration-500">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-primary/5 backdrop-blur-md border border-primary/20 rounded-3xl dark:bg-primary/10 dark:border-primary/20">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <AlertCircle className="h-6 w-6" />
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-bold text-foreground">
+                      Unsaved Progress Found
+                    </h4>
+                    <p className="text-xs text-muted-foreground font-medium">
+                      Would you like to restore your previous work?
+                    </p>
+                  </div>
+                </div>
+                <div className="flex gap-2 w-full sm:w-auto">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleDiscardDraft}
+                    className="flex-1 sm:flex-none text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl font-bold"
+                  >
+                    Discard
+                  </Button>
+                  <Button
+                    size="sm"
+                    onClick={handleRestoreDraft}
+                    className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20 font-bold px-6"
+                  >
+                    Restore Draft
+                  </Button>
+                </div>
+              </div>
             </div>
-            <div className="flex gap-2">
-              <Button variant="outline" size="sm" onClick={handleDiscardDraft}>
-                Discard
-              </Button>
-              <Button
-                size="sm"
-                className="bg-blue-600 hover:bg-blue-700 text-white"
-                onClick={handleRestoreDraft}
-              >
-                Restore
-              </Button>
-            </div>
-          </Alert>
-        )}
+          )}
 
-        {/* Main Layout: Horizontal Section Nav + Form Content */}
-        <div className="flex flex-col gap-6 relative w-full">
+          {/* Progress Tracker Layer */}
           <SectionProgress
             sections={FORM_SECTIONS}
             currentSection={currentSection}
@@ -458,24 +446,25 @@ export default function IIRForm() {
             lastSaved={lastSaved}
           />
 
-          <div className="flex flex-col gap-2">
-            {/* Form Content Card */}
-            <Card className="border-0 shadow-sm bg-background">
-              <CardHeader className="bg-transparent border-b p-4 sm:p-6">
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
-                  <CardTitle className="text-base sm:text-lg md:text-xl">
-                    {currentSectionDef?.title}
-                  </CardTitle>
-                  <span className="text-xs font-semibold text-muted-foreground bg-muted px-3 py-1.5 rounded-full w-fit">
+          <div className="flex flex-col gap-6">
+            {/* Form Content Wrapper */}
+            <div className="">
+              {/* Floating Completion Pill */}
+              <div className="mb-3 animate-in fade-in slide-in-from-right-4 duration-700 delay-300">
+                <div className="flex items-center gap-2.5 px-4 py-2 bg-white/60 backdrop-blur-md border border-white/20 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:bg-white/[0.04] dark:border-white/10">
+                  <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(var(--primary),0.6)]" />
+                  <span className="text-[11px] font-black uppercase tracking-wider text-neutral-900 dark:text-white">
                     {calculateSectionCompletion(
                       currentSection,
                       localFormData ?? null,
                     )}
-                    % Complete
+                    % Form Progress
                   </span>
                 </div>
-              </CardHeader>
-              <CardContent className="p-4 sm:p-6 md:p-8 pb-24">
+              </div>
+
+              {/* Individual Form Sections */}
+              <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out fill-mode-both">
                 {currentSection === 1 && localFormData?.student && (
                   <PersonalInformationSection
                     ref={personalSectionRef}
@@ -490,8 +479,6 @@ export default function IIRForm() {
                     ref={educationSectionRef}
                     education={localFormData.education}
                     onChange={handleInputChange}
-                  // onFieldBlur={markFieldTouched}
-                  // shouldShowError={shouldShowError}
                   />
                 )}
                 {currentSection === 3 && localFormData?.family && (
@@ -508,8 +495,6 @@ export default function IIRForm() {
                     ref={healthSectionRef}
                     health={localFormData.health}
                     onChange={handleInputChange}
-                  // onFieldBlur={markFieldTouched}
-                  // shouldShowError={shouldShowError}
                   />
                 )}
                 {currentSection === 5 && localFormData?.interests && (
@@ -517,164 +502,120 @@ export default function IIRForm() {
                     ref={interestsSectionRef}
                     interests={localFormData.interests}
                     onChange={handleInputChange}
-                  // onFieldBlur={markFieldTouched}
-                  // shouldShowError={shouldShowError}
                   />
                 )}
-              </CardContent>
-            </Card>
-          </div>
+              </div>
+            </div>
 
-          {/* Form Navigation Buttons */}
-          <div className="sticky bottom-0 flex justify-between gap-3 bg-card p-4 border-t border-border shadow-lg flex-wrap z-20 rounded-2xl">
-            <Button
-              onClick={() => setShowResetConfirm(true)}
-              className="bg-destructive hover:bg-destructive/90 text-white"
-            >
-              Reset Form
-            </Button>
-
-            <div className="flex gap-2 ml-auto">
+            {/* Form Navigation Action Bar */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/40 backdrop-blur-xl p-5 border border-white/20 shadow-[0_12px_40px_rgba(31,38,135,0.08)] dark:bg-white/[0.04] dark:border-white/10 rounded-[28px] mt-4 mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
               <Button
-                variant="outline"
-                onClick={handlePreviousSection}
-                disabled={currentSection === 1 || isSaving}
-                className="flex items-center gap-2"
+                variant="ghost"
+                onClick={() => setShowResetConfirm(true)}
+                className="text-neutral-400 hover:text-destructive hover:bg-destructive/10 font-bold rounded-xl px-4 sm:px-6 transition-all duration-300"
               >
-                <ChevronLeft className="h-4 w-4" />
-                Previous
+                Reset
               </Button>
 
-              {currentSection < FORM_SECTIONS.length && (
+              <div className="flex gap-3">
                 <Button
-                  onClick={handleNextSection}
-                  disabled={isSaving}
-                  className="flex items-center gap-2 bg-destructive hover:bg-destructive/90"
+                  variant="outline"
+                  onClick={handlePreviousSection}
+                  disabled={currentSection === 1 || isSaving}
+                  className="flex items-center gap-2 border-neutral-200/50 bg-white/30 hover:bg-white/60 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 rounded-2xl px-5 sm:px-7 h-12 font-bold text-neutral-700 dark:text-neutral-200 transition-all duration-300 shadow-sm"
                 >
-                  {isSaving ? (
-                    <>
-                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                      Saving...
-                    </>
-                  ) : (
-                    <>
-                      Next
-                      <ChevronRight className="h-4 w-4" />
-                    </>
-                  )}
+                  <ChevronLeft className="h-5 w-5" />
+                  <span className="hidden sm:inline">Back</span>
                 </Button>
-              )}
-              {currentSection === FORM_SECTIONS.length && (
-                <Button
-                  onClick={handleSubmit}
-                  disabled={isSaving}
-                  className="flex items-center gap-2 bg-destructive hover:bg-destructive/90"
-                >
-                  {isSubmitting ? (
-                    <>
-                      <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></div>
-                      Submitting...
-                    </>
-                  ) : (
-                    <>
-                      <Save className="h-4 w-4" />
-                      Submit Form
-                    </>
-                  )}
-                </Button>
-              )}
+
+                {currentSection < FORM_SECTIONS.length ? (
+                  <Button
+                    onClick={handleNextSection}
+                    disabled={isSaving}
+                    className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 rounded-2xl px-6 sm:px-10 h-12 font-black tracking-tight transition-all duration-300 active:scale-95"
+                  >
+                    {isSaving ? (
+                      <div className="flex items-center gap-3">
+                        <div className="animate-spin h-5 w-5 border-3 border-primary-foreground border-t-transparent rounded-full" />
+                        <span>Saving...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <span>Next Step</span>
+                        <ChevronRight className="h-5 w-5" />
+                      </>
+                    )}
+                  </Button>
+                ) : (
+                  <Button
+                    onClick={handleSubmit}
+                    disabled={isSaving}
+                    className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 rounded-2xl px-6 sm:px-10 h-12 font-black tracking-tight transition-all duration-300 active:scale-95"
+                  >
+                    {isSubmitting ? (
+                      <div className="flex items-center gap-3">
+                        <div className="animate-spin h-5 w-5 border-3 border-primary-foreground border-t-transparent rounded-full" />
+                        <span>Submitting...</span>
+                      </div>
+                    ) : (
+                      <>
+                        <Save className="h-5 w-5" />
+                        <span>Complete Profile</span>
+                      </>
+                    )}
+                  </Button>
+                )}
+              </div>
             </div>
           </div>
         </div>
-
-        {/* Legal Consent Dialog */}
-        <LegalConsentDialog
-          open={showLegalConsentDialog}
-          onAccept={handleLegalConsentAccept}
-          onCancel={handleLegalConsentCancel}
-          isSubmitting={isSaving}
-        />
-
-        {/* Success Popup */}
-        {showSuccessPopup && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 pointer-events-none">
-            <Card className="w-full max-w-md shadow-2xl pointer-events-auto bg-card border-border">
-              <CardHeader className="bg-card border-b border-border py-8 text-center">
-                <div className="flex justify-center mb-4">
-                  <div className="w-16 h-16 rounded-full bg-green-500 flex items-center justify-center">
-                    <svg
-                      className="w-10 h-10 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={3}
-                        d="M5 13l4 4L19 7"
-                      />
-                    </svg>
-                  </div>
-                </div>
-                <CardTitle className="text-2xl text-foreground">
-                  Form Submitted!
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6 pt-6 text-center">
-                <div className="space-y-2">
-                  <p className="text-foreground font-medium">
-                    Your Individual Inventory Record has been successfully
-                    submitted.
-                  </p>
-                  <p className="text-sm text-muted-foreground">
-                    Thank you for completing the form. The information has been
-                    saved and will be reviewed.
-                  </p>
-                </div>
-                <Button
-                  onClick={() => navigate("/student")}
-                  className="w-full bg-destructive hover:bg-destructive/90 text-white"
-                >
-                  Return to Dashboard
-                </Button>
-              </CardContent>
-            </Card>
-          </div>
-        )}
-
-        {/* Reset Confirmation Modal */}
-        <AlertDialog
-          open={showResetConfirm}
-          onOpenChange={(open) => setShowResetConfirm(open)}
-        >
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Reset Form</AlertDialogTitle>
-              <AlertDialogDescription>
-                This will clear your current responses while preserving
-                autofilled basic information. Are you sure you want to Reset?
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel asChild>
-                <Button
-                  variant="ghost"
-                  className="border border-border hover:bg-muted"
-                >
-                  Cancel
-                </Button>
-              </AlertDialogCancel>
-              <AlertDialogAction
-                onClick={confirmReset}
-                className="bg-destructive hover:bg-destructive/90 text-white"
-              >
-                Reset
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
       </div>
+
+      {/* Overlays & Modals */}
+      <LegalConsentDialog
+        open={showLegalConsentDialog}
+        onAccept={handleLegalConsentAccept}
+        onCancel={handleLegalConsentCancel}
+        isSubmitting={isSaving}
+      />
+
+      <SuccessPopup
+        isOpen={showSuccessPopup}
+        onReturn={() => navigate("/student")}
+      />
+
+      <AlertDialog
+        open={showResetConfirm}
+        onOpenChange={(open) => setShowResetConfirm(open)}
+      >
+        <AlertDialogContent className="rounded-3xl border-none shadow-2xl backdrop-blur-3xl bg-white/90 dark:bg-neutral-900/90 max-w-sm">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-2xl font-black tracking-tight">
+              Erase everything?
+            </AlertDialogTitle>
+            <AlertDialogDescription className="text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed">
+              This will clear all your current answers. This action cannot be
+              undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter className="flex-row gap-2 mt-4">
+            <AlertDialogCancel asChild>
+              <Button
+                variant="ghost"
+                className="flex-1 rounded-2xl font-bold border border-neutral-200 dark:border-neutral-800"
+              >
+                Cancel
+              </Button>
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={confirmReset}
+              className="flex-1 bg-destructive hover:bg-destructive/90 text-white rounded-2xl font-bold shadow-lg shadow-destructive/20"
+            >
+              Yes, Reset
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <FormErrorModal
         isOpen={isErrorModalOpen}
@@ -684,8 +625,49 @@ export default function IIRForm() {
         onNavigateToSection={(id) => setCurrentSection(id)}
       />
 
-      {/* Toast Notifications */}
+      {/* Notification Toast Layer */}
       <Toast toasts={toasts} />
-    </>
+    </div>
+  );
+}
+
+/**
+ * Premium Success Popup Component
+ */
+function SuccessPopup({
+  isOpen,
+  onReturn,
+}: {
+  isOpen: boolean;
+  onReturn: () => void;
+}) {
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-neutral-950/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-500">
+      <div className="w-full max-w-md bg-white/90 backdrop-blur-2xl border border-white/20 rounded-[40px] shadow-[0_32px_120px_rgba(0,0,0,0.15)] dark:bg-neutral-900/90 dark:border-white/10 p-10 text-center animate-in zoom-in-95 duration-500">
+        <div className="flex justify-center mb-8">
+          <div className="relative">
+            <div className="absolute inset-0 bg-green-500/20 blur-2xl rounded-full animate-pulse" />
+            <div className="relative w-20 h-20 rounded-[28px] bg-green-500 flex items-center justify-center shadow-xl shadow-green-500/30">
+              <Check className="w-10 h-10 text-white" strokeWidth={4} />
+            </div>
+          </div>
+        </div>
+        <h3 className="text-3xl font-[900] tracking-tight text-neutral-900 dark:text-white mb-3">
+          All Done!
+        </h3>
+        <p className="text-neutral-500 dark:text-neutral-400 font-medium mb-10 leading-relaxed px-4">
+          Your Individual Inventory Record has been successfully submitted and
+          saved to our secure database.
+        </p>
+        <Button
+          onClick={onReturn}
+          className="w-full h-14 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 rounded-2xl font-black tracking-tight text-lg shadow-xl transition-all duration-300 active:scale-95"
+        >
+          Back to Dashboard
+        </Button>
+      </div>
+    </div>
   );
 }
