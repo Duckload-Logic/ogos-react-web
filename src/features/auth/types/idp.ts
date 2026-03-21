@@ -25,17 +25,18 @@ export interface IDPTokenExchangeRequest {
  */
 export interface IDPTokenExchangeResponse {
   message: string;
-  user_id: number;
+  accessToken: string;
+  refreshToken: string;
 }
 
 /**
  * Role-based dashboard route mapping
  * Maps role_id to corresponding dashboard path
  */
-export const ROLE_ROUTES = Object.freeze({
-  1: "/admin/dashboard",
-  2: "/counselor/dashboard",
-  3: "/student/dashboard",
+export const ROLE_ROUTES_INTERNAL = Object.freeze({
+  student: "/student/home",
+  admin: "/admin/home",
+  superadmin: "/superadmin/home",
 } as const);
 
 /**

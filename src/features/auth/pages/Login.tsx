@@ -13,6 +13,7 @@ import {
 import { ROLE_ROUTES } from "@/config/constants";
 import { useLogin } from "../hooks";
 import { useMe } from "@/features/users/hooks/useMe";
+import { string } from "zod";
 
 export default function Login() {
   const navigate = useNavigate();
@@ -51,22 +52,12 @@ export default function Login() {
       const result = await refetch();
 
       if (result.data) {
-        const roleId = result.data.role?.id;
-        const route =
-          ROLE_ROUTES[roleId as keyof typeof ROLE_ROUTES];
-
-        if (route) {
-          navigate(route, { replace: true });
-        } else {
-          setLocalError("Unauthorized role.");
-        }
+        navigate("/auth/callback?type=native");
       } else {
         setLocalError("Failed to load user data.");
       }
     } catch (err) {
-      setLocalError(
-        err instanceof Error ? err.message : "Login failed",
-      );
+      setLocalError(err instanceof Error ? err.message : "Login failed");
     }
   };
 
@@ -124,12 +115,7 @@ export default function Login() {
           }
         />
 
-        <div
-          className={
-            "relative flex items-center " +
-            "p-6 sm:p-8 lg:p-10"
-          }
-        >
+        <div className={"relative flex items-center " + "p-6 sm:p-8 lg:p-10"}>
           <div className="mx-auto w-full max-w-xl">
             <div className="mb-7 space-y-2">
               <span
@@ -154,19 +140,12 @@ export default function Login() {
                 Access your account
               </h2>
 
-              <p
-                className={
-                  "text-sm leading-6 text-muted-foreground"
-                }
-              >
-                Use your email, username, or institutional
-                login to continue.
+              <p className={"text-sm leading-6 text-muted-foreground"}>
+                Use your email, username, or institutional login to continue.
               </p>
             </div>
 
-            <AuthMessages
-              error={localError || loginError?.message}
-            />
+            <AuthMessages error={localError || loginError?.message} />
 
             <LoginForm
               username={username}
