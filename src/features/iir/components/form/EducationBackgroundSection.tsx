@@ -1,7 +1,13 @@
-﻿import { forwardRef, useImperativeHandle, useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Plus, Check } from "lucide-react";
-import { InputField } from "@/components/form";
+import { forwardRef, useImperativeHandle, useState } from "react";
+import {
+  GraduationCap,
+  School,
+  MapPin,
+  Award,
+  CheckCircle2,
+  AlertCircle,
+} from "lucide-react";
+import { InputField, DropdownField } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
 import { validateObject, isFieldRequired } from "@/services/validationSchema";
 import { educationValidationSchema } from "@/features/iir/config/educationValidationSchema";
@@ -26,13 +32,13 @@ export const EducationBackgroundSection = forwardRef<
   { education, onChange, onFieldBlur, shouldShowError = false },
   ref,
 ) {
-  const [indexStatus, setIndexStatus] = useState<{ [key: number]: boolean }>(
-    {},
-  );
   const [errors, setErrors] = useState<FormErrors>({});
 
   const validate = (): { isValid: boolean; errors: FormErrors } => {
-    const sectionErrors = validateObject({ education }, educationValidationSchema);
+    const sectionErrors = validateObject(
+      { education },
+      educationValidationSchema,
+    );
     setErrors(sectionErrors);
     return {
       isValid: Object.keys(sectionErrors).length === 0,
@@ -45,7 +51,7 @@ export const EducationBackgroundSection = forwardRef<
   }));
 
   const clearError = (field: string) => {
-    setErrors((prev) => {
+    setErrors((prev: FormErrors) => {
       const updated = { ...prev };
       delete updated[field];
       return updated;
@@ -57,7 +63,7 @@ export const EducationBackgroundSection = forwardRef<
     clearError(fieldPath);
   };
 
-  const getCompletionLevel = (idx: number) => {
+  const getCompletionStatus = (idx: number) => {
     const school = education?.schools?.[idx] || {};
     const requiredFields = [
       "schoolName",
@@ -68,78 +74,93 @@ export const EducationBackgroundSection = forwardRef<
     ];
     const filled = requiredFields.filter((field) => !!school[field]).length;
 
-    if (filled === 0) return { color: "bg-muted", text: "Empty" };
+    if (filled === 0) return { color: "bg-muted", text: "Empty", icon: null };
     if (filled < requiredFields.length)
-      return { color: "bg-yellow-500", text: "Incomplete" };
+      return { color: "bg-amber-500", text: "Incomplete", icon: AlertCircle };
 
-    return { color: "bg-green-500", text: "Complete" };
+    return { color: "bg-emerald-500", text: "Complete", icon: CheckCircle2 };
   };
 
+  const schoolTypes = [
+    { id: "Public", name: "Public" },
+    { id: "Private", name: "Private" },
+    { id: "Others", name: "Others" },
+  ];
+
   return (
-    <Card className="bg-card border border-border overflow-hidden">
-      <CardContent className="p-6">
-        {/* Part A: Nature of Schooling - Checkboxes */}
-        <div className="mb-8 pb-8 border-b border-border">
-          <label className="text-sm font-semibold text-foreground mb-4 block">
+    <SectionContainer
+      title="Educational Background"
+      description="Your academic journey from primary to recent schooling"
+      icon={GraduationCap}
+    >
+      <div className="space-y-12">
+        {/* Nature of Schooling */}
+        <div className="bg-glass-bg/60 backdrop-blur-glass rounded-[24px] p-5 sm:p-8 border border-glass-border/40 shadow-sm transition-all duration-300">
+          <label className="text-sm font-bold text-foreground/80 mb-6 block flex items-center gap-2">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             Nature of Schooling
           </label>
-          <div className="flex items-center gap-6">
-            <label className="flex items-center gap-2 cursor-pointer">
-              <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                <input
-                  type="radio"
-                  name="natureOfSchooling"
-                  value="Continuous"
-                  checked={education?.natureOfSchooling === "Continuous"}
-                  onChange={() =>
-                    handleInputChange(
-                      "education.natureOfSchooling",
-                      "Continuous",
-                    )
-                  }
-                  className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                />
-                <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-              </div>
-              <span className="text-sm text-foreground">Continuous</span>
-            </label>
 
-            <label className="flex items-center gap-2 cursor-pointer">
-              <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
-                <input
-                  type="radio"
-                  name="natureOfSchooling"
-                  value="Interrupted"
-                  checked={education?.natureOfSchooling === "Interrupted"}
-                  onChange={() =>
-                    handleInputChange(
-                      "education.natureOfSchooling",
-                      "Interrupted",
-                    )
-                  }
-                  className="peer absolute h-full w-full opacity-0 cursor-pointer z-10"
-                />
-                <div className="h-full w-full rounded-full border border-card-foreground bg-card transition-all duration-200 peer-checked:border-red-600" />
-                <div className="absolute h-2 w-2 rounded-full bg-red-600 opacity-0 peer-checked:opacity-100 transition-opacity pointer-events-none" />
-              </div>
-              <span className="text-sm text-foreground">Interrupted, Why?</span>
-            </label>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <button
+              type="button"
+              onClick={() =>
+                handleInputChange("education.natureOfSchooling", "Continuous")
+              }
+              className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
+                education?.natureOfSchooling === "Continuous"
+                  ? "bg-primary/5 border-primary shadow-sm"
+                  : "bg-glass-bg/40 border-glass-border/20 hover:bg-glass-bg/60 hover:border-primary/20"
+              }`}
+            >
+              <span
+                className={`text-sm font-bold ${education?.natureOfSchooling === "Continuous" ? "text-primary" : "text-foreground/70"}`}
+              >
+                Continuous
+              </span>
+              {education?.natureOfSchooling === "Continuous" && (
+                <CheckCircle2 className="w-5 h-5 text-primary stroke-[2.5]" />
+              )}
+            </button>
+
+            <button
+              type="button"
+              onClick={() =>
+                handleInputChange("education.natureOfSchooling", "Interrupted")
+              }
+              className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
+                education?.natureOfSchooling === "Interrupted"
+                  ? "bg-primary/5 border-primary shadow-sm"
+                  : "bg-glass-bg/40 border-glass-border/20 hover:bg-glass-bg/60 hover:border-primary/20"
+              }`}
+            >
+              <span
+                className={`text-sm font-bold ${education?.natureOfSchooling === "Interrupted" ? "text-primary" : "text-foreground/70"}`}
+              >
+                Interrupted
+              </span>
+              {education?.natureOfSchooling === "Interrupted" && (
+                <CheckCircle2 className="w-5 h-5 text-primary stroke-[2.5]" />
+              )}
+            </button>
           </div>
+
           {errors["education.natureOfSchooling"] && (
-            <p className="text-xs font-semibold text-red-600 mt-1">
+            <p className="text-xs font-medium text-destructive mt-2 ml-1">
               {errors["education.natureOfSchooling"]}
             </p>
           )}
 
-          {/* Interruption Reason Input */}
           {education?.natureOfSchooling === "Interrupted" && (
-            <div className="mt-4">
+            <div className="mt-6 animate-fade-in">
               <InputField
                 name="education.interruptedDetails"
                 label="Reason for Interruption"
                 isTextarea
-                required={isFieldRequired(educationValidationSchema, "education.interruptedDetails")}
+                required={isFieldRequired(
+                  educationValidationSchema,
+                  "education.interruptedDetails",
+                )}
                 value={
                   typeof education?.interruptedDetails === "string"
                     ? education?.interruptedDetails
@@ -148,15 +169,15 @@ export const EducationBackgroundSection = forwardRef<
                 onChange={(val) =>
                   handleInputChange("education.interruptedDetails", val)
                 }
-                placeholder="Explain the reason for interruption"
+                placeholder="Please describe why your schooling was interrupted..."
                 error={errors["education.interruptedDetails"]}
               />
             </div>
           )}
         </div>
 
-        {/* Part B: School Level Accordions */}
-        <div className="space-y-3">
+        {/* School Levels */}
+        <div className="space-y-8">
           {[
             { name: "Pre-elementary" },
             { name: "Elementary" },
@@ -165,145 +186,160 @@ export const EducationBackgroundSection = forwardRef<
             { name: "College" },
           ].map((level: any, idx: number) => {
             const school = education?.schools?.[idx] || {};
+            const status = getCompletionStatus(idx);
+            const StatusIcon = status.icon;
+
             return (
               <div
                 key={idx}
-                className="bg-muted border border-border rounded-lg overflow-hidden"
+                className="group bg-glass-bg/60 backdrop-blur-glass rounded-[24px] border border-glass-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
               >
-                <CardHeader className="pb-4 pt-4 px-5 bg-muted">
+                <div className="px-5 sm:px-8 py-4 sm:py-5 bg-glass-bg/40 border-b border-glass-border/20 flex items-center justify-between flex-wrap gap-3">
                   <div className="flex items-center gap-3">
-                    <span className="text-base font-semibold text-foreground">
-                      {level.name}
-                    </span>
-                    <div
-                      className={`w-2 h-2 rounded-full ${getCompletionLevel(idx).color}`}
-                    />
-                    <span className="text-xs text-muted-foreground">
-                      {getCompletionLevel(idx).text}
-                    </span>
-                  </div>
-                </CardHeader>
-                <CardContent className="space-y-5 px-5 py-6 bg-card border-t border-border">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <InputField
-                      name={`education.schools.${idx}.schoolName`}
-                      label="School Name"
-                      required={isFieldRequired(educationValidationSchema, `education.schools.${idx}.schoolName`)}
-                      value={school.schoolName || ""}
-                      onChange={(val) =>
-                        handleInputChange(
-                          `education.schools.${idx}.schoolName`,
-                          val,
-                        )
-                      }
-                      placeholder="Name of school"
-                      error={errors[`education.schools.${idx}.schoolName`]}
-                    />
-                    <InputField
-                      name={`education.schools.${idx}.schoolAddress`}
-                      label="School Address"
-                      required={isFieldRequired(educationValidationSchema, `education.schools.${idx}.schoolAddress`)}
-                      value={school.schoolAddress || ""}
-                      onChange={(val) =>
-                        handleInputChange(
-                          `education.schools.${idx}.schoolAddress`,
-                          val,
-                        )
-                      }
-                      placeholder="School location"
-                      error={errors[`education.schools.${idx}.schoolAddress`]}
-                    />
-                    <div>
-                      <label className="block text-sm font-medium text-foreground mb-2">
-                        School Type
-                      </label>
-                      <div className="relative">
-                        <select
-                          value={school.schoolType || ""}
-                          onChange={(e) =>
-                            handleInputChange(
-                              `education.schools.${idx}.schoolType`,
-                              e.target.value,
-                            )
-                          }
-                          className={`
-                            w-full px-3 py-2 border rounded-md bg-card text-sm
-                            appearance-none cursor-pointer transition-all duration-200
-                            focus:outline-none focus:ring-2 focus:ring-offset-0
-                            ${school.schoolType
-                              ? "border-green-500 text-foreground font-medium hover:border-green-600 focus:border-green-500 focus:ring-green-500/20"
-                              : "border-red-500 text-muted-foreground dark:text-muted-foreground hover:border-red-600 focus:border-red-500 focus:ring-red-500/20"
-                            }
-                          `}
-                        >
-                          <option value="">Select type</option>
-                          <option value="Public">Public</option>
-                          <option value="Private">Private</option>
-                          <option value="Others">Others</option>
-                        </select>
-                        {school.schoolType && (
-                          <div className="absolute right-3 top-1/2 -translate-y-1/2 text-green-500 pointer-events-none">
-                            <Check size={18} strokeWidth={2.5} />
-                          </div>
-                        )}
-                      </div>
-                      {errors[`education.schools.${idx}.schoolType`] && (
-                        <p className="text-xs font-semibold text-red-600 mt-1">
-                          {errors[`education.schools.${idx}.schoolType`]}
-                        </p>
-                      )}
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-sm text-primary">
+                      <School className="w-5 h-5" />
                     </div>
-                    <InputField
-                      name={`education.schools.${idx}.yearStarted`}
-                      label="Year Started"
-                      type="text"
-                      inputMode="numeric"
-                      required={isFieldRequired(educationValidationSchema, `education.schools.${idx}.yearStarted`)}
-                      value={school.yearStarted || ""}
-                      onChange={(val) =>
-                        handleInputChange(
-                          `education.schools.${idx}.yearStarted`,
-                          val.replace(/[^0-9]/g, ""),
-                        )
-                      }
-                      placeholder="e.g., 2012"
-                      error={errors[`education.schools.${idx}.yearStarted`]}
+                    <div>
+                      <h3 className="text-base font-bold text-foreground">
+                        {level.name}
+                      </h3>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span
+                          className={`w-1.5 h-1.5 rounded-full ${status.color}`}
+                        />
+                        <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                          {status.text}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                  {StatusIcon && (
+                    <StatusIcon
+                      className={`w-5 h-5 ${status.color.replace("bg-", "text-")}`}
                     />
-                    <InputField
-                      name={`education.schools.${idx}.yearCompleted`}
-                      label="Year Completed"
-                      type="text"
-                      inputMode="numeric"
-                      required={isFieldRequired(educationValidationSchema, `education.schools.${idx}.yearCompleted`)}
-                      value={school.yearCompleted || ""}
-                      onChange={(val) =>
+                  )}
+                </div>
+
+                <div className="p-5 sm:p-8">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 sm:gap-8">
+                    <div className="md:col-span-2">
+                      <InputField
+                        name={`education.schools.${idx}.schoolName`}
+                        label="School Name"
+                        required={isFieldRequired(
+                          educationValidationSchema,
+                          `education.schools.${idx}.schoolName`,
+                        )}
+                        value={school.schoolName || ""}
+                        onChange={(val) =>
+                          handleInputChange(
+                            `education.schools.${idx}.schoolName`,
+                            val,
+                          )
+                        }
+                        placeholder="e.g. Philippine Science High School"
+                        error={errors[`education.schools.${idx}.schoolName`]}
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <InputField
+                        name={`education.schools.${idx}.schoolAddress`}
+                        label="School Address"
+                        required={isFieldRequired(
+                          educationValidationSchema,
+                          `education.schools.${idx}.schoolAddress`,
+                        )}
+                        value={school.schoolAddress || ""}
+                        onChange={(val) =>
+                          handleInputChange(
+                            `education.schools.${idx}.schoolAddress`,
+                            val,
+                          )
+                        }
+                        placeholder="Street, City, Province"
+                        error={errors[`education.schools.${idx}.schoolAddress`]}
+                      />
+                    </div>
+
+                    <DropdownField
+                      formStyle
+                      label="School Type"
+                      options={schoolTypes}
+                      value={school.schoolType || ""}
+                      onChange={(val: any) =>
                         handleInputChange(
-                          `education.schools.${idx}.yearCompleted`,
-                          val.replace(/[^0-9]/g, ""),
-                        )
-                      }
-                      placeholder="e.g., 2018"
-                      error={errors[`education.schools.${idx}.yearCompleted`]}
-                    />
-                    <InputField
-                      name={`education.schools.${idx}.awards`}
-                      label="Awards/Honors"
-                      value={school.awards || ""}
-                      onChange={(val) =>
-                        handleInputChange(
-                          `education.schools.${idx}.awards`,
+                          `education.schools.${idx}.schoolType`,
                           val,
                         )
                       }
-                      placeholder="e.g., Academic Excellence"
+                      error={errors[`education.schools.${idx}.schoolType`]}
+                      required={isFieldRequired(
+                        educationValidationSchema,
+                        `education.schools.${idx}.schoolType`,
+                      )}
                     />
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <InputField
+                        name={`education.schools.${idx}.yearStarted`}
+                        label="Year Started"
+                        inputMode="numeric"
+                        required={isFieldRequired(
+                          educationValidationSchema,
+                          `education.schools.${idx}.yearStarted`,
+                        )}
+                        value={school.yearStarted || ""}
+                        onChange={(val) =>
+                          handleInputChange(
+                            `education.schools.${idx}.yearStarted`,
+                            val.replace(/[^0-9]/g, ""),
+                          )
+                        }
+                        placeholder="YYYY"
+                        error={errors[`education.schools.${idx}.yearStarted`]}
+                      />
+                      <InputField
+                        name={`education.schools.${idx}.yearCompleted`}
+                        label="Year Graduated"
+                        inputMode="numeric"
+                        required={isFieldRequired(
+                          educationValidationSchema,
+                          `education.schools.${idx}.yearCompleted`,
+                        )}
+                        value={school.yearCompleted || ""}
+                        onChange={(val) =>
+                          handleInputChange(
+                            `education.schools.${idx}.yearCompleted`,
+                            val.replace(/[^0-9]/g, ""),
+                          )
+                        }
+                        placeholder="YYYY"
+                        error={errors[`education.schools.${idx}.yearCompleted`]}
+                      />
+                    </div>
+
+                    <div className="md:col-span-2">
+                      <InputField
+                        name={`education.schools.${idx}.awards`}
+                        label="Awards/Honors"
+                        value={school.awards || ""}
+                        onChange={(val) =>
+                          handleInputChange(
+                            `education.schools.${idx}.awards`,
+                            val,
+                          )
+                        }
+                        placeholder="e.g. With Honors, Academic Excellence..."
+                      />
+                    </div>
                   </div>
-                </CardContent>
+                </div>
               </div>
             );
           })}
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </SectionContainer>
   );
 });

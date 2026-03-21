@@ -100,8 +100,13 @@
     --notice-background: 280 100% 92%; /* Vibrant Lavender Back */
     --notice-foreground: 280 100% 45%; /* Electric Purple */
 
-    --stale-background: 215 15% 90%;
-    --stale-foreground: 215 20% 40%;
+    /* Stale (Gray/Neutral) */
+    --stale-background: 0 0% 90%;
+    --stale-foreground: 0 0% 40%;
+
+    --glass-bg: var(--card);
+    --glass-border: var(--border);
+    --glass-blur: 12px;
   }
 
   .dark {
@@ -116,7 +121,7 @@
     --popover: 0 0% 20%;
     --popover-foreground: 0 0% 95%;
 
-    --primary: 0 70.68% 37.45%;
+    --primary: 0 90.6% 58%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 45 93% 56%;
@@ -165,9 +170,13 @@
     --notice-background: 280 30% 22%; /* Deep lavender shadow */
     --notice-foreground: 280 60% 72%; /* Pastel electric purple */
 
-    /* Stale (Gray/Slate) */
-    --stale-background: 215 15% 25%; /* Neutral dark slate */
-    --stale-foreground: 215 20% 65%; /* Soft muted gray */
+    /* Stale (Gray/Neutral) */
+    --stale-background: 0 0% 25%; /* Neutral dark gray */
+    --stale-foreground: 0 0% 65%; /* Soft muted gray */
+
+    --glass-bg: var(--card);
+    --glass-border: var(--border);
+    --glass-blur: 16px;
   }
 }
 
@@ -188,10 +197,6 @@
     color: hsl(var(--foreground));
     font-size: 16px;
     line-height: 1.6;
-    scrollbar-gutter: stable;
-  }
-
-  html {
     scrollbar-gutter: stable;
   }
 

@@ -250,7 +250,7 @@ export interface TestResult {
  */
 export interface SignificantNote {
   id?: number;
-  iirId?: number;
+  iirId?: string;
   note: string;
   remarks: string;
   appointmentId?: number;
@@ -301,7 +301,7 @@ export interface InterestsSection {
 }
 
 export interface IIRForm {
-  id?: number;
+  id?: string;
   student: StudentSection;
   education: EducationSection;
   family: FamilySection;

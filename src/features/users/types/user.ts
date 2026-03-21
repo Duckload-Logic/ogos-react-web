@@ -4,7 +4,7 @@ export interface UserRole {
 }
 
 export interface User {
-  id: number;
+  id: string;
   role: UserRole;
   firstName: string;
   middleName?: string;

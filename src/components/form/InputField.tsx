@@ -1,107 +1,121 @@
 import { Info, Check } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 
-export default function InputField({
-  className = "",
-  name,
-  label,
-  min,
-  max,
-  type = "text",
-  value,
-  onChange,
-  onBlur,
-  error,
-  placeholder,
-  required = false,
-  inputMode,
-  disabled = false,
-  info = "",
-  prefix,
-}: {
-  className?: string;
-  name?: string;
-  label: string;
-  min?: string;
-  max?: string;
-  type?: string;
-  value: any;
-  onChange: (val: string) => void;
-  onBlur?: () => void;
-  error?: string;
-  placeholder?: string;
-  required?: boolean;
-  isTextarea?: boolean;
-  inputMode?:
-  | "search"
-  | "none"
-  | "text"
-  | "tel"
-  | "url"
-  | "email"
-  | "numeric"
-  | "decimal";
-  disabled?: boolean;
-  info?: string;
-  prefix?: string;
-}) {
-  return (
-    <div className={`space-y-2 ${className}`}>
-      <div className="text-sm font-medium text-card-foreground flex max-h-10 items-start gap-1">
-        {info && <CustomTooltip content={info} />}
-        <span>{label}</span>
-        {required && <span className="text-red-500">*</span>}
-      </div>
-      <div className="flex gap-2">
-        {prefix && (
-          <div className="flex items-center w-fit rounded-md bg-muted-foreground/50 px-3 py-2 text-muted-foreground rounded-r-none">
-            <span className="text-sm font-medium text-card-foreground text-nowrap">
-              {prefix}
-            </span>
-          </div>
-        )}
-        <div className="relative w-full">
-          <input
-            type={type}
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            onBlur={onBlur}
-            placeholder={placeholder}
-            inputMode={inputMode}
-            disabled={disabled}
-            className={`
-              w-full h-10 rounded-md border px-3 py-2 focus:ring-2 font-normal text-left
-              outline-none transition-colors duration-200
-              placeholder:text-muted-foreground
-              focus:ring-offset-0 text-foreground
-              ${disabled
-                ? "bg-muted border-border text-muted-foreground cursor-not-allowed pointer-events-none"
-                : (value !== undefined && value !== null && value !== "")
-                  ? "bg-card border-green-500 focus:border-green-500 focus:ring-green-500/20"
-                  : required
-                    ? "bg-card border-red-500 hover:border-red-600 focus:border-red-500 focus:ring-red-500/20"
-                    : "bg-card border-border"
+import { forwardRef } from "react";
+
+const InputField = forwardRef<
+  HTMLInputElement,
+  {
+    className?: string;
+    name?: string;
+    label: string;
+    min?: string;
+    max?: string;
+    type?: string;
+    value: any;
+    onChange: (val: string) => void;
+    onBlur?: () => void;
+    error?: string;
+    placeholder?: string;
+    required?: boolean;
+    isTextarea?: boolean;
+    inputMode?:
+      | "search"
+      | "none"
+      | "text"
+      | "tel"
+      | "url"
+      | "email"
+      | "numeric"
+      | "decimal";
+    disabled?: boolean;
+    info?: string;
+    prefix?: string;
+  }
+>(
+  (
+    {
+      className = "",
+      name,
+      label,
+      min,
+      max,
+      type = "text",
+      value,
+      onChange,
+      onBlur,
+      error,
+      placeholder,
+      required = false,
+      inputMode,
+      disabled = false,
+      info = "",
+      prefix,
+    },
+    ref,
+  ) => {
+    return (
+      <div className={`space-y-2 ${className}`}>
+        <div className="text-sm font-medium text-card-foreground flex max-h-10 items-start gap-1">
+          {info && <CustomTooltip content={info} />}
+          <span>{label}</span>
+          {required && <span className="text-red-500">*</span>}
+        </div>
+        <div className="flex gap-2">
+          {prefix && (
+            <div className="flex items-center w-fit rounded-md bg-muted-foreground/50 px-3 py-2 text-muted-foreground rounded-r-none">
+              <span className="text-sm font-medium text-card-foreground text-nowrap">
+                {prefix}
+              </span>
+            </div>
+          )}
+          <div className="relative w-full">
+            <input
+              ref={ref}
+              type={type}
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              onBlur={onBlur}
+              placeholder={placeholder}
+              inputMode={inputMode}
+              disabled={disabled}
+              className={`
+              w-full h-11 rounded-xl border px-4 py-2.5 outline-none transition-all duration-200
+              text-sm font-medium tracking-tight text-foreground placeholder:text-muted-foreground/70
+              ${
+                disabled
+                  ? "bg-muted/80 border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-60"
+                  : value !== undefined && value !== null && value !== ""
+                    ? "bg-muted/20 border-primary/30 focus:bg-glass-bg/100 dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm"
+                    : required
+                      ? "bg-muted/60 dark:bg-muted/20 border-border hover:border-destructive/40 focus:border-destructive/50 focus:ring-2 focus:ring-destructive/5"
+                      : "bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg/100 dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
               }
             `}
-            min={min}
-            max={max}
-          />
-          {!disabled && (value !== undefined && value !== null && value !== "") && (
-            <Check
-              size={18}
-              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-green-500"
-              strokeWidth={2.5}
+              min={min}
+              max={max}
             />
-          )}
+            {!disabled &&
+              value !== undefined &&
+              value !== null &&
+              value !== "" && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary animate-in zoom-in duration-300">
+                  <Check size={12} strokeWidth={3} />
+                </div>
+              )}
+          </div>
         </div>
+        {error && (
+          <p className="text-[11px] font-medium text-destructive mt-1.5 ml-1 animate-in fade-in slide-in-from-top-1 duration-200">
+            {error}
+          </p>
+        )}
       </div>
-      {info && <p className="text-xs text-muted-foreground">{info}</p>}
-      {error && (
-        <p className="text-xs font-thin text-red-600 mt-1">{error}</p>
-      )}
-    </div>
-  );
-}
+    );
+  },
+);
+
+export default InputField;
 
 export function CustomTooltip({
   content,

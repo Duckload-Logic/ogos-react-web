@@ -49,8 +49,8 @@ export interface PaginatedAppointmentsResponse {
  * Includes iirId instead of userId
  */
 export interface Appointment {
-  id?: number;
-  iirId?: number;
+  id?: string;
+  iirId?: string;
   user?: User;
   reason: string;
   adminNotes?: string;

@@ -1,6 +1,20 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { Card, CardContent } from "@/components/ui/card";
+import { 
+  Star, 
+  Library, 
+  Trophy, 
+  Users, 
+  CheckCircle2, 
+  Heart, 
+  BookOpen, 
+  Music, 
+  Palette,
+  Briefcase,
+  ChevronRight,
+  Sparkles
+} from "lucide-react";
 import { InputField, Checkbox } from "@/components/form";
+import { SectionContainer } from "./index";
 import { validateObject } from "@/services/validationSchema";
 import { interestsValidationSchema } from "@/features/iir/config/interestsValidationSchema";
 import { useActivityOptions } from "@/features/iir/hooks/useLookups";
@@ -50,12 +64,11 @@ export const InterestsSection = forwardRef<
     clearError(fieldPath);
   };
 
-  // Activity Constants updated for casing
+  // Activity Constants
   const ACADEMIC_CLUBS = ["Math Club", "Science Club", "Debating Club", "Quizzer's Club"];
   const EXTRA_CURRICULAR_ORGS = ["Athletics", "Religious Organizations", "Glee Club", "Dramatics", "Chess Club", "Scouting"];
   const ROLE_OPTIONS = ["Officer", "Member"];
 
-  // Helper for case-insensitive and flexible name matching
   const namesMatch = (name1: string = "", name2: string = "") =>
     (name1 || "").toLowerCase().trim() === (name2 || "").toLowerCase().trim();
 
@@ -66,24 +79,19 @@ export const InterestsSection = forwardRef<
 
   const categoryMatches = (optCategory: string = "", isAcademic: boolean) => {
     const cat = (optCategory || "").toLowerCase();
-    if (!cat || cat === "both") return true; // Flexible fallback or "both"
+    if (!cat || cat === "both") return true;
     return isAcademic ? cat.includes("academic") : !cat.includes("academic");
   };
 
-  // Activity Handlers
   const toggleActivity = (name: string, isAcademic: boolean, isOther: boolean = false) => {
     const currentActivities = [...(interests?.activities || [])];
-
-    // Check if the activity is already selected (Academic matching logic depends on isAcademic flag)
     const existingIndex = currentActivities.findIndex(a => {
       const optName = a.activityOption.name;
       const optCategory = a.activityOption.category;
 
       if (isOther) {
         if (!isOtherName(optName)) return false;
-        // If categories are present in both, they must match
         if (optCategory) return categoryMatches(optCategory, isAcademic);
-        // Fallback to our internal flag for consistency
         return !!a.activityOption.isAcademic === isAcademic;
       }
       return namesMatch(optName, name);
@@ -92,8 +100,6 @@ export const InterestsSection = forwardRef<
     if (existingIndex > -1) {
       currentActivities.splice(existingIndex, 1);
     } else {
-      // Find the option in the lookup data more flexibly
-      // First try to find by name AND category (best match)
       let option = activityOptions.find((opt: any) => {
         const nameMatch = isOther ? isOtherName(opt.name) : namesMatch(opt.name, name);
         if (!nameMatch) return false;
@@ -101,7 +107,6 @@ export const InterestsSection = forwardRef<
         return true;
       });
 
-      // Fallback: Just find by name if category wasn't specific enough
       if (!option) {
         option = activityOptions.find((opt: any) =>
           isOther ? isOtherName(opt.name) : namesMatch(opt.name, name)
@@ -224,186 +229,238 @@ export const InterestsSection = forwardRef<
     handleInputChange("interests.subjectPreferences", [...otherPreferences, ...newPreferences]);
   };
 
+  const getFieldError = (field: string) => errors[field];
+
   return (
-    <Card className="bg-card border border-border">
-      <CardContent className="pt-6">
-        <div className="space-y-12">
-          {/* A. Academic Section */}
-          <section>
-            <div className="space-y-8">
-              <div>
-                <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-6">
-                  A. Academic (School Clubs / Organizations)
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
-                  {ACADEMIC_CLUBS.map((club, idx) => (
-                    <Checkbox
-                      key={club}
-                      id={`academic-club-${idx}`}
-                      name="academic_clubs"
-                      label={club}
-                      checked={isActivityChecked(club)}
-                      onCheckedChange={() => toggleActivity(club, true)}
-                    />
-                  ))}
+    <SectionContainer 
+      title="Interests & Activities" 
+      description="Tell us about your passions and involvement"
+      icon={Sparkles}
+    >
+      <div className="space-y-12">
+        {/* A. Academic Section */}
+        <section>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-8 w-1.5 bg-primary rounded-full" />
+            <h3 className="text-xl font-bold text-neutral-900 dark:text-white">A. Academic Interests</h3>
+          </div>
+
+          <div className="bg-glass-bg/60 backdrop-blur-glass border border-glass-border/40 rounded-[24px] p-5 sm:p-8 mb-8 relative overflow-hidden transition-all duration-300">
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
+            
+            <h4 className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-widest mb-6 sm:mb-8">
+              <Library size={16} />
+              School Clubs & Organizations
+            </h4>
+            
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+              {ACADEMIC_CLUBS.map((club, idx) => (
+                <div key={club} className="flex items-center">
                   <Checkbox
-                    id="academic-others-check"
+                    id={`academic-club-${idx}`}
                     name="academic_clubs"
-                    label="Others, please specify"
-                    checked={isActivityChecked("Others", true, true)}
-                    onCheckedChange={() => toggleActivity("Others", true, true)}
+                    label={club}
+                    checked={isActivityChecked(club)}
+                    onCheckedChange={() => toggleActivity(club, true)}
                   />
                 </div>
-                {isActivityChecked("Others", true, true) && (
-                  <div className="max-w-md animate-in fade-in slide-in-from-top-2 duration-200 mt-4 px-4 border-l-2 border-red-500/20">
-                    <InputField
-                      label="Please specify:"
-                      name="academic_others_input"
-                      value={getOtherSpecification(true)}
-                      onChange={(val) => updateOtherSpecification(true, val)}
-                      placeholder="e.g. Journalism Club"
-                    />
-                  </div>
-                )}
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-8 border-t border-border/40">
-                <InputField
-                  label="What is/are your favorite subject/s?"
-                  name="favoriteSubjects"
-                  value={getSubjects(true)}
-                  onChange={(val) => updateSubjects(true, val)}
-                  placeholder="e.g. Mathematics, Science"
-                  error={errors["interests.academic.favoriteSubjects"]}
-                />
-
-                <InputField
-                  label="What is/are the subject/s you like least?"
-                  name="leastLikedSubjects"
-                  value={getSubjects(false)}
-                  onChange={(val) => updateSubjects(false, val)}
-                  placeholder="e.g. History, Physical Education"
-                  error={errors["interests.academic.leastLikedSubjects"]}
-                />
-              </div>
+              ))}
+              <Checkbox
+                id="academic-others-check"
+                name="academic_clubs"
+                label="Others (Specify)"
+                checked={isActivityChecked("Others", true, true)}
+                onCheckedChange={() => toggleActivity("Others", true, true)}
+              />
             </div>
-          </section>
 
-          {/* B. Extra-Curricular Section */}
-          <section className="pt-8 border-t border-border/60">
-            <div className="space-y-10">
-              <div>
-                <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider mb-4">
-                  B. Extra-Curricular (Hobbies)
-                </h4>
-                <p className="text-sm text-muted-foreground mb-6 italic">
-                  What are your hobbies? Write them in the order of your preferences.
-                </p>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4">
-                  {[1, 2, 3, 4].map((rank) => (
-                    <InputField
-                      key={rank}
-                      name={`hobby-${rank}`}
-                      label={`${rank}. ${rank <= 2 ? "(Required)" : ""}`}
-                      value={getHobby(rank)}
-                      onChange={(val) => updateHobby(rank, val)}
-                      placeholder={`Hobby #${rank}`}
-                      error={rank <= 2 ? errors[`interests.hobbies.${rank - 1}.hobbyName`] : undefined}
-                      required={rank <= 2}
-                    />
-                  ))}
-                </div>
+            {isActivityChecked("Others", true, true) && (
+              <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-glass-border/20 animate-in fade-in slide-in-from-top-4 duration-300">
+                <InputField
+                  label="Please specify club name"
+                  value={getOtherSpecification(true)}
+                  onChange={(val: string) => updateOtherSpecification(true, val)}
+                  placeholder="e.g. Journalism Club"
+                />
               </div>
+            )}
+          </div>
 
-              <div className="pt-10 border-t border-border/40 relative">
-                {errors["interests.activities"] && (
-                  <p className="absolute top-4 right-0 text-xs font-semibold text-red-600 bg-red-50 px-2 py-1 rounded">{errors["interests.activities"]}</p>
-                )}
-                <h4 className="text-sm font-semibold text-foreground uppercase tracking-wider opacity-80 mb-6 font-medium">
-                  Which organizations have you participated in?
-                </h4>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                  {EXTRA_CURRICULAR_ORGS.map((org, idx) => (
-                    <Checkbox
-                      key={org}
-                      id={`extra-org-${idx}`}
-                      name="extra_orgs"
-                      label={org}
-                      checked={isActivityChecked(org)}
-                      onCheckedChange={() => toggleActivity(org, false)}
-                    />
-                  ))}
-                  <Checkbox
-                    id="extra-others-check"
-                    name="extra_orgs"
-                    label="Others, please specify"
-                    checked={isActivityChecked("Others", false, true)}
-                    onCheckedChange={() => toggleActivity("Others", false, true)}
-                  />
-                </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
+            <div className="bg-glass-bg/60 backdrop-blur-glass border border-glass-border/40 rounded-[24px] p-5 sm:p-6 hover:border-primary/20 transition-all duration-300 shadow-sm">
+              <h4 className="flex items-center gap-2 text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-6">
+                <Star size={14} className="text-primary" />
+                Favorite Subjects
+              </h4>
+              <InputField
+                label=""
+                value={getSubjects(true)}
+                onChange={(val: string) => updateSubjects(true, val)}
+                placeholder="Math, Science, etc."
+                error={getFieldError("interests.academic.favoriteSubjects")}
+              />
+            </div>
+            <div className="bg-glass-bg/60 backdrop-blur-glass border border-glass-border/40 rounded-[24px] p-5 sm:p-6 hover:border-primary/20 transition-all duration-300 shadow-sm">
+              <h4 className="flex items-center gap-2 text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-6">
+                <Heart size={14} className="text-primary opacity-50" />
+                Least Liked Subjects
+              </h4>
+              <InputField
+                label=""
+                value={getSubjects(false)}
+                onChange={(val: string) => updateSubjects(false, val)}
+                placeholder="History, etc."
+                error={getFieldError("interests.academic.leastLikedSubjects")}
+              />
+            </div>
+          </div>
+        </section>
 
-                {isActivityChecked("Others", false, true) && (
-                  <div className="max-w-md mb-10 animate-in fade-in slide-in-from-top-2 duration-200 px-4 border-l-2 border-red-500/20">
-                    <InputField
-                      label="Please specify:"
-                      name="org_others_input"
-                      value={getOtherSpecification(false)}
-                      onChange={(val) => updateOtherSpecification(false, val)}
-                      placeholder="e.g. Red Cross Youth"
-                    />
-                  </div>
-                )}
+        <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
 
-                <div className="mt-12 p-8 rounded-2xl border border-border bg-muted/5">
-                  <h5 className="text-xs font-bold text-foreground uppercase tracking-widest opacity-60 mb-8">
-                    Occupational position in the organization:
-                  </h5>
-                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-                    {ROLE_OPTIONS.map((role, idx) => (
-                      <Checkbox
-                        key={role}
-                        id={`role-${idx}`}
-                        name="occupational_role"
-                        label={role}
-                        checked={isRoleChecked(role)}
-                        onCheckedChange={() => toggleRole(role)}
-                      />
-                    ))}
+        {/* B. Extra-Curricular Section */}
+        <section>
+          <div className="flex items-center gap-3 mb-6">
+            <div className="h-8 w-1.5 bg-primary rounded-full" />
+            <h3 className="text-xl font-bold text-neutral-900 dark:text-white">B. Extra-Curricular & Hobbies</h3>
+          </div>
 
-                    <div className="md:col-span-1 lg:col-span-2 space-y-6">
-                      <Checkbox
-                        id="role-others-check"
-                        name="occupational_role"
-                        label="Others, please specify"
-                        checked={isRoleChecked("Others")}
-                        onCheckedChange={() => toggleRole("Others")}
-                      />
-                      {isRoleChecked("Others") && (
-                        <div className="animate-in fade-in slide-in-from-top-2 duration-200 mt-2">
-                          <InputField
-                            label=""
-                            name="role_others_input"
-                            value={interests?._tempRoleSpecification || ""}
-                            onChange={(val) => handleInputChange("interests._tempRoleSpecification", val)}
-                            onBlur={() => {
-                              const currentActivities = (interests?.activities || []).map((a: Activity) => ({
-                                ...a,
-                                roleSpecification: interests?._tempRoleSpecification
-                              }));
-                              handleInputChange("interests.activities", currentActivities);
-                            }}
-                            placeholder="Specify role"
-                          />
-                        </div>
-                      )}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 sm:gap-8 mb-12">
+            {/* Hobbies Card */}
+            <div className="lg:col-span-1 bg-glass-bg/60 backdrop-blur-glass border border-glass-border/40 rounded-[24px] p-6 sm:p-8 overflow-hidden relative group transition-all duration-300 shadow-sm">
+              <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl transition-transform duration-700 group-hover:scale-150" />
+              
+              <h4 className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-widest mb-2">
+                <Palette size={16} />
+                My Hobbies
+              </h4>
+              <p className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-8">Rank by preference</p>
+
+              <div className="space-y-5 sm:space-y-6">
+                {[1, 2, 3, 4].map((rank) => (
+                  <div key={rank} className="relative group">
+                    <div className="absolute -left-3 top-1/2 -translate-y-1/2 scale-0 group-focus-within:scale-100 transition-transform duration-300">
+                      <ChevronRight size={16} className="text-primary" strokeWidth={3} />
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <div className={`
+                        flex h-10 w-10 shrink-0 items-center justify-center rounded-xl text-xs font-black
+                        ${rank <= 2 ? "bg-primary text-white shadow-sm" : "bg-primary/10 text-primary"}
+                      `}>
+                        {rank}
+                      </div>
+                      <div className="w-full">
+                        <InputField
+                          label=""
+                          value={getHobby(rank)}
+                          onChange={(val: string) => updateHobby(rank, val)}
+                          placeholder={`Preference #${rank}`}
+                          error={rank <= 2 ? getFieldError(`interests.hobbies.${rank - 1}.hobbyName`) : undefined}
+                          required={rank <= 2}
+                        />
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
             </div>
-          </section>
-        </div>
-      </CardContent>
-    </Card>
+
+            {/* Organizations Card */}
+            <div className="lg:col-span-2 bg-glass-bg/60 backdrop-blur-glass border border-glass-border/40 rounded-[24px] p-6 sm:p-8 relative overflow-hidden transition-all duration-300 shadow-sm">
+               <h4 className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-widest mb-8">
+                <Users size={16} />
+                Organizations Participated In
+              </h4>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-6 mb-8">
+                {EXTRA_CURRICULAR_ORGS.map((org, idx) => (
+                  <Checkbox
+                    key={org}
+                    id={`extra-org-${idx}`}
+                    name="extra_orgs"
+                    label={org}
+                    checked={isActivityChecked(org)}
+                    onCheckedChange={() => toggleActivity(org, false)}
+                  />
+                ))}
+                <Checkbox
+                  id="extra-others-check"
+                  name="extra_orgs"
+                  label="Other Organizations"
+                  checked={isActivityChecked("Others", false, true)}
+                  onCheckedChange={() => toggleActivity("Others", false, true)}
+                />
+              </div>
+
+              {isActivityChecked("Others", false, true) && (
+                <div className="mt-8 pt-8 border-t border-white/10 animate-in fade-in slide-in-from-top-4 duration-300">
+                  <InputField
+                    label="Please specify details"
+                    value={getOtherSpecification(false)}
+                    onChange={(val: string) => updateOtherSpecification(false, val)}
+                    placeholder="e.g. Community Volunteers"
+                  />
+                </div>
+              )}
+
+              {/* Roles Section Sub-Card */}
+              <div className="mt-8 sm:mt-10 p-5 sm:p-8 rounded-[20px] bg-primary/5 border border-primary/10 relative overflow-hidden">
+                 <div className="absolute top-0 right-0 p-3 opacity-10">
+                   <Briefcase size={64} className="text-primary" />
+                 </div>
+                 <h5 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6 sm:mb-8">
+                  Occupational Role/Position:
+                </h5>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-6 items-start">
+                  {ROLE_OPTIONS.map((role, idx) => (
+                    <Checkbox
+                      key={role}
+                      id={`role-${idx}`}
+                      name="occupational_role"
+                      label={role}
+                      checked={isRoleChecked(role)}
+                      onCheckedChange={() => toggleRole(role)}
+                    />
+                  ))}
+                  <div className="col-span-2 space-y-4">
+                    <Checkbox
+                      id="role-others-check"
+                      name="occupational_role"
+                      label="Others (Specify)"
+                      checked={isRoleChecked("Others")}
+                      onCheckedChange={() => toggleRole("Others")}
+                    />
+                    {isRoleChecked("Others") && (
+                      <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+                        <InputField
+                          label=""
+                          value={interests?._tempRoleSpecification || ""}
+                          onChange={(val: string) => handleInputChange("interests._tempRoleSpecification", val)}
+                          onBlur={() => {
+                            const currentActivities = (interests?.activities || []).map((a: Activity) => ({
+                              ...a,
+                              roleSpecification: interests?._tempRoleSpecification
+                            }));
+                            handleInputChange("interests.activities", currentActivities);
+                          }}
+                          placeholder="Specify your role"
+                        />
+                      </div>
+                    )}
+                  </div>
+                </div>
+                {getFieldError("interests.activities") && (
+                   <p className="mt-6 text-xs font-bold text-primary flex items-center gap-2">
+                     <CheckCircle2 size={12} />
+                     Select organization & role to complete
+                   </p>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </SectionContainer>
   );
 });
+

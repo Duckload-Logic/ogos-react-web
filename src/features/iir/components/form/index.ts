@@ -5,4 +5,3 @@ export { EducationBackgroundSection } from "./EducationBackgroundSection";
 export { FamilyBackgroundSection } from "./FamilyBackgroundSection";
 export { HealthInformationSection } from "./HealthInformationSection";
 export { InterestsSection } from "./InterestsSection";
-export { TestResultsSection } from "./TestResultsSection";
