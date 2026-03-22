@@ -102,7 +102,9 @@ export default function Layout({
 
   const getRoleLabel = () => {
     if (!user) return "";
-    if (user.roles.some((r) => r.toLowerCase().replace(" ", "") === "superadmin"))
+    if (
+      user.roles.some((r) => r.toLowerCase().replace(" ", "") === "superadmin")
+    )
       return "Super Admin Account";
     if (user.roles.some((r) => r.toLowerCase().replace(" ", "") === "admin"))
       return "Admin Account";
@@ -189,7 +191,7 @@ export default function Layout({
             toasts={toasts}
           />
 
-          <div className="flex min-h-0 w-full flex-1">
+          <div className="flex flex-col-reverse md:flex-row min-h-0 w-full flex-1">
             {isLoggedIn && (
               <Navigation
                 navigationItems={navigationItems}
@@ -216,7 +218,7 @@ export default function Layout({
                bg-cover bg-center bg-no-repeat opacity-[0.15] dark:opacity-10 transform-gpu"
               />
               <div className="relative z-10 flex h-full flex-col overflow-x-hidden overflow-y-auto">
-                <main className="flex-1 p-2 md:p-6 lg:p-8">{children}</main>
+                <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
               </div>
             </div>
           </div>

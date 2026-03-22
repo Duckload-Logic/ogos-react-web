@@ -8,6 +8,8 @@ import {
   User,
   Minus,
   Plus,
+  ShieldCheck,
+  Gavel,
 } from "lucide-react";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
@@ -47,7 +49,7 @@ export default function Navigation({
 
     return (
       <>
-        <nav className="fixed bottom-0 left-0 right-0 z-40 bg-background border-t">
+        <nav className="bg-background border-t shrink-0 z-50">
           <div className="flex items-center justify-around h-16 px-2">
             {homeItem && (
               <NavItem
@@ -69,7 +71,6 @@ export default function Navigation({
             >
               <MoreHorizontal className="w-6 h-6 group-aria-pressed:animate-spin" />
             </button>
-
             <button
               onClick={() => {
                 setDrawerMode("settings");
@@ -169,6 +170,25 @@ function MobileSettingsContent({
           </p>
           <p className="text-xs text-muted-foreground">{roleLabel}</p>
         </div>
+      </div>
+      <div className="border-t border-border my-2" />
+      <div className="flex flex-col gap-2">
+        <a
+          href="https://www.pup.edu.ph/terms/"
+          target="_blank"
+          className="w-full flex items-center rounded-xl gap-3 px-4 py-3 text-sm hover:bg-muted transition"
+        >
+          <Gavel size={16} />
+          <span>Terms of Service</span>
+        </a>
+        <a
+          href="https://www.pup.edu.ph/privacy/"
+          target="_blank"
+          className="w-full flex items-center rounded-xl gap-3 px-4 py-3 text-sm hover:bg-muted transition"
+        >
+          <ShieldCheck size={16} />
+          <span>Privacy Policy</span>
+        </a>
       </div>
 
       {/* Logout Action */}
