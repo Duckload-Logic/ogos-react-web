@@ -21,6 +21,7 @@ interface AuthContextType {
   logout: () => void;
   isLoading: boolean;
   user: User | null;
+  refresh: () => Promise<void>;
 }
 
 const AuthContext = createContext<
@@ -52,6 +53,7 @@ export const AuthProvider: React.FC<{
     data: user,
     status,
     isError,
+    refetch,
   } = useMe({ enabled: !isCallbackPage });
   const { logout: logoutMutation } = useLogoutMutation();
   const [hasTimedOut, setHasTimedOut] = useState(false);
@@ -119,6 +121,9 @@ export const AuthProvider: React.FC<{
         user: user || null,
         logout,
         isLoading: isAuthLoading,
+        refresh: async () => {
+          await refetch();
+        },
       }}
     >
       {children}

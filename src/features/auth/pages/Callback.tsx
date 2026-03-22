@@ -13,6 +13,7 @@ import {
   ROLE_ROUTES_INTERNAL,
   ERROR_DISMISS_TIMEOUT,
 } from "../types/idp";
+import { useAuth } from "@/context";
 
 /**
  * OAuth callback page component
@@ -28,6 +29,7 @@ import {
 export default function Callback() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { refresh } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,8 +73,16 @@ export default function Callback() {
 
           // Exchange code for tokens (OAuth only)
           const response = await PostIDPTokenExchange({ code });
+          
+          // Synchronize AuthContext state before proceeding
+          await refresh();
+          
           roleKey = response.role.toLowerCase().replace(" ", "");
         } else {
+          // Synchronize AuthContext state (Native already refetched in Login.tsx
+          // but we call it anyway for robustness)
+          await refresh();
+          
           // Fetch user profile to determine role (Native only)
           const user = await GetCurrentUser();
           if (!user.roles || user.roles.length === 0) {
