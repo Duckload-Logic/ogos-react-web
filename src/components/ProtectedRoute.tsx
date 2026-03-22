@@ -42,6 +42,7 @@ export const ProtectedRoute = ({
    * is not authenticated
    */
   if (!isAuthenticated || !user) {
+    console.error("[ProtectedRoute] Unauthorized access attempt");
     return <Navigate to="/login" replace />;
   }
 
