@@ -19,14 +19,12 @@ export interface IDPTokenExchangeRequest {
   code: string;
 }
 
-/**
- * Response from POST /auth/idp/token endpoint
- * Tokens are set as HTTP-only cookies by the server
- */
 export interface IDPTokenExchangeResponse {
   message: string;
-  accessToken: string;
-  refreshToken: string;
+  role: string;
+  roles: string[];
+  userId: string;
+  userEmail: string;
 }
 
 /**

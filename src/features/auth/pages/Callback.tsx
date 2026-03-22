@@ -7,7 +7,6 @@
 
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import { Spinner } from "@/components/ui/spinner";
 import { PostIDPTokenExchange, GetCurrentUser } from "../services";
 import {
   IDP_ERROR_MESSAGES,
@@ -56,7 +55,10 @@ export default function Callback() {
           return;
         }
 
-        // Conditional token exchange
+        // Use Same normalization as rest of app
+        let roleKey = "student";
+        
+        // Use returned data if available (OAuth)
         if (!isNative) {
           if (!code) {
             console.error(
@@ -68,19 +70,17 @@ export default function Callback() {
           }
 
           // Exchange code for tokens (OAuth only)
-          await PostIDPTokenExchange({ code });
+          const response = await PostIDPTokenExchange({ code });
+          roleKey = response.role.toLowerCase().replace(" ", "");
+        } else {
+          // Fetch user profile to determine role (Native only)
+          const user = await GetCurrentUser();
+          if (!user.roles || user.roles.length === 0) {
+            throw new Error("User has no roles assigned");
+          }
+          roleKey = user.roles[0]?.toLowerCase().replace(" ", "");
         }
 
-        // Fetch user profile to determine role
-        const user = await GetCurrentUser();
-
-        // Determine dashboard route based on role
-        if (!user.roles || user.roles.length === 0) {
-          throw new Error("User has no roles assigned");
-        }
-
-        // Use same normalization as rest of app
-        const roleKey = user.roles[0]?.toLowerCase().replace(" ", "");
         const dashboardRoute = (ROLE_ROUTES_INTERNAL as Record<string, string>)[roleKey];
 
         if (!dashboardRoute) {
@@ -126,9 +126,6 @@ export default function Callback() {
       return () => clearTimeout(timeoutId);
     }
   }, [error, navigate]);
-
-  // Load for 10 seconds before exiting
-
 
   // Loading state
   if (isLoading) {

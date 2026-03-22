@@ -47,11 +47,12 @@ const AUTH_TIMEOUT_MS = 5000;
 export const AuthProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
+  const isCallbackPage = window.location.pathname === "/auth/callback";
   const {
     data: user,
     status,
     isError,
-  } = useMe({});
+  } = useMe({ enabled: !isCallbackPage });
   const { logout: logoutMutation } = useLogoutMutation();
   const [hasTimedOut, setHasTimedOut] = useState(false);
 
