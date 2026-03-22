@@ -400,8 +400,9 @@ export const FamilyBackgroundSection = forwardRef<
               <div className="flex items-center gap-3 self-end sm:self-auto">
                 {["Living", "Deceased"].map((status) => {
                   const isLiving = status === "Living";
-                  const isSelected =
-                    family?.relatedPersons?.[FATHER_IDX].isLiving === isLiving;
+                  const fatherStatus =
+                    family?.relatedPersons?.[FATHER_IDX]?.isLiving || true;
+                  const isSelected = fatherStatus === isLiving;
                   return (
                     <button
                       key={status}
@@ -433,7 +434,7 @@ export const FamilyBackgroundSection = forwardRef<
                   name={`family.relatedPersons.${FATHER_IDX}.firstName`}
                   label="First Name"
                   required
-                  value={family?.relatedPersons?.[FATHER_IDX].firstName || ""}
+                  value={family?.relatedPersons?.[FATHER_IDX]?.firstName || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${FATHER_IDX}.firstName`,
@@ -453,7 +454,7 @@ export const FamilyBackgroundSection = forwardRef<
                 <InputField
                   name={`family.relatedPersons.${FATHER_IDX}.middleName`}
                   label="Middle Name"
-                  value={family?.relatedPersons?.[FATHER_IDX].middleName || ""}
+                  value={family?.relatedPersons?.[FATHER_IDX]?.middleName || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${FATHER_IDX}.middleName`,
@@ -474,7 +475,7 @@ export const FamilyBackgroundSection = forwardRef<
                   name={`family.relatedPersons.${FATHER_IDX}.lastName`}
                   label="Last Name"
                   required
-                  value={family?.relatedPersons?.[FATHER_IDX].lastName || ""}
+                  value={family?.relatedPersons?.[FATHER_IDX]?.lastName || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${FATHER_IDX}.lastName`,
@@ -499,7 +500,7 @@ export const FamilyBackgroundSection = forwardRef<
                   label="Date of Birth"
                   inputMode="numeric"
                   required
-                  value={family?.relatedPersons?.[FATHER_IDX].dateOfBirth || ""}
+                  value={family?.relatedPersons?.[FATHER_IDX]?.dateOfBirth || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${FATHER_IDX}.dateOfBirth`,
@@ -521,7 +522,7 @@ export const FamilyBackgroundSection = forwardRef<
                   label="Educational Attainment"
                   required
                   value={
-                    family?.relatedPersons?.[FATHER_IDX].educationalLevel || ""
+                    family?.relatedPersons?.[FATHER_IDX]?.educationalLevel || ""
                   }
                   onChange={(val) =>
                     handleInputChange(
@@ -543,7 +544,7 @@ export const FamilyBackgroundSection = forwardRef<
                   name={`family.relatedPersons.${FATHER_IDX}.occupation`}
                   label="Occupation"
                   required
-                  value={family?.relatedPersons?.[FATHER_IDX].occupation || ""}
+                  value={family?.relatedPersons?.[FATHER_IDX]?.occupation || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${FATHER_IDX}.occupation`,
@@ -565,7 +566,7 @@ export const FamilyBackgroundSection = forwardRef<
                   label="Name of Employer"
                   required
                   value={
-                    family?.relatedPersons?.[FATHER_IDX].employerName || ""
+                    family?.relatedPersons?.[FATHER_IDX]?.employerName || ""
                   }
                   onChange={(val) =>
                     handleInputChange(
@@ -588,7 +589,7 @@ export const FamilyBackgroundSection = forwardRef<
                     name={`family.relatedPersons.${FATHER_IDX}.employerAddress`}
                     label="Address of Employer"
                     value={
-                      family?.relatedPersons?.[FATHER_IDX].employerAddress || ""
+                      family?.relatedPersons?.[FATHER_IDX]?.employerAddress || ""
                     }
                     onChange={(val) =>
                       handleInputChange(
@@ -626,7 +627,7 @@ export const FamilyBackgroundSection = forwardRef<
                 {["Living", "Deceased"].map((status) => {
                   const isLiving = status === "Living";
                   const isSelected =
-                    family?.relatedPersons?.[MOTHER_IDX].isLiving === isLiving;
+                    family?.relatedPersons?.[MOTHER_IDX]?.isLiving === isLiving;
                   return (
                     <button
                       key={status}
@@ -658,7 +659,7 @@ export const FamilyBackgroundSection = forwardRef<
                   name={`family.relatedPersons.${MOTHER_IDX}.firstName`}
                   label="First Name"
                   required
-                  value={family?.relatedPersons?.[MOTHER_IDX].firstName || ""}
+                  value={family?.relatedPersons?.[MOTHER_IDX]?.firstName || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${MOTHER_IDX}.firstName`,
@@ -679,7 +680,7 @@ export const FamilyBackgroundSection = forwardRef<
                   name={`family.relatedPersons.${MOTHER_IDX}.middleName`}
                   label="Middle Name"
                   required
-                  value={family?.relatedPersons?.[MOTHER_IDX].middleName || ""}
+                  value={family?.relatedPersons?.[MOTHER_IDX]?.middleName || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${MOTHER_IDX}.middleName`,
@@ -700,7 +701,7 @@ export const FamilyBackgroundSection = forwardRef<
                   name={`family.relatedPersons.${MOTHER_IDX}.lastName`}
                   label="Last Name"
                   required
-                  value={family?.relatedPersons?.[MOTHER_IDX].lastName || ""}
+                  value={family?.relatedPersons?.[MOTHER_IDX]?.lastName || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${MOTHER_IDX}.lastName`,
@@ -725,7 +726,7 @@ export const FamilyBackgroundSection = forwardRef<
                   label="Date of Birth"
                   inputMode="numeric"
                   required
-                  value={family?.relatedPersons?.[MOTHER_IDX].dateOfBirth || ""}
+                  value={family?.relatedPersons?.[MOTHER_IDX]?.dateOfBirth || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${MOTHER_IDX}.dateOfBirth`,
@@ -747,7 +748,7 @@ export const FamilyBackgroundSection = forwardRef<
                   label="Educational Attainment"
                   required
                   value={
-                    family?.relatedPersons?.[MOTHER_IDX].educationalLevel || ""
+                    family?.relatedPersons?.[MOTHER_IDX]?.educationalLevel || ""
                   }
                   onChange={(val) =>
                     handleInputChange(
@@ -769,7 +770,7 @@ export const FamilyBackgroundSection = forwardRef<
                   name={`family.relatedPersons.${MOTHER_IDX}.occupation`}
                   label="Occupation"
                   required
-                  value={family?.relatedPersons?.[MOTHER_IDX].occupation || ""}
+                  value={family?.relatedPersons?.[MOTHER_IDX]?.occupation || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${MOTHER_IDX}.occupation`,
@@ -794,7 +795,7 @@ export const FamilyBackgroundSection = forwardRef<
                     `family.relatedPersons.${MOTHER_IDX}.employerName`,
                   )}
                   value={
-                    family?.relatedPersons?.[MOTHER_IDX].employerName || ""
+                    family?.relatedPersons?.[MOTHER_IDX]?.employerName || ""
                   }
                   onChange={(val) =>
                     handleInputChange(
@@ -817,7 +818,7 @@ export const FamilyBackgroundSection = forwardRef<
                     name={`family.relatedPersons.${MOTHER_IDX}.employerAddress`}
                     label="Address of Employer"
                     value={
-                      family?.relatedPersons?.[MOTHER_IDX].employerAddress || ""
+                      family?.relatedPersons?.[MOTHER_IDX]?.employerAddress || ""
                     }
                     onChange={(val) =>
                       handleInputChange(
@@ -857,7 +858,7 @@ export const FamilyBackgroundSection = forwardRef<
                 {["Living", "Deceased"].map((status) => {
                   const isLiving = status === "Living";
                   const isSelected =
-                    family?.relatedPersons?.[GUARDIAN_IDX].isLiving ===
+                    family?.relatedPersons?.[GUARDIAN_IDX]?.isLiving ===
                     isLiving;
                   return (
                     <button
@@ -890,7 +891,7 @@ export const FamilyBackgroundSection = forwardRef<
                   name={`family.relatedPersons.${GUARDIAN_IDX}.firstName`}
                   label="First Name"
                   required
-                  value={family?.relatedPersons?.[GUARDIAN_IDX].firstName || ""}
+                  value={family?.relatedPersons?.[GUARDIAN_IDX]?.firstName || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${GUARDIAN_IDX}.firstName`,
@@ -911,7 +912,7 @@ export const FamilyBackgroundSection = forwardRef<
                   name={`family.relatedPersons.${GUARDIAN_IDX}.middleName`}
                   label="Middle Name"
                   value={
-                    family?.relatedPersons?.[GUARDIAN_IDX].middleName || ""
+                    family?.relatedPersons?.[GUARDIAN_IDX]?.middleName || ""
                   }
                   onChange={(val) =>
                     handleInputChange(
@@ -933,7 +934,7 @@ export const FamilyBackgroundSection = forwardRef<
                   name={`family.relatedPersons.${GUARDIAN_IDX}.lastName`}
                   label="Last Name"
                   required
-                  value={family?.relatedPersons?.[GUARDIAN_IDX].lastName || ""}
+                  value={family?.relatedPersons?.[GUARDIAN_IDX]?.lastName || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${GUARDIAN_IDX}.lastName`,
@@ -959,7 +960,7 @@ export const FamilyBackgroundSection = forwardRef<
                   inputMode="numeric"
                   required
                   value={
-                    family?.relatedPersons?.[GUARDIAN_IDX].dateOfBirth || ""
+                    family?.relatedPersons?.[GUARDIAN_IDX]?.dateOfBirth || ""
                   }
                   onChange={(val) =>
                     handleInputChange(
@@ -982,7 +983,7 @@ export const FamilyBackgroundSection = forwardRef<
                   label="Educational Attainment"
                   required
                   value={
-                    family?.relatedPersons?.[GUARDIAN_IDX].educationalLevel ||
+                    family?.relatedPersons?.[GUARDIAN_IDX]?.educationalLevel ||
                     ""
                   }
                   onChange={(val) =>
@@ -1006,7 +1007,7 @@ export const FamilyBackgroundSection = forwardRef<
                   label="Occupation"
                   required
                   value={
-                    family?.relatedPersons?.[GUARDIAN_IDX].occupation || ""
+                    family?.relatedPersons?.[GUARDIAN_IDX]?.occupation || ""
                   }
                   onChange={(val) =>
                     handleInputChange(
@@ -1029,7 +1030,7 @@ export const FamilyBackgroundSection = forwardRef<
                   label="Name of Employer"
                   required
                   value={
-                    family?.relatedPersons?.[GUARDIAN_IDX].employerName || ""
+                    family?.relatedPersons?.[GUARDIAN_IDX]?.employerName || ""
                   }
                   onChange={(val) =>
                     handleInputChange(
@@ -1052,7 +1053,7 @@ export const FamilyBackgroundSection = forwardRef<
                     name={`family.relatedPersons.${GUARDIAN_IDX}.employerAddress`}
                     label="Address of Employer"
                     value={
-                      family?.relatedPersons?.[GUARDIAN_IDX].employerAddress ||
+                      family?.relatedPersons?.[GUARDIAN_IDX]?.employerAddress ||
                       ""
                     }
                     onChange={(val) =>

@@ -151,7 +151,7 @@ export function initializeFormData(
     education: baseData.education || { schools: [] },
     family: baseData.family || {
       background: {},
-      relatedPersons: {},
+      relatedPersons: [],
       finance: {},
     },
     health: baseData.health || { healthRecord: {}, consultations: [] },
