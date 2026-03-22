@@ -9,9 +9,9 @@ export function useIIRStatus() {
   const userId = me?.id;
 
   return useQuery({
-    queryKey: QUERY_KEYS.iir.inventory.byUserId(userId || 0),
+    queryKey: QUERY_KEYS.iir.inventory.byUserId(userId || ""),
     queryFn: async () => {
-      const iirRecord = await GetIIRByUserId(userId || 0);
+      const iirRecord = await GetIIRByUserId(userId || "");
       console.debug("Fetched IIR Record:", iirRecord);
       return iirRecord?.isSubmitted;
     },

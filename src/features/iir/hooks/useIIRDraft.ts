@@ -7,7 +7,7 @@ import { IIRForm } from "../types/IIRForm";
 import { useAuth } from "@/context";
 import { useMe } from "@/features/users/hooks/useMe";
 
-export const IIR_DRAFT_STORAGE_KEY = (userId: number) =>
+export const IIR_DRAFT_STORAGE_KEY = (userId: string) =>
   `iir_draft-student_${userId}`;
 
 export function useGetIIRDraft() {
@@ -33,7 +33,7 @@ export function useSaveIIRDraft() {
   const [lastSaved, setLastSaved] = useState<string>("");
 
   const clearDraft = useCallback(() => {
-    localStorage.removeItem(IIR_DRAFT_STORAGE_KEY(me?.id || 0));
+    localStorage.removeItem(IIR_DRAFT_STORAGE_KEY(me?.id || ""));
   }, [me?.id]);
 
   const mutation = useMutation({
@@ -41,7 +41,7 @@ export function useSaveIIRDraft() {
       // Mirror to local storage
       try {
         localStorage.setItem(
-          IIR_DRAFT_STORAGE_KEY(me?.id || 0),
+          IIR_DRAFT_STORAGE_KEY(me?.id || ""),
           JSON.stringify(data),
         );
         const now = new Date();

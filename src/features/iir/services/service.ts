@@ -20,20 +20,20 @@ const toNumber = (value: unknown): number => {
 const normalizeIIRPayload = (iir: IIRForm) => {
   const activities = Array.isArray(iir.interests?.activities)
     ? iir.interests.activities.map((activity) => ({
-      id: activity.id,
-      activityOption: activity.activityOption,
-      otherSpecification: activity.otherSpecification,
-      role: activity.role,
-      roleSpecification: activity.roleSpecification,
-    }))
+        id: activity.id,
+        activityOption: activity.activityOption,
+        otherSpecification: activity.otherSpecification,
+        role: activity.role,
+        roleSpecification: activity.roleSpecification,
+      }))
     : [];
 
   const schools = Array.isArray(iir.education?.schools)
     ? iir.education.schools.map((school) => ({
-      ...school,
-      yearStarted: toNumber(school.yearStarted),
-      yearCompleted: toNumber(school.yearCompleted),
-    }))
+        ...school,
+        yearStarted: toNumber(school.yearStarted),
+        yearCompleted: toNumber(school.yearCompleted),
+      }))
     : [];
 
   const addresses = Array.isArray(iir.student?.addresses)
@@ -41,7 +41,7 @@ const normalizeIIRPayload = (iir: IIRForm) => {
     : [];
 
   return {
-    iirId: iir.id ?? 0,
+    iirId: iir.id ?? "",
     student: {
       basicInfo: iir.student.basicInfo,
       personalInfo: {
@@ -80,9 +80,9 @@ const normalizeIIRPayload = (iir: IIRForm) => {
         : [],
       hobbies: Array.isArray(iir.interests?.hobbies)
         ? iir.interests.hobbies.map((hobby) => ({
-          ...hobby,
-          priorityRank: toNumber(hobby.priorityRank),
-        }))
+            ...hobby,
+            priorityRank: toNumber(hobby.priorityRank),
+          }))
         : [],
     },
     // testResults: Array.isArray(iir.testResults) ? iir.testResults : []
@@ -96,7 +96,7 @@ const normalizeIIRPayload = (iir: IIRForm) => {
  * @returns Promise resolving to onboarding status
  */
 export const CheckStudentOnboarding = async (
-  userID: number,
+  userID: string,
   config?: AxiosConfigWithMeta,
 ): Promise<boolean> => {
   try {
@@ -106,13 +106,9 @@ export const CheckStudentOnboarding = async (
     );
     return data?.studentRecord?.isSubmitted;
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'CheckStudentOnboarding';
-    const stepName = config?.stepName ||
-      'Check Onboarding';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "CheckStudentOnboarding";
+    const stepName = config?.stepName || "Check Onboarding";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -121,58 +117,41 @@ const LOOKUP_GET_ROUTES = {
   courses: API_ROUTES.iir.lookups.courses,
   genders: API_ROUTES.iir.lookups.genders,
   religions: API_ROUTES.iir.lookups.religions,
-  parentalStatusTypes:
-    API_ROUTES.iir.lookups.parentalStatusTypes,
-  enrollmentReasons:
-    API_ROUTES.iir.lookups.enrollmentReasons,
+  parentalStatusTypes: API_ROUTES.iir.lookups.parentalStatusTypes,
+  enrollmentReasons: API_ROUTES.iir.lookups.enrollmentReasons,
   incomeRanges: API_ROUTES.iir.lookups.incomeRanges,
-  studentSupportTypes:
-    API_ROUTES.iir.lookups.studentSupportTypes,
-  siblingSupportTypes:
-    API_ROUTES.iir.lookups.siblingSupportTypes,
+  studentSupportTypes: API_ROUTES.iir.lookups.studentSupportTypes,
+  siblingSupportTypes: API_ROUTES.iir.lookups.siblingSupportTypes,
   civilStatuses: API_ROUTES.iir.lookups.civilStatuses,
-  natureOfResidenceTypes:
-    API_ROUTES.iir.lookups.natureOfResidenceTypes,
-  studentRelationshipTypes:
-    API_ROUTES.iir.lookups.studentRelationshipTypes,
+  natureOfResidenceTypes: API_ROUTES.iir.lookups.natureOfResidenceTypes,
+  studentRelationshipTypes: API_ROUTES.iir.lookups.studentRelationshipTypes,
   activityOptions: API_ROUTES.iir.lookups.activityOptions,
 };
 
 const INVENTORY_GET_ROUTES = {
   listStudents: API_ROUTES.iir.inventory.all,
-  iirByUserID: (userId: number) =>
-    API_ROUTES.iir.inventory.byUserId(userId),
-  iirByIIRID: (iirID: number) =>
-    API_ROUTES.iir.inventory.byIirId(iirID),
-  IIRProfile: (iirID: number) =>
-    API_ROUTES.iir.inventory.profile(iirID),
-  enrollmentReasons: (iirID: number) =>
+  iirByUserID: (userId: string) => API_ROUTES.iir.inventory.byUserId(userId),
+  iirByIIRID: (iirID: string) => API_ROUTES.iir.inventory.byIirId(iirID),
+  IIRProfile: (iirID: string) => API_ROUTES.iir.inventory.profile(iirID),
+  enrollmentReasons: (iirID: string) =>
     API_ROUTES.iir.inventory.enrollmentReasons(iirID),
-  personalInfo: (iirID: number) =>
-    API_ROUTES.iir.inventory.personalInfo(iirID),
-  addresses: (iirID: number) =>
-    API_ROUTES.iir.inventory.addresses(iirID),
-  familyBackground: (iirID: number) =>
+  personalInfo: (iirID: string) => API_ROUTES.iir.inventory.personalInfo(iirID),
+  addresses: (iirID: string) => API_ROUTES.iir.inventory.addresses(iirID),
+  familyBackground: (iirID: string) =>
     API_ROUTES.iir.inventory.familyBackground(iirID),
-  relatedPersons: (iirID: number) =>
+  relatedPersons: (iirID: string) =>
     API_ROUTES.iir.inventory.relatedPersons(iirID),
-  education: (iirID: number) =>
-    API_ROUTES.iir.inventory.education(iirID),
-  finance: (iirID: number) =>
-    API_ROUTES.iir.inventory.finance(iirID),
-  health: (iirID: number) =>
-    API_ROUTES.iir.inventory.health(iirID),
-  consultations: (iirID: number) =>
+  education: (iirID: string) => API_ROUTES.iir.inventory.education(iirID),
+  finance: (iirID: string) => API_ROUTES.iir.inventory.finance(iirID),
+  health: (iirID: string) => API_ROUTES.iir.inventory.health(iirID),
+  consultations: (iirID: string) =>
     API_ROUTES.iir.inventory.consultations(iirID),
-  activities: (iirID: number) =>
-    API_ROUTES.iir.inventory.activities(iirID),
-  subjectPreferences: (iirID: number) =>
+  activities: (iirID: string) => API_ROUTES.iir.inventory.activities(iirID),
+  subjectPreferences: (iirID: string) =>
     API_ROUTES.iir.inventory.subjectPreferences(iirID),
-  hobbies: (iirID: number) =>
-    API_ROUTES.iir.inventory.hobbies(iirID),
-  testResults: (iirID: number) =>
-    API_ROUTES.iir.inventory.testResults(iirID),
-  significantNotes: (iirID: number) =>
+  hobbies: (iirID: string) => API_ROUTES.iir.inventory.hobbies(iirID),
+  testResults: (iirID: string) => API_ROUTES.iir.inventory.testResults(iirID),
+  significantNotes: (iirID: string) =>
     API_ROUTES.iir.inventory.significantNotes(iirID),
 };
 
@@ -200,13 +179,9 @@ export const GetIIRLookup = async (
     const { data } = await apiClient.get(route, config);
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'GetIIRLookup';
-    const stepName = config?.stepName ||
-      `Fetch ${lookupType}`;
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "GetIIRLookup";
+    const stepName = config?.stepName || `Fetch ${lookupType}`;
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -222,22 +197,15 @@ export const GetStudents = async (
   config?: AxiosConfigWithMeta,
 ) => {
   try {
-    const { data } = await apiClient.get(
-      INVENTORY_GET_ROUTES.listStudents,
-      {
-        ...config,
-        params: decamelizeKeys(params),
-      },
-    );
+    const { data } = await apiClient.get(INVENTORY_GET_ROUTES.listStudents, {
+      ...config,
+      params: decamelizeKeys(params),
+    });
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'GetStudents';
-    const stepName = config?.stepName ||
-      'Fetch Students';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "GetStudents";
+    const stepName = config?.stepName || "Fetch Students";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -249,7 +217,7 @@ export const GetStudents = async (
  * @returns Promise resolving to IIR record
  */
 export const GetIIRByUserId = async (
-  userId: number,
+  userId: string,
   config?: AxiosConfigWithMeta,
 ) => {
   try {
@@ -259,13 +227,9 @@ export const GetIIRByUserId = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'GetIIRByUserId';
-    const stepName = config?.stepName ||
-      'Fetch IIR by User';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "GetIIRByUserId";
+    const stepName = config?.stepName || "Fetch IIR by User";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -277,7 +241,7 @@ export const GetIIRByUserId = async (
  * @returns Promise resolving to IIR record
  */
 export const GetIIRByIirId = async (
-  iirID: number,
+  iirID: string,
   config?: AxiosConfigWithMeta,
 ) => {
   try {
@@ -287,13 +251,9 @@ export const GetIIRByIirId = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'GetIIRByIirId';
-    const stepName = config?.stepName ||
-      'Fetch IIR by ID';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "GetIIRByIirId";
+    const stepName = config?.stepName || "Fetch IIR by ID";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -306,7 +266,7 @@ export const GetIIRByIirId = async (
  * @returns Promise resolving to resource data
  */
 export const GetIIRResource = async (
-  iirID: number,
+  iirID: string,
   resourceType: keyof typeof INVENTORY_GET_ROUTES,
   config?: AxiosConfigWithMeta,
 ): Promise<IIRForm | any> => {
@@ -315,20 +275,13 @@ export const GetIIRResource = async (
     if (typeof routeFunc === "function") {
       // @ts-ignore
       const route = routeFunc(iirID);
-      const { data } = await apiClient.get(
-        route,
-        config,
-      );
+      const { data } = await apiClient.get(route, config);
       return data;
     }
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'GetIIRResource';
-    const stepName = config?.stepName ||
-      `Fetch ${resourceType}`;
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "GetIIRResource";
+    const stepName = config?.stepName || `Fetch ${resourceType}`;
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -342,19 +295,12 @@ export const GetIIRDraft = async (
   config?: AxiosConfigWithMeta,
 ): Promise<IIRForm | null> => {
   try {
-    const { data } = await apiClient.get(
-      DRAFT_ROUTES.submitDraft,
-      config,
-    );
+    const { data } = await apiClient.get(DRAFT_ROUTES.submitDraft, config);
     return data || null;
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'GetIIRDraft';
-    const stepName = config?.stepName ||
-      'Fetch Draft';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "GetIIRDraft";
+    const stepName = config?.stepName || "Fetch Draft";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -371,19 +317,11 @@ export const PostIIRDraft = async (
 ): Promise<void> => {
   try {
     const payload = normalizeIIRPayload(data);
-    await apiClient.post(
-      DRAFT_ROUTES.saveSection,
-      payload,
-      config,
-    );
+    await apiClient.post(DRAFT_ROUTES.saveSection, payload, config);
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'PostIIRDraft';
-    const stepName = config?.stepName ||
-      'Save Draft';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "PostIIRDraft";
+    const stepName = config?.stepName || "Save Draft";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -400,19 +338,11 @@ export const PostIIRSubmit = async (
 ): Promise<void> => {
   try {
     const payload = normalizeIIRPayload(iir);
-    await apiClient.post(
-      POST_ROUTES.submit,
-      payload,
-      config,
-    );
+    await apiClient.post(POST_ROUTES.submit, payload, config);
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'PostIIRSubmit';
-    const stepName = config?.stepName ||
-      'Submit Form';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "PostIIRSubmit";
+    const stepName = config?.stepName || "Submit Form";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -422,9 +352,7 @@ export const PostIIRSubmit = async (
  * @deprecated Use individual exported functions instead
  */
 export const iirService = {
-  async getLookupData(
-    lookupType: keyof typeof LOOKUP_GET_ROUTES,
-  ) {
+  async getLookupData(lookupType: keyof typeof LOOKUP_GET_ROUTES) {
     return GetIIRLookup(lookupType);
   },
 
@@ -432,24 +360,22 @@ export const iirService = {
     return GetStudents(params);
   },
 
-  async getIIRByUserID(userId: number) {
+  async getIIRByUserID(userId: string) {
     return GetIIRByUserId(userId);
   },
 
-  async getIIRByIIRID(iirID: number) {
+  async getIIRByIIRID(iirID: string) {
     return GetIIRByIirId(iirID);
   },
 
   async getIIRResource(
-    iirID: number,
+    iirID: string,
     resourceType: keyof typeof INVENTORY_GET_ROUTES,
   ): Promise<IIRForm | any> {
     return GetIIRResource(iirID, resourceType);
   },
 
-  async getIIRLookup(
-    lookupType: keyof typeof LOOKUP_GET_ROUTES,
-  ) {
+  async getIIRLookup(lookupType: keyof typeof LOOKUP_GET_ROUTES) {
     return GetIIRLookup(lookupType);
   },
 

@@ -24,23 +24,12 @@ export const useAppointments = (
   const { data: me } = useMe({});
   return useQuery<PaginatedAppointmentsResponse>({
     queryKey: isMe
-      ? [
-          ...QUERY_KEYS.appointments.myAppointments,
-          me?.email,
-          params,
-        ]
-      : [
-          ...QUERY_KEYS.appointments.all,
-          params,
-        ],
+      ? [...QUERY_KEYS.appointments.myAppointments, me?.email, params]
+      : [...QUERY_KEYS.appointments.all, params],
     queryFn: async () => {
       const result = isMe
-        ? await appointmentService.GetMyAppointments(
-            params,
-          )
-        : await appointmentService.GetAllAppointments(
-            params,
-          );
+        ? await appointmentService.GetMyAppointments(params)
+        : await appointmentService.GetAllAppointments(params);
       return result;
     },
     staleTime: CACHE_TIMING.SHORT.staleTime,
@@ -50,18 +39,11 @@ export const useAppointments = (
   });
 };
 
-export const useAppointmentsStats = (
-  { params }: { params?: QueryParam },
-) => {
+export const useAppointmentsStats = ({ params }: { params?: QueryParam }) => {
   const { data: me } = useMe({});
   return useQuery<StatusCount[]>({
-    queryKey: [
-      ...QUERY_KEYS.appointments.stats,
-      me?.email,
-      params,
-    ],
-    queryFn: () =>
-      appointmentService.GetAppointmentStats(params),
+    queryKey: [...QUERY_KEYS.appointments.stats, me?.email, params],
+    queryFn: () => appointmentService.GetAppointmentStats(params),
     staleTime: CACHE_TIMING.SHORT.staleTime,
     gcTime: CACHE_TIMING.SHORT.gcTime,
     refetchOnWindowFocus: false,
@@ -76,8 +58,7 @@ export function useSubmitAppointment() {
       appointmentService.PostAppointment(data),
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey:
-          QUERY_KEYS.appointments.myAppointments,
+        queryKey: QUERY_KEYS.appointments.myAppointments,
       });
     },
   });
@@ -88,13 +69,8 @@ export function useUpdateAppointmentStatus() {
   const { data: me } = useMe({});
 
   return useMutation({
-    mutationFn: (
-      { id, status }: { id: number; status: AppointmentStatus },
-    ) =>
-      appointmentService.PatchAppointmentStatus(
-        id,
-        status,
-      ),
+    mutationFn: ({ id, status }: { id: number; status: AppointmentStatus }) =>
+      appointmentService.PatchAppointmentStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.appointments.myAppointments,
@@ -110,9 +86,7 @@ export const useUpdateAppointment = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: (
-      { id, data }: { id: number; data: Appointment },
-    ) =>
+    mutationFn: ({ id, data }: { id: string; data: Appointment }) =>
       appointmentService.PatchAppointment(id, data),
     onSuccess: () => {
       queryClient.invalidateQueries({

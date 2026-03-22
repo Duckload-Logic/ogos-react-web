@@ -10,13 +10,13 @@ export function useUpdateSlipStatus() {
       status,
       adminNotes,
     }: {
-      id: number;
+      id: string;
       status: string;
       adminNotes?: string;
     }) => {
       return PatchSlipStatus(id, status, adminNotes, {
-        handlerName: 'useUpdateSlipStatus',
-        stepName: 'Update Status',
+        handlerName: "useUpdateSlipStatus",
+        stepName: "Update Status",
       });
     },
     onSuccess: () => {

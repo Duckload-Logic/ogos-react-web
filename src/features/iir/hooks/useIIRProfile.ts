@@ -4,11 +4,9 @@ import { QUERY_KEYS } from "@/config/queryKeys";
 import { CACHE_TIMING } from "@/config/constants";
 import { IIRForm } from "../types/IIRForm";
 
-export function useIIRProfile(iirId: number) {
+export function useIIRProfile(iirId: string) {
   return useQuery<IIRForm>({
-    queryKey: QUERY_KEYS.iir.inventory.profile(
-      iirId,
-    ),
+    queryKey: QUERY_KEYS.iir.inventory.profile(iirId),
     queryFn: async () => {
       return GetIIRResource(iirId, "IIRProfile");
     },

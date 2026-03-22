@@ -48,8 +48,8 @@ export interface CreateSlipRequest {
 }
 
 export interface SlipAttachment {
-  id: number;
-  slipId: number;
+  id: string;
+  slipId: string;
   fileName: string;
   fileUrl: string;
   uploadedAt: string;

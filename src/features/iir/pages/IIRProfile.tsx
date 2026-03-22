@@ -15,8 +15,8 @@ export default function IIRProfile() {
   const location = useLocation();
   const { iirId: hashedId } = useParams();
   const { data: me } = useMe({});
-  const { data: iir } = useUserIIR(!hashedId && me?.id ? me.id : 0);
-  const isAdmin = me?.role.name.toLowerCase() === "admin";
+  const { data: iir } = useUserIIR(!hashedId && me?.id ? me.id : "");
+  const isAdmin = me?.roles?.[0]?.toLowerCase() === "admin";
 
   // Determine which resolved ID to use
   const resolvedId =

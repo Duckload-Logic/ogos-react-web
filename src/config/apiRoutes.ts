@@ -24,15 +24,15 @@ export const API_ROUTES = Object.freeze({
     mySlips: "/slips/me",
     urgent: "/slips/urgent",
     stats: "/slips/stats",
-    byId: (id: number) => `/slips/id/${id}`,
-    attachments: (id: number) => `/slips/id/${id}/attachments`,
-    downloadAttachment: (id: number, attachmentId: number) =>
+    byId: (id: string) => `/slips/id/${id}`,
+    attachments: (id: string) => `/slips/id/${id}/attachments`,
+    downloadAttachment: (id: string, attachmentId: string) =>
       `/slips/id/${id}/attachments/${attachmentId}`,
     lookups: Object.freeze({
       statuses: "/slips/lookups/statuses",
       categories: "/slips/lookups/categories",
     }),
-    updateStatus: (id: number) => `/slips/id/${id}/status`,
+    updateStatus: (id: string) => `/slips/id/${id}/status`,
   }),
 
   /**
@@ -43,7 +43,7 @@ export const API_ROUTES = Object.freeze({
     myAppointments: "/appointments/me",
     stats: "/appointments/stats",
     calendarStats: "/appointments/calendar/stats",
-    byId: (id: number) => `/appointments/id/${id}`,
+    byId: (id: string) => `/appointments/id/${id}`,
     lookups: Object.freeze({
       statuses: "/appointments/lookups/statuses",
       categories: "/appointments/lookups/categories",
@@ -56,7 +56,7 @@ export const API_ROUTES = Object.freeze({
    */
   notes: Object.freeze({
     all: "/notes",
-    byIirId: (iirId: number) => `/notes/user/id/${iirId}`,
+    byIirId: (iirId: string) => `/notes/user/id/${iirId}`,
   }),
 
   /**
@@ -125,38 +125,38 @@ export const API_ROUTES = Object.freeze({
     }),
     inventory: Object.freeze({
       all: "/students/inventory/records",
-      byUserId: (userId: number) =>
+      byUserId: (userId: string) =>
         `/students/inventory/records/user/${userId}`,
-      byIirId: (iirId: number) => `/students/inventory/records/iir/${iirId}`,
-      profile: (iirId: number) =>
+      byIirId: (iirId: string) => `/students/inventory/records/iir/${iirId}`,
+      profile: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/profile`,
-      enrollmentReasons: (iirId: number) =>
+      enrollmentReasons: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/enrollment-reasons`,
-      personalInfo: (iirId: number) =>
+      personalInfo: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/personal-info`,
-      addresses: (iirId: number) =>
+      addresses: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/addresses`,
-      familyBackground: (iirId: number) =>
+      familyBackground: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/family-background`,
-      relatedPersons: (iirId: number) =>
+      relatedPersons: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/related-persons`,
-      education: (iirId: number) =>
+      education: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/education`,
-      finance: (iirId: number) =>
+      finance: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/finance`,
-      health: (iirId: number) =>
+      health: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/health`,
-      consultations: (iirId: number) =>
+      consultations: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/consultations`,
-      activities: (iirId: number) =>
+      activities: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/activities`,
-      subjectPreferences: (iirId: number) =>
+      subjectPreferences: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/subject-preferences`,
-      hobbies: (iirId: number) =>
+      hobbies: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/hobbies`,
-      testResults: (iirId: number) =>
+      testResults: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/test-results`,
-      significantNotes: (iirId: number) =>
+      significantNotes: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/significant-notes`,
     }),
     draft: Object.freeze({
@@ -164,7 +164,7 @@ export const API_ROUTES = Object.freeze({
       submit: "/students/inventory/records/iir/draft",
     }),
     submit: "/students/inventory/records/iir",
-    checkOnboarding: (userId: number) => `/students/record/${userId}`,
+    checkOnboarding: (userId: string) => `/students/record/${userId}`,
   }),
   /**
    * Superadmin related endpoints

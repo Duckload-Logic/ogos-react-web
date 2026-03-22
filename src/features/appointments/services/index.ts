@@ -19,11 +19,7 @@ import { DailyStatusCount } from "../types/calendar";
 import { toISODateString } from "../utils";
 
 // Re-export types for legacy imports
-export type {
-  Appointment,
-  CreateAppointmentRequest,
-  AvailableTimeSlotView,
-};
+export type { Appointment, CreateAppointmentRequest, AvailableTimeSlotView };
 
 /**
  * Get current user's appointments
@@ -43,27 +39,19 @@ export async function GetMyAppointments(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName ||
-      'GetMyAppointments';
+    const handlerName = config?.handlerName || "GetMyAppointments";
 
     // Handle Day One student (403 Forbidden)
     if (error.response?.status === 403) {
-      const stepName = config?.stepName ||
-        'Check IIR Profile';
+      const stepName = config?.stepName || "Check IIR Profile";
       console.error(
-        `[${handlerName}] {${stepName}}: ` +
-        `${error.response.data?.error}`,
+        `[${handlerName}] {${stepName}}: ` + `${error.response.data?.error}`,
       );
-      throw new Error(
-        'Please complete your IIR profile',
-      );
+      throw new Error("Please complete your IIR profile");
     }
 
-    const stepName = config?.stepName ||
-      'Fetch My Appointments';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const stepName = config?.stepName || "Fetch My Appointments";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -79,17 +67,15 @@ export async function GetAllAppointments(
   config?: AxiosConfigWithMeta,
 ): Promise<PaginatedAppointmentsResponse> {
   try {
-    const response = await apiClient.get(
-      API_ROUTES.appointments.all,
-      { ...config, params },
-    );
+    const response = await apiClient.get(API_ROUTES.appointments.all, {
+      ...config,
+      params,
+    });
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetAllAppointments';
-    const stepName = config?.stepName || 'Fetch All Appointments';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetAllAppointments";
+    const stepName = config?.stepName || "Fetch All Appointments";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -105,17 +91,15 @@ export async function GetAppointmentStats(
   config?: AxiosConfigWithMeta,
 ): Promise<StatusCount[]> {
   try {
-    const response = await apiClient.get(
-      API_ROUTES.appointments.stats,
-      { ...config, params },
-    );
+    const response = await apiClient.get(API_ROUTES.appointments.stats, {
+      ...config,
+      params,
+    });
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetAppointmentStats';
-    const stepName = config?.stepName || 'Fetch Stats';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetAppointmentStats";
+    const stepName = config?.stepName || "Fetch Stats";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -137,11 +121,9 @@ export async function GetCalendarStats(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetCalendarStats';
-    const stepName = config?.stepName || 'Fetch Calendar Stats';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetCalendarStats";
+    const stepName = config?.stepName || "Fetch Calendar Stats";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -153,7 +135,7 @@ export async function GetCalendarStats(
  * @returns Appointment details
  */
 export async function GetAppointmentById(
-  id: number,
+  id: string,
   config?: AxiosConfigWithMeta,
 ): Promise<Appointment> {
   try {
@@ -163,11 +145,9 @@ export async function GetAppointmentById(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetAppointmentById';
-    const stepName = config?.stepName || 'Fetch Appointment';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetAppointmentById";
+    const stepName = config?.stepName || "Fetch Appointment";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -190,11 +170,9 @@ export async function GetAvailableSlots(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetAvailableSlots';
-    const stepName = config?.stepName || 'Fetch Available Slots';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetAvailableSlots";
+    const stepName = config?.stepName || "Fetch Available Slots";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -214,12 +192,9 @@ export async function GetAppointmentCategories(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName ||
-      'GetAppointmentCategories';
-    const stepName = config?.stepName || 'Fetch Categories';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetAppointmentCategories";
+    const stepName = config?.stepName || "Fetch Categories";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -239,12 +214,9 @@ export async function GetAppointmentStatuses(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName ||
-      'GetAppointmentStatuses';
-    const stepName = config?.stepName || 'Fetch Statuses';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetAppointmentStatuses";
+    const stepName = config?.stepName || "Fetch Statuses";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -269,27 +241,19 @@ export async function PostAppointment(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName ||
-      'PostAppointment';
+    const handlerName = config?.handlerName || "PostAppointment";
 
     // Handle Day One student (403 Forbidden)
     if (error.response?.status === 403) {
-      const stepName = config?.stepName ||
-        'Check IIR Profile';
+      const stepName = config?.stepName || "Check IIR Profile";
       console.error(
-        `[${handlerName}] {${stepName}}: ` +
-        `${error.response.data?.error}`,
+        `[${handlerName}] {${stepName}}: ` + `${error.response.data?.error}`,
       );
-      throw new Error(
-        'Please complete your IIR profile',
-      );
+      throw new Error("Please complete your IIR profile");
     }
 
-    const stepName = config?.stepName ||
-      'Submit Appointment';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const stepName = config?.stepName || "Submit Appointment";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -302,7 +266,7 @@ export async function PostAppointment(
  * @returns Updated appointment
  */
 export async function PatchAppointmentStatus(
-  id: number,
+  id: string,
   status: AppointmentStatus,
   config?: AxiosConfigWithMeta,
 ): Promise<Appointment> {
@@ -314,12 +278,9 @@ export async function PatchAppointmentStatus(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName ||
-      'PatchAppointmentStatus';
-    const stepName = config?.stepName || 'Update Status';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "PatchAppointmentStatus";
+    const stepName = config?.stepName || "Update Status";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -332,7 +293,7 @@ export async function PatchAppointmentStatus(
  * @returns Updated appointment
  */
 export async function PatchAppointment(
-  id: number,
+  id: string,
   data: Appointment,
   config?: AxiosConfigWithMeta,
 ): Promise<Appointment> {
@@ -344,11 +305,9 @@ export async function PatchAppointment(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'PatchAppointment';
-    const stepName = config?.stepName || 'Update Appointment';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "PatchAppointment";
+    const stepName = config?.stepName || "Update Appointment";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }

@@ -63,7 +63,7 @@ export function validateNumericFields(formData: IIRForm): string[] {
  */
 export function transformFormToPayload(formData: IIRForm): any {
   return {
-    iirId: formData.id,
+    iirId: "",
     student: {
       basicInfo: {
         email: formData.student.basicInfo.email,
@@ -116,18 +116,19 @@ export function transformFormToPayload(formData: IIRForm): any {
           address: {
             ...formData.student.personalInfo.emergencyContact.address,
             regionCode: parseNullSafely(
-              formData.student.personalInfo.emergencyContact.address.region?.code,
+              formData.student.personalInfo.emergencyContact.address.region
+                ?.code,
             ),
             provinceCode: parseNullSafely(
-              formData.student.personalInfo.emergencyContact.address
-                .province?.code,
+              formData.student.personalInfo.emergencyContact.address.province
+                ?.code,
             ),
             cityCode: parseNullSafely(
               formData.student.personalInfo.emergencyContact.address.city?.code,
             ),
             barangayCode: parseNullSafely(
-              formData.student.personalInfo.emergencyContact.address
-                .barangay?.code,
+              formData.student.personalInfo.emergencyContact.address.barangay
+                ?.code,
             ),
           },
         },
@@ -137,18 +138,10 @@ export function transformFormToPayload(formData: IIRForm): any {
         addressType: addr.addressType,
         address: {
           ...addr.address,
-          regionCode: parseNullSafely(
-            addr.address.region?.code,
-          ),
-          provinceCode: parseNullSafely(
-            addr.address.province?.code,
-          ),
-          cityCode: parseNullSafely(
-            addr.address.city?.code,
-          ),
-          barangayCode: parseNullSafely(
-            addr.address.barangay?.code,
-          ),
+          regionCode: parseNullSafely(addr.address.region?.code),
+          provinceCode: parseNullSafely(addr.address.province?.code),
+          cityCode: parseNullSafely(addr.address.city?.code),
+          barangayCode: parseNullSafely(addr.address.barangay?.code),
         },
       })),
     },
@@ -296,7 +289,7 @@ function parseNumberSafely(val: any): number | undefined {
  * Converts empty strings to null for nullable fields
  */
 function parseNullSafely(val: any): string | null {
-  return (val && String(val).trim() !== "") ? val : null;
+  return val && String(val).trim() !== "" ? val : null;
 }
 
 /**

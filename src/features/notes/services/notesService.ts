@@ -13,7 +13,7 @@ import { SignificantNote, CreateNoteRequest } from "../types/types";
  * @returns Promise resolving to array of notes
  */
 export const getStudentNotes = async (
-  iirId: number,
+  iirId: string,
   config?: AxiosConfigWithMeta,
 ): Promise<SignificantNote[]> => {
   try {
@@ -38,7 +38,7 @@ export const getStudentNotes = async (
  * @returns Promise resolving when note is created
  */
 export const createNote = async (
-  iirId: number,
+  iirId: string,
   noteData: CreateNoteRequest,
   config?: AxiosConfigWithMeta,
 ): Promise<void> => {

@@ -19,7 +19,7 @@ import { useDownloadAttachment } from "../hooks/useDownloadAttachment";
 import { useGetAttachmentPreview } from "../hooks/useGetAttachmentPreview";
 
 interface SlipAttachmentsGridProps {
-  slipId: number;
+  slipId: string;
   files: SlipAttachment[];
 }
 
@@ -36,7 +36,7 @@ function PreviewModal({
   isPdfFile,
 }: {
   file: SlipAttachment;
-  slipId: number;
+  slipId: string;
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
   onDownload: () => void;
@@ -134,7 +134,7 @@ function AttachmentItem({
   getFileExtension,
   getFileName,
 }: {
-  slipId: number;
+  slipId: string;
   file: SlipAttachment;
   index: number;
   onPreview: (file: SlipAttachment) => void;

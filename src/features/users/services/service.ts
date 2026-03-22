@@ -12,21 +12,14 @@ import { User } from "@/features/users/types/user";
  * @param config - Axios config with logging metadata
  * @returns Current user data
  */
-export async function GetMe(
-  config?: AxiosConfigWithMeta,
-): Promise<User> {
+export async function GetMe(config?: AxiosConfigWithMeta): Promise<User> {
   try {
-    const response = await apiClient.get(
-      API_ROUTES.auth.me,
-      config,
-    );
+    const response = await apiClient.get(API_ROUTES.auth.me, config);
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetMe';
-    const stepName = config?.stepName || 'Fetch User';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetMe";
+    const stepName = config?.stepName || "Fetch User";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -38,7 +31,7 @@ export async function GetMe(
  * @returns User data
  */
 export async function GetUserById(
-  userId: number,
+  userId: string,
   config?: AxiosConfigWithMeta,
 ): Promise<User> {
   try {
@@ -48,11 +41,9 @@ export async function GetUserById(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetUserById';
-    const stepName = config?.stepName || 'Fetch User';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetUserById";
+    const stepName = config?.stepName || "Fetch User";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }

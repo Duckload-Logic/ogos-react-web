@@ -48,7 +48,7 @@ export async function PostNote(
  * @throws Error on 403 (Day One student) or other failures
  */
 export async function GetNotesByIirId(
-  iirId: number,
+  iirId: string,
   config?: AxiosConfigWithMeta,
 ): Promise<SignificantNote[]> {
   try {

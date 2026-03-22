@@ -14,18 +14,14 @@ const NotFound = () => {
     );
   }, [location.pathname]);
 
-  const userRoleId = user?.role?.id || 1;
-  let homeRoute = ROLE_ROUTES[
-    userRoleId as keyof typeof ROLE_ROUTES
-  ];
+  const userRole = user?.roles?.[0]?.toLowerCase() || "guest";
+  let homeRoute = ROLE_ROUTES[userRole as keyof typeof ROLE_ROUTES];
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">404</h1>
-        <p className="text-xl text-gray-600 mb-4">
-          Oops! Page not found
-        </p>
+        <p className="text-xl text-gray-600 mb-4">Oops! Page not found</p>
         <a
           href={homeRoute}
           className="text-blue-500 hover:text-blue-700 underline"

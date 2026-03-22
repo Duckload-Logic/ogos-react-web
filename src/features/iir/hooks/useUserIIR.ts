@@ -3,11 +3,9 @@ import { GetIIRByUserId } from "../services/service";
 import { QUERY_KEYS } from "@/config/queryKeys";
 import { CACHE_TIMING } from "@/config/constants";
 
-export function useUserIIR(userID?: number) {
+export function useUserIIR(userID?: string) {
   return useQuery({
-    queryKey: QUERY_KEYS.iir.inventory.byUserId(
-      userID || 0,
-    ),
+    queryKey: QUERY_KEYS.iir.inventory.byUserId(userID || ""),
     queryFn: async () => {
       if (!userID) return null;
 

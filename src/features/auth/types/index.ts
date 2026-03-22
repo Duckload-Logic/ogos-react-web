@@ -10,7 +10,7 @@ export type {
 } from "./idp";
 
 export {
-  ROLE_ROUTES,
+  // ROLE_ROUTES,
   IDP_ERROR_MESSAGES,
   ERROR_DISMISS_TIMEOUT,
   IDP_BUTTON_TEXT,

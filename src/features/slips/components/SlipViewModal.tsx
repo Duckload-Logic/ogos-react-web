@@ -57,7 +57,7 @@ export function SlipViewModal({
   const [actionType, setActionType] = useState<ActionType>(null);
   const [reason, setReason] = useState("");
   const [isConfirming, setIsConfirming] = useState(false);
-  const { data: attachments } = useGetSlipAttachments(Number(slip?.id));
+  const { data: attachments } = useGetSlipAttachments(slip?.id || "");
 
   if (!slip) return null;
 
@@ -265,7 +265,7 @@ export function SlipViewModal({
                       Attachments
                     </p>
                     <SlipAttachmentsGrid
-                      slipId={slip.id || 0}
+                      slipId={slip.id || ""}
                       files={attachments}
                     />
                   </CardContent>

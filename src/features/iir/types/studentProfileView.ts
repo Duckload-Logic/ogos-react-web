@@ -1,6 +1,6 @@
 export interface IIRProfileView {
-  iirId: number;
-  userId: number;
+  iirId: string;
+  userId: string;
   studentNumber: string;
   firstName: string;
   middleName?: string;

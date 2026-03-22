@@ -25,8 +25,8 @@ export const QUERY_KEYS = {
     all: ["slips"] as const,
     mySlips: ["slips", "me"] as const,
     stats: ["slips", "stats"] as const,
-    byId: (id: number) => ["slips", "id", id] as const,
-    attachments: (id: number) => ["slips", "id", id, "attachments"] as const,
+    byId: (id: string) => ["slips", "id", id] as const,
+    attachments: (id: string) => ["slips", "id", id, "attachments"] as const,
     lookups: {
       statuses: ["slips", "lookups", "statuses"] as const,
       categories: ["slips", "lookups", "categories"] as const,
@@ -110,10 +110,10 @@ export const QUERY_KEYS = {
     },
     inventory: {
       all: ["iir", "inventory", "all"] as const,
-      byUserId: (userId: number) =>
+      byUserId: (userId: string) =>
         ["iir", "inventory", "user", userId] as const,
-      byIirId: (iirId: number) => ["iir", "inventory", "iir", iirId] as const,
-      profile: (iirId: number) =>
+      byIirId: (iirId: string) => ["iir", "inventory", "iir", iirId] as const,
+      profile: (iirId: string) =>
         ["iir", "inventory", "profile", iirId] as const,
     },
     draft: ["iir", "draft"] as const,
@@ -124,7 +124,7 @@ export const QUERY_KEYS = {
    */
   notes: {
     all: ["notes"] as const,
-    byIirId: (iirId: number) => ["notes", "iir", iirId] as const,
+    byIirId: (iirId: string) => ["notes", "iir", iirId] as const,
   },
 
   /**
