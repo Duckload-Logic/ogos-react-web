@@ -24,6 +24,17 @@ export const ProtectedRoute = ({
 }: ProtectedRouteProps) => {
   const { user, isLoading, isAuthenticated } = useAuth();
 
+  // Diagnostic logging to catch "invalid" state
+  if (!isLoading) {
+    console.log("[ProtectedRoute] {Diagnostic}:", {
+      isAuthenticated,
+      userExists: !!user,
+      hasRoles: user?.roles?.length > 0,
+      firstName: user?.firstName,
+      id: user?.id,
+    });
+  }
+
   /**
    * While loading, show spinner instead of redirecting
    * This prevents redirect loops during page refresh
