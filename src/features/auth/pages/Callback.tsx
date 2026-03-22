@@ -119,7 +119,7 @@ export default function Callback() {
    */
   useEffect(() => {
     if (error) {
-      console.debug("[AuthCallback] {Error}:", error);
+      console.error("[AuthCallback] {Error}:", error);
       const timeoutId = setTimeout(() => {
         navigate("/login", { replace: true });
       }, ERROR_DISMISS_TIMEOUT);
