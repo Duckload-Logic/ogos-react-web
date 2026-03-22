@@ -27,6 +27,7 @@ import IIRProfile from "@/features/iir/pages/IIRProfile";
 import IIRForm from "@/features/iir/pages/IIRForm";
 import { CreateAppointment } from "@/features/appointments";
 import StatementPage from "@/features/consents/pages/StatementPage";
+import Profile from "@/features/users/pages/Profile";
 
 // Super Admin Feature
 import {
@@ -127,6 +128,16 @@ export const routes: RouteObject[] = [
       </ProtectedRoute>
     ),
   },
+  {
+    path: "/student/iir",
+    element: (
+      <ProtectedRoute requiredRole="student">
+        <Layout title="My IIR Profile">
+          <IIRProfile />
+        </Layout>
+      </ProtectedRoute>
+    ),
+  },
 
   // Admin routes
   {
@@ -206,6 +217,22 @@ export const routes: RouteObject[] = [
         <Layout title="Analytics">
           <Analytics />
         </Layout>
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/profile",
+    element: (
+      <ProtectedRoute>
+        <Profile />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/admin/profile",
+    element: (
+      <ProtectedRoute requiredRole="admin">
+        <Profile />
       </ProtectedRoute>
     ),
   },

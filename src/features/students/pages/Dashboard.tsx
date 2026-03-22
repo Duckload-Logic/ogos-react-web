@@ -15,6 +15,7 @@ import {
   FileText,
   ClipboardList,
   ArrowRight,
+  User,
 } from "lucide-react";
 import { useMe } from "@/features/users/hooks/useMe";
 import { useUserIIR } from "@/features/iir/hooks/useUserIIR";
@@ -51,6 +52,13 @@ const QUICK_ACTIONS: QuickAction[] = [
     icon: FileText,
     to: "/student/slips",
     color: "text-orange-600 bg-orange-50",
+  },
+  {
+    title: "My IIR Profile",
+    description: "View your personal record",
+    icon: User,
+    to: "/student/iir",
+    color: "text-rose-600 bg-rose-50",
   },
 ];
 

@@ -20,20 +20,20 @@ const toNumber = (value: unknown): number => {
 const normalizeIIRPayload = (iir: IIRForm) => {
   const activities = Array.isArray(iir.interests?.activities)
     ? iir.interests.activities.map((activity) => ({
-        id: activity.id,
-        activityOption: activity.activityOption,
-        otherSpecification: activity.otherSpecification,
-        role: activity.role,
-        roleSpecification: activity.roleSpecification,
-      }))
+      id: activity.id,
+      activityOption: activity.activityOption,
+      otherSpecification: activity.otherSpecification,
+      role: activity.role,
+      roleSpecification: activity.roleSpecification,
+    }))
     : [];
 
   const schools = Array.isArray(iir.education?.schools)
     ? iir.education.schools.map((school) => ({
-        ...school,
-        yearStarted: toNumber(school.yearStarted),
-        yearCompleted: toNumber(school.yearCompleted),
-      }))
+      ...school,
+      yearStarted: toNumber(school.yearStarted),
+      yearCompleted: toNumber(school.yearCompleted),
+    }))
     : [];
 
   const addresses = Array.isArray(iir.student?.addresses)
@@ -80,9 +80,9 @@ const normalizeIIRPayload = (iir: IIRForm) => {
         : [],
       hobbies: Array.isArray(iir.interests?.hobbies)
         ? iir.interests.hobbies.map((hobby) => ({
-            ...hobby,
-            priorityRank: toNumber(hobby.priorityRank),
-          }))
+          ...hobby,
+          priorityRank: toNumber(hobby.priorityRank),
+        }))
         : [],
     },
     // testResults: Array.isArray(iir.testResults) ? iir.testResults : []
@@ -132,6 +132,7 @@ const INVENTORY_GET_ROUTES = {
   listStudents: API_ROUTES.iir.inventory.all,
   iirByUserID: (userId: string) => API_ROUTES.iir.inventory.byUserId(userId),
   iirByIIRID: (iirID: string) => API_ROUTES.iir.inventory.byIirId(iirID),
+  profileByMe: API_ROUTES.iir.inventory.profileByMe,
   IIRProfile: (iirID: string) => API_ROUTES.iir.inventory.profile(iirID),
   enrollmentReasons: (iirID: string) =>
     API_ROUTES.iir.inventory.enrollmentReasons(iirID),
@@ -229,6 +230,29 @@ export const GetIIRByUserId = async (
   } catch (error) {
     const handlerName = config?.handlerName || "GetIIRByUserId";
     const stepName = config?.stepName || "Fetch IIR by User";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+    throw error;
+  }
+};
+
+/**
+ * Get IIR record by session
+ * @param sessionID - Session ID to fetch
+ * @param config - Optional axios config with metadata
+ * @returns Promise resolving to IIR record
+ */
+export const GetIIRByMe = async (
+  config?: AxiosConfigWithMeta,
+) => {
+  try {
+    const { data } = await apiClient.get(
+      INVENTORY_GET_ROUTES.profileByMe,
+      config,
+    );
+    return data;
+  } catch (error) {
+    const handlerName = config?.handlerName || "GetIIRBySessionId";
+    const stepName = config?.stepName || "Fetch IIR by Session";
     console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }

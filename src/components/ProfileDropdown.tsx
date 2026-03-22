@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
 interface ProfileDropdownProps {
   firstName?: string;
+  middleName?: string;
   lastName?: string;
   roleLabel: string;
 
@@ -18,6 +19,7 @@ interface ProfileDropdownProps {
 
 export default function ProfileDropdown({
   firstName,
+  middleName,
   lastName,
   roleLabel,
   section,
@@ -90,7 +92,7 @@ export default function ProfileDropdown({
               </Avatar>
               <div>
                 <p className="text-sm font-semibold">
-                  {firstName} {lastName}
+                  {firstName} {middleName ? middleName[0] + "." : ""} {lastName}
                 </p>
 
                 {section && studentNumber ? (

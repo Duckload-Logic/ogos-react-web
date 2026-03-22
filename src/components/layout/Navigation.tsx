@@ -153,7 +153,7 @@ function MobileSettingsContent({
       {/* Profile Section */}
       <div
         onClick={() => {
-          navigate("/admin/profile");
+          navigate("/profile");
           closeDrawer();
         }}
         className="flex items-center gap-4 p-2"

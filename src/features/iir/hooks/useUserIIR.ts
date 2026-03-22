@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { GetIIRByUserId } from "../services/service";
+import { GetIIRByMe, GetIIRByUserId } from "../services/service";
 import { QUERY_KEYS } from "@/config/queryKeys";
 import { CACHE_TIMING } from "@/config/constants";
 

@@ -11,6 +11,7 @@ import {
   Shield,
   Server,
   ClipboardList,
+  User,
 } from "lucide-react";
 
 export interface NavItem {
@@ -73,6 +74,11 @@ export const NAV_CONFIG: Record<string, NavItem[]>[] = [
         label: "Admission Slips",
         href: "/student/slips",
         icon: <FileText size={ICON_SIZE} />,
+      },
+      {
+        label: "IIR Profile",
+        href: "/student/iir",
+        icon: <User size={ICON_SIZE} />,
       },
     ],
   },

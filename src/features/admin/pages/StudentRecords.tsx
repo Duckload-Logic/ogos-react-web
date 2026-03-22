@@ -123,10 +123,7 @@ export default function StudentRecords() {
               students={allStudents}
               isStudentsLoading={isStudentsLoading}
               onViewClick={(student) => {
-                const hashedId = encodeURIComponent(
-                  hashId(String(student.iirId)),
-                );
-                navigate(`/admin/student-records/${hashedId}`, {
+                navigate(`/admin/student-records/${student.iirId}`, {
                   state: { student },
                 });
               }}

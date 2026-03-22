@@ -128,6 +128,7 @@ export const API_ROUTES = Object.freeze({
       byUserId: (userId: string) =>
         `/students/inventory/records/user/${userId}`,
       byIirId: (iirId: string) => `/students/inventory/records/iir/${iirId}`,
+      profileByMe: "/students/inventory/records/iir/me/profile",
       profile: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/profile`,
       enrollmentReasons: (iirId: string) =>

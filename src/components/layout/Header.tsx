@@ -64,9 +64,10 @@ export default function Header({
           <div className="hidden md:block">
             <ProfileDropdown
               firstName={user?.firstName}
+              middleName={user?.middleName}
               lastName={user?.lastName}
               roleLabel={getRoleLabel()}
-              profilePath="/admin/profile"
+              profilePath="/profile"
               onLogout={handleLogout}
             />
           </div>

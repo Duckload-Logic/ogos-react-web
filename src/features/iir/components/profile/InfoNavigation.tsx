@@ -26,14 +26,20 @@ const TABS: { id: TabId; label: string; icon: any }[] = [
 export default function InfoNavigation({
   activeTab,
   setActiveTab,
+  showSignificantNotes = true,
 }: {
   activeTab: TabId;
   setActiveTab: (tab: TabId) => void;
+  showSignificantNotes?: boolean;
 }) {
+  const filteredTabs = showSignificantNotes
+    ? TABS
+    : TABS.filter((tab) => tab.id !== "significantNotes");
+
   return (
     <div className="relative z-20 -mb-[2px]">
       <nav className="flex items-end gap-1 w-full sm:w-auto overflow-x-auto overflow-y-hidden sm:overflow-visible no-scrollbar ml-0 sm:ml-4">
-        {TABS.map((tab) => {
+        {filteredTabs.map((tab) => {
           const isActive = activeTab === tab.id;
 
           return (
