@@ -69,7 +69,7 @@ export function useUpdateAppointmentStatus() {
   const { data: me } = useMe({});
 
   return useMutation({
-    mutationFn: ({ id, status }: { id: number; status: AppointmentStatus }) =>
+    mutationFn: ({ id, status }: { id: string; status: AppointmentStatus }) =>
       appointmentService.PatchAppointmentStatus(id, status),
     onSuccess: () => {
       queryClient.invalidateQueries({
