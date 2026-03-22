@@ -2,11 +2,6 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context";
 import { LoadingSpinner } from "@/components/shared";
 
-const ROLE_MAP: { [key: number]: string } = {
-  1: "student",
-  2: "admin",
-  3: "superadmin",
-};
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -53,7 +48,7 @@ export const ProtectedRoute = ({
   /**
    * Check role-based access if required
    */
-  if (requiredRole && ROLE_MAP[user.role?.id || 0] !== requiredRole) {
+  if (requiredRole && !user.roles.some(r => r.toLowerCase().replace(" ", "") === requiredRole.toLowerCase().replace(" ", ""))) {
     return <Navigate to="/" replace />;
   }
 

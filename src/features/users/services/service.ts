@@ -17,7 +17,7 @@ export async function GetMe(
 ): Promise<User> {
   try {
     const response = await apiClient.get(
-      API_ROUTES.users.me,
+      API_ROUTES.auth.me,
       config,
     );
     return response.data;

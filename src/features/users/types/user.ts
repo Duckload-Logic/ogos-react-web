@@ -5,11 +5,12 @@ export interface UserRole {
 
 export interface User {
   id: string;
-  role: UserRole;
+  roles: string[];
   firstName: string;
   middleName?: string;
   lastName: string;
   email: string;
+  type: string;
   createdAt?: string;
   updatedAt?: string;
 }

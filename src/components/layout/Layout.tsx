@@ -2,7 +2,7 @@ import Header from "@/components/layout/Header";
 import NotificationModal from "@/components/notifications/NotificationModal";
 import AppFooter from "@/components/common/AppFooter";
 import Toast from "@/components/ui/Toast";
-import { NAV_CONFIG, roleMap } from "@/config/navigation";
+import { NAV_CONFIG } from "@/config/navigation";
 
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -38,7 +38,7 @@ export default function Layout({
   const currentPath = location.pathname;
   const isExcluded = excludedPaths.includes(currentPath);
   const mustAcceptTerms =
-    !sessionAccepted && !isExcluded && !!user && !isLoggedIn;
+    !sessionAccepted && !isExcluded && !!user && isLoggedIn;
 
   useEffect(() => {
     setTermsOpen(mustAcceptTerms);
@@ -90,9 +90,9 @@ export default function Layout({
   };
 
   const navigationItems = useMemo(() => {
-    if (!user || !user.role?.id) return [];
+    if (!user || user.roles.length === 0) return [];
 
-    const roleKey = roleMap[user.role.id];
+    const roleKey = user.roles[0]?.toLowerCase().replace(" ", "");
     if (!roleKey) return [];
 
     const roleData = NAV_CONFIG.find((config) => !!config[roleKey]);
@@ -102,13 +102,19 @@ export default function Layout({
 
   const getRoleLabel = () => {
     if (!user) return "";
-    if (user.role?.id === 3) return "Super Admin Account";
-    if (user.role?.id === 2) return "Admin Account";
+    if (user.roles.some((r) => r.toLowerCase().replace(" ", "") === "superadmin"))
+      return "Super Admin Account";
+    if (user.roles.some((r) => r.toLowerCase().replace(" ", "") === "admin"))
+      return "Admin Account";
     return "Student Account";
   };
 
-  const currentRole =
-    user?.role?.id === 2 || user?.role?.id === 3 ? "admin" : "student";
+  const currentRole = user?.roles.some((r) => {
+    const key = r.toLowerCase().replace(" ", "");
+    return key === "admin" || key === "superadmin";
+  })
+    ? "admin"
+    : "student";
 
   useEffect(() => {
     const node = contentRef.current;
@@ -160,11 +166,10 @@ export default function Layout({
 
         <div
           ref={contentRef}
-          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${
-            termsOpen
+          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${termsOpen
               ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
               : ""
-          }`}
+            }`}
         >
           <Header
             title={title}

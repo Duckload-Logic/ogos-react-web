@@ -45,7 +45,8 @@ export interface UserProfile {
   firstName: string;
   lastName: string;
   email: string;
-  roleId: number;
+  roles: string[];
+  type: string;
   createdAt: string;
 }
 
@@ -157,7 +158,7 @@ export const GetCurrentUser = async (
   config?: AxiosConfigWithMeta,
 ): Promise<UserProfile> => {
   try {
-    const { data } = await apiClient.get(API_ROUTES.users.me, config);
+    const { data } = await apiClient.get(API_ROUTES.auth.me, config);
     return data;
   } catch (error) {
     const handlerName = config?.handlerName || "GetCurrentUser";

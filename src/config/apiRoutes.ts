@@ -13,7 +13,6 @@ export const API_ROUTES = Object.freeze({
    * User-related endpoints
    */
   users: Object.freeze({
-    me: "/users/me",
     byId: (id: string) => `/users/${id}`,
   }),
 
@@ -97,6 +96,7 @@ export const API_ROUTES = Object.freeze({
    * Authentication related endpoints
    */
   auth: Object.freeze({
+    me: "/auth/me",
     login: "/auth/login",
     logout: "/auth/logout",
     refresh: "/auth/refresh",

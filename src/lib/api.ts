@@ -2,7 +2,7 @@ import axios, {
   AxiosError,
   InternalAxiosRequestConfig,
 } from "axios";
-import { decamelizeKeys } from "humps";
+import { decamelizeKeys, camelizeKeys } from "humps";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -43,7 +43,15 @@ apiClient.interceptors.request.use((config) => {
  * AuthProvider to handle session expiration.
  */
 apiClient.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    if (
+      response.data &&
+      response.headers["content-type"]?.includes("application/json")
+    ) {
+      response.data = camelizeKeys(response.data);
+    }
+    return response;
+  },
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosConfigWithMeta;
     const handlerName =

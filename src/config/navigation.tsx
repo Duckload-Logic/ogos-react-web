@@ -21,11 +21,6 @@ export interface NavItem {
 
 const ICON_SIZE = 20;
 
-export const roleMap: Record<number, string> = {
-  1: "student",
-  2: "admin",
-  3: "superadmin",
-};
 
 export const NAV_CONFIG: Record<string, NavItem[]>[] = [
   {
