@@ -57,7 +57,7 @@ export default function Callback() {
 
         // Use Same normalization as rest of app
         let roleKey = "student";
-        
+
         // Use returned data if available (OAuth)
         if (!isNative) {
           if (!code) {
@@ -119,6 +119,9 @@ export default function Callback() {
    */
   useEffect(() => {
     if (error) {
+      alert(
+        `[AuthCallback] {Error}: ${error}`,
+      );
       const timeoutId = setTimeout(() => {
         navigate("/login", { replace: true });
       }, ERROR_DISMISS_TIMEOUT);
