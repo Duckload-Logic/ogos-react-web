@@ -1,7 +1,7 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context";
 import { LoadingSpinner } from "@/components/shared";
-
+import { useMe } from "@/features/users/hooks/useMe";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -48,7 +48,14 @@ export const ProtectedRoute = ({
   /**
    * Check role-based access if required
    */
-  if (requiredRole && !user.roles.some(r => r.toLowerCase().replace(" ", "") === requiredRole.toLowerCase().replace(" ", ""))) {
+  if (
+    requiredRole &&
+    !user.roles.some(
+      (r) =>
+        r.toLowerCase().replace(" ", "") ===
+        requiredRole.toLowerCase().replace(" ", ""),
+    )
+  ) {
     return <Navigate to="/" replace />;
   }
 
