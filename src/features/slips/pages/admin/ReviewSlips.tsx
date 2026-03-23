@@ -16,6 +16,7 @@ import {
   type TimeFilter,
 } from "../../utils/dateFilters";
 import { useGetUrgentSlips } from "../../hooks/useGetUrgentSlips";
+import Layout from "@/components/layout/Layout";
 
 export default function ReviewSlips() {
   const navigate = useNavigate();
@@ -29,7 +30,7 @@ export default function ReviewSlips() {
   const debouncedSearch = useDebounce(searchTerm, 500);
   const dateRange = useMemo(() => getDateRange(timeFilter), [timeFilter]);
 
-  const { data: slipStats } = useGetSlipStats({
+  const { data: slipStats, isLoading: isStatsLoading } = useGetSlipStats({
     params: {
       startDate: dateRange.startDate,
       endDate: dateRange.endDate,
@@ -132,7 +133,7 @@ export default function ReviewSlips() {
     setIsModalOpen(true);
   };
 
-  const handleApprove = (id: number) => {
+  const handleApprove = (id: string) => {
     updateSlipStatus(
       { id, status: "Approved" },
       {
@@ -144,7 +145,7 @@ export default function ReviewSlips() {
     );
   };
 
-  const handleReject = (id: number, reason: string) => {
+  const handleReject = (id: string, reason: string) => {
     updateSlipStatus(
       { id, status: "Rejected", adminNotes: reason },
       {
@@ -156,7 +157,7 @@ export default function ReviewSlips() {
     );
   };
 
-  const handleForRevision = (id: number, reason: string) => {
+  const handleForRevision = (id: string, reason: string) => {
     updateSlipStatus(
       { id, status: "For Revision", adminNotes: reason },
       {
@@ -174,154 +175,161 @@ export default function ReviewSlips() {
   const statCardBase =
     "overflow-hidden rounded-2xl border bg-card text-card-foreground shadow-sm";
 
-  return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 space-y-4 duration-300 lg:space-y-5">
-      <div className="rounded-lg border border-blue-300 bg-blue-500/10 px-4 py-3.5 shadow-sm">
-        <p className="text-sm text-blue-600">
-          <strong>Note:</strong> Students request excuse slips in their portal.
-          This page allows you to review, approve, reject, or request revisions
-          for those slips.
-        </p>
-      </div>
+  const isPageLoading = isStatsLoading || isLoading || isUpdating;
 
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-        <div className="space-y-0.5">
-          <h1 className="text-2xl font-bold tracking-tight text-foreground lg:text-[2rem]">
-            Review Excuse Slips
-          </h1>
-          <p className="text-sm text-muted-foreground">
-            Review submissions, filter the queue, and process student requests.
+  return (
+    <Layout
+      title="Review Excuse Slips"
+      isLoading={isPageLoading}
+    >
+      <div className="animate-in fade-in slide-in-from-bottom-4 space-y-4 duration-300 lg:space-y-5">
+        <div className="rounded-lg border border-blue-300 bg-blue-500/10 px-4 py-3.5 shadow-sm">
+          <p className="text-sm text-blue-600">
+            <strong>Note:</strong> Students request excuse slips in their portal.
+            This page allows you to review, approve, reject, or request revisions
+            for those slips.
           </p>
         </div>
 
-        <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
-          {(["today", "week", "month"] as TimeFilter[]).map((filter) => (
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
+          <div className="space-y-0.5">
+            <h1 className="text-2xl font-bold tracking-tight text-foreground lg:text-[2rem]">
+              Review Excuse Slips
+            </h1>
+            <p className="text-sm text-muted-foreground">
+              Review submissions, filter the queue, and process student requests.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
+            {(["today", "week", "month"] as TimeFilter[]).map((filter) => (
+              <Button
+                key={filter}
+                variant={timeFilter === filter ? "default" : "outline"}
+                onClick={() => {
+                  setTimeFilter(filter);
+                  setCurrentPage(1);
+                }}
+                className={controlClass}
+              >
+                {getFilterLabel(filter)}
+              </Button>
+            ))}
+
             <Button
-              key={filter}
-              variant={timeFilter === filter ? "default" : "outline"}
-              onClick={() => {
-                setTimeFilter(filter);
-                setCurrentPage(1);
-              }}
-              className={controlClass}
+              variant="outline"
+              onClick={() => navigate("/admin/admission-slips/logs")}
+              className={`${controlClass} gap-2`}
             >
-              {getFilterLabel(filter)}
+              <Archive className="h-4 w-4" />
+              View All Logs
             </Button>
-          ))}
-
-          <Button
-            variant="outline"
-            onClick={() => navigate("/admin/admission-slips/logs")}
-            className={`${controlClass} gap-2`}
-          >
-            <Archive className="h-4 w-4" />
-            View All Logs
-          </Button>
+          </div>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 gap-3.5 xl:grid-cols-12">
-        <Card
-          className={`${statCardBase} xl:col-span-4 ${pendingCard.tone.border}`}
-        >
-          <CardContent className="flex min-h-[156px] flex-col justify-between p-5">
-            <div className="flex items-start justify-between gap-3">
-              <div className="space-y-1">
-                <p className={`text-sm font-semibold ${pendingCard.tone.label}`}>
-                  {pendingCard.title}
-                </p>
-                <p className="max-w-[34ch] text-sm text-muted-foreground">
-                  {pendingCard.helperText}
-                </p>
+        <div className="grid grid-cols-1 gap-3.5 xl:grid-cols-12">
+          <Card
+            className={`${statCardBase} xl:col-span-4 ${pendingCard.tone.border}`}
+          >
+            <CardContent className="flex min-h-[156px] flex-col justify-between p-5">
+              <div className="flex items-start justify-between gap-3">
+                <div className="space-y-1">
+                  <p className={`text-sm font-semibold ${pendingCard.tone.label}`}>
+                    {pendingCard.title}
+                  </p>
+                  <p className="max-w-[34ch] text-sm text-muted-foreground">
+                    {pendingCard.helperText}
+                  </p>
+                </div>
+
+                <Badge
+                  variant="outline"
+                  className={`whitespace-nowrap rounded-full ${pendingCard.tone.badge}`}
+                >
+                  {getFilterLabel(timeFilter)}
+                </Badge>
               </div>
 
-              <Badge
-                variant="outline"
-                className={`whitespace-nowrap rounded-full ${pendingCard.tone.badge}`}
-              >
-                {getFilterLabel(timeFilter)}
-              </Badge>
-            </div>
+              <div className="space-y-1.5">
+                <p
+                  className={`text-4xl font-bold tracking-tight lg:text-5xl ${pendingCard.tone.value}`}
+                >
+                  {pendingCard.value}
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  {pendingCard.value === 1 ? "slip" : "slips"} awaiting review
+                </p>
+              </div>
+            </CardContent>
+          </Card>
 
-            <div className="space-y-1.5">
-              <p
-                className={`text-4xl font-bold tracking-tight lg:text-5xl ${pendingCard.tone.value}`}
-              >
-                {pendingCard.value}
-              </p>
-              <p className="text-sm text-muted-foreground">
-                {pendingCard.value === 1 ? "slip" : "slips"} awaiting review
-              </p>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:col-span-8 xl:grid-cols-3">
+            {otherCards.map((card) => {
+              const Icon = card.icon;
 
-        <div className="grid grid-cols-1 gap-3.5 sm:grid-cols-2 xl:col-span-8 xl:grid-cols-3">
-          {otherCards.map((card) => {
-            const Icon = card.icon;
+              return (
+                <Card
+                  key={card.key}
+                  className={`${statCardBase} ${card.tone.border}`}
+                >
+                  <CardContent className="flex min-h-[156px] flex-col justify-between p-5">
+                    <div className="flex items-start justify-between gap-3">
+                      <div className="space-y-1">
+                        <p className={`text-sm font-semibold ${card.tone.label}`}>
+                          {card.label}
+                        </p>
+                        <p className="max-w-[22ch] text-sm text-muted-foreground">
+                          {card.helperText}
+                        </p>
+                      </div>
 
-            return (
-              <Card
-                key={card.key}
-                className={`${statCardBase} ${card.tone.border}`}
-              >
-                <CardContent className="flex min-h-[156px] flex-col justify-between p-5">
-                  <div className="flex items-start justify-between gap-3">
-                    <div className="space-y-1">
-                      <p className={`text-sm font-semibold ${card.tone.label}`}>
-                        {card.label}
-                      </p>
-                      <p className="max-w-[22ch] text-sm text-muted-foreground">
-                        {card.helperText}
-                      </p>
+                      <div
+                        className={`flex h-11 w-11 items-center justify-center rounded-xl ${card.tone.iconWrap}`}
+                      >
+                        <Icon className={`h-5 w-5 ${card.tone.icon}`} />
+                      </div>
                     </div>
 
-                    <div
-                      className={`flex h-11 w-11 items-center justify-center rounded-xl ${card.tone.iconWrap}`}
-                    >
-                      <Icon className={`h-5 w-5 ${card.tone.icon}`} />
+                    <div className="flex items-end justify-between gap-3">
+                      <p
+                        className={`text-4xl font-bold leading-none lg:text-5xl ${card.tone.value}`}
+                      >
+                        {card.value}
+                      </p>
+                      <span className="text-xs text-muted-foreground">total</span>
                     </div>
-                  </div>
-
-                  <div className="flex items-end justify-between gap-3">
-                    <p
-                      className={`text-4xl font-bold leading-none lg:text-5xl ${card.tone.value}`}
-                    >
-                      {card.value}
-                    </p>
-                    <span className="text-xs text-muted-foreground">total</span>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
         </div>
+
+        <SlipsList
+          slips={slips}
+          isLoading={isLoading}
+          onViewClick={handleViewSlip}
+          searchTerm={searchTerm}
+          onSearchChange={(value: string) => {
+            setSearchTerm(value);
+            setCurrentPage(1);
+          }}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          totalPages={totalPages}
+        />
+
+        <SlipViewModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          slip={selectedSlip}
+          isAdmin={true}
+          onApprove={handleApprove}
+          onReject={handleReject}
+          onForRevision={handleForRevision}
+          isLoading={isUpdating}
+        />
       </div>
-
-      <SlipsList
-        slips={slips}
-        isLoading={isLoading}
-        onViewClick={handleViewSlip}
-        searchTerm={searchTerm}
-        onSearchChange={(value: string) => {
-          setSearchTerm(value);
-          setCurrentPage(1);
-        }}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-        totalPages={totalPages}
-      />
-
-      <SlipViewModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        slip={selectedSlip}
-        isAdmin={true}
-        onApprove={handleApprove}
-        onReject={handleReject}
-        onForRevision={handleForRevision}
-        isLoading={isUpdating}
-      />
-    </div>
+    </Layout>
   );
 }

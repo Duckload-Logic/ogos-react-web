@@ -13,6 +13,6 @@ export function useUserIIR(userID?: string) {
     },
     staleTime: CACHE_TIMING.LONG.staleTime,
     gcTime: CACHE_TIMING.LONG.gcTime,
-    enabled: true,
+    enabled: !!userID,
   });
 }

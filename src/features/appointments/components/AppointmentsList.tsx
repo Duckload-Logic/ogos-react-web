@@ -7,6 +7,7 @@ import { useMemo } from "react";
 import { SearchInput } from "@/components/form";
 import { format12HourTime } from "../utils";
 import { formatDate } from "@/features/schedules/utils/formatters";
+import { LoadingSpinner } from "@/components/shared";
 
 interface AppointmentsListProps {
   title?: string;
@@ -48,7 +49,7 @@ export default function AppointmentsList({
     });
     return map;
   }, [statusCounts]);
-  
+
   return (
     <Card
       className={`border border-border shadow-sm lg:col-span-3 flex flex-col ${className || ""}`}
@@ -111,7 +112,9 @@ export default function AppointmentsList({
       <CardContent className="p-0 flex-1">
         {isLoading ? (
           <div className="flex min-h-[320px] items-center justify-center px-4 text-center">
-            <p className="text-muted-foreground">Loading appointments...</p>
+            <p className="text-muted-foreground">
+              <LoadingSpinner size="sm" message="Loading appointments" />
+            </p>
           </div>
         ) : appointments.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 px-4">

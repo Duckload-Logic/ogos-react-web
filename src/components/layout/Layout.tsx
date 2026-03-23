@@ -3,6 +3,7 @@ import NotificationModal from "@/components/notifications/NotificationModal";
 import AppFooter from "@/components/common/AppFooter";
 import Toast from "@/components/ui/Toast";
 import { NAV_CONFIG } from "@/config/navigation";
+import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
 
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
@@ -19,12 +20,14 @@ interface LayoutProps {
   children: React.ReactNode;
   title?: string;
   isLoggedIn?: boolean;
+  isLoading?: boolean;
 }
 
 export default function Layout({
   children,
   title,
   isLoggedIn = true,
+  isLoading = false,
 }: LayoutProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -218,7 +221,15 @@ export default function Layout({
                bg-cover bg-center bg-no-repeat opacity-[0.15] dark:opacity-10 transform-gpu"
               />
               <div className="relative z-10 flex h-full flex-col overflow-x-hidden overflow-y-auto">
-                <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
+                <main className="flex-1 p-4 md:p-6 lg:p-8">
+                  {isLoading ? (
+                    <div className="flex h-full w-full items-center justify-center">
+                      <LoadingSpinner size="lg" />
+                    </div>
+                  ) : (
+                    children
+                  )}
+                </main>
               </div>
             </div>
           </div>

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useStudentAnalytics } from "../hooks/useStudentAnalytics";
-import { LoadingSpinner } from "@/components/shared";
+import Layout from "@/components/layout/Layout";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, TrendingUp, Users, Percent } from "lucide-react";
 import { apiClient } from "@/lib/api";
@@ -29,10 +29,6 @@ export default function AnalyticsPage() {
   const [cityPage, setCityPage] = useState(0);
   const [educationPage, setEducationPage] = useState(0);
   const [statusPage, setStatusPage] = useState(0);
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
 
   if (error) {
     return (
@@ -337,445 +333,450 @@ export default function AnalyticsPage() {
   };
 
   return (
-    <div className="space-y-6 pb-8">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-        <div className="flex flex-col gap-1">
-          <h1 className="text-3xl font-bold text-foreground">Student Analytics</h1>
-          <p className="text-sm text-muted-foreground">
-            Comprehensive overview of student demographics and educational data
-          </p>
-        </div>
-        <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
-          {/* Year Filter */}
+    <Layout
+      title="Analytics"
+      isLoading={loading}
+    >
+      <div className="space-y-6 pb-8">
+        {/* Header */}
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div className="flex flex-col gap-1">
-            <label className="text-sm font-medium text-foreground">Filter by Year</label>
-            <select
-              value={selectedYear}
-              onChange={(e) => {
-                setSelectedYear(parseInt(e.target.value));
-                setReligionPage(0);
-                setCityPage(0);
-                setEducationPage(0);
-                setStatusPage(0);
-              }}
-              className="px-3 py-2 rounded-md border border-input bg-background text-foreground text-sm"
-            >
-              <option value={new Date().getFullYear()}>All Years</option>
-              {getAvailableYears().map((year) => (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              ))}
-            </select>
-          </div>
-        </div>
-      </div>
-
-      {/* Top KPI Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* Total Students */}
-        <div className={`${KPI_COLORS[0].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
-          <p className={`text-xs font-semibold ${KPI_COLORS[0].text} uppercase tracking-wide mb-3 opacity-80`}>
-            Total Students
-          </p>
-          <p className={`text-5xl font-bold ${KPI_COLORS[0].text} mb-2`}>
-            {filteredStudents.length.toLocaleString()}
-          </p>
-          <p className={`text-xs ${KPI_COLORS[0].text} opacity-70`}>
-            For selected year
-          </p>
-        </div>
-
-        {/* Average Age */}
-        <div className={`${KPI_COLORS[1].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
-          <p className={`text-xs font-semibold ${KPI_COLORS[1].text} uppercase tracking-wide mb-3 opacity-80`}>
-            Average Age
-          </p>
-          <p className={`text-5xl font-bold ${KPI_COLORS[1].text} mb-2`}>
-            {getAgeStats().avg}
-          </p>
-          <p className={`text-xs ${KPI_COLORS[1].text} opacity-70`}>
-            Range: {getAgeStats().min}-{getAgeStats().max} years
-          </p>
-        </div>
-
-        {/* Completion Rate */}
-        <div className={`${KPI_COLORS[2].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
-          <p className={`text-xs font-semibold ${KPI_COLORS[2].text} uppercase tracking-wide mb-3 opacity-80`}>
-            Data Completeness
-          </p>
-          <p className={`text-5xl font-bold ${KPI_COLORS[2].text} mb-2`}>
-            {Math.round(
-              ((filteredStudents.filter((s) => s.religion && s.addresses?.length).length /
-                filteredStudents.length) *
-                100) as any
-            )}
-            <span className="text-2xl">%</span>
-          </p>
-          <p className={`text-xs ${KPI_COLORS[2].text} opacity-70`}>
-            Religion + Address data
-          </p>
-        </div>
-
-        {/* With Addresses */}
-        <div className={`${KPI_COLORS[3].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
-          <p className={`text-xs font-semibold ${KPI_COLORS[3].text} uppercase tracking-wide mb-3 opacity-80`}>
-            Locations Mapped
-          </p>
-          <p className={`text-5xl font-bold ${KPI_COLORS[3].text} mb-2`}>
-            {filteredStudents.filter((s) => s.addresses?.length).length.toLocaleString()}
-          </p>
-          <p className="text-xs opacity-70">
-            Students with addresses
-          </p>
-        </div>
-      </div>
-
-      {/* Overview Charts - 2x2 Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Age Distribution Chart */}
-        <div className="bg-card rounded-md shadow border border-border p-6">
-          <h2 className="text-lg font-semibold text-card-foreground mb-4">
-            Age Distribution
-          </h2>
-          {getAgeDistributionData().some((d) => d.value > 0) ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={getAgeDistributionData()}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis dataKey="name" stroke="#6b7280" />
-                <YAxis stroke="#6b7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--background))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "6px",
-                  }}
-                  formatter={(value) => [value, "Students"]}
-                />
-                <Bar dataKey="value" fill={SOFT_COLORS[0]} radius={[8, 8, 0, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="text-muted-foreground text-center py-12">
-              No age data available
+            <h1 className="text-3xl font-bold text-foreground">Student Analytics</h1>
+            <p className="text-sm text-muted-foreground">
+              Comprehensive overview of student demographics and educational data
             </p>
-          )}
-        </div>
-
-        {/* Civil Status Chart */}
-        <div className="bg-card rounded-md shadow border border-border p-6">
-          <h2 className="text-lg font-semibold text-card-foreground mb-4">
-            Civil Status
-          </h2>
-          {getCivilStatusData().length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie
-                  data={getCivilStatusData()}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, value }) => `${name}: ${value}`}
-                  outerRadius={100}
-                  fill="#8884d8"
-                  dataKey="value"
-                >
-                  {getCivilStatusData().map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={SOFT_COLORS[index % SOFT_COLORS.length]} />
-                  ))}
-                </Pie>
-                <Tooltip formatter={(value) => [value, "Count"]} />
-              </PieChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="text-muted-foreground text-center py-12">
-              No civil status data available
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Breakdown Cards - 2x2 Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Religion Breakdown */}
-        <div className={`${STATUS_COLOR_MAP.info.bg} rounded-md shadow border border-border p-6`}>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.info.text}`}>
-              Religion Distribution
-            </h3>
-            <span className="text-xs font-medium opacity-70">({getReligionBreakdown().total})</span>
           </div>
-          <div className="space-y-2">
-            {getReligionBreakdown().data.length > 0 ? (
-              getReligionBreakdown().data.map(([religion, count]) => (
-                <div key={religion} className="flex justify-between items-center">
-                  <span className="text-sm">{religion}</span>
-                  <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.info.text}`}>
-                    {count}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm opacity-70">No data available</p>
-            )}
-          </div>
-          {getReligionBreakdown().pages > 1 && (
-            <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-              {Array.from({ length: getReligionBreakdown().pages }).map((_, page) => (
-                <button
-                  key={page}
-                  onClick={() => setReligionPage(page)}
-                  className={`px-2 py-1 text-xs rounded transition-colors ${
-                    religionPage === page
-                      ? `${STATUS_COLOR_MAP.info.bg} ${STATUS_COLOR_MAP.info.text}`
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
-                >
-                  {page + 1}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Location Breakdown */}
-        <div className={`${STATUS_COLOR_MAP.success.bg} rounded-md shadow border border-border p-6`}>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.success.text}`}>
-              Top Locations
-            </h3>
-            <span className="text-xs font-medium opacity-70">({getCityBreakdown().total})</span>
-          </div>
-          <div className="space-y-2">
-            {getCityBreakdown().data.length > 0 ? (
-              getCityBreakdown().data.map(([city, count]) => (
-                <div key={city} className="flex justify-between items-center">
-                  <span className="text-sm truncate">{city}</span>
-                  <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.success.text}`}>
-                    {count}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm opacity-70">No data available</p>
-            )}
-          </div>
-          {getCityBreakdown().pages > 1 && (
-            <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-              {Array.from({ length: getCityBreakdown().pages }).map((_, page) => (
-                <button
-                  key={page}
-                  onClick={() => setCityPage(page)}
-                  className={`px-2 py-1 text-xs rounded transition-colors ${
-                    cityPage === page
-                      ? `${STATUS_COLOR_MAP.success.bg} ${STATUS_COLOR_MAP.success.text}`
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
-                >
-                  {page + 1}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Education & Income Breakdown */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Father's Education */}
-        <div className={`${STATUS_COLOR_MAP.warning.bg} rounded-md shadow border border-border p-6`}>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.warning.text}`}>
-              Father's Education
-            </h3>
-            <span className="text-xs font-medium opacity-70">({getEducationBreakdown().total})</span>
-          </div>
-          <div className="space-y-2">
-            {getEducationBreakdown().data.length > 0 ? (
-              getEducationBreakdown().data.map(([education, count]) => (
-                <div key={education} className="flex justify-between items-center">
-                  <span className="text-sm">{education}</span>
-                  <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.warning.text}`}>
-                    {count}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm opacity-70">No data available</p>
-            )}
-          </div>
-          {getEducationBreakdown().pages > 1 && (
-            <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-              {Array.from({ length: getEducationBreakdown().pages }).map((_, page) => (
-                <button
-                  key={page}
-                  onClick={() => setEducationPage(page)}
-                  className={`px-2 py-1 text-xs rounded transition-colors ${
-                    educationPage === page
-                      ? `${STATUS_COLOR_MAP.warning.bg} ${STATUS_COLOR_MAP.warning.text}`
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
-                >
-                  {page + 1}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-
-        {/* Civil Status Breakdown */}
-        <div className={`${STATUS_COLOR_MAP.notice.bg} rounded-md shadow border border-border p-6`}>
-          <div className="flex justify-between items-center mb-4">
-            <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.notice.text}`}>
-              Civil Status Breakdown
-            </h3>
-            <span className="text-xs font-medium opacity-70">({getCivilStatusBreakdown().total})</span>
-          </div>
-          <div className="space-y-2">
-            {getCivilStatusBreakdown().data.length > 0 ? (
-              getCivilStatusBreakdown().data.map(([status, count]) => (
-                <div key={status} className="flex justify-between items-center">
-                  <span className="text-sm">{status}</span>
-                  <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.notice.text}`}>
-                    {count}
-                  </span>
-                </div>
-              ))
-            ) : (
-              <p className="text-sm opacity-70">No data available</p>
-            )}
-          </div>
-          {getCivilStatusBreakdown().pages > 1 && (
-            <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-              {Array.from({ length: getCivilStatusBreakdown().pages }).map((_, page) => (
-                <button
-                  key={page}
-                  onClick={() => setStatusPage(page)}
-                  className={`px-2 py-1 text-xs rounded transition-colors ${
-                    statusPage === page
-                      ? `${STATUS_COLOR_MAP.notice.bg} ${STATUS_COLOR_MAP.notice.text}`
-                      : "bg-muted text-muted-foreground hover:bg-muted/80"
-                  }`}
-                >
-                  {page + 1}
-                </button>
-              ))}
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Full Width Charts */}
-      <div className="grid grid-cols-1 gap-6">
-        {/* Religion Distribution Chart */}
-        <div className="bg-card rounded-md shadow border border-border p-6">
-          <h2 className="text-lg font-semibold text-card-foreground mb-4">
-            Religion Distribution
-          </h2>
-          {getReligionData().length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={getReligionData()}
-                layout="vertical"
-                margin={{ top: 5, right: 30, left: 150, bottom: 5 }}
+          <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
+            {/* Year Filter */}
+            <div className="flex flex-col gap-1">
+              <label className="text-sm font-medium text-foreground">Filter by Year</label>
+              <select
+                value={selectedYear}
+                onChange={(e) => {
+                  setSelectedYear(parseInt(e.target.value));
+                  setReligionPage(0);
+                  setCityPage(0);
+                  setEducationPage(0);
+                  setStatusPage(0);
+                }}
+                className="px-3 py-2 rounded-md border border-input bg-background text-foreground text-sm"
               >
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis type="number" stroke="#6b7280" />
-                <YAxis dataKey="name" type="category" width={150} stroke="#6b7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--background))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "6px",
-                  }}
-                  formatter={(value) => [value, "Students"]}
-                />
-                <Bar dataKey="value" fill={SOFT_COLORS[1]} radius={[0, 8, 8, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="text-muted-foreground text-center py-12">
-              No religion data available
-            </p>
-          )}
-        </div>
-      </div>
-
-      {/* Location & Income Charts */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Top Cities Chart */}
-        <div className="bg-card rounded-md shadow border border-border p-6">
-          <h2 className="text-lg font-semibold text-card-foreground mb-4">
-            Top Student Locations
-          </h2>
-          {getCityData().length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={getCityData()}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis
-                  dataKey="name"
-                  angle={-45}
-                  textAnchor="end"
-                  height={80}
-                  interval={0}
-                  tick={{ fontSize: 12, fill: "#6b7280" }}
-                />
-                <YAxis stroke="#6b7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--background))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "6px",
-                  }}
-                  formatter={(value) => [value, "Students"]}
-                />
-                <Bar dataKey="value" fill={SOFT_COLORS[2]} radius={[0, 8, 8, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="text-muted-foreground text-center py-12">
-              No location data available
-            </p>
-          )}
+                <option value={new Date().getFullYear()}>All Years</option>
+                {getAvailableYears().map((year) => (
+                  <option key={year} value={year}>
+                    {year}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
         </div>
 
-        {/* Monthly Income Chart */}
-        <div className="bg-card rounded-md shadow border border-border p-6">
-          <h2 className="text-lg font-semibold text-card-foreground mb-4">
-            Monthly Family Income Distribution
-          </h2>
-          {getIncomeData().length > 0 ? (
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={getIncomeData()}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                <XAxis
-                  dataKey="name"
-                  angle={-45}
-                  textAnchor="end"
-                  height={100}
-                  interval={0}
-                  tick={{ fontSize: 11, fill: "#6b7280" }}
-                />
-                <YAxis stroke="#6b7280" />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--background))",
-                    border: "1px solid hsl(var(--border))",
-                    borderRadius: "6px",
-                  }}
-                  formatter={(value) => [value, "Students"]}
-                />
-                <Bar dataKey="value" fill={SOFT_COLORS[3]} radius={[0, 8, 8, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
-          ) : (
-            <p className="text-muted-foreground text-center py-12">
-              No income data available
+        {/* Top KPI Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {/* Total Students */}
+          <div className={`${KPI_COLORS[0].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
+            <p className={`text-xs font-semibold ${KPI_COLORS[0].text} uppercase tracking-wide mb-3 opacity-80`}>
+              Total Students
             </p>
-          )}
+            <p className={`text-5xl font-bold ${KPI_COLORS[0].text} mb-2`}>
+              {filteredStudents.length.toLocaleString()}
+            </p>
+            <p className={`text-xs ${KPI_COLORS[0].text} opacity-70`}>
+              For selected year
+            </p>
+          </div>
+
+          {/* Average Age */}
+          <div className={`${KPI_COLORS[1].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
+            <p className={`text-xs font-semibold ${KPI_COLORS[1].text} uppercase tracking-wide mb-3 opacity-80`}>
+              Average Age
+            </p>
+            <p className={`text-5xl font-bold ${KPI_COLORS[1].text} mb-2`}>
+              {getAgeStats().avg}
+            </p>
+            <p className={`text-xs ${KPI_COLORS[1].text} opacity-70`}>
+              Range: {getAgeStats().min}-{getAgeStats().max} years
+            </p>
+          </div>
+
+          {/* Completion Rate */}
+          <div className={`${KPI_COLORS[2].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
+            <p className={`text-xs font-semibold ${KPI_COLORS[2].text} uppercase tracking-wide mb-3 opacity-80`}>
+              Data Completeness
+            </p>
+            <p className={`text-5xl font-bold ${KPI_COLORS[2].text} mb-2`}>
+              {Math.round(
+                ((filteredStudents.filter((s) => s.religion && s.addresses?.length).length /
+                  filteredStudents.length) *
+                  100) as any
+              )}
+              <span className="text-2xl">%</span>
+            </p>
+            <p className={`text-xs ${KPI_COLORS[2].text} opacity-70`}>
+              Religion + Address data
+            </p>
+          </div>
+
+          {/* With Addresses */}
+          <div className={`${KPI_COLORS[3].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
+            <p className={`text-xs font-semibold ${KPI_COLORS[3].text} uppercase tracking-wide mb-3 opacity-80`}>
+              Locations Mapped
+            </p>
+            <p className={`text-5xl font-bold ${KPI_COLORS[3].text} mb-2`}>
+              {filteredStudents.filter((s) => s.addresses?.length).length.toLocaleString()}
+            </p>
+            <p className="text-xs opacity-70">
+              Students with addresses
+            </p>
+          </div>
+        </div>
+
+        {/* Overview Charts - 2x2 Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Age Distribution Chart */}
+          <div className="bg-card rounded-md shadow border border-border p-6">
+            <h2 className="text-lg font-semibold text-card-foreground mb-4">
+              Age Distribution
+            </h2>
+            {getAgeDistributionData().some((d) => d.value > 0) ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={getAgeDistributionData()}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis dataKey="name" stroke="#6b7280" />
+                  <YAxis stroke="#6b7280" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "6px",
+                    }}
+                    formatter={(value) => [value, "Students"]}
+                  />
+                  <Bar dataKey="value" fill={SOFT_COLORS[0]} radius={[8, 8, 0, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground text-center py-12">
+                No age data available
+              </p>
+            )}
+          </div>
+
+          {/* Civil Status Chart */}
+          <div className="bg-card rounded-md shadow border border-border p-6">
+            <h2 className="text-lg font-semibold text-card-foreground mb-4">
+              Civil Status
+            </h2>
+            {getCivilStatusData().length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <PieChart>
+                  <Pie
+                    data={getCivilStatusData()}
+                    cx="50%"
+                    cy="50%"
+                    labelLine={false}
+                    label={({ name, value }) => `${name}: ${value}`}
+                    outerRadius={100}
+                    fill="#8884d8"
+                    dataKey="value"
+                  >
+                    {getCivilStatusData().map((_, index) => (
+                      <Cell key={`cell-${index}`} fill={SOFT_COLORS[index % SOFT_COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip formatter={(value) => [value, "Count"]} />
+                </PieChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground text-center py-12">
+                No civil status data available
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Breakdown Cards - 2x2 Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Religion Breakdown */}
+          <div className={`${STATUS_COLOR_MAP.info.bg} rounded-md shadow border border-border p-6`}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.info.text}`}>
+                Religion Distribution
+              </h3>
+              <span className="text-xs font-medium opacity-70">({getReligionBreakdown().total})</span>
+            </div>
+            <div className="space-y-2">
+              {getReligionBreakdown().data.length > 0 ? (
+                getReligionBreakdown().data.map(([religion, count]) => (
+                  <div key={religion} className="flex justify-between items-center">
+                    <span className="text-sm">{religion}</span>
+                    <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.info.text}`}>
+                      {count}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm opacity-70">No data available</p>
+              )}
+            </div>
+            {getReligionBreakdown().pages > 1 && (
+              <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
+                {Array.from({ length: getReligionBreakdown().pages }).map((_, page) => (
+                  <button
+                    key={page}
+                    onClick={() => setReligionPage(page)}
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
+                      religionPage === page
+                        ? `${STATUS_COLOR_MAP.info.bg} ${STATUS_COLOR_MAP.info.text}`
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    }`}
+                  >
+                    {page + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Location Breakdown */}
+          <div className={`${STATUS_COLOR_MAP.success.bg} rounded-md shadow border border-border p-6`}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.success.text}`}>
+                Top Locations
+              </h3>
+              <span className="text-xs font-medium opacity-70">({getCityBreakdown().total})</span>
+            </div>
+            <div className="space-y-2">
+              {getCityBreakdown().data.length > 0 ? (
+                getCityBreakdown().data.map(([city, count]) => (
+                  <div key={city} className="flex justify-between items-center">
+                    <span className="text-sm truncate">{city}</span>
+                    <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.success.text}`}>
+                      {count}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm opacity-70">No data available</p>
+              )}
+            </div>
+            {getCityBreakdown().pages > 1 && (
+              <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
+                {Array.from({ length: getCityBreakdown().pages }).map((_, page) => (
+                  <button
+                    key={page}
+                    onClick={() => setCityPage(page)}
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
+                      cityPage === page
+                        ? `${STATUS_COLOR_MAP.success.bg} ${STATUS_COLOR_MAP.success.text}`
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    }`}
+                  >
+                    {page + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Education & Income Breakdown */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Father's Education */}
+          <div className={`${STATUS_COLOR_MAP.warning.bg} rounded-md shadow border border-border p-6`}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.warning.text}`}>
+                Father's Education
+              </h3>
+              <span className="text-xs font-medium opacity-70">({getEducationBreakdown().total})</span>
+            </div>
+            <div className="space-y-2">
+              {getEducationBreakdown().data.length > 0 ? (
+                getEducationBreakdown().data.map(([education, count]) => (
+                  <div key={education} className="flex justify-between items-center">
+                    <span className="text-sm">{education}</span>
+                    <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.warning.text}`}>
+                      {count}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm opacity-70">No data available</p>
+              )}
+            </div>
+            {getEducationBreakdown().pages > 1 && (
+              <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
+                {Array.from({ length: getEducationBreakdown().pages }).map((_, page) => (
+                  <button
+                    key={page}
+                    onClick={() => setEducationPage(page)}
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
+                      educationPage === page
+                        ? `${STATUS_COLOR_MAP.warning.bg} ${STATUS_COLOR_MAP.warning.text}`
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    }`}
+                  >
+                    {page + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Civil Status Breakdown */}
+          <div className={`${STATUS_COLOR_MAP.notice.bg} rounded-md shadow border border-border p-6`}>
+            <div className="flex justify-between items-center mb-4">
+              <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.notice.text}`}>
+                Civil Status Breakdown
+              </h3>
+              <span className="text-xs font-medium opacity-70">({getCivilStatusBreakdown().total})</span>
+            </div>
+            <div className="space-y-2">
+              {getCivilStatusBreakdown().data.length > 0 ? (
+                getCivilStatusBreakdown().data.map(([status, count]) => (
+                  <div key={status} className="flex justify-between items-center">
+                    <span className="text-sm">{status}</span>
+                    <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.notice.text}`}>
+                      {count}
+                    </span>
+                  </div>
+                ))
+              ) : (
+                <p className="text-sm opacity-70">No data available</p>
+              )}
+            </div>
+            {getCivilStatusBreakdown().pages > 1 && (
+              <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
+                {Array.from({ length: getCivilStatusBreakdown().pages }).map((_, page) => (
+                  <button
+                    key={page}
+                    onClick={() => setStatusPage(page)}
+                    className={`px-2 py-1 text-xs rounded transition-colors ${
+                      statusPage === page
+                        ? `${STATUS_COLOR_MAP.notice.bg} ${STATUS_COLOR_MAP.notice.text}`
+                        : "bg-muted text-muted-foreground hover:bg-muted/80"
+                    }`}
+                  >
+                    {page + 1}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Full Width Charts */}
+        <div className="grid grid-cols-1 gap-6">
+          {/* Religion Distribution Chart */}
+          <div className="bg-card rounded-md shadow border border-border p-6">
+            <h2 className="text-lg font-semibold text-card-foreground mb-4">
+              Religion Distribution
+            </h2>
+            {getReligionData().length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={getReligionData()}
+                  layout="vertical"
+                  margin={{ top: 5, right: 30, left: 150, bottom: 5 }}
+                >
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis type="number" stroke="#6b7280" />
+                  <YAxis dataKey="name" type="category" width={150} stroke="#6b7280" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "6px",
+                    }}
+                    formatter={(value) => [value, "Students"]}
+                  />
+                  <Bar dataKey="value" fill={SOFT_COLORS[1]} radius={[0, 8, 8, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground text-center py-12">
+                No religion data available
+              </p>
+            )}
+          </div>
+        </div>
+
+        {/* Location & Income Charts */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Top Cities Chart */}
+          <div className="bg-card rounded-md shadow border border-border p-6">
+            <h2 className="text-lg font-semibold text-card-foreground mb-4">
+              Top Student Locations
+            </h2>
+            {getCityData().length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={getCityData()}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis
+                    dataKey="name"
+                    angle={-45}
+                    textAnchor="end"
+                    height={80}
+                    interval={0}
+                    tick={{ fontSize: 12, fill: "#6b7280" }}
+                  />
+                  <YAxis stroke="#6b7280" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "6px",
+                    }}
+                    formatter={(value) => [value, "Students"]}
+                  />
+                  <Bar dataKey="value" fill={SOFT_COLORS[2]} radius={[0, 8, 8, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground text-center py-12">
+                No location data available
+              </p>
+            )}
+          </div>
+
+          {/* Monthly Income Chart */}
+          <div className="bg-card rounded-md shadow border border-border p-6">
+            <h2 className="text-lg font-semibold text-card-foreground mb-4">
+              Monthly Family Income Distribution
+            </h2>
+            {getIncomeData().length > 0 ? (
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart data={getIncomeData()}>
+                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
+                  <XAxis
+                    dataKey="name"
+                    angle={-45}
+                    textAnchor="end"
+                    height={100}
+                    interval={0}
+                    tick={{ fontSize: 11, fill: "#6b7280" }}
+                  />
+                  <YAxis stroke="#6b7280" />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "hsl(var(--background))",
+                      border: "1px solid hsl(var(--border))",
+                      borderRadius: "6px",
+                    }}
+                    formatter={(value) => [value, "Students"]}
+                  />
+                  <Bar dataKey="value" fill={SOFT_COLORS[3]} radius={[0, 8, 8, 0]} />
+                </BarChart>
+              </ResponsiveContainer>
+            ) : (
+              <p className="text-muted-foreground text-center py-12">
+                No income data available
+              </p>
+            )}
+          </div>
         </div>
       </div>
-    </div>
+    </Layout>
   );
 }

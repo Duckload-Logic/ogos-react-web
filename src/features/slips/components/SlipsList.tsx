@@ -6,6 +6,7 @@ import { STATUS_COLORS } from "@/config/constants";
 import { Eye, Calendar, Tag, Inbox } from "lucide-react";
 import type { Slip } from "../types/slip";
 import { formatDate } from "@/features/schedules/utils/formatters";
+import { LoadingSpinner } from "@/components/shared";
 
 interface SlipsListProps {
   title?: string;
@@ -66,7 +67,9 @@ export function SlipsList({
       <CardContent className="p-0">
         {isLoading ? (
           <div className="flex min-h-[320px] items-center justify-center px-4 text-center">
-            <p className="text-muted-foreground">Loading slips...</p>
+            <p className="text-muted-foreground">
+              <LoadingSpinner size="sm" message="Loading excuse slips" />
+            </p>
           </div>
         ) : slips.length === 0 ? (
           <div className="flex min-h-[340px] flex-col items-center justify-center px-6 text-center">
@@ -90,9 +93,15 @@ export function SlipsList({
                 <thead className="text-muted-foreground text-[11px] uppercase tracking-[0.12em]">
                   <tr>
                     <th className="px-4 py-3 text-left font-medium">Student</th>
-                    <th className="px-4 py-3 text-left font-medium">Absence Date</th>
-                    <th className="px-4 py-3 text-left font-medium">Date Needed</th>
-                    <th className="px-4 py-3 text-left font-medium">Category</th>
+                    <th className="px-4 py-3 text-left font-medium">
+                      Absence Date
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium">
+                      Date Needed
+                    </th>
+                    <th className="px-4 py-3 text-left font-medium">
+                      Category
+                    </th>
                     <th className="px-4 py-3 text-left font-medium">Status</th>
                     <th className="px-4 py-3 text-left font-medium">Action</th>
                   </tr>

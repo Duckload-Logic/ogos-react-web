@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   Ban,
 } from "lucide-react";
+import Layout from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -52,6 +53,8 @@ export default function APIManagement() {
   const { data: keys = [], isLoading } = useAPIKeys(includeRevoked);
   const createMutation = useCreateAPIKey();
   const revokeMutation = useRevokeAPIKey();
+
+  const isPageLoading = isLoading || createMutation.isPending || revokeMutation.isPending;
 
   const activeKeys = keys.filter((k) => k.isActive);
   const revokedKeys = keys.filter((k) => !k.isActive);
@@ -128,108 +131,103 @@ export default function APIManagement() {
   ];
 
   return (
-    <div className="mx-auto w-full max-w-[1700px] space-y-5">
-      <section className="relative overflow-hidden rounded-[20px] border border-white/20 bg-white/50 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.10),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.08),transparent_28%)]" />
+    <Layout
+      title="API Management"
+      isLoading={isPageLoading}
+    >
+      <div className="mx-auto w-full max-w-[1700px] space-y-5">
+        <section className="relative overflow-hidden rounded-[20px] border border-white/20 bg-white/50 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.10),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.08),transparent_28%)]" />
 
-        <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
-          <div className="space-y-3">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-              <Sparkles className="h-3.5 w-3.5" />
-              Integration Access Control
+          <div className="relative flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+                <Sparkles className="h-3.5 w-3.5" />
+                Integration Access Control
+              </div>
+
+              <div className="space-y-2">
+                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                  API Key Management
+                </h1>
+                <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
+                  Create and manage API keys for external integrations while
+                  keeping access secure and easy to monitor.
+                </p>
+              </div>
             </div>
 
-            <div className="space-y-2">
-              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                API Key Management
-              </h1>
-              <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
-                Create and manage API keys for external integrations while
-                keeping access secure and easy to monitor.
-              </p>
-            </div>
-          </div>
-
-          <Button
-            onClick={() => setIsCreateOpen(true)}
-            className="h-10 gap-2 rounded-xl px-4 shadow-sm"
-          >
-            <Plus size={16} />
-            Create API Key
-          </Button>
-        </div>
-      </section>
-
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        {statCards.map((card) => {
-          const Icon = card.icon;
-
-          return (
-            <Card
-              key={card.label}
-              className="rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]"
+            <Button
+              onClick={() => setIsCreateOpen(true)}
+              className="h-10 gap-2 rounded-xl px-4 shadow-sm"
             >
-              <CardContent className="p-5">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="space-y-2">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                      {card.label}
-                    </p>
-                    <p className="text-4xl font-bold tracking-tight tabular-nums text-foreground">
-                      {card.value}
-                    </p>
-                  </div>
-
-                  <div
-                    className={`flex h-11 w-11 items-center justify-center rounded-xl border backdrop-blur-md ${card.iconClass}`}
-                  >
-                    <Icon className="h-5 w-5" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </section>
-
-      <Card className="overflow-hidden rounded-[20px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
-        <CardHeader className="border-b border-white/20 pb-4 dark:border-white/10">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/30 bg-white/70 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-                  <Key className="h-5 w-5" />
-                </span>
-                API Keys
-              </CardTitle>
-              <p className="mt-2 text-sm text-muted-foreground">
-                Manage active credentials, scopes, and revocations.
-              </p>
-            </div>
-
-            <label className="inline-flex cursor-pointer items-center gap-3 rounded-xl border border-white/30 bg-white/60 px-4 py-2 text-sm backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-              <input
-                type="checkbox"
-                checked={includeRevoked}
-                onChange={(e) => setIncludeRevoked(e.target.checked)}
-                className="rounded border-border"
-              />
-              Show revoked keys
-            </label>
+              <Plus size={16} />
+              Create API Key
+            </Button>
           </div>
-        </CardHeader>
+        </section>
 
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="space-y-3 p-6">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-12 animate-pulse rounded-xl bg-white/50 dark:bg-white/[0.05]"
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+          {statCards.map((card) => {
+            const Icon = card.icon;
+
+            return (
+              <Card
+                key={card.label}
+                className="rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]"
+              >
+                <CardContent className="p-5">
+                  <div className="flex items-start justify-between gap-4">
+                    <div className="space-y-2">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        {card.label}
+                      </p>
+                      <p className="text-4xl font-bold tracking-tight tabular-nums text-foreground">
+                        {card.value}
+                      </p>
+                    </div>
+
+                    <div
+                      className={`flex h-11 w-11 items-center justify-center rounded-xl border backdrop-blur-md ${card.iconClass}`}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
+
+        <Card className="overflow-hidden rounded-[20px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
+          <CardHeader className="border-b border-white/20 pb-4 dark:border-white/10">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/30 bg-white/70 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+                    <Key className="h-5 w-5" />
+                  </span>
+                  API Keys
+                </CardTitle>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Manage active credentials, scopes, and revocations.
+                </p>
+              </div>
+
+              <label className="inline-flex cursor-pointer items-center gap-3 rounded-xl border border-white/30 bg-white/60 px-4 py-2 text-sm backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+                <input
+                  type="checkbox"
+                  checked={includeRevoked}
+                  onChange={(e) => setIncludeRevoked(e.target.checked)}
+                  className="rounded border-border"
                 />
-              ))}
+                Show revoked keys
+              </label>
             </div>
-          ) : keys.length === 0 ? (
+          </CardHeader>
+
+          <CardContent className="p-0">
+            {keys.length === 0 ? (
             <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
                 <Key className="h-6 w-6 text-muted-foreground" />
@@ -540,6 +538,7 @@ export default function APIManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </div>
+      </div>
+    </Layout>
   );
 }

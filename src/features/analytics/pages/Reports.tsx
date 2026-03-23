@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Download, Eye } from "lucide-react";
+import Layout from "@/components/layout/Layout";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -73,7 +74,10 @@ export default function Reports() {
   };
 
   return (
-    <>
+    <Layout
+      title="Reports"
+      isLoading={false}
+    >
       <div className="space-y-6">
         {/* Filters */}
         <div className="bg-card rounded-lg shadow border border-border p-6">
@@ -169,7 +173,7 @@ export default function Reports() {
           />
         </div>
       </div>
-    </>
+    </Layout>
   );
 }
 

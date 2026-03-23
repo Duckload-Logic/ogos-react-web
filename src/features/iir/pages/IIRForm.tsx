@@ -11,6 +11,7 @@ import { IIRForm as IIRFormType } from "@/features/iir/types/IIRForm";
 import { EMPTY_IIR_FORM } from "@/features/iir/constants";
 import { LoadingSpinner } from "@/components/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import Layout from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HeroSection } from "@/components/ui/hero-section";
@@ -200,7 +201,7 @@ export default function IIRForm() {
     }, duration);
   };
 
-  if (isInitializing) return <LoadingSpinner />;
+  const isLoading = isInitializing || isLoadingDraft || isSubmitting || isSaving;
 
   if (draftError) {
     return (
@@ -367,267 +368,272 @@ export default function IIRForm() {
 
   const currentSectionDef = FORM_SECTIONS.find((s) => s.id === currentSection);
   return (
-    <div className="min-h-screen transition-colors duration-500">
-      <AnimationStyles />
+    <Layout
+      title="Individual Inventory Record"
+      isLoading={isLoading}
+    >
+      <div className="transition-colors duration-500">
+        <AnimationStyles />
 
-      {/* Premium Glass Header */}
-      <div className="relative pt-16 pb-24 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -tranneutral-x-1/2 w-full max-w-5xl h-full -z-10 blur-[120px] opacity-70" />
-        <div className="max-w-4xl mx-auto text-center animate-in fade-in zoom-in-95 duration-700">
-          <span className="inline-block px-4 py-1.5 mb-6 text-[11px] font-bold uppercase tracking-[0.2em] text-primary bg-primary/10 rounded-full border border-primary/20 backdrop-blur-md">
-            Student Profile Portal
-          </span>
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-[900] tracking-tight text-neutral-900 dark:text-white mb-6">
-            Individual Inventory <span className="text-primary">Record</span>
-          </h1>
-          <p className="text-neutral-600 dark:text-neutral-400 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-            Fill out your student information with confidence. Your data is
-            protected and used solely for academic and guidance purposes.
-          </p>
+        {/* Premium Glass Header */}
+        <div className="relative pt-16 pb-24 overflow-hidden">
+          <div className="absolute top-0 left-1/2 -tranneutral-x-1/2 w-full max-w-5xl h-full -z-10 blur-[120px] opacity-70" />
+          <div className="max-w-4xl mx-auto text-center animate-in fade-in zoom-in-95 duration-700">
+            <span className="inline-block px-4 py-1.5 mb-6 text-[11px] font-bold uppercase tracking-[0.2em] text-primary bg-primary/10 rounded-full border border-primary/20 backdrop-blur-md">
+              Student Profile Portal
+            </span>
+            <h1 className="text-4xl sm:text-5xl md:text-6xl font-[900] tracking-tight text-neutral-900 dark:text-white mb-6">
+              Individual Inventory <span className="text-primary">Record</span>
+            </h1>
+            <p className="text-neutral-600 dark:text-neutral-400 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
+              Fill out your student information with confidence. Your data is
+              protected and used solely for academic and guidance purposes.
+            </p>
+          </div>
         </div>
-      </div>
 
-      {/* Main Content Container */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-10">
-        <div className="flex flex-col gap-10 w-full">
-          {/* Draft Restore Prompt */}
-          {showDraftPrompt && (
-            <div className="animate-in slide-in-from-top-4 duration-500">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-primary/5 backdrop-blur-md border border-primary/20 rounded-3xl dark:bg-primary/10 dark:border-primary/20">
-                <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-                    <AlertCircle className="h-6 w-6" />
+        {/* Main Content Container */}
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-10">
+          <div className="flex flex-col gap-10 w-full">
+            {/* Draft Restore Prompt */}
+            {showDraftPrompt && (
+              <div className="animate-in slide-in-from-top-4 duration-500">
+                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-primary/5 backdrop-blur-md border border-primary/20 rounded-3xl dark:bg-primary/10 dark:border-primary/20">
+                  <div className="flex items-center gap-3">
+                    <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                      <AlertCircle className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <h4 className="text-sm font-bold text-foreground">
+                        Unsaved Progress Found
+                      </h4>
+                      <p className="text-xs text-muted-foreground font-medium">
+                        Would you like to restore your previous work?
+                      </p>
+                    </div>
                   </div>
-                  <div>
-                    <h4 className="text-sm font-bold text-foreground">
-                      Unsaved Progress Found
-                    </h4>
-                    <p className="text-xs text-muted-foreground font-medium">
-                      Would you like to restore your previous work?
-                    </p>
+                  <div className="flex gap-2 w-full sm:w-auto">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleDiscardDraft}
+                      className="flex-1 sm:flex-none text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl font-bold"
+                    >
+                      Discard
+                    </Button>
+                    <Button
+                      size="sm"
+                      onClick={handleRestoreDraft}
+                      className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20 font-bold px-6"
+                    >
+                      Restore Draft
+                    </Button>
                   </div>
                 </div>
-                <div className="flex gap-2 w-full sm:w-auto">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleDiscardDraft}
-                    className="flex-1 sm:flex-none text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl font-bold"
-                  >
-                    Discard
-                  </Button>
-                  <Button
-                    size="sm"
-                    onClick={handleRestoreDraft}
-                    className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20 font-bold px-6"
-                  >
-                    Restore Draft
-                  </Button>
+              </div>
+            )}
+
+            {/* Progress Tracker Layer */}
+            <SectionProgress
+              sections={FORM_SECTIONS}
+              currentSection={currentSection}
+              sectionsWithErrors={sectionsWithErrors}
+              visitedSections={visitedSections}
+              onNavigate={(id: number) => {
+                setCurrentSection(id);
+                setSectionsWithErrors([]);
+                setShowValidationError(false);
+              }}
+              calculateCompletion={(sectionIndex: number) =>
+                calculateSectionCompletion(sectionIndex, localFormData ?? null)
+              }
+              onToast={addToast}
+              lastSaved={lastSaved}
+            />
+
+            <div className="flex flex-col gap-6">
+              {/* Form Content Wrapper */}
+              <div className="">
+                {/* Floating Completion Pill */}
+                <div className="mb-3 animate-in fade-in slide-in-from-right-4 duration-700 delay-300">
+                  <div className="flex items-center gap-2.5 px-4 py-2 bg-white/60 backdrop-blur-md border border-white/20 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:bg-white/[0.04] dark:border-white/10">
+                    <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(var(--primary),0.6)]" />
+                    <span className="text-[11px] font-black uppercase tracking-wider text-neutral-900 dark:text-white">
+                      {calculateSectionCompletion(
+                        currentSection,
+                        localFormData ?? null,
+                      )}
+                      % Form Progress
+                    </span>
+                  </div>
+                </div>
+
+                {/* Individual Form Sections */}
+                <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out fill-mode-both">
+                  {currentSection === 1 && localFormData?.student && (
+                    <PersonalInformationSection
+                      ref={personalSectionRef}
+                      studentInfo={localFormData.student}
+                      onChange={handleInputChange}
+                      onFieldBlur={markFieldTouched}
+                      shouldShowError={shouldShowError}
+                    />
+                  )}
+                  {currentSection === 2 && localFormData?.education && (
+                    <EducationBackgroundSection
+                      ref={educationSectionRef}
+                      education={localFormData.education}
+                      onChange={handleInputChange}
+                    />
+                  )}
+                  {currentSection === 3 && localFormData?.family && (
+                    <FamilyBackgroundSection
+                      ref={familySectionRef}
+                      family={localFormData.family}
+                      onChange={handleInputChange}
+                      onFieldBlur={markFieldTouched}
+                      shouldShowError={shouldShowError}
+                    />
+                  )}
+                  {currentSection === 4 && localFormData?.health && (
+                    <HealthInformationSection
+                      ref={healthSectionRef}
+                      health={localFormData.health}
+                      onChange={handleInputChange}
+                    />
+                  )}
+                  {currentSection === 5 && localFormData?.interests && (
+                    <InterestsSection
+                      ref={interestsSectionRef}
+                      interests={localFormData.interests}
+                      onChange={handleInputChange}
+                    />
+                  )}
                 </div>
               </div>
-            </div>
-          )}
 
-          {/* Progress Tracker Layer */}
-          <SectionProgress
-            sections={FORM_SECTIONS}
-            currentSection={currentSection}
-            sectionsWithErrors={sectionsWithErrors}
-            visitedSections={visitedSections}
-            onNavigate={(id: number) => {
-              setCurrentSection(id);
-              setSectionsWithErrors([]);
-              setShowValidationError(false);
-            }}
-            calculateCompletion={(sectionIndex: number) =>
-              calculateSectionCompletion(sectionIndex, localFormData ?? null)
-            }
-            onToast={addToast}
-            lastSaved={lastSaved}
-          />
-
-          <div className="flex flex-col gap-6">
-            {/* Form Content Wrapper */}
-            <div className="">
-              {/* Floating Completion Pill */}
-              <div className="mb-3 animate-in fade-in slide-in-from-right-4 duration-700 delay-300">
-                <div className="flex items-center gap-2.5 px-4 py-2 bg-white/60 backdrop-blur-md border border-white/20 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:bg-white/[0.04] dark:border-white/10">
-                  <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(var(--primary),0.6)]" />
-                  <span className="text-[11px] font-black uppercase tracking-wider text-neutral-900 dark:text-white">
-                    {calculateSectionCompletion(
-                      currentSection,
-                      localFormData ?? null,
-                    )}
-                    % Form Progress
-                  </span>
-                </div>
-              </div>
-
-              {/* Individual Form Sections */}
-              <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out fill-mode-both">
-                {currentSection === 1 && localFormData?.student && (
-                  <PersonalInformationSection
-                    ref={personalSectionRef}
-                    studentInfo={localFormData.student}
-                    onChange={handleInputChange}
-                    onFieldBlur={markFieldTouched}
-                    shouldShowError={shouldShowError}
-                  />
-                )}
-                {currentSection === 2 && localFormData?.education && (
-                  <EducationBackgroundSection
-                    ref={educationSectionRef}
-                    education={localFormData.education}
-                    onChange={handleInputChange}
-                  />
-                )}
-                {currentSection === 3 && localFormData?.family && (
-                  <FamilyBackgroundSection
-                    ref={familySectionRef}
-                    family={localFormData.family}
-                    onChange={handleInputChange}
-                    onFieldBlur={markFieldTouched}
-                    shouldShowError={shouldShowError}
-                  />
-                )}
-                {currentSection === 4 && localFormData?.health && (
-                  <HealthInformationSection
-                    ref={healthSectionRef}
-                    health={localFormData.health}
-                    onChange={handleInputChange}
-                  />
-                )}
-                {currentSection === 5 && localFormData?.interests && (
-                  <InterestsSection
-                    ref={interestsSectionRef}
-                    interests={localFormData.interests}
-                    onChange={handleInputChange}
-                  />
-                )}
-              </div>
-            </div>
-
-            {/* Form Navigation Action Bar */}
-            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/40 backdrop-blur-xl p-5 border border-white/20 shadow-[0_12px_40px_rgba(31,38,135,0.08)] dark:bg-white/[0.04] dark:border-white/10 rounded-[28px] mt-4 mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
-              <Button
-                variant="ghost"
-                onClick={() => setShowResetConfirm(true)}
-                className="text-neutral-400 hover:text-destructive hover:bg-destructive/10 font-bold rounded-xl px-4 sm:px-6 transition-all duration-300"
-              >
-                Reset
-              </Button>
-
-              <div className="flex gap-3">
+              {/* Form Navigation Action Bar */}
+              <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/40 backdrop-blur-xl p-5 border border-white/20 shadow-[0_12px_40px_rgba(31,38,135,0.08)] dark:bg-white/[0.04] dark:border-white/10 rounded-[28px] mt-4 mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
                 <Button
-                  variant="outline"
-                  onClick={handlePreviousSection}
-                  disabled={currentSection === 1 || isSaving}
-                  className="flex items-center gap-2 border-neutral-200/50 bg-white/30 hover:bg-white/60 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 rounded-2xl px-5 sm:px-7 h-12 font-bold text-neutral-700 dark:text-neutral-200 transition-all duration-300 shadow-sm"
+                  variant="ghost"
+                  onClick={() => setShowResetConfirm(true)}
+                  className="text-neutral-400 hover:text-destructive hover:bg-destructive/10 font-bold rounded-xl px-4 sm:px-6 transition-all duration-300"
                 >
-                  <ChevronLeft className="h-5 w-5" />
-                  <span className="hidden sm:inline">Back</span>
+                  Reset
                 </Button>
 
-                {currentSection < FORM_SECTIONS.length ? (
+                <div className="flex gap-3">
                   <Button
-                    onClick={handleNextSection}
-                    disabled={isSaving}
-                    className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 rounded-2xl px-6 sm:px-10 h-12 font-black tracking-tight transition-all duration-300 active:scale-95"
+                    variant="outline"
+                    onClick={handlePreviousSection}
+                    disabled={currentSection === 1 || isSaving}
+                    className="flex items-center gap-2 border-neutral-200/50 bg-white/30 hover:bg-white/60 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 rounded-2xl px-5 sm:px-7 h-12 font-bold text-neutral-700 dark:text-neutral-200 transition-all duration-300 shadow-sm"
                   >
-                    {isSaving ? (
-                      <div className="flex items-center gap-3">
-                        <div className="animate-spin h-5 w-5 border-3 border-primary-foreground border-t-transparent rounded-full" />
-                        <span>Saving...</span>
-                      </div>
-                    ) : (
-                      <>
-                        <span>Next Step</span>
-                        <ChevronRight className="h-5 w-5" />
-                      </>
-                    )}
+                    <ChevronLeft className="h-5 w-5" />
+                    <span className="hidden sm:inline">Back</span>
                   </Button>
-                ) : (
-                  <Button
-                    onClick={handleSubmit}
-                    disabled={isSaving}
-                    className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 rounded-2xl px-6 sm:px-10 h-12 font-black tracking-tight transition-all duration-300 active:scale-95"
-                  >
-                    {isSubmitting ? (
-                      <div className="flex items-center gap-3">
-                        <div className="animate-spin h-5 w-5 border-3 border-primary-foreground border-t-transparent rounded-full" />
-                        <span>Submitting...</span>
-                      </div>
-                    ) : (
-                      <>
-                        <Save className="h-5 w-5" />
-                        <span>Complete Profile</span>
-                      </>
-                    )}
-                  </Button>
-                )}
+
+                  {currentSection < FORM_SECTIONS.length ? (
+                    <Button
+                      onClick={handleNextSection}
+                      disabled={isSaving}
+                      className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 rounded-2xl px-6 sm:px-10 h-12 font-black tracking-tight transition-all duration-300 active:scale-95"
+                    >
+                      {isSaving ? (
+                        <div className="flex items-center gap-3">
+                          <div className="animate-spin h-5 w-5 border-3 border-primary-foreground border-t-transparent rounded-full" />
+                          <span>Saving...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <span>Next Step</span>
+                          <ChevronRight className="h-5 w-5" />
+                        </>
+                      )}
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleSubmit}
+                      disabled={isSaving}
+                      className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 rounded-2xl px-6 sm:px-10 h-12 font-black tracking-tight transition-all duration-300 active:scale-95"
+                    >
+                      {isSubmitting ? (
+                        <div className="flex items-center gap-3">
+                          <div className="animate-spin h-5 w-5 border-3 border-primary-foreground border-t-transparent rounded-full" />
+                          <span>Submitting...</span>
+                        </div>
+                      ) : (
+                        <>
+                          <Save className="h-5 w-5" />
+                          <span>Complete Profile</span>
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Overlays & Modals */}
-      <LegalConsentDialog
-        open={showLegalConsentDialog}
-        onAccept={handleLegalConsentAccept}
-        onCancel={handleLegalConsentCancel}
-        isSubmitting={isSaving}
-      />
+        {/* Overlays & Modals */}
+        <LegalConsentDialog
+          open={showLegalConsentDialog}
+          onAccept={handleLegalConsentAccept}
+          onCancel={handleLegalConsentCancel}
+          isSubmitting={isSaving}
+        />
 
-      <SuccessPopup
-        isOpen={showSuccessPopup}
-        onReturn={() => navigate("/student")}
-      />
+        <SuccessPopup
+          isOpen={showSuccessPopup}
+          onReturn={() => navigate("/student")}
+        />
 
-      <AlertDialog
-        open={showResetConfirm}
-        onOpenChange={(open) => setShowResetConfirm(open)}
-      >
-        <AlertDialogContent className="rounded-3xl border-none shadow-2xl backdrop-blur-3xl bg-white/90 dark:bg-neutral-900/90 max-w-sm">
-          <AlertDialogHeader>
-            <AlertDialogTitle className="text-2xl font-black tracking-tight">
-              Erase everything?
-            </AlertDialogTitle>
-            <AlertDialogDescription className="text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed">
-              This will clear all your current answers. This action cannot be
-              undone.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter className="flex-row gap-2 mt-4">
-            <AlertDialogCancel asChild>
-              <Button
-                variant="ghost"
-                className="flex-1 rounded-2xl font-bold border border-neutral-200 dark:border-neutral-800"
+        <AlertDialog
+          open={showResetConfirm}
+          onOpenChange={(open) => setShowResetConfirm(open)}
+        >
+          <AlertDialogContent className="rounded-3xl border-none shadow-2xl backdrop-blur-3xl bg-white/90 dark:bg-neutral-900/90 max-w-sm">
+            <AlertDialogHeader>
+              <AlertDialogTitle className="text-2xl font-black tracking-tight">
+                Erase everything?
+              </AlertDialogTitle>
+              <AlertDialogDescription className="text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed">
+                This will clear all your current answers. This action cannot be
+                undone.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter className="flex-row gap-2 mt-4">
+              <AlertDialogCancel asChild>
+                <Button
+                  variant="ghost"
+                  className="flex-1 rounded-2xl font-bold border border-neutral-200 dark:border-neutral-800"
+                >
+                  Cancel
+                </Button>
+              </AlertDialogCancel>
+              <AlertDialogAction
+                onClick={confirmReset}
+                className="flex-1 bg-destructive hover:bg-destructive/90 text-white rounded-2xl font-bold shadow-lg shadow-destructive/20"
               >
-                Cancel
-              </Button>
-            </AlertDialogCancel>
-            <AlertDialogAction
-              onClick={confirmReset}
-              className="flex-1 bg-destructive hover:bg-destructive/90 text-white rounded-2xl font-bold shadow-lg shadow-destructive/20"
-            >
-              Yes, Reset
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+                Yes, Reset
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
 
-      <FormErrorModal
-        isOpen={isErrorModalOpen}
-        onClose={() => setIsErrorModalOpen(false)}
-        groupedErrors={groupedErrors}
-        totalErrors={totalErrors}
-        onNavigateToSection={(id) => setCurrentSection(id)}
-      />
+        <FormErrorModal
+          isOpen={isErrorModalOpen}
+          onClose={() => setIsErrorModalOpen(false)}
+          groupedErrors={groupedErrors}
+          totalErrors={totalErrors}
+          onNavigateToSection={(id) => setCurrentSection(id)}
+        />
 
-      {/* Notification Toast Layer */}
-      <Toast toasts={toasts} />
-    </div>
+        {/* Notification Toast Layer */}
+        <Toast toasts={toasts} />
+      </div>
+    </Layout>
   );
 }
 

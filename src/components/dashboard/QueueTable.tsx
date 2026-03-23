@@ -3,6 +3,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { STATUS_COLORS } from "@/config/constants";
 import { format12HourTime } from "@/features/appointments/utils";
+import { LoadingSpinner } from "../shared";
 
 interface Props {
   appointments: any[];
@@ -10,11 +11,7 @@ interface Props {
   isLoading: boolean;
 }
 
-export default function QueueTable({
-  appointments,
-  onView,
-  isLoading,
-}: Props) {
+export default function QueueTable({ appointments, onView, isLoading }: Props) {
   return (
     <section>
       <div className="flex items-center justify-between mb-4">
@@ -30,7 +27,6 @@ export default function QueueTable({
       <Card className="border-border shadow-sm overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-left border-collapse">
-
             <thead>
               <tr className="bg-muted/40 border-b border-border">
                 <th className="p-4 text-xs font-bold text-muted-foreground">
@@ -55,21 +51,21 @@ export default function QueueTable({
               {isLoading ? (
                 <tr>
                   <td colSpan={4} className="p-8 text-center text-sm">
-                    Loading appointments...
+                    <LoadingSpinner size="sm" message="Loading appointments" />
                   </td>
                 </tr>
               ) : appointments.length === 0 ? (
                 <tr>
-                  <td colSpan={4} className="p-8 text-center text-sm italic text-muted-foreground">
+                  <td
+                    colSpan={4}
+                    className="p-8 text-center text-sm italic text-muted-foreground"
+                  >
                     No appointments today
                   </td>
                 </tr>
               ) : (
                 appointments.map((apt) => (
-                  <tr
-                    key={apt.id}
-                    className="hover:bg-muted/30 transition-all"
-                  >
+                  <tr key={apt.id} className="hover:bg-muted/30 transition-all">
                     <td className="p-4 font-semibold">
                       {apt.user?.firstName} {apt.user?.lastName}
                     </td>
@@ -111,7 +107,6 @@ export default function QueueTable({
                 ))
               )}
             </tbody>
-
           </table>
         </div>
       </Card>

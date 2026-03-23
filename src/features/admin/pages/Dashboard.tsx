@@ -21,14 +21,15 @@ import { Button } from "@/components/ui/button";
 import { useStatuses } from "@/features/appointments/hooks/useLookups";
 import { format12HourTime, toISODateString } from "@/features/appointments/utils";
 import PortalShell from "../../../layout/PortalShell";
+import Layout from "@/components/layout/Layout";
 
 export default function Dashboard() {
   const today = new Date();
   const todayStr = toISODateString(today);
 
-  const { data: statuses } = useStatuses();
+  const { data: statuses, isLoading: isStatusesLoading } = useStatuses();
 
-  const { data } = useAppointments({
+  const { data, isLoading: isAppointmentsLoading } = useAppointments({
     params: {
       startDate: todayStr,
       endDate: todayStr,
@@ -112,7 +113,10 @@ export default function Dashboard() {
   ];
 
   return (
-    <PortalShell role="admin">
+    <Layout
+      title="Guidance Dashboard"
+      isLoading={isStatusesLoading || isAppointmentsLoading}
+    >
       <div className="max-w-[1600px] mx-auto space-y-10 relative">
         {showDailyTip && (
           <div className="fixed top-24 right-6 z-50 w-[340px] max-w-[calc(100vw-2rem)] animate-in fade-in slide-in-from-top-2 duration-300">
@@ -392,6 +396,6 @@ export default function Dashboard() {
           hasActions={false}
         />
       </div>
-    </PortalShell>
+    </Layout>
   );
 }

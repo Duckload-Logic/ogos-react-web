@@ -6,6 +6,7 @@ import { useMe } from "@/features/users/hooks/useMe";
 import { useIIRForm } from "@/features/iir/hooks";
 import { useIIRStatus } from "@/features/iir/hooks";
 import { AnimationStyles } from "@/components/ui/animations";
+import { LoadingSpinner } from "./shared";
 
 interface IIRGateProps {
   children: React.ReactNode;
@@ -25,14 +26,7 @@ export const IIRGate = ({
   const { data: isSubmitted, isLoading: isIIRLoading } = useIIRStatus();
 
   if (isIIRLoading) {
-    return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="text-center">
-          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-muted-foreground">Loading...</p>
-        </div>
-      </div>
-    );
+    return <LoadingSpinner size="lg" message="Checking your profile..." />;
   }
 
   // If PDS is not completed and this is not the form page

@@ -30,6 +30,7 @@ import {
 } from "@/features/slips/hooks";
 import { Slip, SlipStatus } from "@/features/slips/types/slip";
 import Pagination from "@/components/Pagination";
+import Layout from "@/components/layout/Layout";
 
 interface StatusCount {
   id: string | number;
@@ -49,11 +50,14 @@ export default function StudentSlips() {
     filterStatuses[0],
   );
 
-  const { data } = useGetMySlips({
+  const { data, isLoading: isSlipsLoading } = useGetMySlips({
     page: currentPage,
     statusId: selectedStatus?.id === "0" ? undefined : selectedStatus?.id,
   });
-  const { data: slipStats } = useGetSlipStats({});
+  const { data: slipStats, isLoading: isStatsLoading } = useGetSlipStats({});
+  const { isLoading: isStatusesLoading } = useGetSlipStatuses();
+
+  const isLoading = isSlipsLoading || isStatsLoading || isStatusesLoading;
   const statsWithAll = [
     {
       id: "0",
@@ -86,7 +90,7 @@ export default function StudentSlips() {
   };
 
   return (
-    <>
+    <Layout title="My Admission Slips" isLoading={isLoading}>
       <AnimationStyles />
       <div className="space-y-6">
         {/* Header Section */}
@@ -284,6 +288,6 @@ export default function StudentSlips() {
           </CardContent>
         </Card>
       </div>
-    </>
+    </Layout>
   );
 }

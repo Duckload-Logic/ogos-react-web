@@ -4,6 +4,7 @@ import {
   AuthMessages,
   RegisterForm,
 } from "@/features/auth/components";
+import Layout from "@/components/layout/Layout";
 
 export default function Register() {
   const [firstName, setFirstName] = useState("");
@@ -70,61 +71,67 @@ export default function Register() {
   };
 
   return (
-    <section className="mx-auto flex w-full max-w-[1180px] items-center justify-center py-3 sm:py-5 lg:py-6">
-      <div className="relative grid w-full overflow-hidden rounded-[30px] border border-[hsl(var(--border)/0.65)] bg-[hsl(var(--card)/0.82)] shadow-[0_30px_90px_-40px_rgba(0,0,0,0.55)] backdrop-blur-2xl lg:grid-cols-[0.9fr_1.1fr]">
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute -right-12 top-0 h-48 w-48 rounded-full bg-red-500/10 blur-3xl" />
-          <div className="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-amber-300/10 blur-3xl" />
-          <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.10),transparent_45%,rgba(255,255,255,0.03))]" />
-        </div>
+    <Layout
+      title="Register"
+      isLoggedIn={false}
+      isLoading={isLoading}
+    >
+      <section className="mx-auto flex w-full max-w-[1180px] items-center justify-center py-3 sm:py-5 lg:py-6">
+        <div className="relative grid w-full overflow-hidden rounded-[30px] border border-[hsl(var(--border)/0.65)] bg-[hsl(var(--card)/0.82)] shadow-[0_30px_90px_-40px_rgba(0,0,0,0.55)] backdrop-blur-2xl lg:grid-cols-[0.9fr_1.1fr]">
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -right-12 top-0 h-48 w-48 rounded-full bg-red-500/10 blur-3xl" />
+            <div className="absolute bottom-0 left-0 h-56 w-56 rounded-full bg-amber-300/10 blur-3xl" />
+            <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.10),transparent_45%,rgba(255,255,255,0.03))]" />
+          </div>
 
-        <AuthHeader
-          title="PUPT OGOS"
-          subtitle="Create your account and get started with a cleaner, more focused onboarding flow."
-        />
+          <AuthHeader
+            title="PUPT OGOS"
+            subtitle="Create your account and get started with a cleaner, more focused onboarding flow."
+          />
 
-        <div className="relative flex items-center p-6 sm:p-8 lg:p-10">
-          <div className="mx-auto w-full max-w-xl">
-            <div className="mb-7 space-y-2">
-              <span className="inline-flex rounded-full border border-[hsl(var(--border)/0.7)] bg-[hsl(var(--background)/0.72)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground backdrop-blur">
-                Register
-              </span>
+          <div className="relative flex items-center p-6 sm:p-8 lg:p-10">
+            <div className="mx-auto w-full max-w-xl">
+              <div className="mb-7 space-y-2">
+                <span className="inline-flex rounded-full border border-[hsl(var(--border)/0.7)] bg-[hsl(var(--background)/0.72)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.22em] text-muted-foreground backdrop-blur">
+                  Register
+                </span>
 
-              <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
-                Create your account
-              </h2>
+                <h2 className="text-2xl font-semibold tracking-tight text-foreground sm:text-3xl">
+                  Create your account
+                </h2>
 
-              <p className="text-sm leading-6 text-muted-foreground">
-                Fill in your details to access guidance services and student
-                support tools.
+                <p className="text-sm leading-6 text-muted-foreground">
+                  Fill in your details to access guidance services and student
+                  support tools.
+                </p>
+              </div>
+
+              <AuthMessages error={error} success={success} />
+
+              <RegisterForm
+                firstName={firstName}
+                middleInitial={middleInitial}
+                surname={surname}
+                email={email}
+                password={password}
+                confirmPassword={confirmPassword}
+                onFirstNameChange={setFirstName}
+                onMiddleInitialChange={setMiddleInitial}
+                onSurnameChange={setSurname}
+                onEmailChange={setEmail}
+                onPasswordChange={setPassword}
+                onConfirmPasswordChange={setConfirmPassword}
+                onSubmit={handleSubmit}
+                isLoading={isLoading}
+              />
+
+              <p className="mt-6 text-center text-sm text-muted-foreground">
+                Need help? Contact the guidance office.
               </p>
             </div>
-
-            <AuthMessages error={error} success={success} />
-
-            <RegisterForm
-              firstName={firstName}
-              middleInitial={middleInitial}
-              surname={surname}
-              email={email}
-              password={password}
-              confirmPassword={confirmPassword}
-              onFirstNameChange={setFirstName}
-              onMiddleInitialChange={setMiddleInitial}
-              onSurnameChange={setSurname}
-              onEmailChange={setEmail}
-              onPasswordChange={setPassword}
-              onConfirmPasswordChange={setConfirmPassword}
-              onSubmit={handleSubmit}
-              isLoading={isLoading}
-            />
-
-            <p className="mt-6 text-center text-sm text-muted-foreground">
-              Need help? Contact the guidance office.
-            </p>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </Layout>
   );
 }

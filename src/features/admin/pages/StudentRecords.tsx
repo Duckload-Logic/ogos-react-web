@@ -21,6 +21,7 @@ import { IIRProfileView } from "@/features/iir/types/studentProfileView";
 import { useDebounce } from "@/hooks/useDebounce";
 import { LoadingSpinner } from "@/components/shared";
 import { Pagination } from "@/components/Pagination";
+import Layout from "@/components/layout/Layout";
 
 export default function StudentRecords() {
   const {
@@ -74,12 +75,13 @@ export default function StudentRecords() {
   const [showAdd, setShowAdd] = useState(false);
   const navigate = useNavigate();
 
-  if (isCoursesLoading || isGendersLoading) {
-    return <LoadingSpinner />;
-  }
+  const isLoading = isCoursesLoading || isGendersLoading || isStudentsLoading || isDeleting;
 
   return (
-    <>
+    <Layout
+      title="Student Records"
+      isLoading={isLoading}
+    >
       <div className="space-y-6">
         <StudentRecordsHeader
           onAddClick={() => setShowAdd(true)}
@@ -182,6 +184,6 @@ export default function StudentRecords() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </>
+    </Layout>
   );
 }

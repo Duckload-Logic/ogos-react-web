@@ -36,9 +36,9 @@ interface SlipViewModalProps {
   onClose: () => void;
   slip: Slip | null;
   isAdmin?: boolean;
-  onApprove: (id: number) => void;
-  onReject: (id: number, reason: string) => void;
-  onForRevision: (id: number, reason: string) => void;
+  onApprove: (id: string) => void;
+  onReject: (id: string, reason: string) => void;
+  onForRevision: (id: string, reason: string) => void;
   isLoading?: boolean;
 }
 
@@ -63,19 +63,19 @@ export function SlipViewModal({
 
   const handleActionConfirm = () => {
     if (actionType === "approve") {
-      onApprove(Number(slip.id));
+      onApprove(slip.id!);
     } else if (actionType === "reject") {
       if (!reason.trim()) {
         alert("Please provide a reason for rejection");
         return;
       }
-      onReject(Number(slip.id), reason);
+      onReject(slip.id!, reason);
     } else if (actionType === "revision") {
       if (!reason.trim()) {
         alert("Please provide revision notes");
         return;
       }
-      onForRevision(Number(slip.id), reason);
+      onForRevision(slip.id!, reason);
     }
     handleCloseModal();
   };

@@ -29,7 +29,7 @@ export default function Profile() {
   if (!user) return null;
 
   return (
-    <Layout title="Account Profile">
+    <Layout title="Account Profile" isLoading={false}>
       <div className="w-full h-full flex items-center justify-center">
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 px-4 md:px-0">
           {/* Profile Header */}

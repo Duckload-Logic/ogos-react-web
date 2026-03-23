@@ -14,6 +14,7 @@ import {
   getMonthRange,
 } from "../../utils/dateFilters";
 import { DropdownField } from "@/components/form";
+import Layout from "@/components/layout/Layout";
 
 export default function SlipLogs() {
   const navigate = useNavigate();
@@ -77,7 +78,7 @@ export default function SlipLogs() {
     endDate: dateRange.endDate,
   });
 
-  const { data: slipStats = [] } = useGetSlipStats({
+  const { data: slipStats = [], isLoading: isStatsLoading } = useGetSlipStats({
     params: {
       startDate: dateRange.startDate,
       endDate: dateRange.endDate,
@@ -119,120 +120,127 @@ export default function SlipLogs() {
     navigate(-1);
   };
 
+  const isPageLoading = isLoading || isStatsLoading;
+
   return (
-    <div className="space-y-6">
-      {/* Header with Back Button */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div className="flex flex-col items-start justify-start gap-8">
-          <Link
-            className="flex gap-2 group items-center text-sm text-foreground/70 font-medium hover:text-primary transition-colors w-max"
-            to="/admin/admission-slips"
-          >
-            <div className="flex items-center gap-2">
-              <CircleChevronLeft
-                size={20}
-                className="transform group-hover:-translate-x-1 transition-transform duration-300"
-              />
-              <span className="text-sm font-medium">Back</span>
-            </div>
-          </Link>
-        </div>
-      </div>
-
-      {/* Filters Section */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
-            <Calendar className="h-5 w-5" />
-            Filter by Date
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <DropdownField
-              label="Year"
-              options={yearsList}
-              value={selectedYear.id}
-              onChange={handleYearChange}
-            />
-            <DropdownField
-              label="Month"
-              options={monthsList}
-              value={selectedMonth.id}
-              onChange={handleMonthChange}
-            />
+    <Layout
+      title="Admission Slip Logs"
+      isLoading={isPageLoading}
+    >
+      <div className="space-y-6">
+        {/* Header with Back Button */}
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <div className="flex flex-col items-start justify-start gap-8">
+            <Link
+              className="flex gap-2 group items-center text-sm text-foreground/70 font-medium hover:text-primary transition-colors w-max"
+              to="/admin/admission-slips"
+            >
+              <div className="flex items-center gap-2">
+                <CircleChevronLeft
+                  size={20}
+                  className="transform group-hover:-translate-x-1 transition-transform duration-300"
+                />
+                <span className="text-sm font-medium">Back</span>
+              </div>
+            </Link>
           </div>
-        </CardContent>
-      </Card>
-
-      {/* Status Filter Cards */}
-      <div>
-        <h3 className="text-sm font-medium text-foreground mb-3">
-          Filter by Status
-        </h3>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          {/* Status Cards */}
-          {slipStatusesWithAll.map((status: SlipStats) => {
-            const count = status.count || 0;
-            return (
-              <Card
-                key={String(status.id)}
-                className={`cursor-pointer transition-all ${
-                  statusFilter === String(status.id)
-                    ? `border-2 ${STATUS_COLORS[status.colorKey]}`
-                    : ""
-                }`}
-                onClick={() => {
-                  setStatusFilter(String(status.id));
-                  setCurrentPage(1);
-                }}
-              >
-                <CardContent className="pt-6">
-                  <div className="text-right">
-                    <Badge className="mb-2" variant="outline">
-                      {status.name}
-                    </Badge>
-                    <p className="text-2xl font-bold text-foreground">
-                      {count}
-                    </p>
-                    <p className="text-xs text-muted-foreground mt-1">
-                      {count === 1 ? "slip" : "slips"}
-                    </p>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
         </div>
+
+        {/* Filters Section */}
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Calendar className="h-5 w-5" />
+              Filter by Date
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <DropdownField
+                label="Year"
+                options={yearsList}
+                value={selectedYear.id}
+                onChange={handleYearChange}
+              />
+              <DropdownField
+                label="Month"
+                options={monthsList}
+                value={selectedMonth.id}
+                onChange={handleMonthChange}
+              />
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Status Filter Cards */}
+        <div>
+          <h3 className="text-sm font-medium text-foreground mb-3">
+            Filter by Status
+          </h3>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
+            {/* Status Cards */}
+            {slipStatusesWithAll.map((status: SlipStats) => {
+              const count = status.count || 0;
+              return (
+                <Card
+                  key={String(status.id)}
+                  className={`cursor-pointer transition-all ${
+                    statusFilter === String(status.id)
+                      ? `border-2 ${STATUS_COLORS[status.colorKey]}`
+                      : ""
+                  }`}
+                  onClick={() => {
+                    setStatusFilter(String(status.id));
+                    setCurrentPage(1);
+                  }}
+                >
+                  <CardContent className="pt-6">
+                    <div className="text-right">
+                      <Badge className="mb-2" variant="outline">
+                        {status.name}
+                      </Badge>
+                      <p className="text-2xl font-bold text-foreground">
+                        {count}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        {count === 1 ? "slip" : "slips"}
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+        </div>
+
+        {/* Slips List */}
+        <SlipsList
+          title="Submission Details"
+          slips={slips}
+          isLoading={isLoading}
+          onViewClick={handleViewSlip}
+          searchTerm={searchTerm}
+          onSearchChange={(value: string) => {
+            setSearchTerm(value);
+            setCurrentPage(1);
+          }}
+          currentPage={currentPage}
+          onPageChange={setCurrentPage}
+          totalPages={totalPages}
+        />
+
+        {/* View Modal */}
+        <SlipViewModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          slip={selectedSlip}
+          isAdmin={false}
+          onApprove={() => {}}
+          onReject={() => {}}
+          onForRevision={() => {}}
+          isLoading={false}
+        />
       </div>
-
-      {/* Slips List */}
-      <SlipsList
-        title="Submission Details"
-        slips={slips}
-        isLoading={isLoading}
-        onViewClick={handleViewSlip}
-        searchTerm={searchTerm}
-        onSearchChange={(value: string) => {
-          setSearchTerm(value);
-          setCurrentPage(1);
-        }}
-        currentPage={currentPage}
-        onPageChange={setCurrentPage}
-        totalPages={totalPages}
-      />
-
-      {/* View Modal */}
-      <SlipViewModal
-        isOpen={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        slip={selectedSlip}
-        isAdmin={false}
-        onApprove={() => {}}
-        onReject={() => {}}
-        onForRevision={() => {}}
-        isLoading={false}
-      />
-    </div>
+    </Layout>
   );
 }

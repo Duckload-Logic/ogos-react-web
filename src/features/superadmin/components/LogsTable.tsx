@@ -12,6 +12,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Pagination } from "@/components/Pagination";
 import { useDebounce } from "@/hooks/useDebounce";
+import Layout from "@/components/layout/Layout";
 import type { SystemLog, SystemLogsParams, SystemLogsResponse } from "../types";
 import type { UseQueryResult } from "@tanstack/react-query";
 
@@ -155,191 +156,186 @@ export default function LogsTable({
   };
 
   return (
-    <div className="mx-auto w-full max-w-[1700px] space-y-5">
-      <section className="relative overflow-hidden rounded-[20px] border border-white/20 bg-white/50 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6">
-        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.08),transparent_22%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.08),transparent_24%)]" />
+    <Layout
+      title={title}
+      isLoading={isLoading}
+    >
+      <div className="mx-auto w-full max-w-[1700px] space-y-5">
+        <section className="relative overflow-hidden rounded-[20px] border border-white/20 bg-white/50 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6">
+          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.08),transparent_22%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.08),transparent_24%)]" />
 
-        <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-          <div className="space-y-2">
-            <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-              <Sparkles className="h-3.5 w-3.5" />
-              Monitoring Module
+          <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+            <div className="space-y-2">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+                <Sparkles className="h-3.5 w-3.5" />
+                Monitoring Module
+              </div>
+
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+                  {title}
+                </h1>
+                <p className="mt-1 text-sm text-muted-foreground sm:text-base">
+                  {description}
+                </p>
+              </div>
             </div>
 
-            <div>
-              <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                {title}
-              </h1>
-              <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-                {description}
-              </p>
+            <div className="flex flex-wrap items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => refetch()}
+                className="h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
+              >
+                <RefreshCw
+                  size={14}
+                  className={`mr-2 ${isFetching ? "animate-spin" : ""}`}
+                />
+                Refresh
+              </Button>
+
+              <Button
+                variant={showFilters || hasActiveFilters ? "default" : "outline"}
+                size="sm"
+                onClick={() => setShowFilters(!showFilters)}
+                className={
+                  showFilters || hasActiveFilters
+                    ? "h-10 rounded-xl px-4"
+                    : "h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
+                }
+              >
+                <Filter size={14} className="mr-2" />
+                Filters
+              </Button>
             </div>
           </div>
+        </section>
 
-          <div className="flex flex-wrap items-center gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => refetch()}
-              className="h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
-            >
-              <RefreshCw
-                size={14}
-                className={`mr-2 ${isFetching ? "animate-spin" : ""}`}
-              />
-              Refresh
-            </Button>
+        {showFilters && (
+          <Card className="rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
+            <CardContent className="p-5">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+                <div className="space-y-2">
+                  <label className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                    Action
+                  </label>
+                  <select
+                    value={actionFilter}
+                    onChange={(e) => {
+                      setActionFilter(e.target.value);
+                      setCurrentPage(1);
+                    }}
+                    className="h-10 w-full rounded-xl border border-white/30 bg-white/70 px-3 text-sm outline-none backdrop-blur-md transition-colors focus:border-primary/40 dark:border-white/10 dark:bg-white/[0.04]"
+                  >
+                    <option value="">All Actions</option>
+                    {actionOptions.map((action) => (
+                      <option key={action} value={action}>
+                        {formatAction(action)}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-            <Button
-              variant={showFilters || hasActiveFilters ? "default" : "outline"}
-              size="sm"
-              onClick={() => setShowFilters(!showFilters)}
-              className={
-                showFilters || hasActiveFilters
-                  ? "h-10 rounded-xl px-4"
-                  : "h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
-              }
-            >
-              <Filter size={14} className="mr-2" />
-              Filters
-            </Button>
-          </div>
-        </div>
-      </section>
+                <div className="space-y-2">
+                  <label
+                    htmlFor="start-date"
+                    className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                  >
+                    Start Date
+                  </label>
+                  <div className="relative">
+                    <CalendarRange className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="start-date"
+                      type="date"
+                      value={startDate}
+                      onChange={(e) => {
+                        setStartDate(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="h-10 rounded-xl border-white/30 bg-white/70 pl-10 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04]"
+                    />
+                  </div>
+                </div>
 
-      {showFilters && (
-        <Card className="rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
-          <CardContent className="p-5">
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-              <div className="space-y-2">
-                <label className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                  Action
-                </label>
-                <select
-                  value={actionFilter}
+                <div className="space-y-2">
+                  <label
+                    htmlFor="end-date"
+                    className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
+                  >
+                    End Date
+                  </label>
+                  <div className="relative">
+                    <CalendarRange className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="end-date"
+                      type="date"
+                      value={endDate}
+                      onChange={(e) => {
+                        setEndDate(e.target.value);
+                        setCurrentPage(1);
+                      }}
+                      className="h-10 rounded-xl border-white/30 bg-white/70 pl-10 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04]"
+                    />
+                  </div>
+                </div>
+
+                <div className="flex items-end">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleReset}
+                    className="h-10 rounded-xl px-4"
+                  >
+                    Reset Filters
+                  </Button>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        <Card className="overflow-hidden rounded-[20px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
+          <CardHeader className="border-b border-white/20 pb-4 dark:border-white/10">
+            <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+              <div className="flex flex-wrap items-center gap-3">
+                <CardTitle className="flex items-center gap-2 text-lg font-semibold tracking-tight">
+                  <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/30 bg-white/70 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+                    {icon}
+                  </span>
+                  <span>{title}</span>
+                </CardTitle>
+
+                {total > 0 && (
+                  <Badge
+                    variant="secondary"
+                    className="rounded-full border border-white/30 bg-white/70 px-3 py-1 text-xs backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
+                  >
+                    {total.toLocaleString()} entries
+                  </Badge>
+                )}
+              </div>
+
+              <div className="relative w-full lg:w-80">
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                <Input
+                  placeholder="Search logs..."
+                  value={searchTerm}
                   onChange={(e) => {
-                    setActionFilter(e.target.value);
+                    setSearchTerm(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className="h-10 w-full rounded-xl border border-white/30 bg-white/70 px-3 text-sm outline-none backdrop-blur-md transition-colors focus:border-primary/40 dark:border-white/10 dark:bg-white/[0.04]"
-                >
-                  <option value="">All Actions</option>
-                  {actionOptions.map((action) => (
-                    <option key={action} value={action}>
-                      {formatAction(action)}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="start-date"
-                  className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
-                >
-                  Start Date
-                </label>
-                <div className="relative">
-                  <CalendarRange className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="start-date"
-                    type="date"
-                    value={startDate}
-                    onChange={(e) => {
-                      setStartDate(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="h-10 rounded-xl border-white/30 bg-white/70 pl-10 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04]"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-2">
-                <label
-                  htmlFor="end-date"
-                  className="text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground"
-                >
-                  End Date
-                </label>
-                <div className="relative">
-                  <CalendarRange className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                  <Input
-                    id="end-date"
-                    type="date"
-                    value={endDate}
-                    onChange={(e) => {
-                      setEndDate(e.target.value);
-                      setCurrentPage(1);
-                    }}
-                    className="h-10 rounded-xl border-white/30 bg-white/70 pl-10 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04]"
-                  />
-                </div>
-              </div>
-
-              <div className="flex items-end">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleReset}
-                  className="h-10 rounded-xl px-4"
-                >
-                  Reset Filters
-                </Button>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      <Card className="overflow-hidden rounded-[20px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
-        <CardHeader className="border-b border-white/20 pb-4 dark:border-white/10">
-          <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="flex flex-wrap items-center gap-3">
-              <CardTitle className="flex items-center gap-2 text-lg font-semibold tracking-tight">
-                <span className="flex h-9 w-9 items-center justify-center rounded-xl border border-white/30 bg-white/70 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-                  {icon}
-                </span>
-                <span>{title}</span>
-              </CardTitle>
-
-              {total > 0 && (
-                <Badge
-                  variant="secondary"
-                  className="rounded-full border border-white/30 bg-white/70 px-3 py-1 text-xs backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
-                >
-                  {total.toLocaleString()} entries
-                </Badge>
-              )}
-            </div>
-
-            <div className="relative w-full lg:w-80">
-              <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                placeholder="Search logs..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className={`h-10 rounded-xl border-white/30 bg-white/70 pl-10 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04] ${
-                  searchTerm ? "border-primary/40" : ""
-                }`}
-              />
-            </div>
-          </div>
-        </CardHeader>
-
-        <CardContent className="p-0">
-          {isLoading ? (
-            <div className="space-y-3 p-6">
-              {Array.from({ length: 6 }).map((_, i) => (
-                <div
-                  key={i}
-                  className="h-11 animate-pulse rounded-xl bg-white/50 dark:bg-white/[0.05]"
+                  className={`h-10 rounded-xl border-white/30 bg-white/70 pl-10 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04] ${
+                    searchTerm ? "border-primary/40" : ""
+                  }`}
                 />
-              ))}
+              </div>
             </div>
-          ) : logs.length === 0 ? (
+          </CardHeader>
+
+          <CardContent className="p-0">
+            {logs.length === 0 ? (
             <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
                 {icon}
@@ -456,6 +452,7 @@ export default function LogsTable({
           )}
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </Layout>
   );
 }

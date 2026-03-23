@@ -6,7 +6,7 @@ interface Props {
 
 export default function Toast({ toasts }: Props) {
   return (
-    <div className="fixed top-6 right-6 z-[99999] flex flex-col gap-3">
+    <div className="fixed top-20 right-6 z-[99999] flex flex-col gap-3">
       {toasts.map((toast, index) => (
         <div
           key={index}
