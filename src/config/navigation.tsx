@@ -22,13 +22,12 @@ export interface NavItem {
 
 const ICON_SIZE = 20;
 
-
 export const NAV_CONFIG: Record<string, NavItem[]>[] = [
   {
     admin: [
       {
         label: "Dashboard",
-        href: "/admin/home",
+        href: "/admin",
         icon: <Home size={ICON_SIZE} />,
       },
       {
@@ -62,7 +61,7 @@ export const NAV_CONFIG: Record<string, NavItem[]>[] = [
     student: [
       {
         label: "Home",
-        href: "/student/home",
+        href: "/student",
         icon: <Home size={ICON_SIZE} />,
       },
       {
@@ -86,7 +85,7 @@ export const NAV_CONFIG: Record<string, NavItem[]>[] = [
     superadmin: [
       {
         label: "Dashboard",
-        href: "/superadmin/home",
+        href: "/superadmin",
         icon: <Home size={ICON_SIZE} />,
       },
       {

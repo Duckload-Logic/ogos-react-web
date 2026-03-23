@@ -66,11 +66,7 @@ export default function Login() {
   };
 
   return (
-    <Layout
-      title="Login"
-      isLoggedIn={false}
-      isLoading={isLoggingIn}
-    >
+    <Layout showHeader={false} isLoggedIn={false} isLoading={isLoggingIn}>
       <section
         className={
           "mx-auto flex w-full max-w-[1180px] " +

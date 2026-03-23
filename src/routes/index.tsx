@@ -46,20 +46,16 @@ export const routes: RouteObject[] = [
   // Public routes
   {
     path: "/login",
-    element: (
-        <Login />
-    ),
+    element: <Login />,
   },
   {
     path: "/register",
-    element: (
-        <Register />
-    ),
+    element: <Register />,
   },
 
   // Student routes
   {
-    path: "/student/home",
+    path: "/student",
     element: (
       <ProtectedRoute requiredRole="student">
         <IIRGate>
@@ -110,7 +106,7 @@ export const routes: RouteObject[] = [
     path: "/student/form",
     element: (
       <ProtectedRoute requiredRole="student">
-          <IIRForm />
+        <IIRForm />
       </ProtectedRoute>
     ),
   },
@@ -125,10 +121,10 @@ export const routes: RouteObject[] = [
 
   // Admin routes
   {
-    path: "/admin/home",
+    path: "/admin",
     element: (
       <ProtectedRoute requiredRole="admin">
-          <Dashboard />
+        <Dashboard />
       </ProtectedRoute>
     ),
   },
@@ -136,7 +132,7 @@ export const routes: RouteObject[] = [
     path: "/admin/student-records",
     element: (
       <ProtectedRoute requiredRole="admin">
-          <StudentRecords />
+        <StudentRecords />
       </ProtectedRoute>
     ),
   },
@@ -152,7 +148,7 @@ export const routes: RouteObject[] = [
     path: "/admin/appointments",
     element: (
       <ProtectedRoute requiredRole="admin">
-          <AppointmentsManagement />
+        <AppointmentsManagement />
       </ProtectedRoute>
     ),
   },
@@ -160,7 +156,7 @@ export const routes: RouteObject[] = [
     path: "/admin/admission-slips",
     element: (
       <ProtectedRoute requiredRole="admin">
-          <ReviewSlips />
+        <ReviewSlips />
       </ProtectedRoute>
     ),
   },
@@ -168,7 +164,7 @@ export const routes: RouteObject[] = [
     path: "/admin/admission-slips/logs",
     element: (
       <ProtectedRoute requiredRole="admin">
-          <SlipLogs />
+        <SlipLogs />
       </ProtectedRoute>
     ),
   },
@@ -176,7 +172,7 @@ export const routes: RouteObject[] = [
     path: "/admin/reports",
     element: (
       <ProtectedRoute requiredRole="admin">
-          <Reports />
+        <Reports />
       </ProtectedRoute>
     ),
   },
@@ -184,7 +180,7 @@ export const routes: RouteObject[] = [
     path: "/admin/analytics",
     element: (
       <ProtectedRoute requiredRole="admin">
-          <Analytics />
+        <Analytics />
       </ProtectedRoute>
     ),
   },
@@ -207,10 +203,10 @@ export const routes: RouteObject[] = [
 
   // Super Admin routes
   {
-    path: "/superadmin/home",
+    path: "/superadmin",
     element: (
       <ProtectedRoute requiredRole="superadmin">
-          <SuperAdminDashboard />
+        <SuperAdminDashboard />
       </ProtectedRoute>
     ),
   },
@@ -218,7 +214,7 @@ export const routes: RouteObject[] = [
     path: "/superadmin/api-management",
     element: (
       <ProtectedRoute requiredRole="superadmin">
-          <APIManagement />
+        <APIManagement />
       </ProtectedRoute>
     ),
   },
@@ -226,7 +222,7 @@ export const routes: RouteObject[] = [
     path: "/superadmin/security-logs",
     element: (
       <ProtectedRoute requiredRole="superadmin">
-          <SecurityLogs />
+        <SecurityLogs />
       </ProtectedRoute>
     ),
   },
@@ -234,7 +230,7 @@ export const routes: RouteObject[] = [
     path: "/superadmin/system-logs",
     element: (
       <ProtectedRoute requiredRole="superadmin">
-          <SystemLogs />
+        <SystemLogs />
       </ProtectedRoute>
     ),
   },
@@ -242,7 +238,7 @@ export const routes: RouteObject[] = [
     path: "/superadmin/audit-logs",
     element: (
       <ProtectedRoute requiredRole="superadmin">
-          <AuditLogs />
+        <AuditLogs />
       </ProtectedRoute>
     ),
   },
@@ -250,7 +246,13 @@ export const routes: RouteObject[] = [
   {
     path: "/terms",
     element: (
-      <Layout title="Terms and Conditions" isLoggedIn={false} isLoading={false}>
+      <Layout
+        title="Terms and Conditions"
+        description="Please read our terms and conditions carefully before using our services"
+        badgeText="Legal"
+        isLoggedIn={false}
+        isLoading={false}
+      >
         <div className="prose max-w-none">
           <StatementPage statementType="terms" />
         </div>
@@ -260,7 +262,13 @@ export const routes: RouteObject[] = [
   {
     path: "/privacy",
     element: (
-      <Layout title="Privacy Policy" isLoggedIn={false} isLoading={false}>
+      <Layout
+        title="Privacy Policy"
+        description="We value your privacy and are committed to protecting your personal data"
+        badgeText="Legal"
+        isLoggedIn={false}
+        isLoading={false}
+      >
         <div className="prose max-w-none">
           <StatementPage statementType="privacy" />
         </div>

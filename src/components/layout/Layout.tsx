@@ -15,19 +15,38 @@ import { useGetLatestStatement } from "@/features/consents/hooks";
 import useCheckUserConsent from "@/features/consents/hooks/useCheckUserConsent";
 import { useGiveConsent } from "@/features/consents/hooks/useGiveConsent";
 import Navigation from "./Navigation";
+import PageHeader from "./PageHeader";
 
 interface LayoutProps {
+  showHeader?: boolean;
   children: React.ReactNode;
   title?: string;
+  subTitle?: string;
+  headerChildren?: React.ReactNode;
   isLoggedIn?: boolean;
   isLoading?: boolean;
+  description?: string;
+  badgeText?: string;
+  badgeIcon?: React.ReactNode;
+  headerActions?: React.ReactNode;
+  headerStats?: React.ReactNode;
+  showDate?: boolean;
 }
 
 export default function Layout({
+  showHeader = true,
   children,
   title,
+  subTitle,
+  headerChildren,
   isLoggedIn = true,
   isLoading = false,
+  description,
+  badgeText,
+  badgeIcon,
+  headerActions,
+  headerStats,
+  showDate = false,
 }: LayoutProps) {
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -171,10 +190,11 @@ export default function Layout({
 
         <div
           ref={contentRef}
-          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${termsOpen
+          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${
+            termsOpen
               ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
               : ""
-            }`}
+          }`}
         >
           <Header
             title={title}
@@ -227,7 +247,20 @@ export default function Layout({
                       <LoadingSpinner size="lg" />
                     </div>
                   ) : (
-                    children
+                    <>
+                      {showHeader && (
+                        <PageHeader
+                          title={title || ""}
+                          description={description || subTitle}
+                          badgeText={badgeText}
+                          badgeIcon={badgeIcon}
+                          headerActions={headerActions}
+                          headerStats={headerStats}
+                          showDate={showDate}
+                        />
+                      )}
+                      {children}
+                    </>
                   )}
                 </main>
               </div>

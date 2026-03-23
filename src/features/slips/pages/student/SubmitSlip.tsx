@@ -23,6 +23,7 @@ import {
   Trash2,
   X,
   Folder,
+  Plus,
 } from "lucide-react";
 import { useGetSlipCategories, useSubmitSlip } from "@/features/slips/hooks";
 import {
@@ -176,37 +177,17 @@ export default function SubmitSlip() {
   };
 
   return (
-    <Layout title="Submit Admission Slip" isLoading={isCategoriesLoading || isSubmitting}>
+    <Layout
+      title="Submit Admission Slip"
+      description="Provide the required information and supporting documents for your absence."
+      badgeText="New Request"
+      badgeIcon={<Plus className="h-4 w-4" />}
+      isLoading={isCategoriesLoading || isSubmitting}
+    >
       <AnimationStyles />
-      <div className="min-h-full bg-background">
-        {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border/40 bg-gradient-to-b from-muted/40 to-transparent">
-          <Link
-            to="/student/slips"
-            className="inline-flex items-center gap-2 px-3 py-1 rounded-full text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all group"
-          >
-            <CircleChevronLeft
-              size={16}
-              className="group-hover:-translate-x-0.5 transition-transform"
-            />
-            <span>Return to My Slips</span>
-          </Link>
-          <span className="text-sm font-medium text-muted-foreground">
-            Step {currentStep} of {steps.length}
-          </span>
-        </div>
-
+      <div className="min-h-full bg-background pt-6">
         {/* Main Content - Two Column Layout */}
         <div className="max-w-6xl mx-auto px-6 py-6">
-          {/* Title Section - Centered in main content */}
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              Submit an Admission Slip
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              Provide the required information and supporting documents for your absence.
-            </p>
-          </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Left Column - Form */}

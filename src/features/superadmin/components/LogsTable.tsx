@@ -158,59 +158,42 @@ export default function LogsTable({
   return (
     <Layout
       title={title}
-      isLoading={isLoading}
+      isLoading={false}
+      badgeText="Monitoring Module"
+      badgeIcon={<Sparkles className="h-3.5 w-3.5" />}
+      description={description}
+      headerActions={
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => refetch()}
+            className="h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
+          >
+            <RefreshCw
+              size={14}
+              className={`mr-2 ${isFetching ? "animate-spin" : ""}`}
+            />
+            Refresh
+          </Button>
+
+          <Button
+            variant={showFilters || hasActiveFilters ? "default" : "outline"}
+            size="sm"
+            onClick={() => setShowFilters(!showFilters)}
+            className={
+              showFilters || hasActiveFilters
+                ? "h-10 rounded-xl px-4"
+                : "h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
+            }
+          >
+            <Filter size={14} className="mr-2" />
+            Filters
+          </Button>
+        </div>
+      }
     >
       <div className="mx-auto w-full max-w-[1700px] space-y-5">
-        <section className="relative overflow-hidden rounded-[20px] border border-white/20 bg-white/50 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.08),transparent_22%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.08),transparent_24%)]" />
-
-          <div className="relative flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-            <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/30 bg-white/60 px-3 py-1 text-xs font-medium text-muted-foreground backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-                <Sparkles className="h-3.5 w-3.5" />
-                Monitoring Module
-              </div>
-
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                  {title}
-                </h1>
-                <p className="mt-1 text-sm text-muted-foreground sm:text-base">
-                  {description}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() => refetch()}
-                className="h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
-              >
-                <RefreshCw
-                  size={14}
-                  className={`mr-2 ${isFetching ? "animate-spin" : ""}`}
-                />
-                Refresh
-              </Button>
-
-              <Button
-                variant={showFilters || hasActiveFilters ? "default" : "outline"}
-                size="sm"
-                onClick={() => setShowFilters(!showFilters)}
-                className={
-                  showFilters || hasActiveFilters
-                    ? "h-10 rounded-xl px-4"
-                    : "h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
-                }
-              >
-                <Filter size={14} className="mr-2" />
-                Filters
-              </Button>
-            </div>
-          </div>
-        </section>
 
         {showFilters && (
           <Card className="rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
@@ -326,9 +309,8 @@ export default function LogsTable({
                     setSearchTerm(e.target.value);
                     setCurrentPage(1);
                   }}
-                  className={`h-10 rounded-xl border-white/30 bg-white/70 pl-10 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04] ${
-                    searchTerm ? "border-primary/40" : ""
-                  }`}
+                  className={`h-10 rounded-xl border-white/30 bg-white/70 pl-10 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.04] ${searchTerm ? "border-primary/40" : ""
+                    }`}
                 />
               </div>
             </div>
@@ -336,122 +318,121 @@ export default function LogsTable({
 
           <CardContent className="p-0">
             {logs.length === 0 ? (
-            <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
-              <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-                {icon}
+              <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
+                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+                  {icon}
+                </div>
+
+                <p className="text-lg font-semibold text-foreground">
+                  No log entries found
+                </p>
+                <p className="mt-2 max-w-md text-sm text-muted-foreground">
+                  Try adjusting your filters or clear them to load more results.
+                </p>
+
+                {(hasActiveFilters || searchTerm) && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={handleReset}
+                    className="mt-4 rounded-xl"
+                  >
+                    Clear filters
+                  </Button>
+                )}
               </div>
-
-              <p className="text-lg font-semibold text-foreground">
-                No log entries found
-              </p>
-              <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                Try adjusting your filters or clear them to load more results.
-              </p>
-
-              {(hasActiveFilters || searchTerm) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={handleReset}
-                  className="mt-4 rounded-xl"
-                >
-                  Clear filters
-                </Button>
-              )}
-            </div>
-          ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[980px] text-sm">
-                <thead className="sticky top-0 z-10">
-                  <tr className="border-b border-white/20 bg-white/55 text-left backdrop-blur-md dark:border-white/10 dark:bg-white/[0.03]">
-                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      Timestamp
-                    </th>
-                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      Action
-                    </th>
-                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      Message
-                    </th>
-                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      Actor
-                    </th>
-                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                      Target
-                    </th>
-                    {showIPAddress && (
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full min-w-[980px] text-sm">
+                  <thead className="sticky top-0 z-10">
+                    <tr className="border-b border-white/20 bg-white/55 text-left backdrop-blur-md dark:border-white/10 dark:bg-white/[0.03]">
                       <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                        IP Address
+                        Timestamp
                       </th>
-                    )}
-                  </tr>
-                </thead>
-
-                <tbody>
-                  {logs.map((log: SystemLog) => (
-                    <tr
-                      key={log.id}
-                      className="border-b border-white/10 transition-colors duration-150 hover:bg-white/40 dark:hover:bg-white/[0.03]"
-                    >
-                      <td className="whitespace-nowrap px-5 py-4 text-xs font-medium text-muted-foreground">
-                        {formatDate(log.createdAt)}
-                      </td>
-
-                      <td className="px-5 py-4">
-                        <span
-                          className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${
-                            ACTION_BADGE_COLORS[log.action] ??
-                            "border-white/20 bg-white/40 text-muted-foreground dark:bg-white/[0.04]"
-                          }`}
-                        >
-                          {formatAction(log.action)}
-                        </span>
-                      </td>
-
-                      <td className="max-w-[460px] px-5 py-4 text-sm leading-relaxed text-foreground">
-                        <div className="line-clamp-2">
-                          {highlightText(log.message, debouncedSearch)}
-                        </div>
-                      </td>
-
-                      <td className="px-5 py-4 text-sm text-muted-foreground">
-                        {log.userEmail
-                          ? highlightText(log.userEmail, debouncedSearch)
-                          : "—"}
-                      </td>
-
-                      <td className="px-5 py-4 text-sm text-muted-foreground">
-                        {log.targetEmail
-                          ? highlightText(log.targetEmail, debouncedSearch)
-                          : "—"}
-                      </td>
-
+                      <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                        Action
+                      </th>
+                      <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                        Message
+                      </th>
+                      <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                        Actor
+                      </th>
+                      <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                        Target
+                      </th>
                       {showIPAddress && (
-                        <td className="px-5 py-4">
-                          <code className="rounded-lg border border-white/20 bg-white/55 px-2 py-1 text-xs text-foreground dark:border-white/10 dark:bg-white/[0.04]">
-                            {log.ipAddress || "—"}
-                          </code>
-                        </td>
+                        <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                          IP Address
+                        </th>
                       )}
                     </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          )}
+                  </thead>
 
-          {totalPages > 1 && (
-            <div className="border-t border-white/20 px-4 py-4 dark:border-white/10">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={setCurrentPage}
-                isLoading={isLoading}
-              />
-            </div>
-          )}
-        </CardContent>
-      </Card>
+                  <tbody>
+                    {logs.map((log: SystemLog) => (
+                      <tr
+                        key={log.id}
+                        className="border-b border-white/10 transition-colors duration-150 hover:bg-white/40 dark:hover:bg-white/[0.03]"
+                      >
+                        <td className="whitespace-nowrap px-5 py-4 text-xs font-medium text-muted-foreground">
+                          {formatDate(log.createdAt)}
+                        </td>
+
+                        <td className="px-5 py-4">
+                          <span
+                            className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${ACTION_BADGE_COLORS[log.action] ??
+                              "border-white/20 bg-white/40 text-muted-foreground dark:bg-white/[0.04]"
+                              }`}
+                          >
+                            {formatAction(log.action)}
+                          </span>
+                        </td>
+
+                        <td className="max-w-[460px] px-5 py-4 text-sm leading-relaxed text-foreground">
+                          <div className="line-clamp-2">
+                            {highlightText(log.message, debouncedSearch)}
+                          </div>
+                        </td>
+
+                        <td className="px-5 py-4 text-sm text-muted-foreground">
+                          {log.userEmail
+                            ? highlightText(log.userEmail, debouncedSearch)
+                            : "—"}
+                        </td>
+
+                        <td className="px-5 py-4 text-sm text-muted-foreground">
+                          {log.targetEmail
+                            ? highlightText(log.targetEmail, debouncedSearch)
+                            : "—"}
+                        </td>
+
+                        {showIPAddress && (
+                          <td className="px-5 py-4">
+                            <code className="rounded-lg border border-white/20 bg-white/55 px-2 py-1 text-xs text-foreground dark:border-white/10 dark:bg-white/[0.04]">
+                              {log.ipAddress || "—"}
+                            </code>
+                          </td>
+                        )}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+
+            {totalPages > 1 && (
+              <div className="border-t border-white/20 px-4 py-4 dark:border-white/10">
+                <Pagination
+                  currentPage={currentPage}
+                  totalPages={totalPages}
+                  onPageChange={setCurrentPage}
+                  isLoading={isLoading}
+                />
+              </div>
+            )}
+          </CardContent>
+        </Card>
       </div>
     </Layout>
   );

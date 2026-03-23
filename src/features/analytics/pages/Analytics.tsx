@@ -20,11 +20,12 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-
 export default function AnalyticsPage() {
   const { students, loading, error } = useStudentAnalytics();
 
-  const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
+  const [selectedYear, setSelectedYear] = useState<number>(
+    new Date().getFullYear(),
+  );
   const [religionPage, setReligionPage] = useState(0);
   const [cityPage, setCityPage] = useState(0);
   const [educationPage, setEducationPage] = useState(0);
@@ -35,21 +36,16 @@ export default function AnalyticsPage() {
       <div className="space-y-4">
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
-          <AlertDescription>
-            Error loading analytics: {error}
-          </AlertDescription>
+          <AlertDescription>Error loading analytics: {error}</AlertDescription>
         </Alert>
         <div className="text-sm text-muted-foreground p-4 bg-muted rounded-lg">
           <p className="mb-3">Troubleshooting steps:</p>
           <ul className="list-disc list-inside space-y-1 mb-4">
             <li>Check that the backend API is running</li>
-            <li>
-              Open browser console (F12) for detailed error information
-            </li>
+            <li>Open browser console (F12) for detailed error information</li>
             <li>Verify you are logged in as an admin</li>
             <li>Try refreshing the page</li>
           </ul>
-
         </div>
       </div>
     );
@@ -65,7 +61,7 @@ export default function AnalyticsPage() {
     stale: { bg: "bg-stale-background", text: "text-stale-foreground" },
   };
 
-  // color palette for charts 
+  // color palette for charts
   const SOFT_COLORS = [
     "#93c5fd", // Blue (info) - soft blue
     "#bbf7d0", // Green (success) - soft green
@@ -334,49 +330,48 @@ export default function AnalyticsPage() {
 
   return (
     <Layout
-      title="Analytics"
+      title="Guidance Analytics"
+      description="Detailed analysis of student demographics, distributions, and trends"
+      badgeText="Analytics"
+      badgeIcon={<TrendingUp className="h-4 w-4" />}
       isLoading={loading}
+      headerActions={
+        <div className="flex flex-col gap-1 min-w-[140px]">
+          <label className="text-xs font-medium text-foreground/70 px-1">
+            Filter by Year
+          </label>
+          <select
+            value={selectedYear}
+            onChange={(e) => {
+              setSelectedYear(parseInt(e.target.value));
+              setReligionPage(0);
+              setCityPage(0);
+              setEducationPage(0);
+              setStatusPage(0);
+            }}
+            className="px-3 py-2 rounded-xl border border-border bg-background/50 backdrop-blur-sm text-foreground text-sm shadow-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+          >
+            <option value={new Date().getFullYear()}>All Years</option>
+            {getAvailableYears().map((year) => (
+              <option key={year} value={year}>
+                {year}
+              </option>
+            ))}
+          </select>
+        </div>
+      }
     >
       <div className="space-y-6 pb-8">
-        {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
-          <div className="flex flex-col gap-1">
-            <h1 className="text-3xl font-bold text-foreground">Student Analytics</h1>
-            <p className="text-sm text-muted-foreground">
-              Comprehensive overview of student demographics and educational data
-            </p>
-          </div>
-          <div className="flex flex-col md:flex-row gap-3 items-start md:items-center">
-            {/* Year Filter */}
-            <div className="flex flex-col gap-1">
-              <label className="text-sm font-medium text-foreground">Filter by Year</label>
-              <select
-                value={selectedYear}
-                onChange={(e) => {
-                  setSelectedYear(parseInt(e.target.value));
-                  setReligionPage(0);
-                  setCityPage(0);
-                  setEducationPage(0);
-                  setStatusPage(0);
-                }}
-                className="px-3 py-2 rounded-md border border-input bg-background text-foreground text-sm"
-              >
-                <option value={new Date().getFullYear()}>All Years</option>
-                {getAvailableYears().map((year) => (
-                  <option key={year} value={year}>
-                    {year}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </div>
 
         {/* Top KPI Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Total Students */}
-          <div className={`${KPI_COLORS[0].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
-            <p className={`text-xs font-semibold ${KPI_COLORS[0].text} uppercase tracking-wide mb-3 opacity-80`}>
+          <div
+            className={`${KPI_COLORS[0].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}
+          >
+            <p
+              className={`text-xs font-semibold ${KPI_COLORS[0].text} uppercase tracking-wide mb-3 opacity-80`}
+            >
               Total Students
             </p>
             <p className={`text-5xl font-bold ${KPI_COLORS[0].text} mb-2`}>
@@ -388,8 +383,12 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Average Age */}
-          <div className={`${KPI_COLORS[1].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
-            <p className={`text-xs font-semibold ${KPI_COLORS[1].text} uppercase tracking-wide mb-3 opacity-80`}>
+          <div
+            className={`${KPI_COLORS[1].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}
+          >
+            <p
+              className={`text-xs font-semibold ${KPI_COLORS[1].text} uppercase tracking-wide mb-3 opacity-80`}
+            >
               Average Age
             </p>
             <p className={`text-5xl font-bold ${KPI_COLORS[1].text} mb-2`}>
@@ -401,15 +400,21 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Completion Rate */}
-          <div className={`${KPI_COLORS[2].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
-            <p className={`text-xs font-semibold ${KPI_COLORS[2].text} uppercase tracking-wide mb-3 opacity-80`}>
+          <div
+            className={`${KPI_COLORS[2].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}
+          >
+            <p
+              className={`text-xs font-semibold ${KPI_COLORS[2].text} uppercase tracking-wide mb-3 opacity-80`}
+            >
               Data Completeness
             </p>
             <p className={`text-5xl font-bold ${KPI_COLORS[2].text} mb-2`}>
               {Math.round(
-                ((filteredStudents.filter((s) => s.religion && s.addresses?.length).length /
+                ((filteredStudents.filter(
+                  (s) => s.religion && s.addresses?.length,
+                ).length /
                   filteredStudents.length) *
-                  100) as any
+                  100) as any,
               )}
               <span className="text-2xl">%</span>
             </p>
@@ -419,16 +424,20 @@ export default function AnalyticsPage() {
           </div>
 
           {/* With Addresses */}
-          <div className={`${KPI_COLORS[3].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}>
-            <p className={`text-xs font-semibold ${KPI_COLORS[3].text} uppercase tracking-wide mb-3 opacity-80`}>
+          <div
+            className={`${KPI_COLORS[3].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}
+          >
+            <p
+              className={`text-xs font-semibold ${KPI_COLORS[3].text} uppercase tracking-wide mb-3 opacity-80`}
+            >
               Locations Mapped
             </p>
             <p className={`text-5xl font-bold ${KPI_COLORS[3].text} mb-2`}>
-              {filteredStudents.filter((s) => s.addresses?.length).length.toLocaleString()}
+              {filteredStudents
+                .filter((s) => s.addresses?.length)
+                .length.toLocaleString()}
             </p>
-            <p className="text-xs opacity-70">
-              Students with addresses
-            </p>
+            <p className="text-xs opacity-70">Students with addresses</p>
           </div>
         </div>
 
@@ -453,7 +462,11 @@ export default function AnalyticsPage() {
                     }}
                     formatter={(value) => [value, "Students"]}
                   />
-                  <Bar dataKey="value" fill={SOFT_COLORS[0]} radius={[8, 8, 0, 0]} />
+                  <Bar
+                    dataKey="value"
+                    fill={SOFT_COLORS[0]}
+                    radius={[8, 8, 0, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -482,7 +495,10 @@ export default function AnalyticsPage() {
                     dataKey="value"
                   >
                     {getCivilStatusData().map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={SOFT_COLORS[index % SOFT_COLORS.length]} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={SOFT_COLORS[index % SOFT_COLORS.length]}
+                      />
                     ))}
                   </Pie>
                   <Tooltip formatter={(value) => [value, "Count"]} />
@@ -499,19 +515,30 @@ export default function AnalyticsPage() {
         {/* Breakdown Cards - 2x2 Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Religion Breakdown */}
-          <div className={`${STATUS_COLOR_MAP.info.bg} rounded-md shadow border border-border p-6`}>
+          <div
+            className={`${STATUS_COLOR_MAP.info.bg} rounded-md shadow border border-border p-6`}
+          >
             <div className="flex justify-between items-center mb-4">
-              <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.info.text}`}>
+              <h3
+                className={`text-lg font-semibold ${STATUS_COLOR_MAP.info.text}`}
+              >
                 Religion Distribution
               </h3>
-              <span className="text-xs font-medium opacity-70">({getReligionBreakdown().total})</span>
+              <span className="text-xs font-medium opacity-70">
+                ({getReligionBreakdown().total})
+              </span>
             </div>
             <div className="space-y-2">
               {getReligionBreakdown().data.length > 0 ? (
                 getReligionBreakdown().data.map(([religion, count]) => (
-                  <div key={religion} className="flex justify-between items-center">
+                  <div
+                    key={religion}
+                    className="flex justify-between items-center"
+                  >
                     <span className="text-sm">{religion}</span>
-                    <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.info.text}`}>
+                    <span
+                      className={`text-sm font-semibold ${STATUS_COLOR_MAP.info.text}`}
+                    >
                       {count}
                     </span>
                   </div>
@@ -522,37 +549,47 @@ export default function AnalyticsPage() {
             </div>
             {getReligionBreakdown().pages > 1 && (
               <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-                {Array.from({ length: getReligionBreakdown().pages }).map((_, page) => (
-                  <button
-                    key={page}
-                    onClick={() => setReligionPage(page)}
-                    className={`px-2 py-1 text-xs rounded transition-colors ${
-                      religionPage === page
-                        ? `${STATUS_COLOR_MAP.info.bg} ${STATUS_COLOR_MAP.info.text}`
-                        : "bg-muted text-muted-foreground hover:bg-muted/80"
-                    }`}
-                  >
-                    {page + 1}
-                  </button>
-                ))}
+                {Array.from({ length: getReligionBreakdown().pages }).map(
+                  (_, page) => (
+                    <button
+                      key={page}
+                      onClick={() => setReligionPage(page)}
+                      className={`px-2 py-1 text-xs rounded transition-colors ${
+                        religionPage === page
+                          ? `${STATUS_COLOR_MAP.info.bg} ${STATUS_COLOR_MAP.info.text}`
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                    >
+                      {page + 1}
+                    </button>
+                  ),
+                )}
               </div>
             )}
           </div>
 
           {/* Location Breakdown */}
-          <div className={`${STATUS_COLOR_MAP.success.bg} rounded-md shadow border border-border p-6`}>
+          <div
+            className={`${STATUS_COLOR_MAP.success.bg} rounded-md shadow border border-border p-6`}
+          >
             <div className="flex justify-between items-center mb-4">
-              <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.success.text}`}>
+              <h3
+                className={`text-lg font-semibold ${STATUS_COLOR_MAP.success.text}`}
+              >
                 Top Locations
               </h3>
-              <span className="text-xs font-medium opacity-70">({getCityBreakdown().total})</span>
+              <span className="text-xs font-medium opacity-70">
+                ({getCityBreakdown().total})
+              </span>
             </div>
             <div className="space-y-2">
               {getCityBreakdown().data.length > 0 ? (
                 getCityBreakdown().data.map(([city, count]) => (
                   <div key={city} className="flex justify-between items-center">
                     <span className="text-sm truncate">{city}</span>
-                    <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.success.text}`}>
+                    <span
+                      className={`text-sm font-semibold ${STATUS_COLOR_MAP.success.text}`}
+                    >
                       {count}
                     </span>
                   </div>
@@ -563,19 +600,21 @@ export default function AnalyticsPage() {
             </div>
             {getCityBreakdown().pages > 1 && (
               <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-                {Array.from({ length: getCityBreakdown().pages }).map((_, page) => (
-                  <button
-                    key={page}
-                    onClick={() => setCityPage(page)}
-                    className={`px-2 py-1 text-xs rounded transition-colors ${
-                      cityPage === page
-                        ? `${STATUS_COLOR_MAP.success.bg} ${STATUS_COLOR_MAP.success.text}`
-                        : "bg-muted text-muted-foreground hover:bg-muted/80"
-                    }`}
-                  >
-                    {page + 1}
-                  </button>
-                ))}
+                {Array.from({ length: getCityBreakdown().pages }).map(
+                  (_, page) => (
+                    <button
+                      key={page}
+                      onClick={() => setCityPage(page)}
+                      className={`px-2 py-1 text-xs rounded transition-colors ${
+                        cityPage === page
+                          ? `${STATUS_COLOR_MAP.success.bg} ${STATUS_COLOR_MAP.success.text}`
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                    >
+                      {page + 1}
+                    </button>
+                  ),
+                )}
               </div>
             )}
           </div>
@@ -584,19 +623,30 @@ export default function AnalyticsPage() {
         {/* Education & Income Breakdown */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
           {/* Father's Education */}
-          <div className={`${STATUS_COLOR_MAP.warning.bg} rounded-md shadow border border-border p-6`}>
+          <div
+            className={`${STATUS_COLOR_MAP.warning.bg} rounded-md shadow border border-border p-6`}
+          >
             <div className="flex justify-between items-center mb-4">
-              <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.warning.text}`}>
+              <h3
+                className={`text-lg font-semibold ${STATUS_COLOR_MAP.warning.text}`}
+              >
                 Father's Education
               </h3>
-              <span className="text-xs font-medium opacity-70">({getEducationBreakdown().total})</span>
+              <span className="text-xs font-medium opacity-70">
+                ({getEducationBreakdown().total})
+              </span>
             </div>
             <div className="space-y-2">
               {getEducationBreakdown().data.length > 0 ? (
                 getEducationBreakdown().data.map(([education, count]) => (
-                  <div key={education} className="flex justify-between items-center">
+                  <div
+                    key={education}
+                    className="flex justify-between items-center"
+                  >
                     <span className="text-sm">{education}</span>
-                    <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.warning.text}`}>
+                    <span
+                      className={`text-sm font-semibold ${STATUS_COLOR_MAP.warning.text}`}
+                    >
                       {count}
                     </span>
                   </div>
@@ -607,37 +657,50 @@ export default function AnalyticsPage() {
             </div>
             {getEducationBreakdown().pages > 1 && (
               <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-                {Array.from({ length: getEducationBreakdown().pages }).map((_, page) => (
-                  <button
-                    key={page}
-                    onClick={() => setEducationPage(page)}
-                    className={`px-2 py-1 text-xs rounded transition-colors ${
-                      educationPage === page
-                        ? `${STATUS_COLOR_MAP.warning.bg} ${STATUS_COLOR_MAP.warning.text}`
-                        : "bg-muted text-muted-foreground hover:bg-muted/80"
-                    }`}
-                  >
-                    {page + 1}
-                  </button>
-                ))}
+                {Array.from({ length: getEducationBreakdown().pages }).map(
+                  (_, page) => (
+                    <button
+                      key={page}
+                      onClick={() => setEducationPage(page)}
+                      className={`px-2 py-1 text-xs rounded transition-colors ${
+                        educationPage === page
+                          ? `${STATUS_COLOR_MAP.warning.bg} ${STATUS_COLOR_MAP.warning.text}`
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                    >
+                      {page + 1}
+                    </button>
+                  ),
+                )}
               </div>
             )}
           </div>
 
           {/* Civil Status Breakdown */}
-          <div className={`${STATUS_COLOR_MAP.notice.bg} rounded-md shadow border border-border p-6`}>
+          <div
+            className={`${STATUS_COLOR_MAP.notice.bg} rounded-md shadow border border-border p-6`}
+          >
             <div className="flex justify-between items-center mb-4">
-              <h3 className={`text-lg font-semibold ${STATUS_COLOR_MAP.notice.text}`}>
+              <h3
+                className={`text-lg font-semibold ${STATUS_COLOR_MAP.notice.text}`}
+              >
                 Civil Status Breakdown
               </h3>
-              <span className="text-xs font-medium opacity-70">({getCivilStatusBreakdown().total})</span>
+              <span className="text-xs font-medium opacity-70">
+                ({getCivilStatusBreakdown().total})
+              </span>
             </div>
             <div className="space-y-2">
               {getCivilStatusBreakdown().data.length > 0 ? (
                 getCivilStatusBreakdown().data.map(([status, count]) => (
-                  <div key={status} className="flex justify-between items-center">
+                  <div
+                    key={status}
+                    className="flex justify-between items-center"
+                  >
                     <span className="text-sm">{status}</span>
-                    <span className={`text-sm font-semibold ${STATUS_COLOR_MAP.notice.text}`}>
+                    <span
+                      className={`text-sm font-semibold ${STATUS_COLOR_MAP.notice.text}`}
+                    >
                       {count}
                     </span>
                   </div>
@@ -648,19 +711,21 @@ export default function AnalyticsPage() {
             </div>
             {getCivilStatusBreakdown().pages > 1 && (
               <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-                {Array.from({ length: getCivilStatusBreakdown().pages }).map((_, page) => (
-                  <button
-                    key={page}
-                    onClick={() => setStatusPage(page)}
-                    className={`px-2 py-1 text-xs rounded transition-colors ${
-                      statusPage === page
-                        ? `${STATUS_COLOR_MAP.notice.bg} ${STATUS_COLOR_MAP.notice.text}`
-                        : "bg-muted text-muted-foreground hover:bg-muted/80"
-                    }`}
-                  >
-                    {page + 1}
-                  </button>
-                ))}
+                {Array.from({ length: getCivilStatusBreakdown().pages }).map(
+                  (_, page) => (
+                    <button
+                      key={page}
+                      onClick={() => setStatusPage(page)}
+                      className={`px-2 py-1 text-xs rounded transition-colors ${
+                        statusPage === page
+                          ? `${STATUS_COLOR_MAP.notice.bg} ${STATUS_COLOR_MAP.notice.text}`
+                          : "bg-muted text-muted-foreground hover:bg-muted/80"
+                      }`}
+                    >
+                      {page + 1}
+                    </button>
+                  ),
+                )}
               </div>
             )}
           </div>
@@ -682,7 +747,12 @@ export default function AnalyticsPage() {
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
                   <XAxis type="number" stroke="#6b7280" />
-                  <YAxis dataKey="name" type="category" width={150} stroke="#6b7280" />
+                  <YAxis
+                    dataKey="name"
+                    type="category"
+                    width={150}
+                    stroke="#6b7280"
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "hsl(var(--background))",
@@ -691,7 +761,11 @@ export default function AnalyticsPage() {
                     }}
                     formatter={(value) => [value, "Students"]}
                   />
-                  <Bar dataKey="value" fill={SOFT_COLORS[1]} radius={[0, 8, 8, 0]} />
+                  <Bar
+                    dataKey="value"
+                    fill={SOFT_COLORS[1]}
+                    radius={[0, 8, 8, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -730,7 +804,11 @@ export default function AnalyticsPage() {
                     }}
                     formatter={(value) => [value, "Students"]}
                   />
-                  <Bar dataKey="value" fill={SOFT_COLORS[2]} radius={[0, 8, 8, 0]} />
+                  <Bar
+                    dataKey="value"
+                    fill={SOFT_COLORS[2]}
+                    radius={[0, 8, 8, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             ) : (
@@ -766,7 +844,11 @@ export default function AnalyticsPage() {
                     }}
                     formatter={(value) => [value, "Students"]}
                   />
-                  <Bar dataKey="value" fill={SOFT_COLORS[3]} radius={[0, 8, 8, 0]} />
+                  <Bar
+                    dataKey="value"
+                    fill={SOFT_COLORS[3]}
+                    radius={[0, 8, 8, 0]}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             ) : (

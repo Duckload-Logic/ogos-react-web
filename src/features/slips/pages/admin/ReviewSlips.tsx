@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Archive, CheckCircle2, Clock3, RotateCcw, XCircle } from "lucide-react";
+import { Archive, CheckCircle2, Clock3, FileText, RotateCcw, XCircle } from "lucide-react";
 
 import { useDebounce } from "@/hooks/useDebounce";
 import { Button } from "@/components/ui/button";
@@ -180,7 +180,36 @@ export default function ReviewSlips() {
   return (
     <Layout
       title="Review Excuse Slips"
+      description="Review submissions, filter the queue, and process student requests."
+      badgeText="Slip Management"
+      badgeIcon={<FileText className="h-4 w-4" />}
       isLoading={isPageLoading}
+      headerActions={
+        <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
+          {(["today", "week", "month"] as TimeFilter[]).map((filter) => (
+            <Button
+              key={filter}
+              variant={timeFilter === filter ? "default" : "outline"}
+              onClick={() => {
+                setTimeFilter(filter);
+                setCurrentPage(1);
+              }}
+              className="h-10 min-w-[100px] rounded-xl px-4 shadow-sm"
+            >
+              {getFilterLabel(filter)}
+            </Button>
+          ))}
+
+          <Button
+            variant="outline"
+            onClick={() => navigate("/admin/admission-slips/logs")}
+            className="h-10 rounded-xl px-4 shadow-sm gap-2"
+          >
+            <Archive className="h-4 w-4" />
+            View All Logs
+          </Button>
+        </div>
+      }
     >
       <div className="animate-in fade-in slide-in-from-bottom-4 space-y-4 duration-300 lg:space-y-5">
         <div className="rounded-lg border border-blue-300 bg-blue-500/10 px-4 py-3.5 shadow-sm">
@@ -189,42 +218,6 @@ export default function ReviewSlips() {
             This page allows you to review, approve, reject, or request revisions
             for those slips.
           </p>
-        </div>
-
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-end xl:justify-between">
-          <div className="space-y-0.5">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground lg:text-[2rem]">
-              Review Excuse Slips
-            </h1>
-            <p className="text-sm text-muted-foreground">
-              Review submissions, filter the queue, and process student requests.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
-            {(["today", "week", "month"] as TimeFilter[]).map((filter) => (
-              <Button
-                key={filter}
-                variant={timeFilter === filter ? "default" : "outline"}
-                onClick={() => {
-                  setTimeFilter(filter);
-                  setCurrentPage(1);
-                }}
-                className={controlClass}
-              >
-                {getFilterLabel(filter)}
-              </Button>
-            ))}
-
-            <Button
-              variant="outline"
-              onClick={() => navigate("/admin/admission-slips/logs")}
-              className={`${controlClass} gap-2`}
-            >
-              <Archive className="h-4 w-4" />
-              View All Logs
-            </Button>
-          </div>
         </div>
 
         <div className="grid grid-cols-1 gap-3.5 xl:grid-cols-12">

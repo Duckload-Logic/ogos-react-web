@@ -1,9 +1,4 @@
-import { Link } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Skeleton } from "@/components/ui/skeleton";
 import { AnimationStyles } from "@/components/ui/animations";
-import { HeroSection } from "@/components/ui/hero-section";
 import { StatsCard } from "@/components/ui/stats-card";
 import { QuickActionsGrid } from "@/components/ui/quick-actions-grid";
 import { StudentProfileCard } from "@/features/students/components/StudentProfileCard";
@@ -99,15 +94,15 @@ export function Dashboard() {
   }
 
   return (
-    <Layout title="Services" isLoading={isLoading}>
+    <Layout
+      title={`Welcome back, ${me?.firstName} ${me?.lastName}`}
+      description="PUP Guidance Services — Supporting your academic and personal growth"
+      badgeText="Student Dashboard"
+      badgeIcon={<User className="h-4 w-4" />}
+      isLoading={isLoading}
+    >
       <PortalShell role="student">
         <AnimationStyles />
-
-        <HeroSection
-          greeting="Welcome back,"
-          title={`${me?.firstName} ${me?.lastName}`}
-          subtitle="PUP Guidance Services — Supporting your academic and personal growth"
-        />
 
         <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-10">
           <div className="grid grid-cols-2 gap-4 mb-6">

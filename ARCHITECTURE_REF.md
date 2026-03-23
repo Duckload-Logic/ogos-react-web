@@ -1,8 +1,9 @@
 # DuckLoad Architecture Reference
+
 ## March 2026 DRY Refactor - Comprehensive Guide
 
-**Last Updated:** March 2026  
-**Version:** 1.0.0  
+**Last Updated:** March 2026
+**Version:** 1.0.0
 **Status:** Production Ready
 
 ---
@@ -24,14 +25,15 @@
 
 The application has transitioned from LocalStorage-based session management to **HttpOnly Cookies** for enhanced security.
 
-| Aspect | LocalStorage | HttpOnly Cookies |
-|--------|-------------|------------------|
-| **XSS Vulnerability** | ❌ Accessible via JavaScript | ✅ Inaccessible to JavaScript |
-| **CSRF Protection** | ❌ Manual handling required | ✅ Automatic with SameSite flag |
-| **Server Control** | ❌ Client-side only | ✅ Server can invalidate anytime |
-| **Refresh Tokens** | ❌ Exposed in storage | ✅ Secure, automatic refresh |
+| Aspect                | LocalStorage                 | HttpOnly Cookies                 |
+| --------------------- | ---------------------------- | -------------------------------- |
+| **XSS Vulnerability** | ❌ Accessible via JavaScript | ✅ Inaccessible to JavaScript    |
+| **CSRF Protection**   | ❌ Manual handling required  | ✅ Automatic with SameSite flag  |
+| **Server Control**    | ❌ Client-side only          | ✅ Server can invalidate anytime |
+| **Refresh Tokens**    | ❌ Exposed in storage        | ✅ Secure, automatic refresh     |
 
 **Implementation:**
+
 - Access tokens stored in HttpOnly cookies (set by server)
 - Refresh tokens stored in HttpOnly cookies (set by server)
 - `withCredentials: true` in Axios config ensures cookies are sent with requests
@@ -52,11 +54,13 @@ const data2 = await BootstrapApp();
 ```
 
 **Why Promise Singleton?**
+
 - Prevents redundant API calls when multiple components initialize simultaneously
 - Ensures consistent data across the app
 - Reduces network overhead on app startup
 
 **Bootstrap Data Includes:**
+
 - User profile (from `/me` endpoint)
 - Slip statuses and categories
 - Appointment statuses and categories
@@ -80,6 +84,7 @@ Response → Check status
 ```
 
 **Critical Behavior:**
+
 - 401 errors are **always rejected** (never swallowed)
 - Rejection allows `useMe` hook to transition to `"error"` state
 - AuthProvider detects error state and redirects to `/login`
@@ -95,15 +100,16 @@ Response → Check status
 
 All service functions follow the naming convention: **`[HTTP Method][Resource]`**
 
-| HTTP Method | Resource | Function Name | Example |
-|------------|----------|---------------|---------|
-| GET | Current User | `GetMe` | `GetMe()` |
-| GET | User by ID | `GetUserById` | `GetUserById(id)` |
-| POST | Slip | `PostSlip` | `PostSlip(data)` |
-| PATCH | Appointment Status | `PatchAppointmentStatus` | `PatchAppointmentStatus(id, status)` |
-| DELETE | Account | `DeleteAccount` | `DeleteAccount()` |
+| HTTP Method | Resource           | Function Name            | Example                              |
+| ----------- | ------------------ | ------------------------ | ------------------------------------ |
+| GET         | Current User       | `GetMe`                  | `GetMe()`                            |
+| GET         | User by ID         | `GetUserById`            | `GetUserById(id)`                    |
+| POST        | Slip               | `PostSlip`               | `PostSlip(data)`                     |
+| PATCH       | Appointment Status | `PatchAppointmentStatus` | `PatchAppointmentStatus(id, status)` |
+| DELETE      | Account            | `DeleteAccount`          | `DeleteAccount()`                    |
 
 **Benefits:**
+
 - Immediately clear what HTTP method is used
 - Prevents confusion between GET and POST operations
 - Consistent across all services
@@ -116,30 +122,23 @@ Every service function accepts an optional `config` parameter for error logging.
 ```typescript
 export interface AxiosConfigWithMeta
   extends Partial<InternalAxiosRequestConfig> {
-  handlerName?: string;  // Function name for logging
-  stepName?: string;     // Specific step that failed
-  _retry?: boolean;      // Internal retry flag
+  handlerName?: string; // Function name for logging
+  stepName?: string; // Specific step that failed
+  _retry?: boolean; // Internal retry flag
 }
 ```
 
 **Usage in Services:**
 
 ```typescript
-export async function GetMe(
-  config?: AxiosConfigWithMeta,
-): Promise<User> {
+export async function GetMe(config?: AxiosConfigWithMeta): Promise<User> {
   try {
-    const response = await apiClient.get(
-      API_ROUTES.users.me,
-      config,
-    );
+    const response = await apiClient.get(API_ROUTES.users.me, config);
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetMe';
-    const stepName = config?.stepName || 'Fetch User';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetMe";
+    const stepName = config?.stepName || "Fetch User";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -151,8 +150,8 @@ export async function GetMe(
 const { data: user } = useQuery({
   queryFn: () =>
     GetMe({
-      handlerName: 'useMe',
-      stepName: 'Fetch Current User',
+      handlerName: "useMe",
+      stepName: "Fetch Current User",
     }),
 });
 ```
@@ -167,14 +166,15 @@ All errors must follow this exact format:
 
 **Examples:**
 
-| Scenario | Log Output |
-|----------|-----------|
-| User fetch fails | `[useMe] {Fetch Current User}: 401 Unauthorized` |
-| Slip submission fails | `[useSubmitSlip] {Submit Slip}: Network timeout` |
-| Bootstrap fails | `[BootstrapApp] {Initialize}: Failed to fetch regions` |
-| Token refresh fails | `[AuthProvider] {Token Refresh}: Invalid refresh token` |
+| Scenario              | Log Output                                              |
+| --------------------- | ------------------------------------------------------- |
+| User fetch fails      | `[useMe] {Fetch Current User}: 401 Unauthorized`        |
+| Slip submission fails | `[useSubmitSlip] {Submit Slip}: Network timeout`        |
+| Bootstrap fails       | `[BootstrapApp] {Initialize}: Failed to fetch regions`  |
+| Token refresh fails   | `[AuthProvider] {Token Refresh}: Invalid refresh token` |
 
 **Why This Format?**
+
 - `[HandlerName]`: Identifies which function/hook failed
 - `{Specific Step}`: Pinpoints exact operation that failed
 - Enables rapid debugging and error tracking
@@ -195,15 +195,15 @@ Centralized query key definitions prevent magic strings and ensure consistency.
 ```typescript
 export const QUERY_KEYS = {
   users: {
-    all: ['users'] as const,
-    me: ['users', 'me'] as const,
-    byId: (id: string) => ['users', 'me', id] as const,
+    all: ["users"] as const,
+    me: ["users", "me"] as const,
+    byId: (id: string) => ["users", "me", id] as const,
   },
   slips: {
-    all: ['slips'] as const,
-    mySlips: ['slips', 'me'] as const,
-    stats: ['slips', 'stats'] as const,
-    byId: (id: number) => ['slips', 'id', id] as const,
+    all: ["slips"] as const,
+    mySlips: ["slips", "me"] as const,
+    stats: ["slips", "stats"] as const,
+    byId: (id: number) => ["slips", "id", id] as const,
   },
   // ... more keys
 } as const;
@@ -220,12 +220,13 @@ useQuery({
 
 // ❌ WRONG: Magic string
 useQuery({
-  queryKey: ['users', 'me'],
+  queryKey: ["users", "me"],
   queryFn: () => GetMe(),
 });
 ```
 
 **Benefits:**
+
 - Single source of truth for query keys
 - Type-safe (TypeScript catches typos)
 - Easy to refactor keys globally
@@ -247,8 +248,8 @@ export function useMe({ enabled = true }: { enabled?: boolean }) {
     queryKey: QUERY_KEYS.users.me,
     queryFn: async (): Promise<User> => {
       return await userService.GetMe({
-        handlerName: 'useMe',
-        stepName: 'Fetch Current User',
+        handlerName: "useMe",
+        stepName: "Fetch Current User",
       });
     },
     enabled: !!localStorage.getItem("accessToken"),
@@ -261,12 +262,12 @@ export function useMe({ enabled = true }: { enabled?: boolean }) {
 
 **How It Prevents Redirect Loops:**
 
-| Scenario | Behavior |
-|----------|----------|
-| Session valid | `status: "success"` → Show app |
-| Session expired (401) | `status: "error"` → Redirect to login |
-| API timeout | After 5s → `hasTimedOut: true` → Redirect to login |
-| Loading | Show spinner (not redirect) |
+| Scenario              | Behavior                                           |
+| --------------------- | -------------------------------------------------- |
+| Session valid         | `status: "success"` → Show app                     |
+| Session expired (401) | `status: "error"` → Redirect to login              |
+| API timeout           | After 5s → `hasTimedOut: true` → Redirect to login |
+| Loading               | Show spinner (not redirect)                        |
 
 ### Cache Timing Constants
 
@@ -277,16 +278,16 @@ Different data types have different freshness requirements.
 ```typescript
 export const CACHE_TIMING = {
   SHORT: {
-    staleTime: 5 * 60 * 1000,      // 5 minutes
-    gcTime: 30 * 60 * 1000,        // 30 minutes
+    staleTime: 5 * 60 * 1000, // 5 minutes
+    gcTime: 30 * 60 * 1000, // 30 minutes
   },
   MEDIUM: {
-    staleTime: 30 * 60 * 1000,     // 30 minutes
-    gcTime: 60 * 60 * 1000,        // 1 hour
+    staleTime: 30 * 60 * 1000, // 30 minutes
+    gcTime: 60 * 60 * 1000, // 1 hour
   },
   LONG: {
-    staleTime: 60 * 60 * 1000,     // 1 hour
-    gcTime: 2 * 60 * 60 * 1000,    // 2 hours
+    staleTime: 60 * 60 * 1000, // 1 hour
+    gcTime: 2 * 60 * 60 * 1000, // 2 hours
   },
   NEVER: {
     staleTime: Infinity,
@@ -297,12 +298,12 @@ export const CACHE_TIMING = {
 
 **When to Use Each:**
 
-| Timing | Use Case | Examples |
-|--------|----------|----------|
-| **SHORT** | Frequently changing data | Appointments, slips, user activity |
-| **MEDIUM** | Moderately changing data | User preferences, settings |
-| **LONG** | Stable reference data | Statuses, categories, locations |
-| **NEVER** | Critical identity data | Current user (`/me` endpoint) |
+| Timing     | Use Case                 | Examples                           |
+| ---------- | ------------------------ | ---------------------------------- |
+| **SHORT**  | Frequently changing data | Appointments, slips, user activity |
+| **MEDIUM** | Moderately changing data | User preferences, settings         |
+| **LONG**   | Stable reference data    | Statuses, categories, locations    |
+| **NEVER**  | Critical identity data   | Current user (`/me` endpoint)      |
 
 **Usage:**
 
@@ -310,7 +311,7 @@ export const CACHE_TIMING = {
 useQuery({
   queryKey: QUERY_KEYS.slips.all,
   queryFn: () => GetAllSlips(),
-  ...CACHE_TIMING.SHORT,  // Spread timing config
+  ...CACHE_TIMING.SHORT, // Spread timing config
 });
 ```
 
@@ -323,6 +324,7 @@ useQuery({
 All code must maintain a maximum line length of **80 characters** for readability and maintainability.
 
 **Why 80 Characters?**
+
 - Fits on standard terminal windows
 - Reduces cognitive load when reading
 - Encourages breaking complex logic into smaller pieces
@@ -367,13 +369,13 @@ setTimeout(() => setHasTimedOut(true), 5000);
 
 // ✅ CORRECT: Use role constants
 const ROLE_ROUTES = {
-  1: "/student/home",
-  2: "/admin/home",
-  3: "/superadmin/home",
+  1: "/student",
+  2: "/student",
+  3: "/superadmin",
 };
 
 // ❌ WRONG: Magic numbers
-if (user.role.id === 1) navigate("/student/home");
+if (user.role.id === 1) navigate("/student");
 ```
 
 ### Dynamic Format12HourTime Utility
@@ -397,8 +399,8 @@ const toISODateString = (date: Date) => {
 
 ```typescript
 // ✅ CORRECT: Use utility
-const displayTime = format12HourTime("14:30");  // "02:30 PM"
-const displayTime2 = format12HourTime("2024-03-15T14:30:00");  // "02:30 PM"
+const displayTime = format12HourTime("14:30"); // "02:30 PM"
+const displayTime2 = format12HourTime("2024-03-15T14:30:00"); // "02:30 PM"
 
 // ❌ WRONG: Manual formatting
 const displayTime = new Date("14:30").toLocaleTimeString();
@@ -431,21 +433,14 @@ export const API_ROUTES = {
 import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
 import { API_ROUTES } from "@/config/apiRoutes";
 
-export async function GetMyFeatures(
-  config?: AxiosConfigWithMeta,
-) {
+export async function GetMyFeatures(config?: AxiosConfigWithMeta) {
   try {
-    const response = await apiClient.get(
-      API_ROUTES.myFeature.all,
-      config,
-    );
+    const response = await apiClient.get(API_ROUTES.myFeature.all, config);
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetMyFeatures';
-    const stepName = config?.stepName || 'Fetch Features';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetMyFeatures";
+    const stepName = config?.stepName || "Fetch Features";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -462,11 +457,9 @@ export async function PostMyFeature(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'PostMyFeature';
-    const stepName = config?.stepName || 'Create Feature';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "PostMyFeature";
+    const stepName = config?.stepName || "Create Feature";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -478,9 +471,8 @@ export async function PostMyFeature(
 // src/config/queryKeys.ts
 export const QUERY_KEYS = {
   myFeature: {
-    all: ['myFeature'] as const,
-    byId: (id: number) =>
-      ['myFeature', 'id', id] as const,
+    all: ["myFeature"] as const,
+    byId: (id: number) => ["myFeature", "id", id] as const,
   },
 };
 ```
@@ -499,8 +491,8 @@ export function useMyFeatures() {
     queryKey: QUERY_KEYS.myFeature.all,
     queryFn: () =>
       GetMyFeatures({
-        handlerName: 'useMyFeatures',
-        stepName: 'Fetch Features',
+        handlerName: "useMyFeatures",
+        stepName: "Fetch Features",
       }),
     ...CACHE_TIMING.SHORT,
   });
@@ -514,9 +506,9 @@ export function useMyFeatures() {
 ```typescript
 // src/config/constants.ts
 export const ROLE_ROUTES = {
-  1: "/student/home",
-  2: "/admin/home",
-  3: "/superadmin/home",
+  1: "/student",
+  2: "/student",
+  3: "/superadmin",
 } as const;
 
 const ROLE_MAP = {
@@ -609,8 +601,8 @@ export async function submitForm(data: FormData) {
     // Step 3: Submit
     console.log("[submitForm] {Submit}: Sending to API");
     const response = await PostFormData(payload, {
-      handlerName: 'submitForm',
-      stepName: 'Submit',
+      handlerName: "submitForm",
+      stepName: "Submit",
     });
     console.log("[submitForm] {Submit}: Success");
 
@@ -623,15 +615,14 @@ export async function submitForm(data: FormData) {
 
     return response;
   } catch (error: any) {
-    console.error(
-      `[submitForm] {Process}: ${error.message}`,
-    );
+    console.error(`[submitForm] {Process}: ${error.message}`);
     throw error;
   }
 }
 ```
 
 **Log Output:**
+
 ```
 [submitForm] {Validate}: Starting validation
 [submitForm] {Validate}: Validation passed
@@ -671,6 +662,7 @@ export async function submitForm(data: FormData) {
 > **CRITICAL:** Never store tokens in LocalStorage. Always use HttpOnly cookies set by the server.
 
 **Automatic Refresh Flow:**
+
 1. Request fails with 401
 2. Axios interceptor calls `/auth/refresh`
 3. Server validates refresh token (from cookie)
@@ -722,19 +714,19 @@ The app prevents redirect loops on page refresh through:
 
 ## Quick Reference
 
-| Concept | Location | Key File |
-|---------|----------|----------|
-| Service naming | All services | `src/features/*/services/` |
-| Query keys | Centralized | `src/config/queryKeys.ts` |
-| Cache timing | Centralized | `src/config/constants.ts` |
-| Axios config | API client | `src/lib/api.ts` |
-| Auth context | Global | `src/context/AuthContext.tsx` |
-| Protected routes | Components | `src/components/ProtectedRoute.tsx` |
-| Bootstrapper | Services | `src/services/bootstrapper.ts` |
-| Date formatting | Utilities | `src/features/appointments/utils/dateTime.ts` |
+| Concept          | Location     | Key File                                      |
+| ---------------- | ------------ | --------------------------------------------- |
+| Service naming   | All services | `src/features/*/services/`                    |
+| Query keys       | Centralized  | `src/config/queryKeys.ts`                     |
+| Cache timing     | Centralized  | `src/config/constants.ts`                     |
+| Axios config     | API client   | `src/lib/api.ts`                              |
+| Auth context     | Global       | `src/context/AuthContext.tsx`                 |
+| Protected routes | Components   | `src/components/ProtectedRoute.tsx`           |
+| Bootstrapper     | Services     | `src/services/bootstrapper.ts`                |
+| Date formatting  | Utilities    | `src/features/appointments/utils/dateTime.ts` |
 
 ---
 
-**Document Version:** 1.0.0  
-**Last Updated:** March 2026  
+**Document Version:** 1.0.0
+**Last Updated:** March 2026
 **Maintained By:** DuckLoad Development Team

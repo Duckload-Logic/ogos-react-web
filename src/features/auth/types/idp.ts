@@ -32,9 +32,9 @@ export interface IDPTokenExchangeResponse {
  * Maps role_id to corresponding dashboard path
  */
 export const ROLE_ROUTES_INTERNAL = Object.freeze({
-  student: "/student/home",
-  admin: "/admin/home",
-  superadmin: "/superadmin/home",
+  student: "/student",
+  admin: "/admin",
+  superadmin: "/superadmin",
 } as const);
 
 /**

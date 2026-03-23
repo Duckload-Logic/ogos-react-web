@@ -33,6 +33,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Check,
+  User,
 } from "lucide-react";
 import {
   PersonalInformationSection,
@@ -201,7 +202,8 @@ export default function IIRForm() {
     }, duration);
   };
 
-  const isLoading = isInitializing || isLoadingDraft || isSubmitting || isSaving;
+  const isLoading =
+    isInitializing || isLoadingDraft || isSubmitting || isSaving;
 
   if (draftError) {
     return (
@@ -370,30 +372,16 @@ export default function IIRForm() {
   return (
     <Layout
       title="Individual Inventory Record"
+      description="Fill out your student information with confidence. Your data is protected and used solely for academic and guidance purposes."
+      badgeText="Student Profile Portal"
+      badgeIcon={<User className="h-4 w-4" />}
       isLoading={isLoading}
     >
       <div className="transition-colors duration-500">
         <AnimationStyles />
 
-        {/* Premium Glass Header */}
-        <div className="relative pt-16 pb-24 overflow-hidden">
-          <div className="absolute top-0 left-1/2 -tranneutral-x-1/2 w-full max-w-5xl h-full -z-10 blur-[120px] opacity-70" />
-          <div className="max-w-4xl mx-auto text-center animate-in fade-in zoom-in-95 duration-700">
-            <span className="inline-block px-4 py-1.5 mb-6 text-[11px] font-bold uppercase tracking-[0.2em] text-primary bg-primary/10 rounded-full border border-primary/20 backdrop-blur-md">
-              Student Profile Portal
-            </span>
-            <h1 className="text-4xl sm:text-5xl md:text-6xl font-[900] tracking-tight text-neutral-900 dark:text-white mb-6">
-              Individual Inventory <span className="text-primary">Record</span>
-            </h1>
-            <p className="text-neutral-600 dark:text-neutral-400 text-base sm:text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-              Fill out your student information with confidence. Your data is
-              protected and used solely for academic and guidance purposes.
-            </p>
-          </div>
-        </div>
-
         {/* Main Content Container */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 -mt-12 relative z-10">
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
           <div className="flex flex-col gap-10 w-full">
             {/* Draft Restore Prompt */}
             {showDraftPrompt && (

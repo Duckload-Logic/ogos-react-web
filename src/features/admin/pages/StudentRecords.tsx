@@ -1,7 +1,5 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { hashId } from "@/lib/hash";
-import StudentRecordsHeader from "../components/StudentRecordsHeader";
 import StudentSearchAndFilter from "../components/StudentSearchAndFilter";
 import StudentCardsGrid from "../components/StudentCardsGrid";
 import {
@@ -15,7 +13,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
+import { AlertCircle, Users } from "lucide-react";
 import { useCourses, useGenders, useIIRPagination } from "@/features/iir/hooks";
 import { IIRProfileView } from "@/features/iir/types/studentProfileView";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -75,19 +73,18 @@ export default function StudentRecords() {
   const [showAdd, setShowAdd] = useState(false);
   const navigate = useNavigate();
 
-  const isLoading = isCoursesLoading || isGendersLoading || isStudentsLoading || isDeleting;
+  const isLoading =
+    isCoursesLoading || isGendersLoading || isStudentsLoading || isDeleting;
 
   return (
     <Layout
       title="Student Records"
+      description="Access and manage student cumulative records and personal information"
+      badgeText="Admin Management"
+      badgeIcon={<Users className="h-4 w-4" />}
       isLoading={isLoading}
     >
       <div className="space-y-6">
-        <StudentRecordsHeader
-          onAddClick={() => setShowAdd(true)}
-          showRecords={allStudents.length}
-          totalRecords={totalRecords}
-        />
         <StudentSearchAndFilter
           searchTerm={searchTerm}
           onSearchChange={(value) => {

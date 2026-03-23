@@ -50,7 +50,8 @@ export default function StudentAppointments() {
       statusId: selectedStatus?.id === 0 ? undefined : selectedStatus?.id,
     },
   });
-  const { data: appointmentStats, isLoading: isStatsLoading } = useAppointmentsStats({});
+  const { data: appointmentStats, isLoading: isStatsLoading } =
+    useAppointmentsStats({});
 
   const isLoading = isAppointmentsLoading || isStatsLoading;
 
@@ -72,25 +73,22 @@ export default function StudentAppointments() {
   };
 
   return (
-    <Layout title="View Appointments" isLoading={isLoading}>
+    <Layout
+      title="My Appointments"
+      subTitle="View and manage your counseling appointments"
+      badgeText="Appointments"
+      badgeIcon={<Calendar className="w-4 h-4" />}
+      isLoading={isLoading}
+      headerActions={
+        <Button asChild className="gap-2 rounded-xl h-10 px-4">
+          <Link to="/student/appointments/schedule">
+            <Plus className="w-4 h-4" />
+            New Appointment
+          </Link>
+        </Button>
+      }
+    >
       <div className="space-y-6">
-        {/* Header with Add Button */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div>
-            <h1 className="text-2xl font-semibold text-foreground">
-              My Appointments
-            </h1>
-            <p className="text-sm text-muted-foreground mt-1">
-              View and manage your counseling appointments
-            </p>
-          </div>
-          <Button asChild className="gap-2">
-            <Link to="/student/appointments/schedule">
-              <Plus className="w-4 h-4" />
-              New Appointment
-            </Link>
-          </Button>
-        </div>
 
         {/* Stats Cards */}
         <div className={`grid grid-cols-2 md:grid-cols-7 gap-4`}>

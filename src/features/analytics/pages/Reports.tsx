@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Download, Eye } from "lucide-react";
+import { Download, Eye, FileText } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -75,7 +75,10 @@ export default function Reports() {
 
   return (
     <Layout
-      title="Reports"
+      title="System Reports"
+      description="View and export comprehensive data reports for students, appointments, and system logs"
+      badgeText="Analytics"
+      badgeIcon={<FileText className="h-4 w-4" />}
       isLoading={false}
     >
       <div className="space-y-6">

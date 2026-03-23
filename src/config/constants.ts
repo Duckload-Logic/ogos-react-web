@@ -5,9 +5,9 @@
 
 // Role to route mapping
 export const ROLE_ROUTES = {
-  student: "/student/home", // Student role
-  admin: "/admin/home", // Admin role
-  superadmin: "/superadmin/home", // Super Admin role
+  student: "/student", // Student role
+  admin: "/admin", // Admin role
+  superadmin: "/superadmin", // Super Admin role
 } as const;
 
 // Excuse Slip status

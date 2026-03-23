@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Calendar, CircleChevronLeft } from "lucide-react";
+import { Calendar } from "lucide-react";
 import { useSlipLogs, useGetSlipStats } from "../../hooks";
 import type { Slip, SlipStats } from "../../types/slip";
 import { SlipViewModal, SlipsList } from "../../components";
@@ -17,7 +17,6 @@ import { DropdownField } from "@/components/form";
 import Layout from "@/components/layout/Layout";
 
 export default function SlipLogs() {
-  const navigate = useNavigate();
 
   // Memoize year and month lists to keep them stable across renders
   const monthsList = useMemo(() => getMonthsList(), []);
@@ -116,35 +115,18 @@ export default function SlipLogs() {
     setIsModalOpen(true);
   };
 
-  const handleGoBack = () => {
-    navigate(-1);
-  };
 
   const isPageLoading = isLoading || isStatsLoading;
 
   return (
     <Layout
       title="Admission Slip Logs"
+      description="Historical record of all processed admission slips with date and status filters"
+      badgeText="Audit Trail"
+      badgeIcon={<Calendar className="h-4 w-4" />}
       isLoading={isPageLoading}
     >
       <div className="space-y-6">
-        {/* Header with Back Button */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-          <div className="flex flex-col items-start justify-start gap-8">
-            <Link
-              className="flex gap-2 group items-center text-sm text-foreground/70 font-medium hover:text-primary transition-colors w-max"
-              to="/admin/admission-slips"
-            >
-              <div className="flex items-center gap-2">
-                <CircleChevronLeft
-                  size={20}
-                  className="transform group-hover:-translate-x-1 transition-transform duration-300"
-                />
-                <span className="text-sm font-medium">Back</span>
-              </div>
-            </Link>
-          </div>
-        </div>
 
         {/* Filters Section */}
         <Card>

@@ -71,11 +71,7 @@ export default function Register() {
   };
 
   return (
-    <Layout
-      title="Register"
-      isLoggedIn={false}
-      isLoading={isLoading}
-    >
+    <Layout showHeader={false} isLoggedIn={false} isLoading={isLoading}>
       <section className="mx-auto flex w-full max-w-[1180px] items-center justify-center py-3 sm:py-5 lg:py-6">
         <div className="relative grid w-full overflow-hidden rounded-[30px] border border-[hsl(var(--border)/0.65)] bg-[hsl(var(--card)/0.82)] shadow-[0_30px_90px_-40px_rgba(0,0,0,0.55)] backdrop-blur-2xl lg:grid-cols-[0.9fr_1.1fr]">
           <div className="pointer-events-none absolute inset-0">

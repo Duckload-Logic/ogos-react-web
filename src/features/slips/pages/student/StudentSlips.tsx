@@ -31,6 +31,7 @@ import {
 import { Slip, SlipStatus } from "@/features/slips/types/slip";
 import Pagination from "@/components/Pagination";
 import Layout from "@/components/layout/Layout";
+import { LoadingSpinner } from "@/components/shared";
 
 interface StatusCount {
   id: string | number;
@@ -57,7 +58,7 @@ export default function StudentSlips() {
   const { data: slipStats, isLoading: isStatsLoading } = useGetSlipStats({});
   const { isLoading: isStatusesLoading } = useGetSlipStatuses();
 
-  const isLoading = isSlipsLoading || isStatsLoading || isStatusesLoading;
+  const isLoading = isStatsLoading || isStatusesLoading;
   const statsWithAll = [
     {
       id: "0",
@@ -90,27 +91,26 @@ export default function StudentSlips() {
   };
 
   return (
-    <Layout title="My Admission Slips" isLoading={isLoading}>
+    <Layout
+      title="My Admission Slips"
+      description="Manage your admission slip requests and track their status"
+      badgeText="My Requests"
+      badgeIcon={<FileText className="h-4 w-4" />}
+      isLoading={isLoading}
+      headerActions={
+        <Button
+          asChild
+          className="gap-2 rounded-xl shadow-lg shadow-primary/20"
+        >
+          <Link to="/student/slips/submit">
+            <Plus className="w-4 h-4" />
+            Submit Slip
+          </Link>
+        </Button>
+      }
+    >
       <AnimationStyles />
       <div className="space-y-6">
-        {/* Header Section */}
-        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 animate-fade-in-down">
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight text-foreground">
-              Admission Slips
-            </h1>
-            <p className="text-sm text-muted-foreground mt-2">
-              Manage your admission slip requests and track their status
-            </p>
-          </div>
-          <Button asChild className="gap-2">
-            <Link to="/student/slips/submit">
-              <Plus className="w-4 h-4" />
-              Submit Slip
-            </Link>
-          </Button>
-        </div>
-
         {/* Stats Cards */}
         <div
           className={`grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in-up`}
@@ -119,7 +119,10 @@ export default function StudentSlips() {
             <Card
               key={stat.id}
               className={`${STATUS_COLORS[stat.colorKey]} border-0 hover:shadow-md transition-shadow`}
-              style={{ animationDelay: `${0.1 * (index + 1)}s`, animationFillMode: "both" }}
+              style={{
+                animationDelay: `${0.1 * (index + 1)}s`,
+                animationFillMode: "both",
+              }}
             >
               <CardContent className="py-4 px-4">
                 <p className="text-xs font-medium uppercase tracking-wide">
@@ -146,15 +149,19 @@ export default function StudentSlips() {
                     setSelectedStatus(filter);
                     setCurrentPage(1);
                   }}
-                  variant={String(selectedStatus.id) === String(filter.id) ? "default" : "ghost"}
+                  variant={
+                    String(selectedStatus.id) === String(filter.id)
+                      ? "default"
+                      : "ghost"
+                  }
                   size="sm"
                   className="shrink-0 whitespace-nowrap h-9 px-3 text-xs font-medium flex items-center gap-1.5"
                 >
                   <span>{filter.name}</span>
-                  <Badge 
+                  <Badge
                     className={`h-5 min-w-[20px] px-1.5 text-[10px] font-bold flex items-center justify-center ${
-                      String(selectedStatus.id) === String(filter.id) 
-                        ? "bg-primary-foreground/40 text-primary-foreground" 
+                      String(selectedStatus.id) === String(filter.id)
+                        ? "bg-primary-foreground/40 text-primary-foreground"
                         : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
                     }`}
                   >
@@ -166,7 +173,11 @@ export default function StudentSlips() {
           </CardHeader>
 
           <CardContent className="p-0">
-            {slips.length > 0 ? (
+            {isSlipsLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <LoadingSpinner size="md" message="Loading your slips..." />
+              </div>
+            ) : slips.length > 0 ? (
               <>
                 {/* Slips List */}
                 <div className="divide-y divide-border">
@@ -174,7 +185,10 @@ export default function StudentSlips() {
                     <div
                       key={slip.id}
                       className="p-4 sm:p-5 hover:bg-muted/30 transition-colors animate-fade-in-up"
-                      style={{ animationDelay: `${0.05 * (index + 1)}s`, animationFillMode: "both" }}
+                      style={{
+                        animationDelay: `${0.05 * (index + 1)}s`,
+                        animationFillMode: "both",
+                      }}
                     >
                       <div className="flex items-start gap-4">
                         {/* Category Badge */}
@@ -243,7 +257,9 @@ export default function StudentSlips() {
                             <span className="text-muted-foreground/40">•</span>
                             <div className="flex items-center gap-1.5">
                               <Calendar className="w-3.5 h-3.5" />
-                              <span>Needed by: {formatDate(slip.dateNeeded)}</span>
+                              <span>
+                                Needed by: {formatDate(slip.dateNeeded)}
+                              </span>
                             </div>
                           </div>
                         </div>

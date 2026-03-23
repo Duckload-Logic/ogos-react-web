@@ -172,15 +172,15 @@ export const API_ROUTES = Object.freeze({
    */
   superadmin: Object.freeze({
     apiKeys: Object.freeze({
-      list: "/api-keys",
-      create: "/api-keys",
-      revoke: (id: number) => `/api-keys/${id}`,
+      list: "/access-tokens",
+      create: "/access-tokens",
+      revoke: (id: number) => `/access-tokens/${id}`,
     }),
     logs: Object.freeze({
-      security: "/system-logs/security",
-      system: "/system-logs/system",
-      audit: "/system-logs/audit",
-      stats: "/system-logs/stats",
+      security: "/activity-meta/security",
+      system: "/activity-meta/system",
+      audit: "/activity-meta/audit",
+      stats: "/activity-meta/stats",
     }),
   }),
 });

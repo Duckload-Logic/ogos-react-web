@@ -27,6 +27,7 @@ import {
   Cell,
 } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
+import { CalendarPlus } from "lucide-react";
 
 const chartConfig = {
   pending: {
@@ -60,7 +61,8 @@ const chartConfig = {
 };
 
 export default function AppointmentsManagement() {
-  const { data: appointmentStatuses, isLoading: isStatusesLoading } = useStatuses();
+  const { data: appointmentStatuses, isLoading: isStatusesLoading } =
+    useStatuses();
 
   const statusWithAll = useMemo(() => {
     if (!appointmentStatuses) return [];
@@ -99,14 +101,16 @@ export default function AppointmentsManagement() {
     return `${y}-${m}-${d}`;
   };
 
-  const { data: statusCounts, isLoading: isStatsLoading } = useAppointmentsStats({
-    params: {
-      startDate: getLocalDateString(selectedDate, startDate),
-      endDate: getLocalDateString(selectedDate, endDate),
-    },
-  });
+  const { data: statusCounts, isLoading: isStatsLoading } =
+    useAppointmentsStats({
+      params: {
+        startDate: getLocalDateString(selectedDate, startDate),
+        endDate: getLocalDateString(selectedDate, endDate),
+      },
+    });
 
-  const { data: allStatusCounts, isLoading: isAllStatsLoading } = useAppointmentsStats({});
+  const { data: allStatusCounts, isLoading: isAllStatsLoading } =
+    useAppointmentsStats({});
 
   const { data, isLoading } = useAppointments({
     isMe: false,
@@ -247,19 +251,23 @@ export default function AppointmentsManagement() {
     };
   });
 
-  const isPageLoading = isStatusesLoading || isStatsLoading || isAllStatsLoading || isLoading;
+  const isPageLoading =
+    isStatusesLoading || isStatsLoading || isAllStatsLoading || isLoading;
 
   return (
     <Layout
       title="Appointments Management"
+      subTitle="View and manage all counseling appointments"
+      badgeText="Admin Management"
+      badgeIcon={<CalendarPlus className="h-4 w-4" />}
       isLoading={isPageLoading}
     >
       <div className="max-w-8xl mx-auto px-4 py-2 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
         <div className="bg-blue-500/10 border border-blue-300 shadow-sm rounded-lg p-4">
           <p className="text-sm text-blue-600 dark:text-blue-300">
-            <strong>Note:</strong> Students request appointments in their portal.
-            This page is for approving, rejecting, or managing appointment
-            requests.
+            <strong>Note:</strong> Students request appointments in their
+            portal. This page is for approving, rejecting, or managing
+            appointment requests.
           </p>
         </div>
 
@@ -278,7 +286,10 @@ export default function AppointmentsManagement() {
 
               <div className="rounded-2xl border border-border bg-background/90 px-2 py-3 sm:px-3">
                 <div className="h-[236px]">
-                  <ChartContainer config={chartConfig} className="h-full w-full">
+                  <ChartContainer
+                    config={chartConfig}
+                    className="h-full w-full"
+                  >
                     <BarChart
                       layout="vertical"
                       accessibilityLayer
@@ -309,7 +320,11 @@ export default function AppointmentsManagement() {
                         width={88}
                         interval={0}
                         tickMargin={6}
-                        tick={{ fontSize: 11, fill: "#64748b", fontWeight: 600 }}
+                        tick={{
+                          fontSize: 11,
+                          fill: "#64748b",
+                          fontWeight: 600,
+                        }}
                       />
 
                       <Bar

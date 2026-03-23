@@ -96,59 +96,32 @@ export default function SuperAdminDashboard() {
     <Layout
       title="Super Admin Dashboard"
       isLoading={isLoading}
+      badgeText="Super Admin Overview"
+      description="Monitor platform activity, access events, API usage, and audit trails in one place."
+      showDate
+      headerStats={
+        <div className="grid grid-cols-2 gap-3">
+          <div className="rounded-xl border border-white/30 bg-white/60 px-4 py-3 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Total Today
+            </p>
+            <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
+              {totalLogs}
+            </p>
+          </div>
+
+          <div className="rounded-xl border border-white/30 bg-white/60 px-4 py-3 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+              Security
+            </p>
+            <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
+              {getStatCount("SECURITY")}
+            </p>
+          </div>
+        </div>
+      }
     >
       <div className="mx-auto flex w-full max-w-[1700px] flex-col space-y-5">
-        {/* Header */}
-        <section className="relative overflow-hidden rounded-[20px] border border-white/20 bg-white/50 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6">
-          <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.10),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.08),transparent_28%)]" />
-
-          <div className="relative flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-            <div className="space-y-3">
-              <div className="inline-flex items-center rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-xs font-medium text-primary dark:border-primary/20 dark:bg-primary/15">
-                Super Admin Overview
-              </div>
-
-              <div className="space-y-2">
-                <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
-                  Super Admin Dashboard
-                </h1>
-                <p className="max-w-3xl text-sm text-muted-foreground sm:text-base">
-                  Monitor platform activity, access events, API usage, and audit
-                  trails in one place.
-                </p>
-              </div>
-
-              <p className="text-sm font-medium text-muted-foreground">
-                {today.toLocaleDateString("en-US", {
-                  weekday: "long",
-                  month: "long",
-                  day: "numeric",
-                  year: "numeric",
-                })}
-              </p>
-            </div>
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="rounded-xl border border-white/30 bg-white/60 px-4 py-3 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Total Today
-                </p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
-                  {totalLogs}
-                </p>
-              </div>
-
-              <div className="rounded-xl border border-white/30 bg-white/60 px-4 py-3 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-                <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-                  Security
-                </p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
-                  {getStatCount("SECURITY")}
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Stats */}
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
