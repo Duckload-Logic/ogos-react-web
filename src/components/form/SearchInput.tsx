@@ -22,7 +22,10 @@ export default function SearchInput({
           placeholder={placeholder}
           value={searchTerm}
           onChange={(e) => onSearchChange(e.target.value)}
-          className="flex-1 px-4 py-2 border-2 border-border rounded-md bg-muted focus:outline-none focus:ring-2 focus:ring-primary"
+          className="w-full h-11 rounded-xl border px-4 py-2.5 outline-none transition-all duration-200
+              text-sm font-medium tracking-tight text-foreground placeholder:text-muted-foreground/70
+              bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg/100 dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5
+              "
         />
         {searchTerm ? (
           <button
