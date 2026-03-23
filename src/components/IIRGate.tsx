@@ -53,7 +53,7 @@ export const IIRGate = ({
               form first to access this service.
             </p>
             <a
-              href="/student/form"
+              href="/student/iir/form"
               className="w-full block text-center bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
             >
               Go to PDS Form

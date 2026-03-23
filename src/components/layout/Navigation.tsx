@@ -1,22 +1,98 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import {
   MoreHorizontal,
   Settings,
   LogOut,
-  User,
-  Minus,
-  Plus,
   ShieldCheck,
   Gavel,
 } from "lucide-react";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import NavItem from "./NavItem";
 
 const HOME_HREF = "/";
 const SETTINGS_HREF = "/settings";
+
+function NavItem({
+  item,
+  active,
+  variant = "desktop",
+  onClick,
+}: {
+  item: { label: string; href: string; icon: React.ReactNode };
+  active: boolean;
+  variant?: "desktop" | "mobile-bottom" | "mobile-drawer";
+  onClick?: () => void;
+}) {
+  if (variant === "mobile-bottom") {
+    return (
+      <Link
+        to={item.href}
+        onClick={onClick}
+        className={`flex flex-col items-center p-2 group ${active ? "text-primary" : "text-muted-foreground"
+          }`}
+      >
+        <div className="w-6 h-6 flex items-center justify-center transition-transform group-hover:scale-110">
+          {item.icon}
+        </div>
+      </Link>
+    );
+  }
+
+  if (variant === "mobile-drawer") {
+    return (
+      <Link
+        to={item.href}
+        onClick={onClick}
+        className={`flex items-center gap-3 p-4 rounded-xl transition-colors ${active ? "bg-primary text-primary-foreground" : "bg-muted/50 hover:bg-muted"
+          }`}
+      >
+        <div className="w-6 h-6 flex items-center justify-center">
+          {item.icon}
+        </div>
+        <span className="font-medium">{item.label}</span>
+      </Link>
+    );
+  }
+
+  // Desktop variant
+  return (
+    <Link
+      to={item.href}
+      onClick={onClick}
+      className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3
+      transition-all duration-200 hover:shadow-sm
+      ${active
+          ? "bg-primary text-primary-foreground shadow-sm"
+          : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+        }`}
+    >
+      <div
+        className="
+        flex items-center justify-center min-w-[24px]
+        transition-transform duration-200
+        group-hover:rotate-6 group-hover:scale-110
+        "
+      >
+        {item.icon}
+      </div>
+
+      <span
+        className="
+        opacity-0
+        translate-x-[-6px]
+        group-hover:opacity-100
+        group-hover:translate-x-0
+        transition-all duration-200 hover:shadow-sm
+        whitespace-nowrap
+        "
+      >
+        {item.label}
+      </span>
+    </Link>
+  );
+}
 
 export default function Navigation({
   navigationItems,
@@ -36,6 +112,18 @@ export default function Navigation({
   const isMobile = useIsMobile();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"menu" | "settings">("menu");
+  const isActive = (item: any) => {
+    if (location.pathname === item.href || location.pathname === `${item.href}/`) {
+      return true;
+    }
+
+    const isRootPath = ['/admin', '/student', '/superadmin', '/'].includes(item.href);
+    if (isRootPath) {
+      return false;
+    }
+
+    return location.pathname.startsWith(`${item.href}/`);
+  };
 
   if (isMobile) {
     const homeItem = navigationItems.find((i) => i.href === HOME_HREF);
@@ -54,7 +142,8 @@ export default function Navigation({
             {homeItem && (
               <NavItem
                 item={homeItem}
-                active={location.pathname === homeItem.href}
+                active={isActive(homeItem)}
+                variant="mobile-bottom"
               />
             )}
 
@@ -63,26 +152,24 @@ export default function Navigation({
                 setDrawerMode("menu");
                 setOpenDrawer(true);
               }}
-              className={`flex flex-col items-center p-2 group ${
-                isOverflowActive
-                  ? "text-muted-foreground"
-                  : "text-muted-foreground"
-              }`}
+              className={`flex flex-col items-center p-2 group ${isOverflowActive
+                ? "text-primary"
+                : "text-muted-foreground"
+                }`}
             >
-              <MoreHorizontal className="w-6 h-6 group-aria-pressed:animate-spin" />
+              <MoreHorizontal className="w-6 h-6 group-aria-pressed:animate-spin transition-transform" />
             </button>
             <button
               onClick={() => {
                 setDrawerMode("settings");
                 setOpenDrawer(true);
               }}
-              className={`flex flex-col items-center p-2 ${
-                location.pathname.includes(SETTINGS_HREF)
-                  ? "text-primary"
-                  : "text-muted-foreground"
-              }`}
+              className={`flex flex-col items-center p-2 group ${location.pathname.includes(SETTINGS_HREF)
+                ? "text-primary"
+                : "text-muted-foreground"
+                }`}
             >
-              <Settings className="w-6 h-6" />
+              <Settings className="w-6 h-6 group-hover:rotate-45 transition-transform" />
             </button>
           </div>
         </nav>
@@ -94,17 +181,15 @@ export default function Navigation({
                 <p className="text-xs font-bold text-muted-foreground px-2">
                   NAVIGATION
                 </p>
-                {overflowItems.map((item) => (
-                  <Link
+                {overflowItems.map((item) => {
+                  return (< NavItem
                     key={item.href}
-                    to={item.href}
+                    item={item}
+                    active={isActive(item)}
+                    variant="mobile-drawer"
                     onClick={() => setOpenDrawer(false)}
-                    className="flex items-center gap-3 p-4 rounded-xl bg-muted/50"
-                  >
-                    {item.icon}
-                    <span className="font-medium">{item.label}</span>
-                  </Link>
-                ))}
+                  />)
+                })}
               </div>
             ) : (
               <MobileSettingsContent
@@ -128,13 +213,16 @@ export default function Navigation({
         w-[72px] hover:w-[260px] transition-all duration-300 z-30"
     >
       <nav className="flex flex-col gap-2 p-3 mt-2">
-        {navigationItems.map((item) => (
-          <NavItem
-            key={item.href}
-            item={item}
-            active={location.pathname === item.href}
-          />
-        ))}
+        {navigationItems.map((item) => {
+          return (
+            <NavItem
+              key={item.href}
+              item={item}
+              active={isActive(item)}
+              variant="desktop"
+            />
+          )
+        })}
       </nav>
     </aside>
   );
@@ -156,7 +244,7 @@ function MobileSettingsContent({
           navigate("/profile");
           closeDrawer();
         }}
-        className="flex items-center gap-4 p-2"
+        className="flex items-center gap-4 p-2 cursor-pointer hover:bg-muted/50 rounded-xl transition"
       >
         <Avatar className="h-12 w-12">
           <AvatarFallback className="bg-primary text-primary-foreground">
@@ -195,7 +283,7 @@ function MobileSettingsContent({
       <button
         onClick={onLogout}
         className="w-full flex items-center justify-center gap-3 p-4
-          text-red-500 bg-red-500/10 rounded-xl font-bold transition"
+          text-red-500 bg-red-500/10 hover:bg-red-500/20 rounded-xl font-bold transition"
       >
         <LogOut size={20} />
         Logout

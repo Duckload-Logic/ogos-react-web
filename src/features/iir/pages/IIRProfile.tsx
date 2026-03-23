@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { LoadingSpinner } from "@/components/shared";
 import { useIIRProfile, useUserIIR } from "@/features/iir/hooks";
 import { useMe } from "@/features/users/hooks/useMe";
@@ -52,8 +52,17 @@ export default function IIRProfile() {
   if (!finalIirId) {
     return (
       <Layout showHeader={false} isLoading={isLoading}>
-        <div className="rounded-2xl border border-border bg-card p-6 text-sm text-card-foreground">
-          No record ID discovered. Please ensure you have submitted your form.
+        <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-border bg-card">
+          <h2 className="text-xl font-semibold mb-2">No IIR Record Found</h2>
+          <p className="text-muted-foreground mb-6">
+            You haven't filled out your Individual Inventory Record form yet. Please submit the form to access your profile.
+          </p>
+          <Link
+            to="/student/iir/form"
+            className="bg-primary text-primary-foreground px-6 py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+          >
+            Go to IIR Form
+          </Link>
         </div>
       </Layout>
     );

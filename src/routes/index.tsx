@@ -103,7 +103,7 @@ export const routes: RouteObject[] = [
     ),
   },
   {
-    path: "/student/form",
+    path: "/student/iir/form",
     element: (
       <ProtectedRoute requiredRole="student">
         <IIRForm />
