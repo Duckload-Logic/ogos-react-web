@@ -40,7 +40,7 @@ export default function StudentSearchAndFilter({
   onYearLevelChange,
 }: SearchFilterProps) {
   return (
-    <div className="bg-card rounded-lg shadow border border-border p-6 space-y-4">
+    <div className="bg-glass-bg/20 backdrop-blur-glass rounded-3xl border border-glass-border/40 p-6 shadow-sm transition-all duration-500 hover:bg-glass-bg/30">
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
         <SearchInput
           className="md:col-span-2"

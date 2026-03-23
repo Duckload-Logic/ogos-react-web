@@ -19,9 +19,8 @@ export default function QuickInfo({
           {label}
         </p>
         <p
-          className={`text-sm font-medium text-card-foreground ${
-            truncate ? "truncate max-w-[200px] sm:max-w-full" : ""
-          }`}
+          className={`text-sm font-medium text-card-foreground ${truncate ? "truncate max-w-[200px] sm:max-w-full" : ""
+            }`}
         >
           {value}
         </p>

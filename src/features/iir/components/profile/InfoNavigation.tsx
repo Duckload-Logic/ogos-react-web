@@ -48,10 +48,9 @@ export default function InfoNavigation({
               onClick={() => setActiveTab(tab.id)}
               className={`relative flex-1 sm:flex-none whitespace-nowrap py-3 px-4 sm:px-6 text-xs sm:text-sm font-medium transition-all duration-300
                 border-t-2 border-l-2 border-r-2 group
-                ${
-                  isActive
-                    ? "bg-card text-card-foreground border-border rounded-t-xl"
-                    : "bg-muted text-muted-foreground border-transparent rounded-t-lg z-0 opacity-70"
+                ${isActive
+                  ? "bg-card text-card-foreground border-border rounded-t-xl"
+                  : "bg-muted text-muted-foreground border-transparent rounded-t-lg z-0 opacity-70"
                 }`}
             >
               <div className="flex items-center justify-center gap-2 group-hover:text-secondary transition-colors">
@@ -61,11 +60,10 @@ export default function InfoNavigation({
                 />
 
                 <div
-                  className={`grid transition-all duration-300 ease-in-out ${
-                    isActive
+                  className={`grid transition-all duration-300 ease-in-out ${isActive
                       ? "grid-cols-[1fr] opacity-100"
                       : "grid-cols-[0fr] opacity-0"
-                  }`}
+                    }`}
                 >
                   <span className="overflow-hidden whitespace-nowrap text-[10px] sm:text-sm hidden sm:block  group-hover:text-secondary">
                     {tab.label}

@@ -20,6 +20,7 @@ import { useDebounce } from "@/hooks/useDebounce";
 import { LoadingSpinner } from "@/components/shared";
 import { Pagination } from "@/components/Pagination";
 import Layout from "@/components/layout/Layout";
+import { cn } from "@/lib/utils";
 
 export default function StudentRecords() {
   const {
@@ -84,7 +85,7 @@ export default function StudentRecords() {
       badgeIcon={<Users className="h-4 w-4" />}
       isLoading={isLoading}
     >
-      <div className="space-y-6">
+      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
         <StudentSearchAndFilter
           searchTerm={searchTerm}
           onSearchChange={(value) => {
@@ -114,13 +115,21 @@ export default function StudentRecords() {
             setPage(1);
           }}
         />
-        {isStudentsLoading ? (
-          <LoadingSpinner />
-        ) : (
-          <>
+
+        <div className="relative min-h-[400px]">
+          {(isStudentsLoading || isDeleting) && (
+            <div className="absolute inset-0 z-20 flex items-center justify-center bg-glass-bg/5 backdrop-blur-[2px] rounded-[32px]">
+              <LoadingSpinner size="lg" />
+            </div>
+          )}
+
+          <div className={cn(
+            "space-y-8 transition-all duration-700",
+            (isStudentsLoading || isDeleting) && "opacity-40 blur-[1px] pointer-events-none"
+          )}>
             <StudentCardsGrid
               students={allStudents}
-              isStudentsLoading={isStudentsLoading}
+              isStudentsLoading={false} // Loading handled by parent
               onViewClick={(student) => {
                 navigate(`/admin/student-records/${student.iirId}`, {
                   state: { student },
@@ -132,13 +141,16 @@ export default function StudentRecords() {
               }}
               yearLevels={yearLevels}
             />
-            <Pagination
-              currentPage={page}
-              totalPages={data?.totalPages || 1}
-              onPageChange={setPage}
-            />
-          </>
-        )}
+
+            <div className="flex justify-center pt-4">
+              <Pagination
+                currentPage={page}
+                totalPages={data?.totalPages || 1}
+                onPageChange={setPage}
+              />
+            </div>
+          </div>
+        </div>
       </div>
       {/* <AddStudentModal
         isOpen={showAdd}

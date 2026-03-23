@@ -5,6 +5,7 @@ export interface IIRProfileView {
   firstName: string;
   middleName?: string;
   lastName: string;
+  suffixName?: string;
   gender: {
     id: number;
     name: string;

@@ -42,95 +42,89 @@ export default function StudentCardsGrid({
   };
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       {students.map((student) => (
         <div
           key={student.email}
-          className="group relative overflow-hidden rounded-2xl border border-border bg-card p-5 border-3 shadow-md transition-all duration-300 hover:-translate-y-0.5 hover:shadow-xl hover:border-primary/50"
+          className="group relative overflow-hidden rounded-[28px] border border-glass-border/40 bg-glass-bg/20 backdrop-blur-glass p-6 shadow-sm transition-all duration-500 hover:bg-glass-bg/40 hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1.5 active:scale-[0.98]"
         >
-          <div className="pointer-events-none absolute inset-x-0 top-0 h-1 bg-primary/70 opacity-60 group-hover:opacity-100 transition-opacity" />
+          {/* Subtle Gradient Accent */}
+          <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-primary/5 blur-3xl group-hover:bg-primary/10 transition-colors duration-500" />
 
-          <div className="flex flex-col gap-3">
-            {/* Name */}
-            <div className="relative flex flex-row items-end justify-between gap-4">
-              <p className="text-2xl font-bold  tracking-tight text-primary flex items-center gap-2 border-b-4 border-border  pb-6 mb-4">
-                {student.firstName}{" "}
-                {typeof student.middleName === "string" &&
-                student.middleName.length > 0
-                  ? student.middleName.charAt(0) + "."
-                  : ""}{" "}
-                {student.lastName}
-              </p>
-              <div className="relative group">
-                {/* Decorative background glow (Optional) */}
-                <div className="absolute inset-0 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-colors" />
+          <div className="flex flex-col gap-5 relative z-10">
+            {/* Header with Avatar and Name */}
+            <div className="flex flex-col items-center gap-4 text-center">
+              <div className="relative group/avatar">
+                {/* Avatar Glow */}
+                <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl group-hover/avatar:bg-primary/30 transition-all duration-700 opacity-0 group-hover:opacity-100" />
 
-                <div className="relative shadow-xl p-1 z-10 rounded-full bg-background border-[6px] border-card aspect-square w-28 h-28 sm:w-32 sm:h-32 flex items-center justify-center overflow-hidden">
+                <div className="relative h-28 w-28 rounded-full bg-glass-bg/50 border-[6px] border-white/40 dark:border-black/20 shadow-xl flex items-center justify-center overflow-hidden transition-transform duration-500 group-hover/avatar:scale-105">
                   {student.gender?.id === 1 || student?.gender?.id !== 2 ? (
-                    <ProfileMale className="w-4/5 h-4/5 text-primary/90" />
+                    <ProfileMale className="w-4/5 h-4/5 text-primary/80" />
                   ) : (
-                    <ProfileFemale className="w-4/5 h-4/5 text-primary/90" />
+                    <ProfileFemale className="w-4/5 h-4/5 text-primary/80" />
                   )}
                 </div>
 
-                {/* 3. Small Gender Indicator Badge */}
-                <div className="absolute bottom-1 right-1 z-20 h-7 w-7 rounded-full bg-card border-2 border-background shadow-lg flex items-center justify-center">
+                {/* Gender Indicator Badge */}
+                <div className="absolute bottom-1 right-1 h-8 w-8 rounded-full bg-white/80 dark:bg-black/40 backdrop-blur-md border border-white/20 shadow-lg flex items-center justify-center transition-transform duration-500 group-hover/avatar:translate-x-1 group-hover/avatar:translate-y-1">
                   <div
-                    className={`h-3 w-3 rounded-full ${genderColors[student?.gender?.id] || "bg-gray-400"}`}
+                    className={`h-3.5 w-3.5 rounded-full shadow-sm ${genderColors[student?.gender?.id] || "bg-gray-400"}`}
                   />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <h3 className="text-xl font-bold tracking-tight text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+                  {student.firstName} {student.lastName} {student.suffixName}
+                </h3>
+                <p className="text-[11px] font-bold text-primary/60 uppercase tracking-widest">
+                  {student.studentNumber}
+                </p>
+              </div>
+            </div>
+
+            {/* Info Grid */}
+            <div className="grid grid-cols-1 gap-3 pt-2 border-t border-glass-border/30">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">
+                  Email Address
+                </span>
+                <span className="text-sm font-medium text-foreground/80 truncate">
+                  {student.email}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-2">
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">
+                    Course
+                  </span>
+                  <span className="text-sm font-semibold text-primary/80">
+                    {student.course.code}
+                  </span>
+                </div>
+                <div className="flex flex-col gap-0.5">
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest opacity-60">
+                    Year Level
+                  </span>
+                  <span className="text-sm font-semibold text-foreground/80">
+                    {yearLevels.find((level) => level.id === student.yearLevel)
+                      ?.name.split(" ")[0] || "N/A"}{" "}
+                    Year
+                  </span>
                 </div>
               </div>
             </div>
 
-            {/* Student Number */}
-            <div>
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase">
-                Student Number
-              </p>
-              <p className="mt-1 text-sm font-semibold text-card-foreground">
-                {student.studentNumber}
-              </p>
-            </div>
-
-            {/* Email */}
-            <div>
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase">
-                Email
-              </p>
-              <p className="mt-1 text-sm text-card-foreground font-semibold break-all line-clamp-2">
-                {student.email}
-              </p>
-            </div>
-
-            {/* Course */}
-            <div>
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase">
-                Course
-              </p>
-              <p className="mt-1 text-sm font-semibold text-card-foreground line-clamp-2">
-                {student.course.code}
-              </p>
-            </div>
-
-            {/* Year Level */}
-            <div>
-              <p className="text-[11px] font-semibold text-muted-foreground uppercase">
-                Year Level
-              </p>
-              <p className="mt-1 text-sm font-semibold text-card-foreground line-clamp-2">
-                {yearLevels.find((level) => level.id === student.yearLevel)
-                  ?.name || "Unknown"}
-              </p>
-            </div>
-
             {/* Actions */}
-            <div className="sm:col-span-2 mt-1 flex gap-2 pt-3 border-t border-border/80">
+            <div className="pt-2">
               <button
                 onClick={() => onViewClick(student)}
-                className="flex-1 inline-flex items-center justify-center gap-2 rounded-lg border border-border bg-muted-foreground/30 px-3 py-2 text-xs font-semibold text-foreground transition-colors hover:bg-muted-foreground/50 active:scale-[0.99]"
+                className="w-full group/btn inline-flex items-center justify-center gap-2 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/20 transition-all duration-300 py-3 text-xs font-bold uppercase tracking-wider active:scale-[0.97]"
               >
-                <Eye size={15} />
-                View
+                <Eye size={16} className="transition-transform group-hover/btn:scale-110" />
+                View Profile
               </button>
             </div>
           </div>

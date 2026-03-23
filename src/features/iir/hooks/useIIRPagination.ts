@@ -3,7 +3,7 @@ import { GetStudents } from "../services/service";
 import { QUERY_KEYS } from "@/config/queryKeys";
 import { QueryParam } from "../types/reqParams";
 
-const STUDENTS_PAGE_SIZE = 12;
+const STUDENTS_PAGE_SIZE = 24;
 
 export function useIIRPagination(
   params: QueryParam,
