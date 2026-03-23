@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useState } from "react";
+﻿import { forwardRef, useImperativeHandle, useState } from "react";
 import {
   GraduationCap,
   School,
@@ -95,8 +95,8 @@ export const EducationBackgroundSection = forwardRef<
     >
       <div className="space-y-12">
         {/* Nature of Schooling */}
-        <div className="bg-glass-bg/60 backdrop-blur-glass rounded-[24px] p-5 sm:p-8 border border-glass-border/40 shadow-sm transition-all duration-300">
-          <label className="text-sm font-bold text-foreground/80 mb-6 block flex items-center gap-2">
+        <div className="bg-glass-bg backdrop-blur-glass rounded-[24px] p-5 sm:p-8 border border-glass-border/40 shadow-sm transition-all duration-300">
+          <label className="text-sm font-bold text-foreground/80 mb-6 flex items-center gap-2">
             <span className="w-1.5 h-1.5 rounded-full bg-primary" />
             Nature of Schooling
           </label>
@@ -110,7 +110,7 @@ export const EducationBackgroundSection = forwardRef<
               className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
                 education?.natureOfSchooling === "Continuous"
                   ? "bg-primary/5 border-primary shadow-sm"
-                  : "bg-glass-bg/40 border-glass-border/20 hover:bg-glass-bg/60 hover:border-primary/20"
+                  : "bg-glass-bg/60 border-glass-border/20 hover:bg-glass-bg/80 hover:border-primary/20"
               }`}
             >
               <span
@@ -131,7 +131,7 @@ export const EducationBackgroundSection = forwardRef<
               className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
                 education?.natureOfSchooling === "Interrupted"
                   ? "bg-primary/5 border-primary shadow-sm"
-                  : "bg-glass-bg/40 border-glass-border/20 hover:bg-glass-bg/60 hover:border-primary/20"
+                  : "bg-glass-bg/60 border-glass-border/20 hover:bg-glass-bg/80 hover:border-primary/20"
               }`}
             >
               <span

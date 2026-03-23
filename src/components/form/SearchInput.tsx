@@ -24,7 +24,7 @@ export default function SearchInput({
           onChange={(e) => onSearchChange(e.target.value)}
           className="w-full h-11 rounded-xl border px-4 py-2.5 outline-none transition-all duration-200
               text-sm font-medium tracking-tight text-foreground placeholder:text-muted-foreground/70
-              bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg/100 dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5
+              bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5
               "
         />
         {searchTerm ? (

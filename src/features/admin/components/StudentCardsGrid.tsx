@@ -46,7 +46,7 @@ export default function StudentCardsGrid({
       {students.map((student) => (
         <div
           key={student.email}
-          className="group relative overflow-hidden rounded-[28px] border border-glass-border/40 bg-glass-bg/20 backdrop-blur-glass p-6 shadow-sm transition-all duration-500 hover:bg-glass-bg/40 hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1.5 active:scale-[0.98]"
+          className="group relative overflow-hidden rounded-[28px] border border-glass-border bg-glass-bg backdrop-blur-glass p-6 shadow-sm transition-all duration-500 hover:bg-glass-bg/40 hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1.5 active:scale-[0.98]"
         >
           {/* Subtle Gradient Accent */}
           <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-primary/5 blur-3xl group-hover:bg-primary/10 transition-colors duration-500" />
@@ -109,7 +109,8 @@ export default function StudentCardsGrid({
                     Year Level
                   </span>
                   <span className="text-sm font-semibold text-foreground/80">
-                    {yearLevels.find((level) => level.id === student.yearLevel)
+                    {yearLevels
+                      .find((level) => level.id === student.yearLevel)
                       ?.name.split(" ")[0] || "N/A"}{" "}
                     Year
                   </span>
@@ -123,7 +124,10 @@ export default function StudentCardsGrid({
                 onClick={() => onViewClick(student)}
                 className="w-full group/btn inline-flex items-center justify-center gap-2 rounded-xl bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/20 transition-all duration-300 py-3 text-xs font-bold uppercase tracking-wider active:scale-[0.97]"
               >
-                <Eye size={16} className="transition-transform group-hover/btn:scale-110" />
+                <Eye
+                  size={16}
+                  className="transition-transform group-hover/btn:scale-110"
+                />
                 View Profile
               </button>
             </div>

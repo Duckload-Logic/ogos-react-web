@@ -54,9 +54,9 @@ export default function Breadcrumbs() {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="mb-4 flex flex-wrap items-center gap-2 sm:gap-3"
+      className="w-full mb-4 flex flex-wrap items-center gap-2 sm:gap-3"
     >
-      <BackwardNavigation to={parentPath} className="mr-1" />
+      <BackwardNavigation to={parentPath} className="" />
 
       <div className="h-4 w-[1px] bg-border mx-1 hidden sm:block" />
 

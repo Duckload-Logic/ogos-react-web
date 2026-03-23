@@ -23,7 +23,7 @@ export default function PageHeader({
   const today = new Date();
 
   return (
-    <section className="relative overflow-hidden rounded-[20px] border border-white/20 bg-white/50 p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6 mb-6">
+    <section className="relative overflow-hidden rounded-[20px] border border-white/20 bg-glass-bg p-5 shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-glass-bg dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6 mb-6">
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(220,38,38,0.10),transparent_24%),radial-gradient(circle_at_bottom_left,rgba(59,130,246,0.08),transparent_28%)]" />
 
       <Breadcrumbs />

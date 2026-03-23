@@ -86,10 +86,10 @@ const InputField = forwardRef<
                 disabled
                   ? "bg-muted/80 border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-60"
                   : value !== undefined && value !== null && value !== ""
-                    ? "bg-muted/20 border-primary/30 focus:bg-glass-bg/100 dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm"
+                    ? "bg-muted/20 border-primary/30 focus:bg-glass-bg dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm"
                     : required
                       ? "bg-muted/60 dark:bg-muted/20 border-border hover:border-destructive/40 focus:border-destructive/50 focus:ring-2 focus:ring-destructive/5"
-                      : "bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg/100 dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
+                      : "bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
               }
             `}
               min={min}

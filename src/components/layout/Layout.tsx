@@ -214,7 +214,7 @@ export default function Layout({
             toasts={toasts}
           />
 
-          <div className="flex flex-col-reverse md:flex-row min-h-0 w-full flex-1">
+          <div className="flex flex-col-reverse md:flex-row min-h-0 w-full flex-1 bg-[radial-gradient(circle_at_bottom_left,rgba(220,38,38,0.1),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.1),transparent_28%)]">
             {isLoggedIn && (
               <Navigation
                 navigationItems={navigationItems}
@@ -231,7 +231,7 @@ export default function Layout({
               {expanded && !termsOpen && (
                 <div
                   className="pointer-events-none absolute inset-0 z-20
-                 bg-black/20 animate-in
+                 bg-black/50 animate-in
                  fade-in duration-200"
                 />
               )}

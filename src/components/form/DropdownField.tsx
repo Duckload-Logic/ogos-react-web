@@ -49,7 +49,9 @@ export default function DropdownField({
   labelKey?: string;
 }) {
   const [open, setOpen] = useState(false);
-  const selectedOption = options.find((opt) => String(opt[identifier]) === String(value));
+  const selectedOption = options.find(
+    (opt) => String(opt[identifier]) === String(value),
+  );
   const isFilled = selectedOption !== undefined;
 
   const getLabel = (option: any) => {
@@ -59,7 +61,9 @@ export default function DropdownField({
   };
 
   const handleSelect = (optionValue: string) => {
-    const selected = options.find((opt) => String(opt[identifier]) === optionValue);
+    const selected = options.find(
+      (opt) => String(opt[identifier]) === optionValue,
+    );
     if (selected) {
       onChange(selected[get]);
       setOpen(false);
@@ -84,16 +88,19 @@ export default function DropdownField({
                 ? "bg-muted/50 border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-60"
                 : formStyle
                   ? isFilled
-                    ? "bg-muted/20 border-primary/30 focus:bg-glass-bg/100 dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
+                    ? "bg-muted/20 border-primary/30 focus:bg-glass-bg dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
                     : "bg-muted/20 border-destructive/20 hover:border-destructive/40 focus:border-destructive/50 focus:ring-2 focus:ring-destructive/5"
-                  : "bg-muted/20 border-glass-border/40 hover:border-glass-border/60 focus:bg-glass-bg/100 dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm",
-              error && "border-destructive/50"
+                  : "bg-muted/20 border-glass-border/40 hover:border-glass-border/60 focus:bg-glass-bg dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm",
+              error && "border-destructive/50",
             )}
           >
-            <span className={cn(
-              "truncate flex-1",
-              !selectedOption && "text-muted-foreground/50 italic font-normal"
-            )}>
+            <span
+              className={cn(
+                "truncate flex-1",
+                !selectedOption &&
+                  "text-muted-foreground/50 italic font-normal",
+              )}
+            >
               {selectedOption ? getLabel(selectedOption) : `Select ${label}`}
             </span>
 
@@ -110,27 +117,34 @@ export default function DropdownField({
                   <Check size={12} strokeWidth={3} />
                 </div>
               )}
-              <ChevronDown className={cn(
-                "size-4 opacity-40 transition-transform duration-300",
-                open && "rotate-180"
-              )} />
+              <ChevronDown
+                className={cn(
+                  "size-4 opacity-40 transition-transform duration-300",
+                  open && "rotate-180",
+                )}
+              />
             </div>
           </button>
         </PopoverTrigger>
         <PopoverContent
           className={cn(
             "p-0 z-50 overflow-hidden rounded-xl border-glass-border",
-            formStyle ? "bg-card" : "bg-background"
+            formStyle ? "bg-card" : "bg-background",
           )}
           align="start"
           sideOffset={8}
         >
           <Command className={formStyle ? "bg-card" : "bg-background"}>
-            <CommandInput placeholder={`Search ${label.toLowerCase()}...`} className="h-11" />
-            <CommandList className={cn(
-              "max-h-[250px] overflow-y-auto p-1",
-              formStyle ? "bg-card" : "bg-background"
-            )}>
+            <CommandInput
+              placeholder={`Search ${label.toLowerCase()}...`}
+              className="h-11"
+            />
+            <CommandList
+              className={cn(
+                "max-h-[250px] overflow-y-auto p-1",
+                formStyle ? "bg-card" : "bg-background",
+              )}
+            >
               <CommandEmpty>No {label.toLowerCase()} found.</CommandEmpty>
               <CommandGroup>
                 {options.map((option) => (
@@ -142,7 +156,7 @@ export default function DropdownField({
                       "flex items-center justify-between px-3 py-2 text-sm rounded-lg cursor-pointer transition-colors mb-0.5",
                       String(option[identifier]) === String(value)
                         ? "bg-primary/10 text-primary font-bold"
-                        : "hover:bg-primary/5 text-foreground"
+                        : "hover:bg-primary/5 text-foreground",
                     )}
                   >
                     <span className="truncate">{getLabel(option)}</span>

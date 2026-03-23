@@ -104,8 +104,8 @@
     --stale-background: 0 0% 90%;
     --stale-foreground: 0 0% 40%;
 
-    --glass-bg: var(--card);
-    --glass-border: var(--border);
+    --glass-bg: hsl(var(--card) / 0.4);
+    --glass-border: hsl(var(--border) / 0.8);
     --glass-blur: 12px;
   }
 
@@ -174,8 +174,8 @@
     --stale-background: 0 0% 25%; /* Neutral dark gray */
     --stale-foreground: 0 0% 65%; /* Soft muted gray */
 
-    --glass-bg: var(--card);
-    --glass-border: var(--border);
+    --glass-bg: hsl(var(--card) / 0.4);
+    --glass-border: hsl(var(--border) / 0.4);
     --glass-blur: 16px;
   }
 }

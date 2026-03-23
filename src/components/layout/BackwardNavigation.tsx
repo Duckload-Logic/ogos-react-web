@@ -44,10 +44,10 @@ export default function BackwardNavigation({
     <button
       type="button"
       onClick={handleBack}
-      className={`flex gap-2 group items-center text-sm text-foreground/70 font-medium hover:text-primary transition-colors w-max ${className}`}
+      className={`flex gap-2 group items-center justify-start text-sm text-foreground/70 font-medium hover:text-primary transition-colors w-fit h-5 p-0 ${className}`}
     >
       <CircleChevronLeft
-        size={18}
+        size={14}
         className="transform group-hover:-translate-x-1 transition-transform duration-300"
       />
       <span className="text-sm font-medium">Back</span>
