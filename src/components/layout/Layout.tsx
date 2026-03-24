@@ -51,10 +51,20 @@ export default function Layout({
   showDate: propsShowDate,
 }: LayoutProps) {
   const {
-    sidebarExpanded: isHovered,
-    setSidebarExpanded: setIsHovered,
+    sidebarPinned,
+    sidebarHovered,
+    setSidebarHovered,
+    darkMode,
+    setDarkMode,
+    grayscale,
+    setGrayscale,
+    dyslexiaMode,
+    setDyslexiaMode,
+    fontScale,
     pageMetadata,
   } = useUI();
+
+  const isExpanded = sidebarPinned || sidebarHovered;
 
   // Merge props with context metadata (props take precedence)
   const title = propsTitle || pageMetadata.title;
@@ -90,41 +100,14 @@ export default function Layout({
     setTermsOpen(mustAcceptTerms);
   }, [mustAcceptTerms]);
 
-  const [darkMode, setDarkMode] = useState(() => {
-    const saved = localStorage.getItem("theme");
-    const isDark = saved ? saved === "dark" : false;
 
-    if (isDark) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-
-    return isDark;
-  });
-
-  const [grayscale, setGrayscale] = useState(() => {
-    return localStorage.getItem("grayscale") === "true";
-  });
-
-  const [isDyslexic, setIsDyslexic] = useState(() => {
-  const saved = localStorage.getItem("dyslexic");
-  const enabled = saved === "true";
-  
-  // Apply immediately on load
-  if (enabled) {
-    document.body.classList.add("dyslexic-mode");
-  }
-  
-  return enabled;
-});
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [toasts, setToasts] = useState<string[]>([]);
   const [termsOpen, setTermsOpen] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
-  const expanded = isHovered;
+  const expanded = isExpanded;
 
   const triggerToast = (message: string) => {
     setToasts((prev) => [...prev, message]);
@@ -135,31 +118,27 @@ export default function Layout({
   };
 
   useEffect(() => {
-  localStorage.setItem("dyslexic", String(isDyslexic));
-
-  if (isDyslexic) {
-    document.body.classList.add("dyslexic-mode");
-  } else {
-    document.body.classList.remove("dyslexic-mode");
-  }
-  }, [isDyslexic]);
-
-  useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
     } else {
       document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
     }
   }, [darkMode]);
 
   useEffect(() => {
-    localStorage.setItem("grayscale", String(grayscale));
-  }, [grayscale]);
+    if (dyslexiaMode) {
+      document.body.classList.add("dyslexic-mode");
+    } else {
+      document.body.classList.remove("dyslexic-mode");
+    }
+  }, [dyslexiaMode]);
+
+  useEffect(() => {
+    document.documentElement.style.fontSize = `${fontScale}%`;
+  }, [fontScale]);
 
   const handleLogout = () => {
-    setIsHovered(false); // Reset sidebar state on logout
+    setSidebarHovered(false); // Reset sidebar state on logout
     logout();
     navigate("/login");
   };
@@ -187,11 +166,11 @@ export default function Layout({
   };
 
   useEffect(() => {
-    // Reset sidebar expanded state on navigation to ensure overlay is dismissed
-    if (isHovered) {
-      setIsHovered(false);
+    // Reset sidebar hovered state on navigation to ensure overlay is dismissed
+    if (sidebarHovered) {
+      setSidebarHovered(false);
     }
-  }, [location.pathname, setIsHovered]);
+  }, [location.pathname, sidebarHovered, setSidebarHovered]);
 
   const currentRole: string =
     user?.roles.map((r) => {
@@ -264,17 +243,11 @@ export default function Layout({
           title={title}
           user={user}
           role={currentRole}
-          darkMode={darkMode}
-          setDarkMode={setDarkMode}
-          grayscale={grayscale}
-          setGrayscale={setGrayscale}
           handleLogout={handleLogout}
           getRoleLabel={getRoleLabel}
           showNotifications={showNotifications}
           setShowNotifications={setShowNotifications}
           isLoggedIn={isLoggedIn}
-          isDyslexic={isDyslexic}
-          setIsDyslexic={setIsDyslexic}
         />
 
           <NotificationModal
@@ -288,8 +261,6 @@ export default function Layout({
               <Navigation
                 navigationItems={navigationItems}
                 location={location}
-                isHovered={isHovered}
-                setIsHovered={setIsHovered}
                 user={user}
                 handleLogout={handleLogout}
                 roleLabel={getRoleLabel()}
@@ -326,7 +297,7 @@ export default function Layout({
               </div>
 
               {/* The Overlay: Handle both the dark tint and the blur here */}
-              {expanded && isLoggedIn && !termsOpen && (
+              {sidebarHovered && !sidebarPinned && isLoggedIn && !termsOpen && (
                 <div
                   className="pointer-events-none absolute inset-0 z-20
                  bg-black/50 animate-in

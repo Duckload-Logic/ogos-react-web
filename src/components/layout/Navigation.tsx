@@ -7,10 +7,15 @@ import {
   LogOut,
   ShieldCheck,
   Gavel,
+  ChevronRight,
+  ChevronLeft,
+  Pin,
+  PinOff,
 } from "lucide-react";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
-import { useDebounce, useDebouncedCallback } from "@/hooks/useDebounce";
+import { useDebouncedCallback } from "@/hooks/useDebounce";
+import { useUI } from "@/context";
 
 const HOME_HREF = "/";
 const SETTINGS_HREF = "/settings";
@@ -19,13 +24,13 @@ function NavItem({
   item,
   active,
   variant = "desktop",
-  isHovered = false,
+  isExpanded = false,
   onClick,
 }: {
   item: { label: string; href: string; icon: React.ReactNode };
   active: boolean;
   variant?: "desktop" | "mobile-bottom" | "mobile-drawer";
-  isHovered?: boolean;
+  isExpanded?: boolean;
   onClick?: () => void;
 }) {
   if (variant === "mobile-bottom") {
@@ -73,14 +78,14 @@ function NavItem({
     >
       <div
         className={`flex items-center justify-center min-w-[24px] transition-transform duration-200
-        ${isHovered ? "rotate-6 scale-110" : ""}`}
+        ${isExpanded ? "scale-110" : ""}`}
       >
         {item.icon}
       </div>
 
       <span
-        className={`opacity-0 translate-x-[-6px] transition-all duration-200 whitespace-nowrap
-        ${isHovered ? "opacity-100 translate-x-0" : ""}`}
+        className={`opacity-0 translate-x-[-3px] transition-all duration-200 whitespace-nowrap
+        ${isExpanded ? "opacity-100 translate-x-0" : ""}`}
       >
         {item.label}
       </span>
@@ -91,20 +96,24 @@ function NavItem({
 export default function Navigation({
   navigationItems,
   location,
-  isHovered, // State from parent
-  setIsHovered,
   user,
   handleLogout,
   roleLabel,
 }: {
   navigationItems: any[];
   location: any;
-  isHovered: boolean;
-  setIsHovered: React.Dispatch<React.SetStateAction<boolean>>;
   user: any;
   handleLogout: () => void;
   roleLabel: string;
 }) {
+  const {
+    sidebarPinned,
+    toggleSidebarPinned,
+    sidebarHovered,
+    setSidebarHovered,
+  } = useUI();
+
+  const isExpanded = sidebarPinned || sidebarHovered;
   const isMobile = useIsMobile();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"menu" | "settings">("menu");
@@ -121,16 +130,16 @@ export default function Navigation({
     return location.pathname.startsWith(`${item.href}/`);
   };
 
-  const debouncedSetIsHovered = useDebouncedCallback((value: boolean) => {
-    setIsHovered(value);
-  }, 200);
+  const debouncedSetHovered = useDebouncedCallback((value: boolean) => {
+    setSidebarHovered(value);
+  }, 150);
 
   const handleMouseEnter = () => {
-    debouncedSetIsHovered(true);
+    debouncedSetHovered(true);
   };
 
   const handleMouseLeave = () => {
-    setIsHovered(false);
+    debouncedSetHovered(false);
   };
 
   if (isMobile) {
@@ -218,7 +227,7 @@ export default function Navigation({
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
       className={`relative flex flex-col bg-background/95 border-r transition-all duration-300 z-30
-        ${isHovered ? "w-[260px]" : "w-[72px]"}`}
+        ${isExpanded ? "w-[260px]" : "w-[72px]"}`}
     >
       <nav className="flex flex-col gap-2 p-3 mt-2">
         {navigationItems.map((item) => {
@@ -227,13 +236,35 @@ export default function Navigation({
               key={item.href}
               item={item}
               active={isActive(item)}
-              isHovered={isHovered}
+              isExpanded={isExpanded}
               variant="desktop"
-              onClick={() => setIsHovered(false)}
             />
           )
         })}
       </nav>
+
+      {/* Pin Toggle (Desktop Only) - Balanced spacing */}
+      <div className="mt-auto p-3 mb-2">
+        <button
+          onClick={toggleSidebarPinned}
+          className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3 w-full
+            transition-all duration-200 hover:shadow-sm
+            ${sidebarPinned
+              ? "bg-primary/10 text-primary shadow-sm"
+              : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            }`}
+          title={sidebarPinned ? "Unpin Sidebar" : "Pin Sidebar"}
+        >
+          <div className="flex items-center justify-center min-w-[24px]">
+            {sidebarPinned ? <PinOff size={20} /> : <Pin size={20} />}
+          </div>
+          {isExpanded && (
+            <span className="font-medium truncate animate-in fade-in slide-in-from-left-2 duration-200">
+              {sidebarPinned ? "Unpin Sidebar" : "Pin Sidebar"}
+            </span>
+          )}
+        </button>
+      </div>
     </aside>
   );
 }

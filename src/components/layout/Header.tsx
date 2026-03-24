@@ -8,35 +8,27 @@ interface HeaderProps {
   title?: string;
   user: any;
   role: string;
-  darkMode: boolean;
-  setDarkMode: (value: boolean) => void;
-  grayscale: boolean;
-  setGrayscale: (value: boolean) => void;
   handleLogout: () => void;
   getRoleLabel: () => string;
   showNotifications: boolean;
   setShowNotifications: (value: boolean) => void;
   isLoggedIn: boolean;
-  isDyslexic: boolean;
-  setIsDyslexic: (value: boolean) => void;
 }
+
+import { useUI } from "@/context/UIContext";
 
 export default function Header({
   title,
   user,
   role,
-  darkMode,
-  setDarkMode,
-  grayscale,
-  setGrayscale,
   handleLogout,
   getRoleLabel,
   showNotifications,
   setShowNotifications,
   isLoggedIn = true,
-  isDyslexic,
-  setIsDyslexic,
 }: HeaderProps) {
+  const { darkMode, setDarkMode } = useUI();
+
   return (
     <header className="h-20 flex items-center justify-between px-6 bg-gradient-to-t from-primary/80 via-primary to-primary backdrop-blur-lg sticky top-0 z-30">
       <div className="flex items-center gap-3 text-primary-foreground">
@@ -79,10 +71,6 @@ export default function Header({
               roleLabel={getRoleLabel()}
               profilePath={`/${role}/profile`}
               onLogout={handleLogout}
-              grayscale={grayscale}
-              setGrayscale={setGrayscale}
-              isDyslexic={isDyslexic}
-              setDyslexic={setIsDyslexic}
             />
           </div>
         )}
