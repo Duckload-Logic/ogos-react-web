@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -16,7 +16,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { useAvailableSlots } from "@/features/appointments/hooks";
-import { DropdownField, InputField } from "@/components/form";
+import { Dropdown, FormInput } from "@/components/form";
 import { AvailableTimeSlotView, TimeSlot } from "../types";
 import { format12HourTime, toISODateString } from "../utils";
 
@@ -89,7 +89,7 @@ export default function RescheduleModal({
         </DialogHeader>
 
         <div className="py-4 space-y-5">
-          <InputField
+          <FormInput
             type="date"
             label="New Date"
             min={dateOptions[0].value}
@@ -98,13 +98,13 @@ export default function RescheduleModal({
             onChange={setSelectedDateStr}
           />
 
-        {isLoading && (
-          <p className="text-xs text-muted-foreground animate-pulse">
-            Loading available time slots...
-          </p>
-        )}
-        
-          <DropdownField
+          {isLoading && (
+            <p className="text-xs text-muted-foreground animate-pulse">
+              Loading available time slots...
+            </p>
+          )}
+
+          <Dropdown
             label={"New time"}
             options={
               availableSlots?.map((slot: AvailableTimeSlotView) => ({
@@ -120,10 +120,10 @@ export default function RescheduleModal({
         </div>
 
         <DialogFooter>
-          <Button 
-          variant="outline" 
-          onClick={onClose}
-          className="transition-all duration-200 hover:scale-105"
+          <Button
+            variant="outline"
+            onClick={onClose}
+            className="transition-all duration-200 hover:scale-105"
           >
             Cancel
           </Button>

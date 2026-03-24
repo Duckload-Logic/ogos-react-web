@@ -1,11 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Appointment, ConcernCategory, TimeSlot } from "../types";
-import { DropdownField } from "@/components/form";
+import { Dropdown } from "@/components/form";
 import { useCategories } from "../hooks";
 import { useState } from "react";
 
-interface AppointmentDetailsFormProps {
+interface AppointmentFormProps {
   data: Appointment;
   onChange: (name: string, value: any) => void;
   onSubmit: () => void;
@@ -13,13 +13,13 @@ interface AppointmentDetailsFormProps {
   isSubmitting: boolean;
 }
 
-export default function AppointmentDetailsForm({
+export default function AppointmentForm({
   data,
   onChange,
   onSubmit,
   isLoading,
   isSubmitting,
-}: AppointmentDetailsFormProps) {
+}: AppointmentFormProps) {
   const { data: categories, isLoading: isCategoriesLoading } = useCategories();
   const isFormValid = data.whenDate && data.timeSlot;
 
@@ -34,7 +34,7 @@ export default function AppointmentDetailsForm({
         <div className="space-y-4">
           {/* Reason/Concern Input */}
           <div className="space-y-4">
-            <DropdownField
+            <Dropdown
               label="Concern Category"
               value={data?.appointmentCategory?.id}
               onChange={(id) => {

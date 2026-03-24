@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { AvailableTimeSlotView, TimeSlot } from "../types";
 import { Sun, Moon } from "lucide-react";
 import { format12HourTime } from "../utils";
-import { LoadingSpinner } from "@/components/shared";
+import { Spinner } from "@/components/shared";
 
 interface TimeSlotselectorProps {
   selectedDate: Date | undefined;
@@ -12,7 +12,7 @@ interface TimeSlotselectorProps {
   onTimeSelect: (slot: AvailableTimeSlotView) => void;
 }
 
-export default function TimeSlotSelector({
+export default function SlotSelector({
   selectedDate,
   selectedTime,
   availableSlots,
@@ -59,7 +59,7 @@ export default function TimeSlotSelector({
               </p>
               {loading ? (
                 <p className="text-muted-foreground text-center py-8 text-sm">
-                  <LoadingSpinner size="sm" message="Loading available slots" />
+                  <Spinner size="sm" message="Loading available slots" />
                 </p>
               ) : availableSlots.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

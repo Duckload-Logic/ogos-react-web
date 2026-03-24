@@ -16,7 +16,7 @@ interface Legend {
   label: string;
 }
 
-interface AppointmentCalendarProps {
+interface CalendarProps {
   /** Current month being displayed */
   currentMonth: Date;
   /** Currently selected date */
@@ -47,7 +47,7 @@ interface AppointmentCalendarProps {
   isAdmin?: boolean;
 }
 
-export default function AppointmentCalendar({
+export default function Calendar({
   currentMonth,
   selectedDate,
   onMonthChange,
@@ -62,7 +62,7 @@ export default function AppointmentCalendar({
   hasHeader = false,
   className,
   isAdmin = false,
-}: AppointmentCalendarProps) {
+}: CalendarProps) {
   const touchStartX = useRef<number | null>(null);
   const today = new Date();
   const todayDate = today.getDate();

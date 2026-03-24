@@ -1,5 +1,6 @@
-import { Button, Card, CardContent, CardHeader } from "@/components";
-import Pagination from "@/components/Pagination";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Pagination } from "@/components/shared";
 import { STATUS_COLORS } from "@/config/constants";
 import { Appointment, AppointmentStatus, StatusCount } from "../types";
 import { CalendarX, Eye, Tag, User, CalendarDays, Clock } from "lucide-react";
@@ -7,9 +8,9 @@ import { useMemo } from "react";
 import { SearchInput } from "@/components/form";
 import { format12HourTime } from "../utils";
 import { formatDate } from "@/features/schedules/utils/formatters";
-import { LoadingSpinner } from "@/components/shared";
+import { Spinner } from "@/components/shared";
 
-interface AppointmentsListProps {
+interface AppointmentListProps {
   title?: string;
   searchTerm?: string;
   onSearchChange?: (value: string) => void;
@@ -26,7 +27,7 @@ interface AppointmentsListProps {
   className?: string;
 }
 
-export default function AppointmentsList({
+export default function AppointmentList({
   title,
   searchTerm,
   onSearchChange,
@@ -41,7 +42,7 @@ export default function AppointmentsList({
   onPageChange,
   totalPages,
   className,
-}: AppointmentsListProps) {
+}: AppointmentListProps) {
   const statMap = useMemo(() => {
     const map: Record<number, StatusCount> = {};
     statusCounts.forEach((sc) => {
@@ -85,20 +86,18 @@ export default function AppointmentsList({
               <button
                 key={filter.id}
                 onClick={() => onStatusChange(filter)}
-                className={`px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-colors duration-200 ${
-                  selectedStatus?.id === filter.id
-                    ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                    : "bg-background text-muted-foreground border-border hover:bg-muted/60 hover:text-foreground"
-                }`}
+                className={`px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-colors duration-200 ${selectedStatus?.id === filter.id
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                  : "bg-background text-muted-foreground border-border hover:bg-muted/60 hover:text-foreground"
+                  }`}
               >
                 {filter.name}
                 {statMap[filter.id] && (
                   <span
-                    className={`ml-1 text-xs ${
-                      selectedStatus?.id === filter.id
-                        ? "text-primary-foreground/90"
-                        : "text-muted-foreground"
-                    }`}
+                    className={`ml-1 text-xs ${selectedStatus?.id === filter.id
+                      ? "text-primary-foreground/90"
+                      : "text-muted-foreground"
+                      }`}
                   >
                     ({statMap[filter.id].count})
                   </span>
@@ -113,7 +112,7 @@ export default function AppointmentsList({
         {isLoading ? (
           <div className="flex min-h-[320px] items-center justify-center px-4 text-center">
             <p className="text-muted-foreground">
-              <LoadingSpinner size="sm" message="Loading appointments" />
+              <Spinner size="sm" message="Loading appointments" />
             </p>
           </div>
         ) : appointments.length === 0 ? (
@@ -174,9 +173,8 @@ export default function AppointmentsList({
 
                       <td className="px-4 py-4">
                         <span
-                          className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium border ${
-                            STATUS_COLORS[apt.status?.colorKey || "info"]
-                          }`}
+                          className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium border ${STATUS_COLORS[apt.status?.colorKey || "info"]
+                            }`}
                         >
                           {apt.status?.name}
                         </span>
@@ -215,9 +213,8 @@ export default function AppointmentsList({
                     </div>
 
                     <span
-                      className={`inline-block px-2 py-1 rounded-full text-xs font-medium border ${
-                        STATUS_COLORS[apt.status?.colorKey || "info"]
-                      }`}
+                      className={`inline-block px-2 py-1 rounded-full text-xs font-medium border ${STATUS_COLORS[apt.status?.colorKey || "info"]
+                        }`}
                     >
                       {apt.status?.name}
                     </span>

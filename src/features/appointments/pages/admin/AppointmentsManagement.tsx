@@ -5,17 +5,17 @@ import {
   useUpdateAppointment,
 } from "@/features/appointments/hooks";
 import {
-  AppointmentCalendar,
-  AppointmentsList,
+  Calendar,
+  AppointmentList,
 } from "@/features/appointments/components";
 import { Appointment, AppointmentStatus } from "@/features/appointments/types";
-import AppointmentViewModal from "@/features/appointments/components/AppointmentViewModal";
+import ViewModal from "@/features/appointments/components/ViewModal";
 import { useStatuses } from "../../hooks/useLookups";
 import { useDebounce } from "@/hooks/useDebounce";
 import { toISODateString } from "../../utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { STATUS_COLORS } from "@/config/constants";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 import {
   Bar,
@@ -254,14 +254,16 @@ export default function AppointmentsManagement() {
   const isPageLoading =
     isStatusesLoading || isStatsLoading || isAllStatsLoading || isLoading;
 
+  usePageMetadata({
+    title: "Appointments Management",
+    description: "View and manage all counseling appointments",
+    badgeText: "Admin Management",
+    badgeIcon: <CalendarPlus className="h-4 w-4" />,
+    isLoading: isPageLoading,
+  });
+
   return (
-    <Layout
-      title="Appointments Management"
-      subTitle="View and manage all counseling appointments"
-      badgeText="Admin Management"
-      badgeIcon={<CalendarPlus className="h-4 w-4" />}
-      isLoading={isPageLoading}
-    >
+    <>
       <div className="max-w-8xl mx-auto px-4 py-2 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
         <div className="bg-blue-500/10 border border-blue-300 shadow-sm rounded-lg p-4">
           <p className="text-sm text-blue-600 dark:text-blue-300">
@@ -372,7 +374,7 @@ export default function AppointmentsManagement() {
           </Card>
 
           <div className="lg:col-span-2 h-full">
-            <AppointmentCalendar
+            <Calendar
               title="Appointments Calendar"
               className="col-span-1 h-full"
               currentMonth={currentMonth}
@@ -408,7 +410,7 @@ export default function AppointmentsManagement() {
           </div>
 
           <div className="lg:col-span-4 h-full">
-            <AppointmentsList
+            <AppointmentList
               title={`Appointment List - ${
                 selectedDate ? selectedDate.toDateString() : "All Dates"
               }`}
@@ -432,7 +434,7 @@ export default function AppointmentsManagement() {
           </div>
         </div>
 
-        <AppointmentViewModal
+        <ViewModal
           appointment={selectedAppointment}
           isOpen={isViewOpen}
           onClose={() => setIsViewOpen(false)}
@@ -441,6 +443,6 @@ export default function AppointmentsManagement() {
           onReschedule={handleReschedule}
         />
       </div>
-    </Layout>
+    </>
   );
 }

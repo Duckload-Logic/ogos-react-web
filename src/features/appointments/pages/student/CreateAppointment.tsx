@@ -2,15 +2,15 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAvailableSlots } from "@/features/appointments/hooks/useLookups";
 import {
-  TimeSlotSelector,
-  AppointmentDetailsForm,
+  SlotSelector,
+  AppointmentForm,
 } from "@/features/appointments/components";
 import {
   Appointment,
   TimeSlot,
   CreateAppointmentRequest,
 } from "@/features/appointments";
-import AppointmentCalendar from "@/features/appointments/components/AppointmentCalendar";
+import Calendar from "@/features/appointments/components/Calendar";
 import {
   CalendarDays,
   Clock,
@@ -26,7 +26,7 @@ import { Link } from "react-router-dom";
 import { ConcernCategory } from "../../types";
 import { useSubmitAppointment } from "../../hooks/useAppointments";
 import { toISODateString } from "../../utils";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 const EMPTY_APPOINTMENT_FORM: Appointment = {
   reason: "",
@@ -70,8 +70,13 @@ export default function CreateAppointment() {
     });
   };
 
+  usePageMetadata({
+    title: "Schedule Appointment",
+    isLoading: isLoading || isSubmitting,
+  });
+
   return (
-    <Layout title="Schedule Appointment" isLoading={isLoading || isSubmitting}>
+    <>
       <div className="min-h-full bg-background">
         {/* Header */}
         <div className="flex flex-col items-center text-center space-y-4 py-10 border-b border-border/40 bg-background/50 backdrop-blur-sm">
@@ -193,7 +198,7 @@ export default function CreateAppointment() {
             {/* Step 1: Calendar */}
             {currentStep === 1 && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <AppointmentCalendar
+                <Calendar
                   currentMonth={currentMonth}
                   selectedDate={selectedDate}
                   onMonthChange={setCurrentMonth}
@@ -218,7 +223,7 @@ export default function CreateAppointment() {
             {/* Step 2: Time Slots */}
             {currentStep === 2 && (
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
-                <TimeSlotSelector
+                <SlotSelector
                   selectedDate={selectedDate}
                   selectedTime={selectedTime}
                   availableSlots={slots || []}
@@ -275,7 +280,7 @@ export default function CreateAppointment() {
                   </CardContent>
                 </Card>
 
-                <AppointmentDetailsForm
+                <AppointmentForm
                   data={appointmentFormData}
                   onChange={(name: string, value: any) => {
                     setAppointmentFormData((prev) => ({
@@ -322,6 +327,6 @@ export default function CreateAppointment() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

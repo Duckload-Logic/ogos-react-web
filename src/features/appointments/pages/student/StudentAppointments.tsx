@@ -28,9 +28,9 @@ import {
 import { useStatuses } from "../../hooks/useLookups";
 import { StatusCount } from "../../types";
 import { useAppointmentsStats } from "../../hooks/useAppointments";
-import Pagination from "@/components/Pagination";
+import { Pagination } from "@/components/shared";
 import { format12HourTime } from "../../utils";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 export default function StudentAppointments() {
   const { data: appointmentStatuses = [] } = useStatuses();
@@ -55,6 +55,22 @@ export default function StudentAppointments() {
 
   const isLoading = isAppointmentsLoading || isStatsLoading;
 
+  usePageMetadata({
+    title: "My Appointments",
+    description: "View and manage your counseling appointments",
+    badgeText: "Appointments",
+    badgeIcon: <Calendar className="w-4 h-4" />,
+    isLoading,
+    headerActions: (
+      <Button asChild className="gap-2 rounded-xl h-10 px-4">
+        <Link to="/student/appointments/schedule">
+          <Plus className="w-4 h-4" />
+          New Appointment
+        </Link>
+      </Button>
+    ),
+  });
+
   const appointments = data?.appointments || [];
   const statusCounts = appointmentStats || ([] as StatusCount[]);
 
@@ -73,21 +89,7 @@ export default function StudentAppointments() {
   };
 
   return (
-    <Layout
-      title="My Appointments"
-      subTitle="View and manage your counseling appointments"
-      badgeText="Appointments"
-      badgeIcon={<Calendar className="w-4 h-4" />}
-      isLoading={isLoading}
-      headerActions={
-        <Button asChild className="gap-2 rounded-xl h-10 px-4">
-          <Link to="/student/appointments/schedule">
-            <Plus className="w-4 h-4" />
-            New Appointment
-          </Link>
-        </Button>
-      }
-    >
+    <>
       <div className="space-y-6">
 
         {/* Stats Cards */}
@@ -279,6 +281,6 @@ export default function StudentAppointments() {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </>
   );
 }

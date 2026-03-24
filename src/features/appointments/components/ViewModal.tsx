@@ -7,7 +7,7 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog";
-import { Button } from "@/components";
+import { Button } from "@/components/ui/button";
 import {
   CalendarDays,
   Clock,
@@ -24,13 +24,13 @@ import {
   ShieldUser,
 } from "lucide-react";
 import { STATUS_COLORS } from "@/config/constants";
-import ActionConfirmModal from "./ActionConfirmationModal";
+import ActionConfirmModal from "./ConfirmModal";
 import RescheduleModal from "./RescheduleModal";
 import { set } from "zod";
 import { format12HourTime } from "../utils";
 import { formatDate } from "@/features/schedules/utils/formatters";
 
-interface AppointmentViewModalProps {
+interface ViewModalProps {
   appointment: Appointment | null;
   isOpen: boolean;
   onClose: () => void;
@@ -48,7 +48,7 @@ interface AppointmentViewModalProps {
   hasActions?: boolean; // whether to show action buttons
 }
 
-export default function AppointmentViewModal({
+export default function ViewModal({
   appointment,
   isOpen,
   onClose,
@@ -56,7 +56,7 @@ export default function AppointmentViewModal({
   onStatusAction,
   onReschedule,
   hasActions = true,
-}: AppointmentViewModalProps) {
+}: ViewModalProps) {
   const [pendingAction, setPendingAction] = useState<{
     type: string;
     requiresMessage: boolean;
@@ -176,7 +176,7 @@ export default function AppointmentViewModal({
             {(appointment.createdAt || appointment.updatedAt) && (
               <div className="border-t border-border pt-4 text-xs text-muted-foreground space-y-1">
                 {appointment.updatedAt &&
-                appointment.updatedAt !== appointment.createdAt ? (
+                  appointment.updatedAt !== appointment.createdAt ? (
                   <p>Last updated: {formatDate(appointment.updatedAt)} at {format12HourTime(appointment.updatedAt)}</p>
                 ) : (
                   <p>Created: {formatDate(appointment.createdAt || "")} at {format12HourTime(appointment.createdAt || "")}</p>
@@ -189,9 +189,8 @@ export default function AppointmentViewModal({
             {/* Status Badge */}
             <div className="flex justify-start">
               <span
-                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border transition-all duration-200 hover:scale-105 ${
-                  STATUS_COLORS[appointment.status?.colorKey || "info"]
-                }`}
+                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border transition-all duration-200 hover:scale-105 ${STATUS_COLORS[appointment.status?.colorKey || "info"]
+                  }`}
               >
                 {appointment.status?.name}
               </span>
@@ -306,9 +305,9 @@ export default function AppointmentViewModal({
           </div>
 
           <div className="flex justify-end">
-            <Button variant="outline" 
-            onClick={onClose}
-            className="transition-all duration-200 hover:scale-105">
+            <Button variant="outline"
+              onClick={onClose}
+              className="transition-all duration-200 hover:scale-105">
               Close
             </Button>
           </div>

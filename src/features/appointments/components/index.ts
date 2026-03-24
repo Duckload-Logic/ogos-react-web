@@ -1,8 +1,9 @@
-export { default as AppointmentHeader } from "./AppointmentHeader";
-export { default as AppointmentMessages } from "./AppointmentMessages";
-export { default as TimeSlotSelector } from "./TimeSlotSelector";
-export { default as AppointmentDetailsForm } from "./AppointmentDetailsForm";
-export { default as AppointmentCalendar } from "./AppointmentCalendar";
+export { default as Header } from "./Header";
+export { default as Messages } from "./Messages";
+export { default as SlotSelector } from "./SlotSelector";
+export { default as AppointmentForm } from "./Form";
+export { default as Calendar } from "./Calendar";
 export { default as RescheduleModal } from "./RescheduleModal";
-export { default as AppointmentsList } from "./AppointmentsList";
-export { default as AppointmentViewModal } from "./AppointmentViewModal";
+export { default as AppointmentList } from "./List";
+export { default as ViewModal } from "./ViewModal";
+export { default as ConfirmModal } from "./ConfirmModal";

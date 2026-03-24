@@ -1,17 +1,17 @@
 import { Link } from "react-router-dom";
 import { ArrowLeft } from "lucide-react";
 
-interface AppointmentHeaderProps {
+interface HeaderProps {
   backTo?: string;
   title: string;
   subtitle?: string;
 }
 
-export default function AppointmentHeader({
+export default function Header({
   backTo = "/student",
   title,
   subtitle,
-}: AppointmentHeaderProps) {
+}: HeaderProps) {
   return (
     <div className="bg-primary text-primary-foreground py-8 md:py-12">
       <div className="max-w-7xl mx-auto px-4 md:px-8">

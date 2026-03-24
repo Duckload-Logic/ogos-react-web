@@ -1,14 +1,14 @@
 import { AlertCircle, Check } from "lucide-react";
 
-interface AppointmentMessagesProps {
+interface MessagesProps {
   error?: string | null;
   successMessage?: string | null;
 }
 
-export default function AppointmentMessages({
+export default function Messages({
   error,
   successMessage,
-}: AppointmentMessagesProps) {
+}: MessagesProps) {
   return (
     <>
       {error && (

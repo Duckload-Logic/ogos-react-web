@@ -7,7 +7,7 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components";
+import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea"; // adjust import
 
 interface ActionConfirmModalProps {
@@ -58,13 +58,13 @@ export default function ActionConfirmModal({
         )}
 
         <DialogFooter>
-          <Button variant="outline" 
-          onClick={onClose}
-              className="transition-all duration-200 hover:scale-105"
+          <Button variant="outline"
+            onClick={onClose}
+            className="transition-all duration-200 hover:scale-105"
           >
             Cancel
           </Button>
-          <Button 
+          <Button
             onClick={handleConfirm}
             className="transition-all duration-200 hover:scale-105"
           >
