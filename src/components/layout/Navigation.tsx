@@ -229,6 +229,7 @@ export default function Navigation({
               active={isActive(item)}
               isHovered={isHovered}
               variant="desktop"
+              onClick={() => setIsHovered(false)}
             />
           )
         })}

@@ -121,6 +121,7 @@ export default function Layout({
   }, [darkMode]);
 
   const handleLogout = () => {
+    setIsHovered(false); // Reset sidebar state on logout
     logout();
     navigate("/login");
   };
@@ -146,6 +147,13 @@ export default function Layout({
       return "Admin Account";
     return "Student Account";
   };
+
+  useEffect(() => {
+    // Reset sidebar expanded state on navigation to ensure overlay is dismissed
+    if (isHovered) {
+      setIsHovered(false);
+    }
+  }, [location.pathname, setIsHovered]);
 
   const currentRole = user?.roles.some((r) => {
     const key = r.toLowerCase().replace(" ", "");
@@ -271,7 +279,7 @@ export default function Layout({
               </div>
 
               {/* The Overlay: Handle both the dark tint and the blur here */}
-              {expanded && !termsOpen && (
+              {expanded && isLoggedIn && !termsOpen && (
                 <div
                   className="pointer-events-none absolute inset-0 z-20
                  bg-black/50 animate-in
