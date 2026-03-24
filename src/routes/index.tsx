@@ -78,31 +78,49 @@ export const routes: RouteObject[] = [
     path: "/student",
     element: (
       <ProtectedRoute requiredRole="student">
-        <IIRGate>
-          <Layout />
-        </IIRGate>
+        <Layout />
       </ProtectedRoute>
     ),
     children: [
       {
         index: true,
-        element: <StudentDashboard />,
+        element: (
+          <IIRGate>
+            <StudentDashboard />
+          </IIRGate >
+        ),
       },
       {
         path: "appointments",
-        element: <StudentAppointments />,
+        element: (
+          <IIRGate>
+            <StudentAppointments />
+          </IIRGate >
+        ),
       },
       {
         path: "appointments/schedule",
-        element: <CreateAppointment />,
+        element: (
+          <IIRGate>
+            <CreateAppointment />
+          </IIRGate >
+        ),
       },
       {
         path: "slips",
-        element: <StudentSlips />,
+        element: (
+          <IIRGate>
+            <StudentSlips />
+          </IIRGate >
+        ),
       },
       {
         path: "slips/submit",
-        element: <SubmitSlip />,
+        element: (
+          <IIRGate>
+            <SubmitSlip />
+          </IIRGate >
+        ),
       },
       {
         path: "iir",
