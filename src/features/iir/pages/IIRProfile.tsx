@@ -59,14 +59,14 @@ export default function IIRProfile() {
     headerActions: (
       <div className="flex items-center gap-2">
         {isAdminOrSuper ? (
-          <button className="flex items-center justify-center h-10 w-10 hover:bg-red-500/10 transition-colors rounded-xl border border-red-500/20 group">
+          <button className="flex items-center justify-center h-10 w-10 p-0 hover:bg-red-500/10 transition-colors rounded-xl border border-red-500/20 group">
             <Trash
               size={ICON_SIZE}
               className="text-red-500 group-hover:scale-110 transition-transform"
             />
           </button>
         ) : (
-          <button className="flex items-center justify-center h-10 w-10 hover:bg-primary/10 transition-colors rounded-xl border border-primary/20 group">
+          <button className="flex items-center justify-center h-10 w-10 p-0 hover:bg-primary/10 transition-colors rounded-xl border border-primary/20 group">
             <Edit
               size={ICON_SIZE}
               className="text-primary group-hover:scale-110 transition-transform"
