@@ -10,6 +10,7 @@ import {
 } from "lucide-react";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { useDebounce, useDebouncedCallback } from "@/hooks/useDebounce";
 
 const HOME_HREF = "/";
 const SETTINGS_HREF = "/settings";
@@ -18,11 +19,13 @@ function NavItem({
   item,
   active,
   variant = "desktop",
+  isHovered = false,
   onClick,
 }: {
   item: { label: string; href: string; icon: React.ReactNode };
   active: boolean;
   variant?: "desktop" | "mobile-bottom" | "mobile-drawer";
+  isHovered?: boolean;
   onClick?: () => void;
 }) {
   if (variant === "mobile-bottom") {
@@ -69,24 +72,15 @@ function NavItem({
         }`}
     >
       <div
-        className="
-        flex items-center justify-center min-w-[24px]
-        transition-transform duration-200
-        group-hover:rotate-6 group-hover:scale-110
-        "
+        className={`flex items-center justify-center min-w-[24px] transition-transform duration-200
+        ${isHovered ? "rotate-6 scale-110" : ""}`}
       >
         {item.icon}
       </div>
 
       <span
-        className="
-        opacity-0
-        translate-x-[-6px]
-        group-hover:opacity-100
-        group-hover:translate-x-0
-        transition-all duration-200 hover:shadow-sm
-        whitespace-nowrap
-        "
+        className={`opacity-0 translate-x-[-6px] transition-all duration-200 whitespace-nowrap
+        ${isHovered ? "opacity-100 translate-x-0" : ""}`}
       >
         {item.label}
       </span>
@@ -97,6 +91,7 @@ function NavItem({
 export default function Navigation({
   navigationItems,
   location,
+  isHovered, // State from parent
   setIsHovered,
   user,
   handleLogout,
@@ -104,6 +99,7 @@ export default function Navigation({
 }: {
   navigationItems: any[];
   location: any;
+  isHovered: boolean;
   setIsHovered: React.Dispatch<React.SetStateAction<boolean>>;
   user: any;
   handleLogout: () => void;
@@ -123,6 +119,18 @@ export default function Navigation({
     }
 
     return location.pathname.startsWith(`${item.href}/`);
+  };
+
+  const debouncedSetIsHovered = useDebouncedCallback((value: boolean) => {
+    setIsHovered(value);
+  }, 200);
+
+  const handleMouseEnter = () => {
+    debouncedSetIsHovered(true);
+  };
+
+  const handleMouseLeave = () => {
+    setIsHovered(false);
   };
 
   if (isMobile) {
@@ -207,10 +215,10 @@ export default function Navigation({
 
   return (
     <aside
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
-      className="group relative flex flex-col bg-background/95 border-r
-        w-[72px] hover:w-[260px] transition-all duration-300 z-30"
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={`relative flex flex-col bg-background/95 border-r transition-all duration-300 z-30
+        ${isHovered ? "w-[260px]" : "w-[72px]"}`}
     >
       <nav className="flex flex-col gap-2 p-3 mt-2">
         {navigationItems.map((item) => {
@@ -219,6 +227,7 @@ export default function Navigation({
               key={item.href}
               item={item}
               active={isActive(item)}
+              isHovered={isHovered}
               variant="desktop"
             />
           )

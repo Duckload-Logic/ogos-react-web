@@ -1,25 +1,25 @@
 import Header from "@/components/layout/Header";
-import NotificationModal from "@/components/notifications/NotificationModal";
-import AppFooter from "@/components/common/AppFooter";
+import NotificationModal from "@/features/notifications/components/NotificationModal";
+
 import Toast from "@/components/ui/Toast";
 import { NAV_CONFIG } from "@/config/navigation";
-import { LoadingSpinner } from "@/components/shared/LoadingSpinner";
+import { Spinner } from "@/components/shared/Spinner";
 
 import React, { useMemo, useState, useEffect, useRef } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Outlet } from "react-router-dom";
 
-import { useAuth } from "@/context";
-import { ErrorBoundary } from "../shared";
+import { useAuth, useUI, PageMetadata } from "@/context";
+import { ErrorBoundary } from "../shared/ErrorBoundary";
 import ConsentModal from "@/features/consents/components/ConsentModal";
 import { useGetLatestStatement } from "@/features/consents/hooks";
 import useCheckUserConsent from "@/features/consents/hooks/useCheckUserConsent";
 import { useGiveConsent } from "@/features/consents/hooks/useGiveConsent";
 import Navigation from "./Navigation";
-import PageHeader from "./PageHeader";
+import SubHeader from "./SubHeader";
 
 interface LayoutProps {
   showHeader?: boolean;
-  children: React.ReactNode;
+  children?: React.ReactNode;
   title?: string;
   subTitle?: string;
   headerChildren?: React.ReactNode;
@@ -36,18 +36,34 @@ interface LayoutProps {
 export default function Layout({
   showHeader = true,
   children,
-  title,
-  subTitle,
+  title: propsTitle,
+  subTitle: propsSubTitle,
   headerChildren,
   isLoggedIn = true,
-  isLoading = false,
-  description,
-  badgeText,
-  badgeIcon,
-  headerActions,
-  headerStats,
-  showDate = false,
+  isLoading: propsIsLoading,
+  description: propsDescription,
+  badgeText: propsBadgeText,
+  badgeIcon: propsBadgeIcon,
+  headerActions: propsHeaderActions,
+  headerStats: propsHeaderStats,
+  showDate: propsShowDate,
 }: LayoutProps) {
+  const {
+    sidebarExpanded: isHovered,
+    setSidebarExpanded: setIsHovered,
+    pageMetadata,
+  } = useUI();
+
+  // Merge props with context metadata (props take precedence)
+  const title = propsTitle || pageMetadata.title;
+  const description = propsDescription || propsSubTitle || pageMetadata.description;
+  const badgeText = propsBadgeText || pageMetadata.badgeText;
+  const badgeIcon = propsBadgeIcon || pageMetadata.badgeIcon;
+  const headerActions = propsHeaderActions || pageMetadata.headerActions;
+  const headerStats = propsHeaderStats || pageMetadata.headerStats;
+  const showDate = propsShowDate !== undefined ? propsShowDate : (pageMetadata.showDate ?? false);
+  const isLoading = propsIsLoading !== undefined ? propsIsLoading : (pageMetadata.isLoading ?? false);
+
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
@@ -84,8 +100,6 @@ export default function Layout({
   const [termsOpen, setTermsOpen] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
-
-  const [isHovered, setIsHovered] = useState(false);
   const expanded = isHovered;
 
   const triggerToast = (message: string) => {
@@ -190,14 +204,14 @@ export default function Layout({
 
         <div
           ref={contentRef}
-          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${
-            termsOpen
-              ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
-              : ""
-          }`}
+          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${termsOpen
+            ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
+            : ""
+            }`}
         >
           <Header
             title={title}
+            role={currentRole}
             user={user}
             darkMode={darkMode}
             setDarkMode={setDarkMode}
@@ -219,6 +233,7 @@ export default function Layout({
               <Navigation
                 navigationItems={navigationItems}
                 location={location}
+                isHovered={isHovered}
                 setIsHovered={setIsHovered}
                 user={user}
                 handleLogout={handleLogout}
@@ -227,6 +242,34 @@ export default function Layout({
             )}
 
             <div className="relative min-w-0 flex-1 overflow-hidden">
+              <div
+                className="absolute inset-0 z-0 bg-[url('/src/assets/images/bg.png')]
+               bg-cover bg-center bg-no-repeat opacity-[0.15] dark:opacity-10 transform-gpu"
+              />
+              <div className="relative z-10 flex h-full flex-col overflow-x-hidden overflow-y-auto">
+                <main className="flex-1 p-4 md:p-6 lg:p-8">
+                  {showHeader && (
+                    <SubHeader
+                      title={title || ""}
+                      description={description || propsSubTitle}
+                      badgeText={badgeText}
+                      badgeIcon={badgeIcon}
+                      headerActions={headerActions}
+                      headerStats={headerStats}
+                      showDate={showDate}
+                    />
+                  )}
+                  {isLoading ? (
+                    <div className="flex h-full w-full items-center justify-center min-h-[400px]">
+                      <Spinner size="lg" />
+                    </div>
+                  ) : null}
+                  <div className={isLoading ? "hidden" : "block"}>
+                    {children || <Outlet />}
+                  </div>
+                </main>
+              </div>
+
               {/* The Overlay: Handle both the dark tint and the blur here */}
               {expanded && !termsOpen && (
                 <div
@@ -235,35 +278,6 @@ export default function Layout({
                  fade-in duration-200"
                 />
               )}
-
-              <div
-                className="absolute inset-0 z-0 bg-[url('/src/assets/images/bg.png')]
-               bg-cover bg-center bg-no-repeat opacity-[0.15] dark:opacity-10 transform-gpu"
-              />
-              <div className="relative z-10 flex h-full flex-col overflow-x-hidden overflow-y-auto">
-                <main className="flex-1 p-4 md:p-6 lg:p-8">
-                  {isLoading ? (
-                    <div className="flex h-full w-full items-center justify-center">
-                      <LoadingSpinner size="lg" />
-                    </div>
-                  ) : (
-                    <>
-                      {showHeader && (
-                        <PageHeader
-                          title={title || ""}
-                          description={description || subTitle}
-                          badgeText={badgeText}
-                          badgeIcon={badgeIcon}
-                          headerActions={headerActions}
-                          headerStats={headerStats}
-                          showDate={showDate}
-                        />
-                      )}
-                      {children}
-                    </>
-                  )}
-                </main>
-              </div>
             </div>
           </div>
         </div>
@@ -272,4 +286,50 @@ export default function Layout({
       </div>
     </ErrorBoundary>
   );
+}
+
+/**
+ * Hook for child pages to set layout metadata when using Shared Layout
+ */
+export function usePageMetadata(metadata: Partial<PageMetadata>) {
+  const { setPageMetadata } = useUI();
+
+  useEffect(() => {
+    setPageMetadata((prev) => {
+      // Shallow comparison of all metadata fields
+      const hasChanged = Object.entries(metadata).some(([key, value]) => {
+        return prev[key as keyof PageMetadata] !== value;
+      });
+
+      if (!hasChanged) return prev;
+      return { ...prev, ...metadata };
+    });
+
+    // Clean up metadata when the component unmounts to prevent stale data
+    // on the next page (e.g., persistent stats or actions)
+    return () => {
+      setPageMetadata({
+        title: "",
+        description: undefined,
+        badgeText: undefined,
+        badgeIcon: undefined,
+        headerActions: undefined,
+        headerStats: undefined,
+        showDate: false,
+        isLoading: false,
+      });
+    };
+    // We intentionally only run this when the components provide new metadata values.
+    // Using individual dependencies for simpler values is safer than stringifying or deep-comparing JSX.
+  }, [
+    metadata.title,
+    metadata.description,
+    metadata.badgeText,
+    metadata.badgeIcon,
+    metadata.headerActions,
+    metadata.headerStats,
+    metadata.showDate,
+    metadata.isLoading,
+    setPageMetadata,
+  ]);
 }

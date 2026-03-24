@@ -1,12 +1,13 @@
-import NotificationBell from "@/components/notifications/NotificationBell";
+import NotificationBell from "@/features/notifications/components/NotificationBell";
 import ThemeToggle from "@/components/ui/ThemeToggle";
-import ProfileDropdown from "@/components/ProfileDropdown";
+import ProfileMenu from "./ProfileMenu";
 
 const LOGO_SRC = "/logo.svg";
 
 interface HeaderProps {
   title?: string;
   user: any;
+  role: string;
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
   handleLogout: () => void;
@@ -19,6 +20,7 @@ interface HeaderProps {
 export default function Header({
   title,
   user,
+  role,
   darkMode,
   setDarkMode,
   handleLogout,
@@ -62,12 +64,12 @@ export default function Header({
         <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
         {isLoggedIn && (
           <div className="hidden md:block">
-            <ProfileDropdown
+            <ProfileMenu
               firstName={user?.firstName}
               middleName={user?.middleName}
               lastName={user?.lastName}
               roleLabel={getRoleLabel()}
-              profilePath="/profile"
+              profilePath={`/${role}/profile`}
               onLogout={handleLogout}
             />
           </div>
