@@ -10,6 +10,8 @@ interface HeaderProps {
   role: string;
   darkMode: boolean;
   setDarkMode: (value: boolean) => void;
+  grayscale: boolean;
+  setGrayscale: (value: boolean) => void;
   handleLogout: () => void;
   getRoleLabel: () => string;
   showNotifications: boolean;
@@ -23,6 +25,8 @@ export default function Header({
   role,
   darkMode,
   setDarkMode,
+  grayscale,
+  setGrayscale,
   handleLogout,
   getRoleLabel,
   showNotifications,
@@ -71,6 +75,8 @@ export default function Header({
               roleLabel={getRoleLabel()}
               profilePath={`/${role}/profile`}
               onLogout={handleLogout}
+              grayscale={grayscale}
+              setGrayscale={setGrayscale}
             />
           </div>
         )}

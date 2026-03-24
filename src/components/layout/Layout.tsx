@@ -56,13 +56,20 @@ export default function Layout({
 
   // Merge props with context metadata (props take precedence)
   const title = propsTitle || pageMetadata.title;
-  const description = propsDescription || propsSubTitle || pageMetadata.description;
+  const description =
+    propsDescription || propsSubTitle || pageMetadata.description;
   const badgeText = propsBadgeText || pageMetadata.badgeText;
   const badgeIcon = propsBadgeIcon || pageMetadata.badgeIcon;
   const headerActions = propsHeaderActions || pageMetadata.headerActions;
   const headerStats = propsHeaderStats || pageMetadata.headerStats;
-  const showDate = propsShowDate !== undefined ? propsShowDate : (pageMetadata.showDate ?? false);
-  const isLoading = propsIsLoading !== undefined ? propsIsLoading : (pageMetadata.isLoading ?? false);
+  const showDate =
+    propsShowDate !== undefined
+      ? propsShowDate
+      : (pageMetadata.showDate ?? false);
+  const isLoading =
+    propsIsLoading !== undefined
+      ? propsIsLoading
+      : (pageMetadata.isLoading ?? false);
 
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -75,8 +82,7 @@ export default function Layout({
   const excludedPaths = ["/terms", "/privacy"];
   const currentPath = location.pathname;
   const isExcluded = excludedPaths.includes(currentPath);
-  const mustAcceptTerms =
-    !sessionAccepted && !isExcluded && !!user && isLoggedIn;
+  const mustAcceptTerms = !sessionAccepted && !isExcluded && !!user && isLoggedIn;
 
   useEffect(() => {
     setTermsOpen(mustAcceptTerms);
@@ -93,6 +99,10 @@ export default function Layout({
     }
 
     return isDark;
+  });
+
+  const [grayscale, setGrayscale] = useState(() => {
+    return localStorage.getItem("grayscale") === "true";
   });
 
   const [showNotifications, setShowNotifications] = useState(false);
@@ -119,6 +129,10 @@ export default function Layout({
       localStorage.setItem("theme", "light");
     }
   }, [darkMode]);
+
+  useEffect(() => {
+    localStorage.setItem("grayscale", String(grayscale));
+  }, [grayscale]);
 
   const handleLogout = () => {
     setIsHovered(false); // Reset sidebar state on logout
@@ -155,13 +169,14 @@ export default function Layout({
     }
   }, [location.pathname, setIsHovered]);
 
-  const currentRole: string = user?.roles.map((r) => {
-    const key = r.toLowerCase().replace(" ", "");
-    if (key === "superadmin") return "superadmin";
-    if (key === "admin") return "admin";
-    if (key === "student") return "student";
-    return "";
-  })[0] || "";
+  const currentRole: string =
+    user?.roles.map((r) => {
+      const key = r.toLowerCase().replace(" ", "");
+      if (key === "superadmin") return "superadmin";
+      if (key === "admin") return "admin";
+      if (key === "student") return "student";
+      return "";
+    })[0] || "";
 
   useEffect(() => {
     const node = contentRef.current;
@@ -197,7 +212,11 @@ export default function Layout({
 
   return (
     <ErrorBoundary>
-      <div className="relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950">
+      <div
+        className={`relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950 ${
+          grayscale ? "grayscale" : ""
+        }`}
+      >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.08),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.06),transparent_24%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.10),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.07),transparent_24%)]" />
           <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.14))] dark:bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.02))]" />
@@ -213,10 +232,9 @@ export default function Layout({
 
         <div
           ref={contentRef}
-          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${termsOpen
-            ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
-            : ""
-            }`}
+          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${
+            termsOpen ? "pointer-events-none select-none opacity-40 grayscale-[0.5]" : ""
+          }`}
         >
           <Header
             title={title}
@@ -224,6 +242,8 @@ export default function Layout({
             role={currentRole}
             darkMode={darkMode}
             setDarkMode={setDarkMode}
+            grayscale={grayscale}
+            setGrayscale={setGrayscale}
             handleLogout={handleLogout}
             getRoleLabel={getRoleLabel}
             showNotifications={showNotifications}
