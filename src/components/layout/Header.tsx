@@ -17,6 +17,8 @@ interface HeaderProps {
   showNotifications: boolean;
   setShowNotifications: (value: boolean) => void;
   isLoggedIn: boolean;
+  isDyslexic: boolean;
+  setIsDyslexic: (value: boolean) => void;
 }
 
 export default function Header({
@@ -32,6 +34,8 @@ export default function Header({
   showNotifications,
   setShowNotifications,
   isLoggedIn = true,
+  isDyslexic,
+  setIsDyslexic,
 }: HeaderProps) {
   return (
     <header className="h-20 flex items-center justify-between px-6 bg-gradient-to-t from-primary/80 via-primary to-primary backdrop-blur-lg sticky top-0 z-30">
@@ -77,6 +81,8 @@ export default function Header({
               onLogout={handleLogout}
               grayscale={grayscale}
               setGrayscale={setGrayscale}
+              isDyslexic={isDyslexic}
+              setDyslexic={setIsDyslexic}
             />
           </div>
         )}

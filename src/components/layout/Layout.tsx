@@ -105,6 +105,18 @@ export default function Layout({
     return localStorage.getItem("grayscale") === "true";
   });
 
+  const [isDyslexic, setIsDyslexic] = useState(() => {
+  const saved = localStorage.getItem("dyslexic");
+  const enabled = saved === "true";
+  
+  // Apply immediately on load
+  if (enabled) {
+    document.body.classList.add("dyslexic-mode");
+  }
+  
+  return enabled;
+});
+
   const [showNotifications, setShowNotifications] = useState(false);
   const [toasts, setToasts] = useState<string[]>([]);
   const [termsOpen, setTermsOpen] = useState(false);
@@ -119,6 +131,16 @@ export default function Layout({
       setToasts((prev) => prev.slice(1));
     }, 4000);
   };
+
+  useEffect(() => {
+  localStorage.setItem("dyslexic", String(isDyslexic));
+
+  if (isDyslexic) {
+    document.body.classList.add("dyslexic-mode");
+  } else {
+    document.body.classList.remove("dyslexic-mode");
+  }
+  }, [isDyslexic]);
 
   useEffect(() => {
     if (darkMode) {
@@ -236,20 +258,22 @@ export default function Layout({
             termsOpen ? "pointer-events-none select-none opacity-40 grayscale-[0.5]" : ""
           }`}
         >
-          <Header
-            title={title}
-            user={user}
-            role={currentRole}
-            darkMode={darkMode}
-            setDarkMode={setDarkMode}
-            grayscale={grayscale}
-            setGrayscale={setGrayscale}
-            handleLogout={handleLogout}
-            getRoleLabel={getRoleLabel}
-            showNotifications={showNotifications}
-            setShowNotifications={setShowNotifications}
-            isLoggedIn={isLoggedIn}
-          />
+        <Header
+          title={title}
+          user={user}
+          role={currentRole}
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+          grayscale={grayscale}
+          setGrayscale={setGrayscale}
+          handleLogout={handleLogout}
+          getRoleLabel={getRoleLabel}
+          showNotifications={showNotifications}
+          setShowNotifications={setShowNotifications}
+          isLoggedIn={isLoggedIn}
+          isDyslexic={isDyslexic}
+          setIsDyslexic={setIsDyslexic}
+        />
 
           <NotificationModal
             showNotifications={showNotifications}

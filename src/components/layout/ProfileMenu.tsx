@@ -23,6 +23,8 @@ interface ProfileMenuProps {
   onLogout: () => void;
   grayscale: boolean;
   setGrayscale: (value: boolean) => void;
+  isDyslexic: boolean;
+  setDyslexic: (value: boolean) => void;
 }
 
 export default function ProfileMenu({
@@ -36,6 +38,8 @@ export default function ProfileMenu({
   onLogout,
   grayscale,
   setGrayscale,
+  isDyslexic,  
+  setDyslexic,
 }: ProfileMenuProps) {
   const [open, setOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -45,6 +49,8 @@ export default function ProfileMenu({
   const [draftFontScale, setDraftFontScale] = useState(100);
   const [appliedGrayscale, setAppliedGrayscale] = useState(grayscale);
   const [draftGrayscale, setDraftGrayscale] = useState(grayscale);
+  const [appliedDyslexic, setAppliedDyslexic] = useState(isDyslexic);
+  const [draftDyslexic, setDraftDyslexic] = useState(isDyslexic);
 
   const fontSteps = [80, 90, 100, 110, 120];
 
@@ -53,7 +59,9 @@ export default function ProfileMenu({
   const navigate = useNavigate();
 
   const hasPendingChanges =
-    draftFontScale !== appliedFontScale || draftGrayscale !== appliedGrayscale;
+    draftFontScale !== appliedFontScale || 
+    draftGrayscale !== appliedGrayscale || 
+    draftDyslexic !== appliedDyslexic;
 
   const persistFont = (value: number) => {
     const safeValue = Math.max(80, Math.min(120, value));
@@ -77,15 +85,25 @@ export default function ProfileMenu({
 
   const handleApplySettings = () => {
     persistFont(draftFontScale);
+    
     setAppliedGrayscale(draftGrayscale);
+    setGrayscale(draftGrayscale);
+
+    setAppliedDyslexic(draftDyslexic);
+    setDyslexic(draftDyslexic);
+
     setSettingsOpen(false);
   };
 
   const handleCancelSettings = () => {
     setDraftFontScale(appliedFontScale);
     setDraftGrayscale(appliedGrayscale);
+    setDraftDyslexic(appliedDyslexic);
+
     document.documentElement.style.fontSize = `${appliedFontScale}%`;
     setGrayscale(appliedGrayscale);
+    setDyslexic(appliedDyslexic);
+
     setSettingsOpen(false);
   };
 
@@ -104,6 +122,8 @@ export default function ProfileMenu({
     setDraftFontScale(initialFontScale);
     setAppliedGrayscale(grayscale);
     setDraftGrayscale(grayscale);
+    setAppliedDyslexic(isDyslexic);
+    setDraftDyslexic(isDyslexic);
     document.documentElement.style.fontSize = `${initialFontScale}%`;
 
     return () => setMounted(false);
@@ -115,6 +135,12 @@ export default function ProfileMenu({
       setDraftGrayscale(grayscale);
     }
   }, [grayscale, settingsOpen]);
+
+  useEffect(() => {
+    if (settingsOpen) {
+      setDyslexic(draftDyslexic);
+    }
+  }, [draftDyslexic, settingsOpen, setDyslexic]);
 
   useEffect(() => {
     if (settingsOpen) {
@@ -147,7 +173,7 @@ export default function ProfileMenu({
 
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
-  }, [open, settingsOpen, appliedFontScale, appliedGrayscale]);
+  }, [open, settingsOpen, appliedFontScale, appliedGrayscale, appliedDyslexic]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -244,6 +270,38 @@ export default function ProfileMenu({
                         <span
                           className={`absolute top-0.5 left-0.5 block h-6 w-6 rounded-full bg-white shadow-md transition ${
                             draftGrayscale ? "translate-x-7" : "translate-x-0"
+                          }`}
+                        />
+                      </span>
+                    </button>
+                  </div>
+
+                  <div className="rounded-3xl border border-slate-300 bg-[rgb(241,243,246)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:border-white/10 dark:bg-white/[0.045] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+                    <div className="mb-4 flex items-center gap-2">
+                      <Type size={18} className="text-primary" />
+                      <p className="text-lg font-medium text-slate-900 dark:text-white">
+                        Dyslexia
+                      </p>
+                    </div>
+
+                    <button
+                      onClick={() => setDraftDyslexic(!draftDyslexic)}
+                      className="flex w-full items-center justify-between rounded-2xl border border-slate-300 bg-[rgb(249,250,251)] px-5 py-4 text-base text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] transition hover:bg-white hover:shadow-md active:scale-[0.99] dark:border-white/10 dark:bg-white/[0.05] dark:text-white dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.04)] dark:hover:bg-white/[0.08]"
+                    >
+                      <span className="font-medium">
+                        {draftDyslexic ? "Enabled" : "Disabled"}
+                      </span>
+
+                      <span
+                        className={`relative h-7 w-14 rounded-full transition ${
+                          draftDyslexic
+                            ? "bg-primary/45"
+                            : "bg-slate-300 dark:bg-white/20"
+                        }`}
+                      >
+                        <span
+                          className={`absolute top-0.5 left-0.5 block h-6 w-6 rounded-full bg-white shadow-md transition ${
+                            draftDyslexic ? "translate-x-7" : "translate-x-0"
                           }`}
                         />
                       </span>

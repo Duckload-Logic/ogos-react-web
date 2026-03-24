@@ -1,6 +1,7 @@
 /* stylelint-disable at-rule-no-unknown */
 /** @import must precede all other statements */
 @import url("https://fonts.googleapis.com/css2?family=Trajan+Pro:wght@400;700&display=swap");
+@import url('https://fonts.cdnfonts.com/css/open-dyslexic');
 
 /* Fade out animation for notifications */
 @keyframes fadeOut {
@@ -453,5 +454,10 @@
 
   .sidebar-icon-tilt:hover svg {
     animation: sidebar-tilt 0.35s ease-in-out;
+  }
+
+  .dyslexic-mode, 
+  .dyslexic-mode * {
+    font-family: 'Open-Dyslexic', 'OpenDyslexic', sans-serif !important;
   }
 }
