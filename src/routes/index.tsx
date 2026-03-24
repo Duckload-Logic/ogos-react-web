@@ -1,10 +1,10 @@
 import { RouteObject, Navigate } from "react-router-dom";
-import { ProtectedRoute } from "@/components/ProtectedRoute";
-import { IIRGate } from "@/components/IIRGate";
+import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
+import { IIRGate } from "@/features/auth/components/IIRGate";
 
 // Shared
-import Layout from "@/components/layout/Layout";
-import NotFound from "@/pages/shared/NotFound";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
+import NotFound from "@/components/shared/NotFound";
 
 // Auth Feature
 import Login from "@/features/auth/pages/Login";
@@ -39,6 +39,26 @@ import {
 } from "@/features/superadmin";
 import Callback from "@/features/auth/pages/Callback";
 
+const TermsContent = () => {
+  usePageMetadata({
+    title: "Terms and Conditions",
+    description: "Please read our terms and conditions carefully before using our services",
+    badgeText: "Legal",
+    isLoading: false,
+  });
+  return <StatementPage statementType="terms" />;
+};
+
+const PrivacyContent = () => {
+  usePageMetadata({
+    title: "Privacy Policy",
+    description: "We value your privacy and are committed to protecting your personal data",
+    badgeText: "Legal",
+    isLoading: false,
+  });
+  return <StatementPage statementType="privacy" />;
+};
+
 export const routes: RouteObject[] = [
   // Root route - redirect to login
   { path: "/", element: <Navigate to="/login" replace /> },
@@ -59,64 +79,40 @@ export const routes: RouteObject[] = [
     element: (
       <ProtectedRoute requiredRole="student">
         <IIRGate>
-          <StudentDashboard />
+          <Layout />
         </IIRGate>
       </ProtectedRoute>
     ),
-  },
-  {
-    path: "/student/appointments",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <IIRGate>
-          <StudentAppointments />
-        </IIRGate>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/student/appointments/schedule",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <CreateAppointment />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/student/slips",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <IIRGate>
-          <StudentSlips />
-        </IIRGate>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/student/slips/submit",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <IIRGate>
-          <SubmitSlip />
-        </IIRGate>
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/student/iir/form",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <IIRForm />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/student/iir",
-    element: (
-      <ProtectedRoute requiredRole="student">
-        <IIRProfile />
-      </ProtectedRoute>
-    ),
+    children: [
+      {
+        index: true,
+        element: <StudentDashboard />,
+      },
+      {
+        path: "appointments",
+        element: <StudentAppointments />,
+      },
+      {
+        path: "appointments/schedule",
+        element: <CreateAppointment />,
+      },
+      {
+        path: "slips",
+        element: <StudentSlips />,
+      },
+      {
+        path: "slips/submit",
+        element: <SubmitSlip />,
+      },
+      {
+        path: "iir",
+        element: <IIRProfile />,
+      },
+      {
+        path: "iir/form",
+        element: <IIRForm />,
+      },
+    ],
   },
 
   // Admin routes
@@ -124,81 +120,47 @@ export const routes: RouteObject[] = [
     path: "/admin",
     element: (
       <ProtectedRoute requiredRole="admin">
-        <Dashboard />
+        <Layout />
       </ProtectedRoute>
     ),
-  },
-  {
-    path: "/admin/student-records",
-    element: (
-      <ProtectedRoute requiredRole="admin">
-        <StudentRecords />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/student-records/:studentId",
-    element: (
-      <ProtectedRoute requiredRole="admin">
-        <IIRProfile />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/appointments",
-    element: (
-      <ProtectedRoute requiredRole="admin">
-        <AppointmentsManagement />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/admission-slips",
-    element: (
-      <ProtectedRoute requiredRole="admin">
-        <ReviewSlips />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/admission-slips/logs",
-    element: (
-      <ProtectedRoute requiredRole="admin">
-        <SlipLogs />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/reports",
-    element: (
-      <ProtectedRoute requiredRole="admin">
-        <Reports />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/analytics",
-    element: (
-      <ProtectedRoute requiredRole="admin">
-        <Analytics />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/profile",
-    element: (
-      <ProtectedRoute>
-        <Profile />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/admin/profile",
-    element: (
-      <ProtectedRoute requiredRole="admin">
-        <Profile />
-      </ProtectedRoute>
-    ),
+    children: [
+      {
+        index: true,
+        element: <Dashboard />,
+      },
+      {
+        path: "student-records",
+        element: <StudentRecords />,
+      },
+      {
+        path: "student-records/:studentId",
+        element: <IIRProfile />,
+      },
+      {
+        path: "appointments",
+        element: <AppointmentsManagement />,
+      },
+      {
+        path: "admission-slips",
+        element: <ReviewSlips />,
+      },
+      {
+        path: "admission-slips/logs",
+        element: <SlipLogs />,
+      },
+      {
+        path: "reports",
+        element: <Reports />,
+      },
+      {
+        path: "analytics",
+        element: <Analytics />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
+      },
+    ],
   },
 
   // Super Admin routes
@@ -206,74 +168,31 @@ export const routes: RouteObject[] = [
     path: "/superadmin",
     element: (
       <ProtectedRoute requiredRole="superadmin">
-        <SuperAdminDashboard />
+        <Layout />
       </ProtectedRoute>
     ),
-  },
-  {
-    path: "/superadmin/api-management",
-    element: (
-      <ProtectedRoute requiredRole="superadmin">
-        <APIManagement />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/superadmin/security-logs",
-    element: (
-      <ProtectedRoute requiredRole="superadmin">
-        <SecurityLogs />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/superadmin/system-logs",
-    element: (
-      <ProtectedRoute requiredRole="superadmin">
-        <SystemLogs />
-      </ProtectedRoute>
-    ),
-  },
-  {
-    path: "/superadmin/audit-logs",
-    element: (
-      <ProtectedRoute requiredRole="superadmin">
-        <AuditLogs />
-      </ProtectedRoute>
-    ),
-  },
-
-  {
-    path: "/terms",
-    element: (
-      <Layout
-        title="Terms and Conditions"
-        description="Please read our terms and conditions carefully before using our services"
-        badgeText="Legal"
-        isLoggedIn={false}
-        isLoading={false}
-      >
-        <div className="prose max-w-none">
-          <StatementPage statementType="terms" />
-        </div>
-      </Layout>
-    ),
-  },
-  {
-    path: "/privacy",
-    element: (
-      <Layout
-        title="Privacy Policy"
-        description="We value your privacy and are committed to protecting your personal data"
-        badgeText="Legal"
-        isLoggedIn={false}
-        isLoading={false}
-      >
-        <div className="prose max-w-none">
-          <StatementPage statementType="privacy" />
-        </div>
-      </Layout>
-    ),
+    children: [
+      {
+        index: true,
+        element: <SuperAdminDashboard />,
+      },
+      {
+        path: "api-management",
+        element: <APIManagement />,
+      },
+      {
+        path: "security-logs",
+        element: <SecurityLogs />,
+      },
+      {
+        path: "system-logs",
+        element: <SystemLogs />,
+      },
+      {
+        path: "audit-logs",
+        element: <AuditLogs />,
+      },
+    ],
   },
 
   // OAuth callback route (public, no layout)

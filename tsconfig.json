@@ -2,7 +2,11 @@
   "compilerOptions": {
     "target": "ES2020",
     "useDefineForClassFields": true,
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "lib": [
+      "ES2020",
+      "DOM",
+      "DOM.Iterable"
+    ],
     "module": "ESNext",
     "moduleResolution": "bundler",
     "skipLibCheck": true,
@@ -15,9 +19,15 @@
     "isolatedModules": true,
     "noEmit": true,
     "baseUrl": ".",
-    "types": ["vite/client", "vite-plugin-svgr/client", "vitest/globals"],
+    "types": [
+      "vite/client",
+      "vite-plugin-svgr/client",
+      "vitest/globals"
+    ],
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
@@ -40,7 +50,15 @@
     "admin/pages/register/components/Reports-Admin.tsx",
     "admin/pages/register/components/Register-Admin.tsx",
     "admin/pages/register/components/Reports.tsx",
-    "admin/pages/register/components/ReviewSlips.tsx"
+    "admin/pages/register/components/ReviewSlips.tsx",
+    "hooks"
   ],
-  "exclude": ["node_modules", "dist", "**/*.spec.ts", "**/*.spec.tsx", "**/*.test.ts", "**/*.test.tsx"]
+  "exclude": [
+    "node_modules",
+    "dist",
+    "**/*.spec.ts",
+    "**/*.spec.tsx",
+    "**/*.test.ts",
+    "**/*.test.tsx"
+  ]
 }
