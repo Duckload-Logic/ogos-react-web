@@ -1,4 +1,4 @@
-import { DropdownField, SearchInput } from "@/components/form";
+import { Dropdown, SearchInput } from "@/components/form";
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -26,7 +26,7 @@ interface SearchFilterProps {
   onYearLevelChange: (level: number) => void;
 }
 
-export default function StudentSearchAndFilter({
+export default function StudentFilters({
   searchTerm,
   onSearchChange,
   courses,
@@ -49,23 +49,23 @@ export default function StudentSearchAndFilter({
           placeholder="Search by name, email, or student number..."
         />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-2 w-full md:col-span-1 items-center justify-center">
-          <DropdownField
+          <Dropdown
             label="Course"
             value={selectedCourseId}
             onChange={onCourseChange}
-            options={[{ id: 0, name: "All Courses" }, ...courses]}
+            options={[{ id: 0, name: "All Courses" }, ...(courses || [])]}
           />
-          <DropdownField
+          <Dropdown
             label="Gender"
             value={selectedGenderId}
             onChange={onGenderChange}
-            options={[{ id: 0, name: "All Genders" }, ...genders]}
+            options={[{ id: 0, name: "All Genders" }, ...(genders || [])]}
           />
-          <DropdownField
+          <Dropdown
             label="Year Level"
             value={selectedYearLevelId}
             onChange={onYearLevelChange}
-            options={[{ id: 0, name: "All Year Levels" }, ...yearLevels]}
+            options={[{ id: 0, name: "All Year Levels" }, ...(yearLevels || [])]}
           />
         </div>
       </div>

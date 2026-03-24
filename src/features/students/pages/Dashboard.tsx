@@ -1,6 +1,6 @@
 import { AnimationStyles } from "@/components/ui/animations";
 import { StatsCard } from "@/components/ui/stats-card";
-import { QuickActionsGrid } from "@/components/ui/quick-actions-grid";
+import { QuickActions } from "@/components/ui/quick-actions-grid";
 import { StudentProfileCard } from "@/features/students/components/StudentProfileCard";
 import { useEffect, useState } from "react";
 import {
@@ -13,12 +13,12 @@ import {
   User,
 } from "lucide-react";
 import { useMe } from "@/features/users/hooks/useMe";
-import { useUserIIR } from "@/features/iir/hooks/useUserIIR";
+import { useUserIIR } from "@/features/iir/hooks";
 import { useGetSlipStats } from "@/features/slips/hooks";
 import { useAppointmentsStats } from "@/features/appointments/hooks/useAppointments";
 import type { QuickAction } from "@/components/ui/quick-actions-grid";
-import PortalShell from "../../../layout/PortalShell";
-import Layout from "@/components/layout/Layout";
+
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 const QUICK_ACTIONS: QuickAction[] = [
   {
@@ -81,64 +81,64 @@ export function Dashboard() {
 
   const isLoading = isUserLoading || isIIRLoading || !isPageLoaded;
 
+  usePageMetadata({
+    title: me ? `Welcome back, ${me.firstName} ${me.lastName}` : "Welcome back",
+    description: "PUP Guidance Services — Supporting your academic and personal growth",
+    badgeText: "Student Dashboard",
+    badgeIcon: <User className="h-4 w-4" />,
+    isLoading,
+  });
+
   if (!isLoading && !me) {
     return (
-      <Layout title="Services" isLoading={false}>
-        <PortalShell role="student">
-          <div className="text-center py-12">
-            <p className="text-red-600">Unable to load user information</p>
-          </div>
-        </PortalShell>
-      </Layout>
+      <div className="text-center py-12">
+        <p className="text-red-600">Unable to load user information</p>
+      </div>
     );
   }
 
+  if (isLoading) {
+    return null; // Layout handles the spinner if metadata.isLoading is true
+  }
+
   return (
-    <Layout
-      title={`Welcome back, ${me?.firstName} ${me?.lastName}`}
-      description="PUP Guidance Services — Supporting your academic and personal growth"
-      badgeText="Student Dashboard"
-      badgeIcon={<User className="h-4 w-4" />}
-      isLoading={isLoading}
-    >
-      <PortalShell role="student">
-        <AnimationStyles />
+    <>
+      <AnimationStyles />
 
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-10">
-          <div className="grid grid-cols-2 gap-4 mb-6">
-            <StatsCard
-              to="/student/appointments"
-              count={totalAppointments}
-              label="Appointments"
-              icon={ClipboardList}
-              iconColor="text-blue-600"
-              bgColor="bg-blue-50"
-              borderColor="border-blue-400"
-              animationDelay="0.1s"
-            />
-            <StatsCard
-              to="/student/slips"
-              count={totalSlips}
-              label="Admission Slips"
-              icon={FileText}
-              iconColor="text-green-600"
-              bgColor="bg-green-50"
-              borderColor="border-green-400"
-              animationDelay="0.1s"
-            />
-          </div>
-
-          <QuickActionsGrid actions={QUICK_ACTIONS} />
-
-          <StudentProfileCard
-            firstName={me?.firstName}
-            lastName={me?.lastName}
-            middleName={me?.middleName}
-            email={me?.email}
-            isFormIncomplete={true}
+      <div className="max-w-7xl mx-auto px-3 sm:px-4 md:px-8 py-6 sm:py-8 md:py-10">
+        <div className="grid grid-cols-2 gap-4 mb-6">
+          <StatsCard
+            to="/student/appointments"
+            count={totalAppointments}
+            label="Appointments"
+            icon={ClipboardList}
+            iconColor="text-blue-600"
+            bgColor="bg-blue-50"
+            borderColor="border-blue-400"
+            animationDelay="0.1s"
+          />
+          <StatsCard
+            to="/student/slips"
+            count={totalSlips}
+            label="Admission Slips"
+            icon={FileText}
+            iconColor="text-green-600"
+            bgColor="bg-green-50"
+            borderColor="border-green-400"
+            animationDelay="0.1s"
           />
         </div>
-      </PortalShell>
-    </Layout>
+
+        <QuickActions actions={QUICK_ACTIONS} />
+
+        <StudentProfileCard
+          firstName={me?.firstName}
+          lastName={me?.lastName}
+          middleName={me?.middleName}
+          email={me?.email}
+          isFormIncomplete={true}
+        />
+      </div>
+    </>
   );
 }

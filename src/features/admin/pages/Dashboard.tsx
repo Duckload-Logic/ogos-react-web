@@ -14,7 +14,7 @@ import { Link } from "react-router-dom";
 import { useEffect, useMemo, useState } from "react";
 import { useAppointments } from "@/features/appointments/hooks/useAppointments";
 import { Appointment } from "@/features/appointments/types";
-import AppointmentViewModal from "@/features/appointments/components/AppointmentViewModal";
+import ViewModal from "@/features/appointments/components/ViewModal";
 import { STATUS_COLORS } from "@/config/constants";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -23,8 +23,7 @@ import {
   format12HourTime,
   toISODateString,
 } from "@/features/appointments/utils";
-import PortalShell from "../../../layout/PortalShell";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 export default function Dashboard() {
   const today = new Date();
@@ -115,15 +114,21 @@ export default function Dashboard() {
     },
   ];
 
+  usePageMetadata({
+    title: "Guidance Dashboard",
+    description: "PUP-T Online Guidance Office Services — Supporting student success",
+    badgeText: "Admin Overview",
+    badgeIcon: <Sparkles className="h-3.5 w-3.5" />,
+    showDate: true,
+    isLoading: isStatusesLoading || isAppointmentsLoading,
+  });
+
+  if (isStatusesLoading || isAppointmentsLoading) {
+    return null;
+  }
+
   return (
-    <Layout
-      title="Guidance Dashboard"
-      subTitle="PUP-T Online Guidance Office Services — Supporting student success"
-      badgeText="Admin Overview"
-      badgeIcon={<Sparkles className="h-3.5 w-3.5" />}
-      showDate={true}
-      isLoading={isStatusesLoading || isAppointmentsLoading}
-    >
+    <>
       <div className="max-w-[1600px] mx-auto space-y-10 relative">
         {showDailyTip && (
           <div className="fixed top-24 right-6 z-50 w-[340px] max-w-[calc(100vw-2rem)] animate-in fade-in slide-in-from-top-2 duration-300">
@@ -379,7 +384,7 @@ export default function Dashboard() {
           </Card>
         </section>
 
-        <AppointmentViewModal
+        <ViewModal
           appointment={selectedAppointment}
           isOpen={isViewOpen}
           onClose={() => setIsViewOpen(false)}
@@ -389,6 +394,6 @@ export default function Dashboard() {
           hasActions={false}
         />
       </div>
-    </Layout>
+    </>
   );
 }

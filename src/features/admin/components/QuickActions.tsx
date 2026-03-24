@@ -7,13 +7,13 @@ interface QuickAction {
   href: string;
 }
 
-interface QuickActionsGridProps {
+interface QuickActionsProps {
   actions: QuickAction[];
 }
 
-export default function QuickActionsGrid({
+export default function QuickActions({
   actions,
-}: QuickActionsGridProps) {
+}: QuickActionsProps) {
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
       {actions.map((action) => (

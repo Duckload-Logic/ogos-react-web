@@ -4,13 +4,13 @@ interface RecentActivity {
   time: string;
 }
 
-interface RecentActivitiesListProps {
+interface RecentActivitiesProps {
   activities: RecentActivity[];
 }
 
-export default function RecentActivitiesList({
+export default function RecentActivities({
   activities,
-}: RecentActivitiesListProps) {
+}: RecentActivitiesProps) {
   return (
     <div className="bg-white rounded-lg shadow border border-gray-200 p-4">
       <h3 className="font-semibold text-foreground mb-4">Recent Activities</h3>

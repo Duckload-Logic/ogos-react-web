@@ -1,10 +1,10 @@
 import { Eye, Trash2 } from "lucide-react";
 import Duck from "@/assets/icons/Duck.svg";
-import { LoadingSpinner } from "@/components/shared";
-import { IIRProfileView } from "@/features/iir/types/studentProfileView";
+import { Spinner } from "@/components/shared";
+import { IIRProfileView } from "@/features/iir/types";
 import { ProfileFemale, ProfileMale } from "@/assets/icons";
 
-interface StudentCardsGridProps {
+interface StudentGridProps {
   students: IIRProfileView[];
   isStudentsLoading: boolean;
   onViewClick: (student: IIRProfileView) => void;
@@ -12,17 +12,17 @@ interface StudentCardsGridProps {
   yearLevels: { id: number; name: string }[];
 }
 
-export default function StudentCardsGrid({
+export default function StudentGrid({
   students,
   isStudentsLoading,
   onViewClick,
   onDeleteClick,
   yearLevels,
-}: StudentCardsGridProps) {
+}: StudentGridProps) {
   if (isStudentsLoading || !students) {
     return (
       <div className="flex items-center justify-center min-h-screen">
-        <LoadingSpinner size="lg" />
+        <Spinner size="lg" />
       </div>
     );
   }

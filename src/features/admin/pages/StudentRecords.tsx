@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import StudentSearchAndFilter from "../components/StudentSearchAndFilter";
-import StudentCardsGrid from "../components/StudentCardsGrid";
+import StudentFilters from "../components/StudentFilters";
+import StudentGrid from "../components/StudentGrid";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -15,11 +15,11 @@ import {
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Users } from "lucide-react";
 import { useCourses, useGenders, useIIRPagination } from "@/features/iir/hooks";
-import { IIRProfileView } from "@/features/iir/types/studentProfileView";
+import { IIRProfileView } from "@/features/iir/types";
 import { useDebounce } from "@/hooks/useDebounce";
-import { LoadingSpinner } from "@/components/shared";
-import { Pagination } from "@/components/Pagination";
-import Layout from "@/components/layout/Layout";
+import { Spinner } from "@/components/shared";
+import { Pagination } from "@/components/shared";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 import { cn } from "@/lib/utils";
 
 export default function StudentRecords() {
@@ -77,16 +77,18 @@ export default function StudentRecords() {
   const isLoading =
     isCoursesLoading || isGendersLoading || isStudentsLoading || isDeleting;
 
+  usePageMetadata({
+    title: "Student Records",
+    description: "Access and manage student cumulative records and personal information",
+    badgeText: "Admin Management",
+    badgeIcon: <Users className="h-4 w-4" />,
+    isLoading,
+  });
+
   return (
-    <Layout
-      title="Student Records"
-      description="Access and manage student cumulative records and personal information"
-      badgeText="Admin Management"
-      badgeIcon={<Users className="h-4 w-4" />}
-      isLoading={isLoading}
-    >
+    <>
       <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
-        <StudentSearchAndFilter
+        <StudentFilters
           searchTerm={searchTerm}
           onSearchChange={(value) => {
             if (value === searchTerm) return;
@@ -119,7 +121,7 @@ export default function StudentRecords() {
         <div className="relative min-h-[400px]">
           {(isStudentsLoading || isDeleting) && (
             <div className="absolute inset-0 z-20 flex items-center justify-center bg-glass-bg/5 backdrop-blur-[2px] rounded-[32px]">
-              <LoadingSpinner size="lg" />
+              <Spinner size="lg" />
             </div>
           )}
 
@@ -127,7 +129,7 @@ export default function StudentRecords() {
             "space-y-8 transition-all duration-700",
             (isStudentsLoading || isDeleting) && "opacity-40 blur-[1px] pointer-events-none"
           )}>
-            <StudentCardsGrid
+            <StudentGrid
               students={allStudents}
               isStudentsLoading={false} // Loading handled by parent
               onViewClick={(student) => {
@@ -193,6 +195,6 @@ export default function StudentRecords() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Layout>
+    </>
   );
 }
