@@ -3,7 +3,7 @@ import { Settings, LogOut, Gavel, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 
-interface ProfileDropdownProps {
+interface ProfileMenuProps {
   firstName?: string;
   middleName?: string;
   lastName?: string;
@@ -17,7 +17,7 @@ interface ProfileDropdownProps {
   onLogout: () => void;
 }
 
-export default function ProfileDropdown({
+export default function ProfileMenu({
   firstName,
   middleName,
   lastName,
@@ -26,7 +26,7 @@ export default function ProfileDropdown({
   studentNumber,
   profilePath,
   onLogout,
-}: ProfileDropdownProps) {
+}: ProfileMenuProps) {
   const [open, setOpen] = useState(false);
   const [fontScale, setFontScale] = useState(100);
   const menuRef = useRef<HTMLDivElement>(null);

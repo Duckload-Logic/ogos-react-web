@@ -1,17 +1,17 @@
 import { CircleChevronLeft } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 
-interface BackwardNavigationProps {
+interface BackNavProps {
   to?: string;
   fallback?: string;
   className?: string;
 }
 
-export default function BackwardNavigation({
+export default function BackNav({
   to,
   fallback,
   className = "",
-}: BackwardNavigationProps) {
+}: BackNavProps) {
   const navigate = useNavigate();
   const location = useLocation();
 

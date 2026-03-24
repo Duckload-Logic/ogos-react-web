@@ -1,7 +1,7 @@
 import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronRight, Home } from "lucide-react";
-import BackwardNavigation from "./BackwardNavigation";
+import BackNav from "./BackNav";
 
 const PATH_LABELS: Record<string, string> = {
   home: "Dashboard",
@@ -56,7 +56,7 @@ export default function Breadcrumbs() {
       aria-label="Breadcrumb"
       className="w-full mb-4 flex flex-wrap items-center gap-2 sm:gap-3"
     >
-      <BackwardNavigation to={parentPath} className="" />
+      <BackNav to={parentPath} className="" />
 
       <div className="h-4 w-[1px] bg-border mx-1 hidden sm:block" />
 

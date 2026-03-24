@@ -15,7 +15,7 @@ import EmptyState from "@/features/iir/components/profile/EmptyState";
 import InfoItem from "@/features/iir/components/profile/InfoItem";
 import SectionTitle from "@/features/iir/components/profile/SectionTitle";
 import { NOT_SPECIFIED } from "@/features/iir/constants";
-import { LoadingSpinner } from "@/components/shared";
+import { Spinner } from "@/components/shared";
 
 interface SignificantNotesProps {
   iirId: string;
@@ -51,7 +51,7 @@ export default function SignificantNotes({
   if (isLoading) {
     return (
       <div className="flex justify-center items-center min-h-[200px]">
-        <LoadingSpinner />
+        <Spinner />
       </div>
     );
   }
