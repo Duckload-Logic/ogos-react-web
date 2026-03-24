@@ -1,6 +1,6 @@
 import React from "react";
 
-export default function RadioField({
+export default function Radio({
   label,
   options,
   value,

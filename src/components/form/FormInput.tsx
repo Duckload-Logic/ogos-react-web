@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { forwardRef } from "react";
 
-const InputField = forwardRef<
+const FormInput = forwardRef<
   HTMLInputElement,
   {
     className?: string;
@@ -115,7 +115,7 @@ const InputField = forwardRef<
   },
 );
 
-export default InputField;
+export default FormInput;
 
 export function CustomTooltip({
   content,

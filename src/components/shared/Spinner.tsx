@@ -1,17 +1,17 @@
 /**
- * LoadingSpinner Component
+ * Spinner Component
  * Reusable loading indicator
  */
 
 import { Label } from "@radix-ui/react-label";
 import React, { useEffect } from "react";
 
-interface LoadingSpinnerProps {
+interface SpinnerProps {
   message?: string;
   size?: "sm" | "md" | "lg";
 }
 
-export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
+export const Spinner: React.FC<SpinnerProps> = ({
   message = "Loading",
   size = "lg",
 }) => {

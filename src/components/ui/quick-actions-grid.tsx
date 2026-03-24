@@ -10,17 +10,17 @@ export interface QuickAction {
   color: string;
 }
 
-interface QuickActionsGridProps {
+interface QuickActionsProps {
   actions: QuickAction[];
   title?: string;
   animationDelay?: string;
 }
 
-export function QuickActionsGrid({
+export function QuickActions({
   actions,
   title = "Quick Actions",
   animationDelay = "0.15s",
-}: QuickActionsGridProps) {
+}: QuickActionsProps) {
   return (
     <div
       className="animate-fade-in-up mb-6"

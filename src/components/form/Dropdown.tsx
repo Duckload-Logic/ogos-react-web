@@ -15,7 +15,7 @@ import {
   CommandList,
 } from "@/components/ui/command";
 
-export default function DropdownField({
+export default function Dropdown({
   label,
   name,
   options = [],
