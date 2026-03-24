@@ -10,9 +10,9 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pagination } from "@/components/Pagination";
+import { Pagination } from "@/components/shared";
 import { useDebounce } from "@/hooks/useDebounce";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 import type { SystemLog, SystemLogsParams, SystemLogsResponse } from "../types";
 import type { UseQueryResult } from "@tanstack/react-query";
 
@@ -155,44 +155,46 @@ export default function LogsTable({
     setCurrentPage(1);
   };
 
-  return (
-    <Layout
-      title={title}
-      isLoading={false}
-      badgeText="Monitoring Module"
-      badgeIcon={<Sparkles className="h-3.5 w-3.5" />}
-      description={description}
-      headerActions={
-        <div className="flex flex-wrap items-center gap-2">
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => refetch()}
-            className="h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
-          >
-            <RefreshCw
-              size={14}
-              className={`mr-2 ${isFetching ? "animate-spin" : ""}`}
-            />
-            Refresh
-          </Button>
+  usePageMetadata({
+    title,
+    description,
+    badgeText: "Monitoring Module",
+    badgeIcon: <Sparkles className="h-3.5 w-3.5" />,
+    isLoading: false,
+    headerActions: (
+      <div className="flex flex-wrap items-center gap-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => refetch()}
+          className="h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
+        >
+          <RefreshCw
+            size={14}
+            className={`mr-2 ${isFetching ? "animate-spin" : ""}`}
+          />
+          Refresh
+        </Button>
 
-          <Button
-            variant={showFilters || hasActiveFilters ? "default" : "outline"}
-            size="sm"
-            onClick={() => setShowFilters(!showFilters)}
-            className={
-              showFilters || hasActiveFilters
-                ? "h-10 rounded-xl px-4"
-                : "h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
-            }
-          >
-            <Filter size={14} className="mr-2" />
-            Filters
-          </Button>
-        </div>
-      }
-    >
+        <Button
+          variant={showFilters || hasActiveFilters ? "default" : "outline"}
+          size="sm"
+          onClick={() => setShowFilters(!showFilters)}
+          className={
+            showFilters || hasActiveFilters
+              ? "h-10 rounded-xl px-4"
+              : "h-10 rounded-xl border-white/30 bg-white/60 px-4 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
+          }
+        >
+          <Filter size={14} className="mr-2" />
+          Filters
+        </Button>
+      </div>
+    ),
+  });
+
+  return (
+    <>
       <div className="mx-auto w-full max-w-[1700px] space-y-5">
 
         {showFilters && (
@@ -434,6 +436,6 @@ export default function LogsTable({
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </>
   );
 }

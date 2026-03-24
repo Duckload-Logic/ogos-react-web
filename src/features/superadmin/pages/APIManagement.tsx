@@ -12,7 +12,7 @@ import {
   ShieldCheck,
   Ban,
 } from "lucide-react";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -130,23 +130,25 @@ export default function APIManagement() {
     },
   ];
 
+  usePageMetadata({
+    title: "API Management",
+    isLoading: isPageLoading,
+    badgeText: "Integration Access Control",
+    badgeIcon: <Sparkles className="h-3.5 w-3.5" />,
+    description: "Create and manage API keys for external integrations while keeping access secure and easy to monitor.",
+    headerActions: (
+      <Button
+        onClick={() => setIsCreateOpen(true)}
+        className="h-10 gap-2 rounded-xl px-4 shadow-sm"
+      >
+        <Plus size={16} />
+        Create API Key
+      </Button>
+    ),
+  });
+
   return (
-    <Layout
-      title="API Management"
-      isLoading={false}
-      badgeText="Integration Access Control"
-      badgeIcon={<Sparkles className="h-3.5 w-3.5" />}
-      description="Create and manage API keys for external integrations while keeping access secure and easy to monitor."
-      headerActions={
-        <Button
-          onClick={() => setIsCreateOpen(true)}
-          className="h-10 gap-2 rounded-xl px-4 shadow-sm"
-        >
-          <Plus size={16} />
-          Create API Key
-        </Button>
-      }
-    >
+    <>
       <div className="mx-auto w-full max-w-[1700px] space-y-5">
 
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-3">
@@ -521,6 +523,6 @@ export default function APIManagement() {
           </AlertDialogContent>
         </AlertDialog>
       </div>
-    </Layout>
+    </>
   );
 }

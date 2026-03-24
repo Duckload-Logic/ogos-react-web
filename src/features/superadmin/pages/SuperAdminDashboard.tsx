@@ -8,7 +8,7 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 import { useLogStats } from "../hooks";
 
 export default function SuperAdminDashboard() {
@@ -92,35 +92,36 @@ export default function SuperAdminDashboard() {
     },
   ];
 
-  return (
-    <Layout
-      title="Super Admin Dashboard"
-      isLoading={isLoading}
-      badgeText="Super Admin Overview"
-      description="Monitor platform activity, access events, API usage, and audit trails in one place."
-      showDate
-      headerStats={
-        <div className="grid grid-cols-2 gap-3">
-          <div className="rounded-xl border border-white/30 bg-white/60 px-4 py-3 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              Total Today
-            </p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
-              {totalLogs}
-            </p>
-          </div>
-
-          <div className="rounded-xl border border-white/30 bg-white/60 px-4 py-3 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-            <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
-              Security
-            </p>
-            <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
-              {getStatCount("SECURITY")}
-            </p>
-          </div>
+  usePageMetadata({
+    title: "Super Admin Dashboard",
+    isLoading: isLoading,
+    badgeText: "Super Admin Overview",
+    description: "Monitor platform activity, access events, API usage, and audit trails in one place.",
+    headerStats: (
+      <div className="grid grid-cols-2 gap-3">
+        <div className="rounded-xl border border-white/30 bg-white/60 px-4 py-3 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Total Today
+          </p>
+          <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
+            {totalLogs}
+          </p>
         </div>
-      }
-    >
+
+        <div className="rounded-xl border border-white/30 bg-white/60 px-4 py-3 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+          <p className="text-[11px] font-medium uppercase tracking-[0.18em] text-muted-foreground">
+            Security
+          </p>
+          <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
+            {getStatCount("SECURITY")}
+          </p>
+        </div>
+      </div>
+    ),
+  });
+
+  return (
+    <>
       <div className="mx-auto flex w-full max-w-[1700px] flex-col space-y-5">
 
         {/* Stats */}
@@ -212,6 +213,6 @@ export default function SuperAdminDashboard() {
           </div>
         </section>
       </div>
-    </Layout>
+    </>
   );
 }

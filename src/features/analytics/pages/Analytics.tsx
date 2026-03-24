@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useStudentAnalytics } from "../hooks/useStudentAnalytics";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, TrendingUp, Users, Percent } from "lucide-react";
 import { apiClient } from "@/lib/api";
@@ -30,26 +30,6 @@ export default function AnalyticsPage() {
   const [cityPage, setCityPage] = useState(0);
   const [educationPage, setEducationPage] = useState(0);
   const [statusPage, setStatusPage] = useState(0);
-
-  if (error) {
-    return (
-      <div className="space-y-4">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Error loading analytics: {error}</AlertDescription>
-        </Alert>
-        <div className="text-sm text-muted-foreground p-4 bg-muted rounded-lg">
-          <p className="mb-3">Troubleshooting steps:</p>
-          <ul className="list-disc list-inside space-y-1 mb-4">
-            <li>Check that the backend API is running</li>
-            <li>Open browser console (F12) for detailed error information</li>
-            <li>Verify you are logged in as an admin</li>
-            <li>Try refreshing the page</li>
-          </ul>
-        </div>
-      </div>
-    );
-  }
 
   // color palette using CSS variables
   const STATUS_COLOR_MAP = {
@@ -223,8 +203,6 @@ export default function AnalyticsPage() {
       }));
   };
 
-  const ageStats = getAgeStats();
-
   // Get all available years from student data
   const getAvailableYears = () => {
     const years = new Set<number>();
@@ -328,39 +306,62 @@ export default function AnalyticsPage() {
     };
   };
 
-  return (
-    <Layout
-      title="Guidance Analytics"
-      description="Detailed analysis of student demographics, distributions, and trends"
-      badgeText="Analytics"
-      badgeIcon={<TrendingUp className="h-4 w-4" />}
-      isLoading={loading}
-      headerActions={
-        <div className="flex flex-col gap-1 min-w-[140px]">
-          <label className="text-xs font-medium text-foreground/70 px-1">
-            Filter by Year
-          </label>
-          <select
-            value={selectedYear}
-            onChange={(e) => {
-              setSelectedYear(parseInt(e.target.value));
-              setReligionPage(0);
-              setCityPage(0);
-              setEducationPage(0);
-              setStatusPage(0);
-            }}
-            className="px-3 py-2 rounded-xl border border-border bg-background/50 backdrop-blur-sm text-foreground text-sm shadow-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-          >
-            <option value={new Date().getFullYear()}>All Years</option>
-            {getAvailableYears().map((year) => (
-              <option key={year} value={year}>
-                {year}
-              </option>
-            ))}
-          </select>
+  usePageMetadata({
+    title: "Guidance Analytics",
+    description: "Detailed analysis of student demographics, distributions, and trends",
+    badgeText: "Analytics",
+    badgeIcon: <TrendingUp className="h-4 w-4" />,
+    isLoading: loading,
+    headerActions: (
+      <div className="flex flex-col gap-1 min-w-[140px]">
+        <label className="text-xs font-medium text-foreground/70 px-1">
+          Filter by Year
+        </label>
+        <select
+          value={selectedYear}
+          onChange={(e) => {
+            setSelectedYear(parseInt(e.target.value));
+            setReligionPage(0);
+            setCityPage(0);
+            setEducationPage(0);
+            setStatusPage(0);
+          }}
+          className="px-3 py-2 rounded-xl border border-border bg-background/50 backdrop-blur-sm text-foreground text-sm shadow-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
+        >
+          <option value={new Date().getFullYear()}>All Years</option>
+          {getAvailableYears().map((year) => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
+        </select>
+      </div>
+    ),
+  });
+
+  if (error) {
+    return (
+      <div className="space-y-4">
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>Error loading analytics: {error}</AlertDescription>
+        </Alert>
+        <div className="text-sm text-muted-foreground p-4 bg-muted rounded-lg">
+          <p className="mb-3">Troubleshooting steps:</p>
+          <ul className="list-disc list-inside space-y-1 mb-4">
+            <li>Check that the backend API is running</li>
+            <li>Open browser console (F12) for detailed error information</li>
+            <li>Verify you are logged in as an admin</li>
+            <li>Try refreshing the page</li>
+          </ul>
         </div>
-      }
-    >
+      </div>
+    );
+  }
+
+
+  return (
+    <>
       <div className="space-y-6 pb-8">
 
         {/* Top KPI Cards */}
@@ -859,6 +860,6 @@ export default function AnalyticsPage() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

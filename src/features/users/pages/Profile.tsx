@@ -4,7 +4,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Camera, Mail, Shield, User, Calendar, LogOut } from "lucide-react";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 export default function Profile() {
   const { user, logout } = useAuth();
@@ -28,8 +28,15 @@ export default function Profile() {
 
   if (!user) return null;
 
+  usePageMetadata({
+    title: "Account Profile",
+    isLoading: false,
+    badgeText: "Security",
+    badgeIcon: <Shield size={16} />
+  });
+
   return (
-    <Layout title="Account Profile" isLoading={false}>
+    <>
       <div className="w-full h-full flex items-center justify-center">
         <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-500 px-4 md:px-0">
           {/* Profile Header */}
@@ -182,6 +189,6 @@ export default function Profile() {
         </div>
 
       </div>
-    </Layout>
+    </>
   );
 }

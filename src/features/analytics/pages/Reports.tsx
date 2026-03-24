@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Download, Eye, FileText } from "lucide-react";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -73,14 +73,16 @@ export default function Reports() {
     }
   };
 
+  usePageMetadata({
+    title: "System Reports",
+    description: "View and export comprehensive data reports for students, appointments, and system logs",
+    badgeText: "Analytics",
+    badgeIcon: <FileText className="h-4 w-4" />,
+    isLoading: false,
+  });
+
   return (
-    <Layout
-      title="System Reports"
-      description="View and export comprehensive data reports for students, appointments, and system logs"
-      badgeText="Analytics"
-      badgeIcon={<FileText className="h-4 w-4" />}
-      isLoading={false}
-    >
+    <>
       <div className="space-y-6">
         {/* Filters */}
         <div className="bg-card rounded-lg shadow border border-border p-6">
@@ -176,7 +178,7 @@ export default function Reports() {
           />
         </div>
       </div>
-    </Layout>
+    </>
   );
 }
 
