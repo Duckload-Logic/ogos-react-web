@@ -251,7 +251,7 @@ function MobileSettingsContent({
       {/* Profile Section */}
       <div
         onClick={() => {
-          navigate("/profile");
+          navigate(`/${roleLabel}/profile`);
           closeDrawer();
         }}
         className="flex items-center gap-4 p-2 cursor-pointer hover:bg-muted/50 rounded-xl transition"

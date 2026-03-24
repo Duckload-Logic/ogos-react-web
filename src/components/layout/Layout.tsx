@@ -155,12 +155,13 @@ export default function Layout({
     }
   }, [location.pathname, setIsHovered]);
 
-  const currentRole = user?.roles.some((r) => {
+  const currentRole: string = user?.roles.map((r) => {
     const key = r.toLowerCase().replace(" ", "");
-    return key === "admin" || key === "superadmin";
-  })
-    ? "admin"
-    : "student";
+    if (key === "superadmin") return "superadmin";
+    if (key === "admin") return "admin";
+    if (key === "student") return "student";
+    return "";
+  })[0] || "";
 
   useEffect(() => {
     const node = contentRef.current;
@@ -219,8 +220,8 @@ export default function Layout({
         >
           <Header
             title={title}
-            role={currentRole}
             user={user}
+            role={currentRole}
             darkMode={darkMode}
             setDarkMode={setDarkMode}
             handleLogout={handleLogout}

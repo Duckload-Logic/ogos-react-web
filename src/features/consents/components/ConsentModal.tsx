@@ -1,11 +1,9 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 
-type Role = "student" | "admin";
-
 type ConsentModalProps = {
   open: boolean;
-  role: Role;
+  role: string;
   loading?: boolean;
   onAccept: () => Promise<void> | void;
 };

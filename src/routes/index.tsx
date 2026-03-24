@@ -130,6 +130,10 @@ export const routes: RouteObject[] = [
         path: "iir/form",
         element: <IIRForm />,
       },
+      {
+        path: "profile",
+        element: <Profile />,
+      },
     ],
   },
 
@@ -209,6 +213,10 @@ export const routes: RouteObject[] = [
       {
         path: "audit-logs",
         element: <AuditLogs />,
+      },
+      {
+        path: "profile",
+        element: <Profile />,
       },
     ],
   },
