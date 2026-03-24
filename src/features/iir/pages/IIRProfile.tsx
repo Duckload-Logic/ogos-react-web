@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
-import { LoadingSpinner } from "@/components/shared";
+import { Spinner } from "@/components/shared";
 import { useIIRProfile, useUserIIR } from "@/features/iir/hooks";
 import { useMe } from "@/features/users/hooks/useMe";
 import { TabId } from "../constants";
 import { asText } from "../utils";
 import { Trash, Edit, User } from "lucide-react";
 import { BioCard, InfoContent, InfoNavigation } from "../components/profile";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 const ICON_SIZE = 20;
 
@@ -48,70 +48,67 @@ export default function IIRProfile() {
     return role === "admin" || role === "superadmin";
   });
 
+  usePageMetadata({
+    title: isAdminOrSuper ? "Individual Inventory Record" : "My IIR Profile",
+    description: isAdminOrSuper
+      ? "Comprehensive student record review for guidance purposes"
+      : "Manage your personal guidance information and student record",
+    badgeText: isAdminOrSuper ? "Admin Audit" : "Student Profile",
+    badgeIcon: <User size={16} />,
+    isLoading,
+    headerActions: (
+      <div className="flex items-center gap-2">
+        {isAdminOrSuper ? (
+          <button className="flex items-center justify-center h-10 w-10 hover:bg-red-500/10 transition-colors rounded-xl border border-red-500/20 group">
+            <Trash
+              size={ICON_SIZE}
+              className="text-red-500 group-hover:scale-110 transition-transform"
+            />
+          </button>
+        ) : (
+          <button className="flex items-center justify-center h-10 w-10 hover:bg-primary/10 transition-colors rounded-xl border border-primary/20 group">
+            <Edit
+              size={ICON_SIZE}
+              className="text-primary group-hover:scale-110 transition-transform"
+            />
+          </button>
+        )}
+      </div>
+    ),
+  });
+
   // Handle final state where no ID can be resolved
   if (!finalIirId) {
     return (
-      <Layout showHeader={false} isLoading={isLoading}>
-        <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-border bg-card">
-          <h2 className="text-xl font-semibold mb-2">No IIR Record Found</h2>
-          <p className="text-muted-foreground mb-6">
-            You haven't filled out your Individual Inventory Record form yet. Please submit the form to access your profile.
-          </p>
-          <Link
-            to="/student/iir/form"
-            className="bg-primary text-primary-foreground px-6 py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
-          >
-            Go to IIR Form
-          </Link>
-        </div>
-      </Layout>
+      <div className="flex flex-col items-center justify-center p-12 text-center rounded-2xl border border-border bg-card">
+        <h2 className="text-xl font-semibold mb-2">No IIR Record Found</h2>
+        <p className="text-muted-foreground mb-6">
+          You haven't filled out your Individual Inventory Record form yet.
+          Please submit the form to access your profile.
+        </p>
+        <Link
+          to="/student/iir/form"
+          className="bg-primary text-primary-foreground px-6 py-2.5 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+        >
+          Go to IIR Form
+        </Link>
+      </div>
     );
   }
 
   // Handle errors from the profile query
   if (isError || !studentData)
     return (
-      <Layout
-        title={
-          isAdminOrSuper ? "Individual Inventory Record" : "My IIR Profile"
-        }
-        isLoading={isLoading}
-      >
-        <div className="rounded-2xl border border-border bg-card p-6 text-sm text-card-foreground">
-          {asText(error) || "Error loading student profile data."}
-        </div>
-      </Layout>
+      <div className="rounded-2xl border border-border bg-card p-6 text-sm text-card-foreground">
+        {asText(error) || "Error loading student profile data."}
+      </div>
     );
 
   const showSignificantNotes = isAdminOrSuper;
 
   return (
-    <Layout
-      title={isAdminOrSuper ? "Individual Inventory Record" : "My IIR Profile"}
-      description={
-        isAdminOrSuper
-          ? "Comprehensive student record review for guidance purposes"
-          : "Manage your personal guidance information and student record"
-      }
-      badgeText={isAdminOrSuper ? "Admin Audit" : "Student Profile"}
-      badgeIcon={<User size={16} />}
-      isLoading={isLoading}
-      headerActions={
-        <div className="flex items-center gap-2">
-          {isAdminOrSuper ? (
-            <button className="flex items-center justify-center h-10 w-10 hover:bg-red-500/10 transition-colors rounded-xl border border-red-500/20 group">
-              <Trash size={ICON_SIZE} className="text-red-500 group-hover:scale-110 transition-transform" />
-            </button>
-          ) : (
-            <button className="flex items-center justify-center h-10 w-10 hover:bg-primary/10 transition-colors rounded-xl border border-primary/20 group">
-              <Edit size={ICON_SIZE} className="text-primary group-hover:scale-110 transition-transform" />
-            </button>
-          )}
-        </div>
-      }
-    >
+    <>
       <div className="flex flex-col gap-8 w-full mt-4">
-
         <div className="grid grid-cols-1 xl:grid-cols-4 gap-4 h-full">
           <BioCard data={studentData?.student} />
 
@@ -129,6 +126,6 @@ export default function IIRProfile() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
   );
 }

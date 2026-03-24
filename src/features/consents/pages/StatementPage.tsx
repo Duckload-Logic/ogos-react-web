@@ -2,7 +2,7 @@ import { useGetStatementContent, useGetLatestStatement } from "../hooks";
 import { StatementLayout } from "../components/StatementLayout";
 import { StatementHeader } from "../components/StatementHeader";
 import { StatementMarkdown } from "../components/StatementMarkdown";
-import BackwardNavigation from "@/components/layout/BackwardNavigation";
+import BackNav from "@/components/layout/BackNav";
 
 export default function StatementPage({
   statementType,
@@ -18,7 +18,7 @@ export default function StatementPage({
 
   return (
     <div className="flex flex-col w-full gap-4">
-      <BackwardNavigation />
+      <BackNav />
       <StatementLayout isLoading={isLoading}>
         {latestStatement && (
           <StatementHeader

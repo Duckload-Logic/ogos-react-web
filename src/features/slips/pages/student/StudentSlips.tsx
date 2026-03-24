@@ -28,10 +28,10 @@ import {
   useGetSlipStats,
   useGetSlipStatuses,
 } from "@/features/slips/hooks";
-import { Slip, SlipStatus } from "@/features/slips/types/slip";
-import Pagination from "@/components/Pagination";
-import Layout from "@/components/layout/Layout";
-import { LoadingSpinner } from "@/components/shared";
+import { Slip, SlipStatus } from "@/features/slips/types";
+import { Pagination } from "@/components/shared";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
+import { Spinner } from "@/components/shared";
 
 interface StatusCount {
   id: string | number;
@@ -90,25 +90,27 @@ export default function StudentSlips() {
     return STATUS_COLORS[key] || STATUS_COLORS.secondary;
   };
 
+  usePageMetadata({
+    title: "My Admission Slips",
+    description: "Manage your admission slip requests and track their status",
+    badgeText: "My Requests",
+    badgeIcon: <FileText className="h-4 w-4" />,
+    isLoading,
+    headerActions: (
+      <Button
+        asChild
+        className="gap-2 rounded-xl shadow-lg shadow-primary/20"
+      >
+        <Link to="/student/slips/submit">
+          <Plus className="w-4 h-4" />
+          Submit Slip
+        </Link>
+      </Button>
+    ),
+  });
+
   return (
-    <Layout
-      title="My Admission Slips"
-      description="Manage your admission slip requests and track their status"
-      badgeText="My Requests"
-      badgeIcon={<FileText className="h-4 w-4" />}
-      isLoading={isLoading}
-      headerActions={
-        <Button
-          asChild
-          className="gap-2 rounded-xl shadow-lg shadow-primary/20"
-        >
-          <Link to="/student/slips/submit">
-            <Plus className="w-4 h-4" />
-            Submit Slip
-          </Link>
-        </Button>
-      }
-    >
+    <>
       <AnimationStyles />
       <div className="space-y-6">
         {/* Stats Cards */}
@@ -175,7 +177,7 @@ export default function StudentSlips() {
           <CardContent className="p-0">
             {isSlipsLoading ? (
               <div className="flex items-center justify-center py-16">
-                <LoadingSpinner size="md" message="Loading your slips..." />
+                <Spinner size="md" message="Loading your slips..." />
               </div>
             ) : slips.length > 0 ? (
               <>
@@ -304,6 +306,6 @@ export default function StudentSlips() {
           </CardContent>
         </Card>
       </div>
-    </Layout>
+    </>
   );
 }

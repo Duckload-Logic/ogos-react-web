@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { LoadingSpinner } from "@/components/shared";
+import { Spinner } from "@/components/shared";
 
 interface StatementLayoutProps {
   isLoading: boolean;
@@ -8,7 +8,7 @@ interface StatementLayoutProps {
 
 export function StatementLayout({ isLoading, children }: StatementLayoutProps) {
   if (isLoading) {
-    return <LoadingSpinner />;
+    return <Spinner />;
   }
 
   return (

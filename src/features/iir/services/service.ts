@@ -1,8 +1,7 @@
 import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
 import { API_ROUTES } from "@/config/apiRoutes";
-import { QueryParam } from "../types/reqParams";
+import { QueryParam, IIRForm } from "../types";
 import { decamelizeKeys } from "humps";
-import { IIRForm } from "../types/IIRForm";
 
 const toNumber = (value: unknown): number => {
   if (typeof value === "number") {

@@ -1,4 +1,4 @@
-import { IIRForm } from "../types/IIRForm";
+import { IIRForm } from "../types";
 
 export const NOT_SPECIFIED = "-";
 

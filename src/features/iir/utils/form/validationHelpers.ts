@@ -3,7 +3,7 @@
  * Extracted from IIRForm component
  */
 
-import { IIRForm } from '../../types/IIRForm';
+import { IIRForm } from "../../types";
 
 export interface SectionValidationResult {
   isValid: boolean;

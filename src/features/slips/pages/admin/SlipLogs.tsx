@@ -5,16 +5,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "lucide-react";
 import { useSlipLogs, useGetSlipStats } from "../../hooks";
-import type { Slip, SlipStats } from "../../types/slip";
-import { SlipViewModal, SlipsList } from "../../components";
+import type { Slip, SlipStats } from "../../types";
+import { ViewModal, SlipList } from "../../components";
 import { STATUS_COLORS } from "@/config/constants";
 import {
   getMonthsList,
   getYearsList,
   getMonthRange,
 } from "../../utils/dateFilters";
-import { DropdownField } from "@/components/form";
-import Layout from "@/components/layout/Layout";
+import { Dropdown } from "@/components/form";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 export default function SlipLogs() {
 
@@ -41,7 +41,7 @@ export default function SlipLogs() {
     return found || monthsList[0];
   });
 
-  // Handle year/month selection from DropdownField
+  // Handle year/month selection from Dropdown
   const handleYearChange = (yearId: number) => {
     const year = yearsList.find((y) => y.id === yearId);
     if (year) setSelectedYear(year);
@@ -118,14 +118,16 @@ export default function SlipLogs() {
 
   const isPageLoading = isLoading || isStatsLoading;
 
+  usePageMetadata({
+    title: "Admission Slip Logs",
+    description: "Historical record of all processed admission slips with date and status filters",
+    badgeText: "Audit Trail",
+    badgeIcon: <Calendar className="h-4 w-4" />,
+    isLoading: isPageLoading,
+  });
+
   return (
-    <Layout
-      title="Admission Slip Logs"
-      description="Historical record of all processed admission slips with date and status filters"
-      badgeText="Audit Trail"
-      badgeIcon={<Calendar className="h-4 w-4" />}
-      isLoading={isPageLoading}
-    >
+    <>
       <div className="space-y-6">
 
         {/* Filters Section */}
@@ -138,13 +140,13 @@ export default function SlipLogs() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <DropdownField
+              <Dropdown
                 label="Year"
                 options={yearsList}
                 value={selectedYear.id}
                 onChange={handleYearChange}
               />
-              <DropdownField
+              <Dropdown
                 label="Month"
                 options={monthsList}
                 value={selectedMonth.id}
@@ -196,7 +198,7 @@ export default function SlipLogs() {
         </div>
 
         {/* Slips List */}
-        <SlipsList
+        <SlipList
           title="Submission Details"
           slips={slips}
           isLoading={isLoading}
@@ -212,7 +214,7 @@ export default function SlipLogs() {
         />
 
         {/* View Modal */}
-        <SlipViewModal
+        <ViewModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           slip={selectedSlip}
@@ -223,6 +225,6 @@ export default function SlipLogs() {
           isLoading={false}
         />
       </div>
-    </Layout>
+    </>
   );
 }

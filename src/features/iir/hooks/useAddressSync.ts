@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Address } from "../types/IIRForm";
+import { Address } from "../types";
 
 /**
  * Hook to manage "Same As" address synchronization

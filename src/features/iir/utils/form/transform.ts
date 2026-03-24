@@ -3,7 +3,16 @@
  * Converts frontend form state to backend DTO format
  */
 
-import { IIRForm } from "../../types/IIRForm";
+import {
+  IIRForm,
+  StudentAddress,
+  SchoolDetails,
+  RelatedPerson,
+  ConsultationRecord,
+  Activity,
+  SubjectPreference,
+  Hobby,
+} from "../../types";
 
 /**
  * Validates that numeric string fields contain valid numbers
@@ -33,7 +42,7 @@ export function validateNumericFields(formData: IIRForm): string[] {
     errors.push("Weekly allowance must be a valid number");
   }
 
-  formData.education.schools.forEach((school, index) => {
+  formData.education.schools.forEach((school: SchoolDetails, index: number) => {
     if (
       school.yearStarted &&
       (isNaN(parseInt(school.yearStarted, 10)) ||
@@ -133,7 +142,7 @@ export function transformFormToPayload(formData: IIRForm): any {
           },
         },
       },
-      addresses: formData.student.addresses.map((addr) => ({
+      addresses: formData.student.addresses.map((addr: StudentAddress) => ({
         id: addr.id,
         addressType: addr.addressType,
         address: {
@@ -151,7 +160,7 @@ export function transformFormToPayload(formData: IIRForm): any {
       interruptedDetails: handleNullableString(
         formData.education.interruptedDetails,
       ),
-      schools: formData.education.schools.map((school) => ({
+      schools: formData.education.schools.map((school: SchoolDetails) => ({
         id: school.id,
         educationalLevel: school.educationalLevel,
         schoolName: school.schoolName,
@@ -185,7 +194,7 @@ export function transformFormToPayload(formData: IIRForm): any {
         ),
         natureOfResidence: formData.family.background.natureOfResidence,
       },
-      relatedPersons: formData.family.relatedPersons.map((person) => ({
+      relatedPersons: formData.family.relatedPersons.map((person: RelatedPerson) => ({
         id: person.id,
         lastName: person.lastName,
         firstName: person.firstName,
@@ -236,7 +245,7 @@ export function transformFormToPayload(formData: IIRForm): any {
           formData.health.healthRecord.generalHealthDetails,
         ),
       },
-      consultations: formData.health.consultations.map((consultation) => ({
+      consultations: formData.health.consultations.map((consultation: ConsultationRecord) => ({
         id: consultation.id,
         professionalType: consultation.professionalType,
         hasConsulted: consultation.hasConsulted,
@@ -245,19 +254,19 @@ export function transformFormToPayload(formData: IIRForm): any {
       })),
     },
     interests: {
-      activities: formData.interests.activities.map((activity) => ({
+      activities: formData.interests.activities.map((activity: Activity) => ({
         id: activity.id,
         activityOption: activity.activityOption,
         otherSpecification: handleNullableString(activity.otherSpecification),
         role: activity.role,
         roleSpecification: handleNullableString(activity.roleSpecification),
       })),
-      subjectPreferences: formData.interests.subjectPreferences.map((pref) => ({
+      subjectPreferences: formData.interests.subjectPreferences.map((pref: SubjectPreference) => ({
         id: pref.id,
         subjectName: pref.subjectName,
         isFavorite: pref.isFavorite,
       })),
-      hobbies: formData.interests.hobbies.map((hobby) => ({
+      hobbies: formData.interests.hobbies.map((hobby: Hobby) => ({
         id: hobby.id,
         hobbyName: hobby.hobbyName,
         priorityRank: hobby.priorityRank,
@@ -279,7 +288,7 @@ function handleNullableString(value: string | null | undefined): string | null {
 /**
  * Safely parses a given entity into a continuous scalar skipping empty.
  */
-function parseNumberSafely(val: any): number | undefined {
+function parseNumberSafely(val: string | number | null | undefined): number | undefined {
   if (val === null || val === undefined || val === "") return undefined;
   const num = Number(val);
   return isNaN(num) ? undefined : num;
@@ -288,7 +297,7 @@ function parseNumberSafely(val: any): number | undefined {
 /**
  * Converts empty strings to null for nullable fields
  */
-function parseNullSafely(val: any): string | null {
+function parseNullSafely(val: string | null | undefined): string | null {
   return val && String(val).trim() !== "" ? val : null;
 }
 

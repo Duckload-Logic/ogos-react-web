@@ -1,4 +1,4 @@
-import { CardBlock } from "./";
+import CardBlock from "./CardBlock";
 
 export default function StatCard({
   label,

@@ -1,5 +1,5 @@
 import { NOT_SPECIFIED } from "../constants";
-import { Address } from "../types/IIRForm";
+import { Address, IIRForm } from "../types";
 
 export function asText(value: unknown) {
   if (value === null || value === undefined || value === "")

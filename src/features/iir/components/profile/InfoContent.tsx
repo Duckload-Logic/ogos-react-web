@@ -1,13 +1,11 @@
 import { TabId } from "../../constants";
-import {
-  PersonalInformationView,
-  EducationBackgroundView,
-  FamilyBackgroundView,
-  HealthInformationView,
-  InterestsHobbiesView,
-  TestResultsView,
-  SignificantNotesView,
-} from "./";
+import PersonalView from "./PersonalView";
+import EducationView from "./EducationView";
+import FamilyView from "./FamilyView";
+import HealthView from "./HealthView";
+import InterestsHobbiesView from "./InterestsView";
+import TestResultsView from "./TestResultsView";
+import NotesView from "./NotesView";
 
 export default function InfoContent({
   activeTab,
@@ -19,15 +17,15 @@ export default function InfoContent({
   showSignificantNotes?: boolean;
 }) {
   const views: Record<TabId, JSX.Element> = {
-    personal: <PersonalInformationView data={studentData?.student} />,
-    education: <EducationBackgroundView data={studentData?.education} />,
-    family: <FamilyBackgroundView data={studentData?.family} />,
-    health: <HealthInformationView data={studentData?.health} />,
+    personal: <PersonalView data={studentData?.student} />,
+    education: <EducationView data={studentData?.education} />,
+    family: <FamilyView data={studentData?.family} />,
+    health: <HealthView data={studentData?.health} />,
     interests: <InterestsHobbiesView data={studentData?.interests} />,
     testResults: <TestResultsView data={studentData?.testResults} />,
     ...(showSignificantNotes && {
       significantNotes: (
-        <SignificantNotesView data={studentData?.significantNotes} />
+        <NotesView data={studentData?.significantNotes} />
       ),
     }),
   } as Record<TabId, JSX.Element>;

@@ -27,11 +27,11 @@ import {
 } from "lucide-react";
 import { useGetSlipCategories, useSubmitSlip } from "@/features/slips/hooks";
 import {
-  SlipStepProgress,
+  StepProgress,
 } from "@/features/slips/components";
 import { AnimationStyles } from "@/components/ui/animations";
-import type { CreateSlipRequest } from "@/features/slips/types/slip";
-import Layout from "@/components/layout/Layout";
+import { Slip, SlipStatus, CreateSlipRequest } from "@/features/slips/types";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 interface FormData {
   dateOfAbsence: string;
@@ -176,14 +176,16 @@ export default function SubmitSlip() {
     );
   };
 
+  usePageMetadata({
+    title: "Submit Admission Slip",
+    description: "Provide the required information and supporting documents for your absence.",
+    badgeText: "New Request",
+    badgeIcon: <Plus className="h-4 w-4" />,
+    isLoading: isCategoriesLoading || isSubmitting,
+  });
+
   return (
-    <Layout
-      title="Submit Admission Slip"
-      description="Provide the required information and supporting documents for your absence."
-      badgeText="New Request"
-      badgeIcon={<Plus className="h-4 w-4" />}
-      isLoading={isCategoriesLoading || isSubmitting}
-    >
+    <>
       <AnimationStyles />
       <div className="min-h-full bg-background pt-6">
         {/* Main Content - Two Column Layout */}
@@ -194,7 +196,7 @@ export default function SubmitSlip() {
             <div className="lg:col-span-2 space-y-4">
               {/* Progress Indicator */}
               <Card className="border-0 shadow-sm bg-muted/30 py-3 px-4">
-                <SlipStepProgress
+                <StepProgress
                   steps={steps}
                   currentStep={currentStep}
                   completedSteps={completedSteps}
@@ -734,6 +736,6 @@ export default function SubmitSlip() {
           </div>
         </div>
       </div>
-    </Layout>
+    </>
 );
 }

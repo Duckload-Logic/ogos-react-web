@@ -1,9 +1,9 @@
 import { AlertCircle, IdCard, Mail, Phone, School } from "lucide-react";
 import { ProfileFemale, ProfileMale } from "@/assets/icons";
 import { asText, renderAddress } from "@/features/iir/utils";
-import { StudentSection } from "../../types/IIRForm";
+import { StudentSection } from "../../types";
 import { NOT_SPECIFIED } from "../../constants";
-import { QuickInfo } from "./";
+import QuickInfo from "./QuickInfo";
 
 export default function BioCard({
   data,

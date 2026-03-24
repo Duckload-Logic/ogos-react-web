@@ -8,15 +8,15 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
 import { useGetSlipStats, useUpdateSlipStatus } from "../../hooks";
-import type { Slip, SlipStats } from "../../types/slip";
-import { SlipViewModal, SlipsList } from "../../components";
+import type { Slip, SlipStats } from "../../types";
+import { ViewModal, SlipList } from "../../components";
 import {
   getDateRange,
   getFilterLabel,
   type TimeFilter,
 } from "../../utils/dateFilters";
 import { useGetUrgentSlips } from "../../hooks/useGetUrgentSlips";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 export default function ReviewSlips() {
   const navigate = useNavigate();
@@ -177,40 +177,42 @@ export default function ReviewSlips() {
 
   const isPageLoading = isStatsLoading || isLoading || isUpdating;
 
-  return (
-    <Layout
-      title="Review Excuse Slips"
-      description="Review submissions, filter the queue, and process student requests."
-      badgeText="Slip Management"
-      badgeIcon={<FileText className="h-4 w-4" />}
-      isLoading={isPageLoading}
-      headerActions={
-        <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
-          {(["today", "week", "month"] as TimeFilter[]).map((filter) => (
-            <Button
-              key={filter}
-              variant={timeFilter === filter ? "default" : "outline"}
-              onClick={() => {
-                setTimeFilter(filter);
-                setCurrentPage(1);
-              }}
-              className="h-10 min-w-[100px] rounded-xl px-4 shadow-sm"
-            >
-              {getFilterLabel(filter)}
-            </Button>
-          ))}
-
+  usePageMetadata({
+    title: "Review Excuse Slips",
+    description: "Review submissions, filter the queue, and process student requests.",
+    badgeText: "Slip Management",
+    badgeIcon: <FileText className="h-4 w-4" />,
+    isLoading: isPageLoading,
+    headerActions: (
+      <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
+        {(["today", "week", "month"] as TimeFilter[]).map((filter) => (
           <Button
-            variant="outline"
-            onClick={() => navigate("/admin/admission-slips/logs")}
-            className="h-10 rounded-xl px-4 shadow-sm gap-2"
+            key={filter}
+            variant={timeFilter === filter ? "default" : "outline"}
+            onClick={() => {
+              setTimeFilter(filter);
+              setCurrentPage(1);
+            }}
+            className="h-10 min-w-[100px] rounded-xl px-4 shadow-sm"
           >
-            <Archive className="h-4 w-4" />
-            View All Logs
+            {getFilterLabel(filter)}
           </Button>
-        </div>
-      }
-    >
+        ))}
+
+        <Button
+          variant="outline"
+          onClick={() => navigate("/admin/admission-slips/logs")}
+          className="h-10 rounded-xl px-4 shadow-sm gap-2"
+        >
+          <Archive className="h-4 w-4" />
+          View All Logs
+        </Button>
+      </div>
+    ),
+  });
+
+  return (
+    <>
       <div className="animate-in fade-in slide-in-from-bottom-4 space-y-4 duration-300 lg:space-y-5">
         <div className="rounded-lg border border-blue-300 bg-blue-500/10 px-4 py-3.5 shadow-sm">
           <p className="text-sm text-blue-600">
@@ -298,7 +300,7 @@ export default function ReviewSlips() {
           </div>
         </div>
 
-        <SlipsList
+        <SlipList
           slips={slips}
           isLoading={isLoading}
           onViewClick={handleViewSlip}
@@ -312,7 +314,7 @@ export default function ReviewSlips() {
           totalPages={totalPages}
         />
 
-        <SlipViewModal
+        <ViewModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
           slip={selectedSlip}
@@ -323,6 +325,6 @@ export default function ReviewSlips() {
           isLoading={isUpdating}
         />
       </div>
-    </Layout>
+    </>
   );
 }

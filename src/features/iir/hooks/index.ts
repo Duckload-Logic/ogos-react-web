@@ -1,4 +1,18 @@
-export { useIIRStatus } from "./useIIRStatus";
+export {
+  useIIRStatus,
+  useUserIIR,
+  useIIRProfile,
+  useIIRPagination,
+} from "./useIIRQueries";
+
+export {
+  useIIRForm,
+  useIIRFormSave,
+  useGetIIRDraft,
+  useSaveIIRDraft,
+} from "./useIIRForm";
+
+export { useAddressSync } from "./useAddressSync";
 export {
   useCourses,
   useGenders,
@@ -13,11 +27,4 @@ export {
   useStudentSupportTypes,
   useActivityOptions,
 } from "./useLookups";
-export { useIIRPagination } from "./useIIRPagination";
-export { useIIRProfile } from "./useIIRProfile";
-export { useUserIIR } from "./useUserIIR";
-export { useIIRForm } from "./useIIRForm";
-export { useIIRFormSave } from "./useIIRFormSave";
-export { useGetIIRDraft, useSaveIIRDraft } from "./useIIRDraft";
-export { useAddressSync } from "./useAddressSync";
 export { useTouchedState } from "./useTouchedState";

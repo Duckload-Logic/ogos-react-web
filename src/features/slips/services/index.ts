@@ -5,12 +5,12 @@
 
 import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
 import { API_ROUTES } from "@/config/apiRoutes";
-import { QueryParams } from "../types/params";
 import type {
   Slip,
   CreateSlipRequest,
   PaginatedSlipsResponse,
-} from "../types/slip";
+  QueryParams,
+} from "../types";
 
 /**
  * Get slip statistics

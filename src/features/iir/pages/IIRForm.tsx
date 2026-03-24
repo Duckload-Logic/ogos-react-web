@@ -7,11 +7,11 @@ import {
   useGetIIRDraft,
   useTouchedState,
 } from "@/features/iir/hooks";
-import { IIRForm as IIRFormType } from "@/features/iir/types/IIRForm";
+import { IIRForm as IIRFormType } from "@/features/iir/types";
 import { EMPTY_IIR_FORM } from "@/features/iir/constants";
-import { LoadingSpinner } from "@/components/shared";
+import { Spinner } from "@/components/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import Layout from "@/components/layout/Layout";
+import Layout, { usePageMetadata } from "@/components/layout/Layout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HeroSection } from "@/components/ui/hero-section";
@@ -36,12 +36,12 @@ import {
   User,
 } from "lucide-react";
 import {
-  PersonalInformationSection,
-  EducationBackgroundSection,
-  FamilyBackgroundSection,
-  HealthInformationSection,
+  PersonalSection,
+  EducationSection,
+  FamilySection,
+  HealthSection,
   InterestsSection,
-  // LegalConsentDialog,
+  // ConsentDialog,
   // FormErrorModal,
   // SectionProgress,
 } from "@/features/iir/components/form";
@@ -61,7 +61,7 @@ import {
 } from "@/features/iir/components/form/FormErrorModal";
 import { completeIIRForm } from "../tests/test";
 import { SectionProgress } from "../components/form/SectionProgress";
-import LegalConsentDialog from "../components/form/LegalConsentDialog";
+import ConsentDialog from "../components/form/ConsentDialog";
 
 const FORM_SECTIONS = [
   { title: "I. Personal Information", id: 1, key: "personal" },
@@ -96,7 +96,7 @@ export default function IIRForm() {
   const [localFormData, setLocalFormData] = useState<IIRFormType | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
-  const [showLegalConsentDialog, setShowLegalConsentDialog] = useState(false);
+  const [showConsentDialog, setShowConsentDialog] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
   const [validationErrorList, setValidationErrorList] = useState<string[]>([]);
@@ -115,7 +115,7 @@ export default function IIRForm() {
 
   const handleInputChange = useCallback((fieldPath: string, value: any) => {
     const path = fieldPath.split(".");
-    setLocalFormData((prev) => updateNestedField(prev, path, value));
+    setLocalFormData((prev: IIRFormType | null) => updateNestedField(prev, path, value));
     setLastChangeTimestamp(Date.now());
   }, []);
 
@@ -319,7 +319,7 @@ export default function IIRForm() {
     // All validations passed, clear section errors and open legal consent dialog
     setSectionsWithErrors([]);
     setShowValidationError(false);
-    setShowLegalConsentDialog(true);
+    setShowConsentDialog(true);
   };
 
   const handleLegalConsentAccept = async () => {
@@ -338,7 +338,7 @@ export default function IIRForm() {
       clearDraft();
 
       // Success
-      setShowLegalConsentDialog(false);
+      setShowConsentDialog(false);
       addToast("✓ Form submitted successfully!");
       setShowSuccessPopup(true);
 
@@ -357,7 +357,7 @@ export default function IIRForm() {
   };
 
   const handleLegalConsentCancel = () => {
-    setShowLegalConsentDialog(false);
+    setShowConsentDialog(false);
   };
 
   const confirmReset = () => {
@@ -369,14 +369,16 @@ export default function IIRForm() {
   };
 
   const currentSectionDef = FORM_SECTIONS.find((s) => s.id === currentSection);
+  usePageMetadata({
+    title: "Individual Inventory Record",
+    description: "Fill out your student information with confidence. Your data is protected and used solely for academic and guidance purposes.",
+    badgeText: "Student Profile Portal",
+    badgeIcon: <User className="h-4 w-4" />,
+    isLoading,
+  });
+
   return (
-    <Layout
-      title="Individual Inventory Record"
-      description="Fill out your student information with confidence. Your data is protected and used solely for academic and guidance purposes."
-      badgeText="Student Profile Portal"
-      badgeIcon={<User className="h-4 w-4" />}
-      isLoading={isLoading}
-    >
+    <>
       <div className="transition-colors duration-500">
         <AnimationStyles />
 
@@ -459,7 +461,7 @@ export default function IIRForm() {
                 {/* Individual Form Sections */}
                 <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out fill-mode-both">
                   {currentSection === 1 && localFormData?.student && (
-                    <PersonalInformationSection
+                    <PersonalSection
                       ref={personalSectionRef}
                       studentInfo={localFormData.student}
                       onChange={handleInputChange}
@@ -468,14 +470,14 @@ export default function IIRForm() {
                     />
                   )}
                   {currentSection === 2 && localFormData?.education && (
-                    <EducationBackgroundSection
+                    <EducationSection
                       ref={educationSectionRef}
                       education={localFormData.education}
                       onChange={handleInputChange}
                     />
                   )}
                   {currentSection === 3 && localFormData?.family && (
-                    <FamilyBackgroundSection
+                    <FamilySection
                       ref={familySectionRef}
                       family={localFormData.family}
                       onChange={handleInputChange}
@@ -484,7 +486,7 @@ export default function IIRForm() {
                     />
                   )}
                   {currentSection === 4 && localFormData?.health && (
-                    <HealthInformationSection
+                    <HealthSection
                       ref={healthSectionRef}
                       health={localFormData.health}
                       onChange={handleInputChange}
@@ -565,8 +567,8 @@ export default function IIRForm() {
         </div>
 
         {/* Overlays & Modals */}
-        <LegalConsentDialog
-          open={showLegalConsentDialog}
+        <ConsentDialog
+          open={showConsentDialog}
           onAccept={handleLegalConsentAccept}
           onCancel={handleLegalConsentCancel}
           isSubmitting={isSaving}
@@ -621,7 +623,7 @@ export default function IIRForm() {
         {/* Notification Toast Layer */}
         <Toast toasts={toasts} />
       </div>
-    </Layout>
+    </>
   );
 }
 

@@ -3,7 +3,7 @@
  * Extracted from IIRForm component for better maintainability
  */
 
-import { IIRForm } from '../../types/IIRForm';
+import { IIRForm } from "../../types";
 
 /**
  * Updates a nested field in the form data immutably

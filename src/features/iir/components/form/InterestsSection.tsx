@@ -13,12 +13,12 @@ import {
   ChevronRight,
   Sparkles
 } from "lucide-react";
-import { InputField, Checkbox } from "@/components/form";
-import { SectionContainer } from "./index";
+import { FormInput, Checkbox } from "@/components/form";
+import { SectionContainer } from "./SectionContainer";
 import { validateObject } from "@/services/validationSchema";
 import { interestsValidationSchema } from "@/features/iir/config/interestsValidationSchema";
 import { useActivityOptions } from "@/features/iir/hooks/useLookups";
-import { Activity, Hobby, SubjectPreference } from "@/features/iir/types/IIRForm";
+import { Activity, Hobby, SubjectPreference } from "@/features/iir/types";
 
 interface FormErrors {
   [key: string]: string;
@@ -276,7 +276,7 @@ export const InterestsSection = forwardRef<
 
             {isActivityChecked("Others", true, true) && (
               <div className="mt-6 sm:mt-8 pt-6 sm:pt-8 border-t border-glass-border/20 animate-in fade-in slide-in-from-top-4 duration-300">
-                <InputField
+                <FormInput
                   label="Please specify club name"
                   value={getOtherSpecification(true)}
                   onChange={(val: string) => updateOtherSpecification(true, val)}
@@ -292,7 +292,7 @@ export const InterestsSection = forwardRef<
                 <Star size={14} className="text-primary" />
                 Favorite Subjects
               </h4>
-              <InputField
+              <FormInput
                 label=""
                 value={getSubjects(true)}
                 onChange={(val: string) => updateSubjects(true, val)}
@@ -305,7 +305,7 @@ export const InterestsSection = forwardRef<
                 <Heart size={14} className="text-primary opacity-50" />
                 Least Liked Subjects
               </h4>
-              <InputField
+              <FormInput
                 label=""
                 value={getSubjects(false)}
                 onChange={(val: string) => updateSubjects(false, val)}
@@ -350,7 +350,7 @@ export const InterestsSection = forwardRef<
                         {rank}
                       </div>
                       <div className="w-full">
-                        <InputField
+                        <FormInput
                           label=""
                           value={getHobby(rank)}
                           onChange={(val: string) => updateHobby(rank, val)}
@@ -394,7 +394,7 @@ export const InterestsSection = forwardRef<
 
               {isActivityChecked("Others", false, true) && (
                 <div className="mt-8 pt-8 border-t border-white/10 animate-in fade-in slide-in-from-top-4 duration-300">
-                  <InputField
+                  <FormInput
                     label="Please specify details"
                     value={getOtherSpecification(false)}
                     onChange={(val: string) => updateOtherSpecification(false, val)}
@@ -432,7 +432,7 @@ export const InterestsSection = forwardRef<
                     />
                     {isRoleChecked("Others") && (
                       <div className="animate-in fade-in slide-in-from-top-2 duration-300">
-                        <InputField
+                        <FormInput
                           label=""
                           value={interests?._tempRoleSpecification || ""}
                           onChange={(val: string) => handleInputChange("interests._tempRoleSpecification", val)}

@@ -13,7 +13,7 @@ export {
   createResetFormData,
   initializeFormData,
 } from './formHelpers';
-export { calculateSectionCompletion } from './completionCalculator';
+export { calculateSectionCompletion } from './completion';
 export {
   validateAllSections,
   validateSection,

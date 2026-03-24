@@ -1,5 +1,5 @@
 /**
- * Validation schema for PersonalInformationSection form
+ * Validation schema for PersonalSection form
  * Defines all field validation rules declaratively
  */
 

@@ -1,4 +1,4 @@
-import { IIRForm } from "../types/IIRForm";
+import { IIRForm } from "../types";
 
 /**
  * SCENARIO 1: Complete IIR Form

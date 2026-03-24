@@ -1,7 +1,10 @@
 import { asText } from "@/features/iir/utils";
 import { formatDate } from "@/features/schedules/utils/formatters";
-import { CardBlock, EmptyState, InfoItem, SectionTitle } from ".";
-import { TestResult } from "../../types/IIRForm";
+import CardBlock from "./CardBlock";
+import EmptyState from "./EmptyState";
+import InfoItem from "./InfoItem";
+import SectionTitle from "./SectionTitle";
+import { TestResult } from "../../types";
 import { Clipboard } from "lucide-react";
 import { NOT_SPECIFIED } from "../../constants";
 

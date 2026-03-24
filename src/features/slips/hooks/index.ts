@@ -1,15 +1,24 @@
 // Query hooks
-export { useGetAllSlips } from "./useGetAllSlips";
-export { useGetMySlips } from "./useGetMySlips";
-export { useGetSlipAttachments } from "./useGetSlipAttachments";
-export { useGetSlipStatuses } from "./useGetSlipStatuses";
-export { useGetSlipCategories } from "./useGetSlipCategories";
-export { useSlipLogs } from "./useSlipLogs";
+export {
+  useSlips,
+  useGetAllSlips,
+  useGetMySlips,
+  useGetUrgentSlips,
+  useGetSlipStats,
+  useSlipLogs,
+} from "./useSlips";
+
+export {
+  useGetSlipStatuses,
+  useGetSlipCategories,
+} from "./useLookups";
 
 // Mutation hooks
-export { useSubmitSlip } from "./useSubmitSlip";
-export { useUpdateSlipStatus } from "./useUpdateSlipStatus";
+export { useSubmitSlip, useUpdateSlipStatus } from "./useSlipMutations";
 
-export { useDownloadAttachment } from "./useDownloadAttachment";
-export { useGetSlipStats } from "./useGetSlipStats";
-export { useGetAttachmentPreview } from "./useGetAttachmentPreview";
+// Attachment hooks
+export {
+  useGetSlipAttachments,
+  useDownloadAttachment,
+  useGetAttachmentPreview,
+} from "./useSlipAttachments";
