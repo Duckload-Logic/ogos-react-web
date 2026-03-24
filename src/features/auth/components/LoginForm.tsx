@@ -1,5 +1,5 @@
 import { Checkbox } from "@/components/form";
-import { FormField, LoadingSpinner } from "@/components/shared";
+import { FormField, Spinner } from "@/components/shared";
 import { Button } from "@/components/ui/button";
 import { useState } from "react";
 import { Link } from "react-router-dom";

@@ -6,7 +6,7 @@ import { useMe } from "@/features/users/hooks/useMe";
 import { useIIRForm } from "@/features/iir/hooks";
 import { useIIRStatus } from "@/features/iir/hooks";
 import { AnimationStyles } from "@/components/ui/animations";
-import { LoadingSpinner } from "./shared";
+import { Spinner } from "@/components/shared";
 
 interface IIRGateProps {
   children: React.ReactNode;
@@ -26,7 +26,7 @@ export const IIRGate = ({
   const { data: isSubmitted, isLoading: isIIRLoading } = useIIRStatus();
 
   if (isIIRLoading) {
-    return <LoadingSpinner size="lg" message="Checking your profile..." />;
+    return <Spinner size="lg" message="Checking your profile..." />;
   }
 
   // If PDS is not completed and this is not the form page
@@ -56,7 +56,7 @@ export const IIRGate = ({
               href="/student/iir/form"
               className="w-full block text-center bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
             >
-              Go to PDS Form
+              Go to IIR Form
             </a>
           </div>
         </div>
