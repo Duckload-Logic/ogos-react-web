@@ -63,7 +63,6 @@ export default function Calendar({
   className,
   isAdmin = false,
 }: CalendarProps) {
-  const touchStartX = useRef<number | null>(null);
   const today = new Date();
   const todayDate = today.getDate();
   const currentYear = currentMonth.getFullYear();
@@ -79,8 +78,8 @@ export default function Calendar({
   const statsMap = useMemo(() => {
     if (!daysMeta) return {};
 
-    return daysMeta.reduce((acc: any, curr: any) => {
-      const rawDate = curr.Date;
+    return daysMeta.reduce((acc: any, curr: DailyStatusCount) => {
+      const rawDate = curr.date;
       if (rawDate) {
         const key = rawDate.split("T")[0];
         acc[key] = curr;
@@ -296,12 +295,11 @@ export default function Calendar({
                       focus:outline-none focus:ring-1 focus:ring-primary/50
                       text-nowrap
                       ${isDisabled ? "opacity-50 cursor-not-allowed" : "hover:ring-1 hover:ring-primary"}
-                      ${
-                        isSelected
-                          ? "bg-primary text-primary-foreground ring-1 ring-primary"
-                          : isDisabled
-                            ? "bg-muted/50 text-muted-foreground"
-                            : "bg-muted hover:bg-muted/80 text-foreground"
+                      ${isSelected
+                        ? "bg-primary text-primary-foreground ring-1 ring-primary"
+                        : isDisabled
+                          ? "bg-muted/50 text-muted-foreground"
+                          : "bg-muted hover:bg-muted/80 text-foreground"
                       }
                       ${isToday ? "ring-1 ring-primary" : ""}
                     `}
@@ -312,8 +310,8 @@ export default function Calendar({
                   </button>
                   {isAdmin && statsMap[dateKey] && (
                     <div className="absolute flex -space-x-1 transform -translate-y-1 justify-center pointer-events-none">
-                      {/* Pending is first in row-reverse order to be on top-right */}
-                      {statsMap[dateKey].RescheduledCount > 0 && (
+                      {/* Rescheduled is first in row-reverse order to be on top-right */}
+                      {statsMap[dateKey].rescheduledCount > 0 && (
                         <div
                           className="size-3 rounded-full bg-notice-background border-2 border-notice-foreground"
                           title="Rescheduled"
@@ -321,7 +319,7 @@ export default function Calendar({
                       )}
 
                       {/* Scheduled is rendered second (middle) */}
-                      {statsMap[dateKey].ScheduledCount > 0 && (
+                      {statsMap[dateKey].scheduledCount > 0 && (
                         <div
                           className="size-3 rounded-full bg-info-background border-2 border-info-foreground"
                           title="Scheduled"
@@ -329,7 +327,7 @@ export default function Calendar({
                       )}
 
                       {/* Pending is rendered last (right-most, top of stack) */}
-                      {statsMap[dateKey].PendingCount > 0 && (
+                      {statsMap[dateKey].pendingCount > 0 && (
                         <div
                           className="size-3 rounded-full bg-warning-background border-2 border-warning-foreground"
                           title="Pending"

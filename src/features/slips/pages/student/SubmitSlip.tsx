@@ -32,6 +32,7 @@ import {
 import { AnimationStyles } from "@/components/ui/animations";
 import { Slip, SlipStatus, CreateSlipRequest } from "@/features/slips/types";
 import Layout, { usePageMetadata } from "@/components/layout/Layout";
+import FormInput from "@/components/form/FormInput";
 
 interface FormData {
   dateOfAbsence: string;
@@ -282,31 +283,28 @@ export default function SubmitSlip() {
                         </div>
                       </div>
 
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-semibold text-foreground">
-                          Reason for Absence <span className="text-red-500">*</span>
-                        </label>
-                        <textarea
-                          value={formData.reason}
-                          onChange={(e) =>
-                            setFormData((prev) => ({
-                              ...prev,
-                              reason: e.target.value,
-                            }))
-                          }
-                          placeholder="Briefly explain why you were absent"
-                          className="w-full border border-border rounded-md p-2.5 text-sm bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors resize-none h-20"
-                        />
-                      </div>
+                      <FormInput
+                        label="Reason for Absence"
+                        value={formData.reason}
+                        onChange={(val) =>
+                          setFormData((prev) => ({
+                            ...prev,
+                            reason: val,
+                          }))
+                        }
+                        placeholder="Briefly explain why you were absent"
+                        isTextarea
+                        required
+                        info="This reason will be reviewed by the Guidance Office. Use the mic icon to dictate your reason."
+                      />
 
                       <Button
                         onClick={() => setCurrentStep(2)}
                         disabled={!datesComplete}
-                        className={`w-full ${
-                          datesComplete
-                            ? "bg-red-500 hover:bg-red-600 text-white"
-                            : "bg-muted text-muted-foreground cursor-not-allowed"
-                        }`}
+                        className={`w-full ${datesComplete
+                          ? "bg-red-500 hover:bg-red-600 text-white"
+                          : "bg-muted text-muted-foreground cursor-not-allowed"
+                          }`}
                       >
                         Continue to Category
                       </Button>
@@ -338,10 +336,9 @@ export default function SubmitSlip() {
                             key={category.id}
                             onClick={() => handleCategoryChange(category.id)}
                             className={`w-full p-3 border rounded-md transition-all text-left text-sm
-                              ${
-                                formData.categoryId === category.id
-                                  ? "border-primary bg-primary/5"
-                                  : "border-border/60 hover:border-primary/50 hover:bg-muted/30"
+                              ${formData.categoryId === category.id
+                                ? "border-primary bg-primary/5"
+                                : "border-border/60 hover:border-primary/50 hover:bg-muted/30"
                               }
                             `}
                           >
@@ -737,5 +734,5 @@ export default function SubmitSlip() {
         </div>
       </div>
     </>
-);
+  );
 }

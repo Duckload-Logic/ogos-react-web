@@ -214,8 +214,8 @@ export default function ReviewSlips() {
   return (
     <>
       <div className="animate-in fade-in slide-in-from-bottom-4 space-y-4 duration-300 lg:space-y-5">
-        <div className="rounded-lg border border-blue-300 bg-blue-500/10 px-4 py-3.5 shadow-sm">
-          <p className="text-sm text-blue-600">
+        <div className="rounded-lg border border-info-foreground bg-info-background px-4 py-3.5 shadow-sm">
+          <p className="text-sm text-info-foreground">
             <strong>Note:</strong> Students request excuse slips in their portal.
             This page allows you to review, approve, reject, or request revisions
             for those slips.

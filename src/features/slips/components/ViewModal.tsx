@@ -17,7 +17,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
-import { Textarea } from "@/components/ui/textarea";
 import {
   CheckCircle2,
   Ban,
@@ -30,6 +29,7 @@ import type { Slip } from "../types";
 import { AttachmentsGrid } from "./AttachmentsGrid";
 import { STATUS_COLORS } from "@/config/constants";
 import { useGetSlipAttachments } from "../hooks";
+import { Textarea } from "@/components/ui/textarea";
 
 interface ViewModalProps {
   isOpen: boolean;

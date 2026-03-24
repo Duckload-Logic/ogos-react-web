@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea"; // adjust import
+import { FormInput } from "@/components/form";
 
 interface ActionConfirmModalProps {
   isOpen: boolean;
@@ -47,13 +47,11 @@ export default function ActionConfirmModal({
 
         {requiresMessage && (
           <div className="py-4">
-            <Textarea
+            <FormInput
               placeholder="Enter reason or message..."
               value={message}
-              onChange={(e) => setMessage(e.target.value)}
-              rows={3}
-              className="resize-none transition-all focus:ring-2 focus:ring-primary"
-            />
+              onChange={(val) => setMessage(val)}
+              isTextarea label={"Reason"} />
           </div>
         )}
 

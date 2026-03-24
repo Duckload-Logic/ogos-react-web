@@ -70,6 +70,41 @@ export const ANIMATION_KEYFRAMES = `
     }
   }
 
+  @keyframes progress-indefinite {
+    0% { transform: translateX(-100%); }
+    50% { transform: translateX(0); }
+    100% { transform: translateX(100%); }
+  }
+
+  @keyframes audio-bar {
+    0%, 100% { height: 4px; }
+    50% { height: 16px; }
+  }
+
+  .animate-progress-indefinite {
+    animation: progress-indefinite 2s infinite linear;
+  }
+
+  .animate-audio-bar-1 {
+    animation: audio-bar 0.6s infinite ease-in-out;
+  }
+
+  .animate-audio-bar-2 {
+    animation: audio-bar 0.6s infinite ease-in-out 0.2s;
+  }
+
+  .animate-audio-bar-3 {
+    animation: audio-bar 0.6s infinite ease-in-out 0.4s;
+  }
+
+  .reader-highlight {
+    outline: 2px dashed #7bb0ffff !important;
+    outline-offset: 4px;
+    cursor: help !important;
+    transition: outline 0.1s ease;
+    border-radius: 4px;
+  }
+
   .animate-fade-in-down {
     animation: fadeInDown 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
   }

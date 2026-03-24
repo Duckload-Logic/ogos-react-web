@@ -2,8 +2,7 @@
  * Modal for adding a new significant note
  */
 
-import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
   Dialog,
@@ -14,9 +13,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
 import { significantNoteSchema, SignificantNoteFormData } from '../validation/noteSchema';
+import { FormInput } from '@/components/form';
 
 interface AddNoteModalProps {
   open: boolean;
@@ -32,12 +30,16 @@ export default function AddNoteModal({
   isSubmitting = false,
 }: AddNoteModalProps) {
   const {
-    register,
     handleSubmit,
+    control,
     formState: { errors },
     reset,
   } = useForm<SignificantNoteFormData>({
     resolver: zodResolver(significantNoteSchema),
+    defaultValues: {
+      note: '',
+      remarks: ''
+    }
   });
 
   const handleFormSubmit = async (data: SignificantNoteFormData) => {
@@ -61,33 +63,35 @@ export default function AddNoteModal({
         </DialogHeader>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="note">Note / Incident Description *</Label>
-            <Textarea
-              id="note"
-              placeholder="Describe the incident or observation..."
-              rows={4}
-              {...register('note')}
-              className={errors.note ? 'border-red-500' : ''}
-            />
-            {errors.note && (
-              <p className="text-sm text-red-500">{errors.note.message}</p>
+          <Controller
+            name="note"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                label="Note / Incident Description"
+                placeholder="Describe the incident or observation..."
+                isTextarea
+                required
+                {...field}
+                error={errors.note?.message}
+              />
             )}
-          </div>
+          />
 
-          <div className="space-y-2">
-            <Label htmlFor="remarks">Action Taken / Remarks *</Label>
-            <Textarea
-              id="remarks"
-              placeholder="Describe the action taken or additional remarks..."
-              rows={4}
-              {...register('remarks')}
-              className={errors.remarks ? 'border-red-500' : ''}
-            />
-            {errors.remarks && (
-              <p className="text-sm text-red-500">{errors.remarks.message}</p>
+          <Controller
+            name="remarks"
+            control={control}
+            render={({ field }) => (
+              <FormInput
+                label="Action Taken / Remarks"
+                placeholder="Describe the action taken or additional remarks..."
+                isTextarea
+                required
+                {...field}
+                error={errors.remarks?.message}
+              />
             )}
-          </div>
+          />
 
           <DialogFooter>
             <Button

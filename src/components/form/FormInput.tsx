@@ -1,33 +1,35 @@
-import { Info, Check } from "lucide-react";
+import { Info, Check, Mic, MicOff, Banknote } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
+import { useSpeechToText } from "@/hooks/useSpeechToText";
 
 import { forwardRef } from "react";
 
 const FormInput = forwardRef<
-  HTMLInputElement,
+  HTMLInputElement | HTMLTextAreaElement,
   {
+    id?: any;
     className?: string;
     name?: string;
     label: string;
-    min?: string;
-    max?: string;
+    min?: string | number;
+    max?: string | number;
     type?: string;
     value: any;
-    onChange: (val: string) => void;
+    onChange: (val: any) => void;
     onBlur?: () => void;
     error?: string;
     placeholder?: string;
     required?: boolean;
     isTextarea?: boolean;
     inputMode?:
-      | "search"
-      | "none"
-      | "text"
-      | "tel"
-      | "url"
-      | "email"
-      | "numeric"
-      | "decimal";
+    | "search"
+    | "none"
+    | "text"
+    | "tel"
+    | "url"
+    | "email"
+    | "numeric"
+    | "decimal";
     disabled?: boolean;
     info?: string;
     prefix?: string;
@@ -35,6 +37,7 @@ const FormInput = forwardRef<
 >(
   (
     {
+      id,
       className = "",
       name,
       label,
@@ -47,6 +50,7 @@ const FormInput = forwardRef<
       error,
       placeholder,
       required = false,
+      isTextarea = false,
       inputMode,
       disabled = false,
       info = "",
@@ -54,6 +58,73 @@ const FormInput = forwardRef<
     },
     ref,
   ) => {
+    const {
+      isListening,
+      transcript,
+      startListening,
+      stopListening,
+      browserSupportsSpeechRecognition
+    } = useSpeechToText();
+
+    const previousTranscriptRef = useRef('');
+
+    useEffect(() => {
+      if (transcript && transcript !== previousTranscriptRef.current) {
+        const newPart = transcript.slice(previousTranscriptRef.current.length);
+        const newValue = (value || '') + newPart;
+
+        // Support both string-based and event-based onChange (React Hook Form)
+        if (typeof onChange === 'function') {
+          // Create a synthetic event for React Hook Form if needed
+          const event = {
+            target: { value: newValue, name },
+            currentTarget: { value: newValue, name }
+          } as any;
+
+          try {
+            onChange(newValue);
+          } catch (e) {
+            onChange(event);
+          }
+        }
+        previousTranscriptRef.current = transcript;
+      }
+    }, [transcript, onChange, value, name]);
+
+    const handleMicToggle = (e: React.MouseEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (isListening) {
+        stopListening();
+      } else {
+        startListening();
+      }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      // Try string first, then event (RHF)
+      try {
+        onChange(e.target.value);
+      } catch (err) {
+        onChange(e);
+      }
+    };
+
+    const inputClasses = `
+      w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200
+      text-sm font-medium tracking-tight text-foreground placeholder:text-muted-foreground/70
+      ${disabled
+        ? "bg-muted/80 border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-60"
+        : value !== undefined && value !== null && value !== ""
+          ? "bg-muted/20 border-primary/30 focus:bg-glass-bg dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm"
+          : required
+            ? "bg-muted/60 dark:bg-muted/20 border-border hover:border-destructive/40 focus:border-destructive/50 focus:ring-2 focus:ring-destructive/5"
+            : "bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
+      }
+      ${isTextarea ? "min-h-[100px] py-3 resize-none" : "h-11"}
+      ${isListening ? "border-primary ring-2 ring-primary/10" : ""}
+    `;
+
     return (
       <div className={`space-y-2 ${className}`}>
         <div className="text-sm font-medium text-card-foreground flex max-h-10 items-start gap-1">
@@ -70,39 +141,55 @@ const FormInput = forwardRef<
             </div>
           )}
           <div className="relative w-full">
-            <input
-              ref={ref}
-              type={type}
-              value={value}
-              onChange={(e) => onChange(e.target.value)}
-              onBlur={onBlur}
-              placeholder={placeholder}
-              inputMode={inputMode}
-              disabled={disabled}
-              className={`
-              w-full h-11 rounded-xl border px-4 py-2.5 outline-none transition-all duration-200
-              text-sm font-medium tracking-tight text-foreground placeholder:text-muted-foreground/70
-              ${
-                disabled
-                  ? "bg-muted/80 border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-60"
-                  : value !== undefined && value !== null && value !== ""
-                    ? "bg-muted/20 border-primary/30 focus:bg-glass-bg dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm"
-                    : required
-                      ? "bg-muted/60 dark:bg-muted/20 border-border hover:border-destructive/40 focus:border-destructive/50 focus:ring-2 focus:ring-destructive/5"
-                      : "bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
-              }
-            `}
-              min={min}
-              max={max}
-            />
-            {!disabled &&
-              value !== undefined &&
-              value !== null &&
-              value !== "" && (
-                <div className="absolute right-3 top-1/2 -translate-y-1/2 flex h-5 w-5 items-center justify-center rounded-full bg-primary/10 text-primary animate-in zoom-in duration-300">
-                  <Check size={12} strokeWidth={3} />
-                </div>
+            {isTextarea ? (
+              <textarea
+                id={id}
+                name={name}
+                ref={ref as any}
+                value={value}
+                onChange={handleChange}
+                onBlur={onBlur}
+                placeholder={placeholder}
+                disabled={disabled}
+                className={inputClasses}
+                rows={5}
+              />
+            ) : (
+              <input
+                id={id}
+                name={name}
+                ref={ref as any}
+                type={type}
+                value={value}
+                onChange={handleChange}
+                onBlur={onBlur}
+                placeholder={placeholder}
+                inputMode={inputMode}
+                disabled={disabled}
+                className={inputClasses}
+                min={min}
+                max={max}
+              />
+            )}
+
+            <div className="block right-2 bottom-4 flex items-center gap-2 z-10">
+              {isTextarea && browserSupportsSpeechRecognition && !disabled && (
+                <button
+                  type="button"
+                  onClick={handleMicToggle}
+                  title={isListening ? "Stop Dictation" : "Start Dictation"}
+                  className={`flex h-10 w-10 items-center justify-center rounded-lg
+                    transition-all shadow-sm p-0 ${isListening
+                      ? "bg-primary text-white animate-pulse ring-4 ring-primary/20"
+                      : "bg-transparent text-muted-foreground hover:bg-primary/10 " +
+                      "hover:text-primary border border-border/50"
+                    }`}
+                >
+
+                  {isListening ? <MicOff size={15} /> : <Mic size={15} />}
+                </button>
               )}
+            </div>
           </div>
         </div>
         {error && (

@@ -109,8 +109,22 @@ export default function AppointmentsManagement() {
       },
     });
 
-  const { data: allStatusCounts, isLoading: isAllStatsLoading } =
-    useAppointmentsStats({});
+  const monthlyRange = useMemo(() => {
+    const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+    const end = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+    return {
+      start: getLocalDateString(start),
+      end: getLocalDateString(end)
+    };
+  }, [currentMonth]);
+
+  const { data: monthlyStatusCounts, isLoading: isMonthlyStatsLoading } =
+    useAppointmentsStats({
+      params: {
+        startDate: monthlyRange.start,
+        endDate: monthlyRange.end,
+      },
+    });
 
   const { data, isLoading } = useAppointments({
     isMe: false,
@@ -149,22 +163,22 @@ export default function AppointmentsManagement() {
 
   const getStatusIdByAction = (action: string): number | undefined => {
     const statusMap: Record<string, number | undefined> = {
-      Approve: appointmentStatuses?.find((s) =>
+      Approve: statusCounts?.find((s) =>
         s.name.toLowerCase().includes("scheduled"),
       )?.id,
-      Reject: appointmentStatuses?.find((s) =>
+      Reject: statusCounts?.find((s) =>
         s.name.toLowerCase().includes("rejected"),
       )?.id,
-      Reschedule: appointmentStatuses?.find((s) =>
+      Reschedule: statusCounts?.find((s) =>
         s.name.toLowerCase().includes("rescheduled"),
       )?.id,
-      Cancel: appointmentStatuses?.find((s) =>
+      Cancel: statusCounts?.find((s) =>
         s.name.toLowerCase().includes("cancelled"),
       )?.id,
-      Complete: appointmentStatuses?.find((s) =>
+      Complete: statusCounts?.find((s) =>
         s.name.toLowerCase().includes("completed"),
       )?.id,
-      "No-show": appointmentStatuses?.find((s) =>
+      "No-show": statusCounts?.find((s) =>
         s.name.toLowerCase().includes("no-show"),
       )?.id,
     };
@@ -232,8 +246,8 @@ export default function AppointmentsManagement() {
     }
   };
 
-  const chartData = (appointmentStatuses || []).map((stat) => {
-    const count = allStatusCounts?.find((s) => s.id === stat.id)?.count || 0;
+  const chartData = (statusCounts || []).map((stat) => {
+    const count = monthlyStatusCounts?.find((s) => s.id === stat.id)?.count || 0;
 
     let key: keyof typeof chartConfig = "noShow";
 
@@ -252,7 +266,7 @@ export default function AppointmentsManagement() {
   });
 
   const isPageLoading =
-    isStatusesLoading || isStatsLoading || isAllStatsLoading || isLoading;
+    isStatusesLoading || isStatsLoading || isMonthlyStatsLoading || isLoading;
 
   usePageMetadata({
     title: "Appointments Management",
@@ -265,8 +279,8 @@ export default function AppointmentsManagement() {
   return (
     <>
       <div className="max-w-8xl mx-auto px-4 py-2 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-        <div className="bg-blue-500/10 border border-blue-300 shadow-sm rounded-lg p-4">
-          <p className="text-sm text-blue-600 dark:text-blue-300">
+        <div className="bg-info-background border border-info-foreground shadow-sm rounded-lg p-4">
+          <p className="text-sm text-info-foreground">
             <strong>Note:</strong> Students request appointments in their
             portal. This page is for approving, rejecting, or managing
             appointment requests.
@@ -283,7 +297,7 @@ export default function AppointmentsManagement() {
 
             <CardContent className="p-5 flex flex-col min-h-[250px]">
               <p className="text-sm text-muted-foreground mb-4">
-                Current appointment status distribution
+                Appointment distribution for {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
               </p>
 
               <div className="rounded-2xl border border-border bg-background/90 px-2 py-3 sm:px-3">
@@ -411,9 +425,8 @@ export default function AppointmentsManagement() {
 
           <div className="lg:col-span-4 h-full">
             <AppointmentList
-              title={`Appointment List - ${
-                selectedDate ? selectedDate.toDateString() : "All Dates"
-              }`}
+              title={`Appointment List - ${selectedDate ? selectedDate.toDateString() : "All Dates"
+                }`}
               className="col-span-1 h-full"
               searchTerm={searchTerm}
               onSearchChange={(value: string) => {

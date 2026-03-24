@@ -4,6 +4,7 @@ import { Appointment, ConcernCategory, TimeSlot } from "../types";
 import { Dropdown } from "@/components/form";
 import { useCategories } from "../hooks";
 import { useState } from "react";
+import { FormInput } from "@/components/form";
 
 interface AppointmentFormProps {
   data: Appointment;
@@ -47,14 +48,15 @@ export default function AppointmentForm({
               loading={isCategoriesLoading}
               required
             />
-            <textarea
+            <FormInput
               value={data.reason}
-              onChange={(e) => {
-                onChange("reason", e.target.value);
+              onChange={(val) => {
+                onChange("reason", val);
               }}
-              className="w-full border border-border rounded-lg p-3 h-24 resize-none bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-colors"
+              isTextarea
               placeholder="(Optional) Enter your concern or reason for appointment"
               aria-label="Appointment reason or concern"
+              label="Reason"
             />
           </div>
 

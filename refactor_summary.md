@@ -66,7 +66,7 @@ All filenames were converted to PascalCase where appropriate, and redundant nami
 - **Hook (usePageMetadata)**: Child pages now call this hook to update the global header.
 - **Loading State**: Modified `Layout` to keep the content area mounted (`display: hidden`) while a spinner is active, preventing deadlocks that stopped data fetching.
 - **Metadata Management**: Added a shallow comparison in the state update and a cleanup function to reset metadata on unmount (preventing Dashboard's stats from showing on other pages).
-- **Circular Reference Fix**: Removed `JSON.stringify` on metadata containing React nodes to prevent crashes.
+- **Circular Reference & Stability Fix**: Removed `JSON.stringify` on metadata containing React nodes. Further optimized `usePageMetadata` to only depend on primitive values, preventing infinite render loops ("Maximum update depth exceeded") caused by unstable JSX elements being passed as dependencies.
 
 ### Dynamic Routing (`App.tsx` / `routes/index.tsx`)
 - **useRoutes**: Refactored `App.tsx` to handle the nested route tree correctly.
@@ -78,3 +78,5 @@ All filenames were converted to PascalCase where appropriate, and redundant nami
 - **Z-Index and Overlays**: Fixed issues with the navigation overlay blocking content or flickering during transitions.
 - **SubHeader Stats Isolation**: Page-specific stats no longer persist after navigating to a different page.
 - **Route 404s**: Corrected nested route pathing in `routes/index.tsx` that were rendering as 404 due to the change from flat to nested architecture.
+- **Overlay Persistence**: Implemented `useEffect` in `Layout` to explicitly collapse the navigation sidebar on every route change and updated `header` logic to hide the overlay when the user is not logged in.
+- **Infinite Render Loop**: Fixed a crash in the appointments page where re-creating JSX buttons on every render was triggering a global state update loop.

@@ -16,6 +16,8 @@ import useCheckUserConsent from "@/features/consents/hooks/useCheckUserConsent";
 import { useGiveConsent } from "@/features/consents/hooks/useGiveConsent";
 import Navigation from "./Navigation";
 import SubHeader from "./SubHeader";
+import { SpeechControl } from "../shared/SpeechControl";
+import { AnimationStyles } from "../ui/animations";
 
 interface LayoutProps {
   showHeader?: boolean;
@@ -336,6 +338,8 @@ export default function Layout({
         </div>
 
         <Toast toasts={toasts} />
+        <SpeechControl />
+        <AnimationStyles />
       </div>
     </ErrorBoundary>
   );
@@ -372,15 +376,10 @@ export function usePageMetadata(metadata: Partial<PageMetadata>) {
         isLoading: false,
       });
     };
-    // We intentionally only run this when the components provide new metadata values.
-    // Using individual dependencies for simpler values is safer than stringifying or deep-comparing JSX.
   }, [
     metadata.title,
     metadata.description,
     metadata.badgeText,
-    metadata.badgeIcon,
-    metadata.headerActions,
-    metadata.headerStats,
     metadata.showDate,
     metadata.isLoading,
     setPageMetadata,
