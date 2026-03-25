@@ -215,9 +215,8 @@ export default function Layout({
   return (
     <ErrorBoundary>
       <div
-        className={`relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950 ${
-          grayscale ? "grayscale" : ""
-        }`}
+        className={`relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950 ${grayscale ? "grayscale" : ""
+          }`}
       >
         <div className="pointer-events-none absolute inset-0">
           <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.08),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.06),transparent_24%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.10),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.07),transparent_24%)]" />
@@ -234,11 +233,10 @@ export default function Layout({
 
         <div
           ref={contentRef}
-          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${
-            termsOpen
+          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${termsOpen
               ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
               : ""
-          }`}
+            }`}
         >
           <Header
             title={title}
@@ -291,7 +289,7 @@ export default function Layout({
                       <Spinner size="lg" />
                     </div>
                   ) : null}
-                  <div className={isLoading ? "hidden" : "block"}>
+                  <div className={`${isLoading ? "hidden" : "block"} h-full`}>
                     {children || <Outlet />}
                   </div>
                 </main>

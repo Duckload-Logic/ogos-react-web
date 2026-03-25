@@ -69,7 +69,7 @@ export default function Login() {
     <Layout showHeader={false} isLoggedIn={false} isLoading={isLoggingIn}>
       <section
         className={
-          "mx-auto flex w-full max-w-[1180px] " +
+          "mx-auto flex h-full w-full max-w-[1180px] " +
           "items-center justify-center " +
           "py-3 sm:py-5 lg:py-6"
         }

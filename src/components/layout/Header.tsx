@@ -1,6 +1,9 @@
 import NotificationBell from "@/features/notifications/components/NotificationBell";
 import ThemeToggle from "@/components/ui/ThemeToggle";
 import ProfileMenu from "./ProfileMenu";
+import { Settings } from "lucide-react";
+import { UISettingsModal } from "@/components/shared/UISettingsModal";
+import { useState } from "react";
 
 const LOGO_SRC = "/logo.svg";
 
@@ -28,6 +31,7 @@ export default function Header({
   isLoggedIn = true,
 }: HeaderProps) {
   const { darkMode, setDarkMode } = useUI();
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
     <header className="h-20 flex items-center justify-between px-6 bg-gradient-to-t from-primary/80 via-primary to-primary backdrop-blur-lg sticky top-0 z-30">
@@ -61,6 +65,13 @@ export default function Header({
           showNotifications={showNotifications}
           setShowNotifications={setShowNotifications}
         /> */}
+        {/* <button
+          onClick={() => setSettingsOpen(true)}
+          className="p-2 hover:bg-muted/30 rounded-lg transition-colors duration-300 text-primary-foreground"
+          aria-label="UI Settings"
+        >
+          <Settings size={18} />
+        </button> */}
         <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
         {isLoggedIn && (
           <div className="hidden md:block">
@@ -75,6 +86,10 @@ export default function Header({
           </div>
         )}
       </div>
+      <UISettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
+      />
     </header>
   );
 }

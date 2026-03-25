@@ -23,8 +23,19 @@ export const Spinner: React.FC<SpinnerProps> = ({
 
   const { container, cube } = sizeClasses[size];
 
+  // Delay for 10 seconds
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      console.warn(
+        "Spinner has been active for 10 seconds. Check for potential issues.",
+      );
+    }, 10000);
+
+    return () => clearTimeout(timer);
+  }, []);
+
   return (
-    <div className="flex flex-col items-center justify-center gap-4 h-full w-full">
+    <div className="flex flex-col items-center justify-center gap-4 h-full w-full bg-background">
       <style
         dangerouslySetInnerHTML={{
           __html: `

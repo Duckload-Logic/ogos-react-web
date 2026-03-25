@@ -101,10 +101,17 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     title: "",
   });
 
-  // Re-initialize state whenever user changes
+  // Re-initialize state whenever user changes or on mount
   useEffect(() => {
-    if (!isLoading && userId) {
-      const getPref = (key: string, def: string) => localStorage.getItem(`${key}-${userId}`) || localStorage.getItem(key) || def;
+    if (!isLoading) {
+      const getPref = (key: string, def: string) => {
+        // Priority: User-specific > Global (Guest) > Default
+        if (userId) {
+          const userPref = localStorage.getItem(`${key}-${userId}`);
+          if (userPref !== null) return userPref;
+        }
+        return localStorage.getItem(key) || def;
+      };
 
       setSidebarPinnedInternal(getPref(STORAGE_KEYS.SIDEBAR_EXPANDED, "false") === "true");
       setDarkModeInternal(getPref(STORAGE_KEYS.DARK_MODE, "light") === "dark");
@@ -113,15 +120,6 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       setFontScaleInternal(parseInt(getPref(STORAGE_KEYS.FONT_SCALE, "100"), 10));
       setSpeechRateState(parseFloat(getPref(STORAGE_KEYS.SPEECH_RATE, "1")));
       setSpeechVoiceState(getPref(STORAGE_KEYS.SPEECH_VOICE, ""));
-    } else if (!isLoading && !userId) {
-      // Reset to defaults on logout
-      setSidebarPinnedInternal(false);
-      setDarkModeInternal(false);
-      setGrayscaleInternal(false);
-      setDyslexiaModeInternal(false);
-      setFontScaleInternal(100);
-      setSpeechRateState(1);
-      setSpeechVoiceState("");
     }
   }, [isLoading, userId]);
 
@@ -137,41 +135,52 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const setDarkMode = useCallback((value: boolean) => {
     setDarkModeInternal(value);
+    const val = value ? "dark" : "light";
+    localStorage.setItem(STORAGE_KEYS.DARK_MODE, val);
     if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.DARK_MODE}-${userId}`, value ? "dark" : "light");
+      localStorage.setItem(`${STORAGE_KEYS.DARK_MODE}-${userId}`, val);
     }
   }, [userId]);
 
   const setGrayscale = useCallback((value: boolean) => {
     setGrayscaleInternal(value);
+    const val = String(value);
+    localStorage.setItem(STORAGE_KEYS.GRAYSCALE, val);
     if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.GRAYSCALE}-${userId}`, String(value));
+      localStorage.setItem(`${STORAGE_KEYS.GRAYSCALE}-${userId}`, val);
     }
   }, [userId]);
 
   const setDyslexiaMode = useCallback((value: boolean) => {
     setDyslexiaModeInternal(value);
+    const val = String(value);
+    localStorage.setItem(STORAGE_KEYS.DYSLEXIA, val);
     if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.DYSLEXIA}-${userId}`, String(value));
+      localStorage.setItem(`${STORAGE_KEYS.DYSLEXIA}-${userId}`, val);
     }
   }, [userId]);
 
   const setFontScale = useCallback((value: number) => {
     setFontScaleInternal(value);
+    const val = String(value);
+    localStorage.setItem(STORAGE_KEYS.FONT_SCALE, val);
     if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.FONT_SCALE}-${userId}`, String(value));
+      localStorage.setItem(`${STORAGE_KEYS.FONT_SCALE}-${userId}`, val);
     }
   }, [userId]);
 
   const setSpeechRate = useCallback((rate: number) => {
     setSpeechRateState(rate);
+    const val = String(rate);
+    localStorage.setItem(STORAGE_KEYS.SPEECH_RATE, val);
     if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.SPEECH_RATE}-${userId}`, String(rate));
+      localStorage.setItem(`${STORAGE_KEYS.SPEECH_RATE}-${userId}`, val);
     }
   }, [userId]);
 
   const setSpeechVoice = useCallback((voice: string) => {
     setSpeechVoiceState(voice);
+    localStorage.setItem(STORAGE_KEYS.SPEECH_VOICE, voice);
     if (userId) {
       localStorage.setItem(`${STORAGE_KEYS.SPEECH_VOICE}-${userId}`, voice);
     }
@@ -180,6 +189,36 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   const toggleSidebarPinned = useCallback(() => {
     setSidebarPinned((prev) => !prev);
   }, [setSidebarPinned]);
+
+  // Apply UI preferences to document root
+  useEffect(() => {
+    const root = document.documentElement;
+
+    // Dark Mode
+    if (darkMode) {
+      root.classList.add("dark");
+    } else {
+      root.classList.remove("dark");
+    }
+
+    // Grayscale
+    if (grayscale) {
+      root.style.filter = "grayscale(100%)";
+    } else {
+      root.style.filter = "";
+    }
+
+    // Dyslexia Mode
+    if (dyslexiaMode) {
+      root.classList.add("dyslexic-mode");
+    } else {
+      root.classList.remove("dyslexic-mode");
+    }
+
+    // Font Scale
+    root.style.fontSize = `${(fontScale / 100) * 16}px`;
+
+  }, [darkMode, grayscale, dyslexiaMode, fontScale]);
 
   return (
     <UIContext.Provider
