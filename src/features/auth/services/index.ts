@@ -6,7 +6,6 @@
 import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
 import { API_ROUTES } from "@/config/apiRoutes";
 import type {
-  IDPAuthorizeResponse,
   IDPTokenExchangeRequest,
   IDPTokenExchangeResponse,
 } from "../types/idp";
@@ -49,29 +48,6 @@ export interface UserProfile {
   type: string;
   createdAt: string;
 }
-
-/**
- * Fetches the IDP authorization URL for OAuth 2.0 flow
- * @param config - Optional axios config with metadata
- * @returns Promise resolving to authorization URL response
- * @throws Error if request fails
- */
-export const GetIDPAuthorize = async (
-  config?: AxiosConfigWithMeta,
-): Promise<IDPAuthorizeResponse> => {
-  try {
-    const { data } = await apiClient.get(
-      API_ROUTES.auth.idpAuthorizeUrl,
-      config,
-    );
-    return data;
-  } catch (error) {
-    console.error(
-      `[GetIDPAuthorize] {Fetch Auth URL}: ${error}`,
-    );
-    throw error;
-  }
-};
 
 /**
  * Exchanges authorization code for access tokens

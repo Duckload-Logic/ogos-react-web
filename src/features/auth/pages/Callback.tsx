@@ -49,9 +49,7 @@ export default function Callback() {
         // Handle IDP error response
         if (errorParam) {
           const errorDesc = searchParams.get("error_description");
-          console.error(
-            `[AuthCallback] {IDP Error}: ${errorParam}`,
-          );
+          console.error(`[AuthCallback] {IDP Error}: ${errorParam}`);
           setError(errorDesc || IDP_ERROR_MESSAGES.MISSING_CODE);
           setIsLoading(false);
           return;
@@ -63,9 +61,7 @@ export default function Callback() {
         // Use returned data if available (OAuth)
         if (!isNative) {
           if (!code) {
-            console.error(
-              "[AuthCallback] {Extract Params}: missing code",
-            );
+            console.error("[AuthCallback] {Extract Params}: missing code");
             setError(IDP_ERROR_MESSAGES.MISSING_CODE);
             setIsLoading(false);
             return;
@@ -73,16 +69,16 @@ export default function Callback() {
 
           // Exchange code for tokens (OAuth only)
           const response = await PostIDPTokenExchange({ code });
-          
+
           // Synchronize AuthContext state before proceeding
           await refresh();
-          
+
           roleKey = response.role.toLowerCase().replace(" ", "");
         } else {
           // Synchronize AuthContext state (Native already refetched in Login.tsx
           // but we call it anyway for robustness)
           await refresh();
-          
+
           // Fetch user profile to determine role (Native only)
           const user = await GetCurrentUser();
           if (!user.roles || user.roles.length === 0) {
@@ -91,18 +87,18 @@ export default function Callback() {
           roleKey = user.roles[0]?.toLowerCase().replace(" ", "");
         }
 
-        const dashboardRoute = (ROLE_ROUTES_INTERNAL as Record<string, string>)[roleKey];
+        const dashboardRoute = (ROLE_ROUTES_INTERNAL as Record<string, string>)[
+          roleKey
+        ];
 
         if (!dashboardRoute) {
           console.error(
-            `[AuthCallback] {Route User}: ` +
-            `unknown role ${roleKey}`,
+            `[AuthCallback] {Route User}: ` + `unknown role ${roleKey}`,
           );
           setError(IDP_ERROR_MESSAGES.UNKNOWN_ROLE);
           setIsLoading(false);
           return;
         }
-
 
         // Navigate to dashboard with replace
         navigate(dashboardRoute, { replace: true });
@@ -112,9 +108,7 @@ export default function Callback() {
             ? err.message
             : IDP_ERROR_MESSAGES.TOKEN_EXCHANGE_FAILED;
 
-        console.error(
-          `[AuthCallback] {Process Callback}: ${err}`,
-        );
+        console.error(`[AuthCallback] {Process Callback}: ${err}`);
 
         setError(errorMessage);
         setIsLoading(false);
@@ -181,7 +175,8 @@ export default function Callback() {
                   <span className="h-1.5 w-1.5 rounded-full bg-primary animate-bounce" />
                 </div>
                 <p className="max-w-[240px] text-sm leading-relaxed text-muted-foreground/80">
-                  Securely authenticating your credentials. Please wait a moment.
+                  Securely authenticating your credentials. Please wait a
+                  moment.
                 </p>
               </div>
             </div>
@@ -202,7 +197,22 @@ export default function Callback() {
       <div className="relative flex min-h-screen items-center justify-center bg-[hsl(var(--background))] p-6">
         <div className="w-full max-w-md overflow-hidden rounded-[32px] border border-destructive/20 bg-destructive/5 p-10 shadow-2xl backdrop-blur-xl">
           <div className="mb-6 flex h-16 w-16 items-center justify-center rounded-2xl bg-destructive/10 text-destructive">
-            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" className="lucide lucide-alert-circle"><circle cx="12" cy="12" r="10" /><line x1="12" x2="12" y1="8" y2="12" /><line x1="12" x2="12.01" y1="16" y2="16" /></svg>
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="32"
+              height="32"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="lucide lucide-alert-circle"
+            >
+              <circle cx="12" cy="12" r="10" />
+              <line x1="12" x2="12" y1="8" y2="12" />
+              <line x1="12" x2="12.01" y1="16" y2="16" />
+            </svg>
           </div>
 
           <h2 className="mb-3 text-2xl font-bold tracking-tight text-foreground">
@@ -210,7 +220,8 @@ export default function Callback() {
           </h2>
 
           <p className="mb-8 text-sm leading-relaxed text-muted-foreground">
-            {error || "An unexpected error occurred during authentication. Please try logging in again."}
+            {error ||
+              "An unexpected error occurred during authentication. Please try logging in again."}
           </p>
 
           <button

@@ -94,13 +94,12 @@ export default function Layout({
   const excludedPaths = ["/terms", "/privacy"];
   const currentPath = location.pathname;
   const isExcluded = excludedPaths.includes(currentPath);
-  const mustAcceptTerms = !sessionAccepted && !isExcluded && !!user && isLoggedIn;
+  const mustAcceptTerms =
+    !sessionAccepted && !isExcluded && !!user && isLoggedIn;
 
   useEffect(() => {
     setTermsOpen(mustAcceptTerms);
   }, [mustAcceptTerms]);
-
-
 
   const [showNotifications, setShowNotifications] = useState(false);
   const [toasts, setToasts] = useState<string[]>([]);
@@ -236,19 +235,21 @@ export default function Layout({
         <div
           ref={contentRef}
           className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${
-            termsOpen ? "pointer-events-none select-none opacity-40 grayscale-[0.5]" : ""
+            termsOpen
+              ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
+              : ""
           }`}
         >
-        <Header
-          title={title}
-          user={user}
-          role={currentRole}
-          handleLogout={handleLogout}
-          getRoleLabel={getRoleLabel}
-          showNotifications={showNotifications}
-          setShowNotifications={setShowNotifications}
-          isLoggedIn={isLoggedIn}
-        />
+          <Header
+            title={title}
+            user={user}
+            role={currentRole}
+            handleLogout={handleLogout}
+            getRoleLabel={getRoleLabel}
+            showNotifications={showNotifications}
+            setShowNotifications={setShowNotifications}
+            isLoggedIn={isLoggedIn}
+          />
 
           <NotificationModal
             showNotifications={showNotifications}
@@ -268,10 +269,10 @@ export default function Layout({
             )}
 
             <div className="relative min-w-0 flex-1 overflow-hidden">
-              <div
+              {/* <div
                 className="absolute inset-0 z-0 bg-[url('/src/assets/images/bg.png')]
                bg-cover bg-center bg-no-repeat opacity-[0.15] dark:opacity-10 transform-gpu"
-              />
+              /> */}
               <div className="relative z-10 flex h-full flex-col overflow-x-hidden overflow-y-auto">
                 <main className="flex-1 p-4 md:p-6 lg:p-8">
                   {showHeader && (

@@ -4,8 +4,8 @@
  */
 
 import { useState } from "react";
-import { GetIDPAuthorize } from "../services";
-import { IDP_BUTTON_TEXT, IDP_ERROR_MESSAGES } from "../types/idp";
+import { API_ROUTES } from "@/config/apiRoutes";
+import { IDP_BUTTON_TEXT } from "../types/idp";
 
 /**
  * Props for IDPLoginButton component
@@ -46,29 +46,15 @@ export const IDPLoginButton: React.FC<IDPLoginButtonProps> = ({
    * Handles button click to initiate OAuth flow
    * Fetches authorization URL and redirects to IDP
    */
-  const handleLogin = async () => {
+  const handleLogin = () => {
     setIsLoading(true);
 
-    try {
-      const response = await GetIDPAuthorize();
+    // Get API Base URL from environment
+    const apiBaseUrl = import.meta.env.VITE_API_BASE_URL;
 
-      // Redirect to IDP authorization URL
-      window.location.href = response.authorizationUrl;
-    } catch (error) {
-      setIsLoading(false);
-
-      const errorMessage = error instanceof Error
-        ? error.message
-        : IDP_ERROR_MESSAGES.AUTHORIZATION_FAILED;
-
-      console.error(
-        `[IDPLoginButton] {Fetch Authorization URL}: ${error}`,
-      );
-
-      if (onError) {
-        onError(errorMessage);
-      }
-    }
+    // Navigate directly to backend authorization endpoint
+    // This allows the backend to perform a direct 302 redirect to the IDP
+    window.location.assign(`${apiBaseUrl}${API_ROUTES.auth.idpAuthorizeUrl}`);
   };
 
   return (
@@ -78,11 +64,7 @@ export const IDPLoginButton: React.FC<IDPLoginButtonProps> = ({
       disabled={disabled || isLoading}
       className={className}
       aria-busy={isLoading}
-      aria-label={
-        isLoading
-          ? IDP_BUTTON_TEXT.LOADING
-          : IDP_BUTTON_TEXT.LOGIN
-      }
+      aria-label={isLoading ? IDP_BUTTON_TEXT.LOADING : IDP_BUTTON_TEXT.LOGIN}
     >
       {isLoading ? IDP_BUTTON_TEXT.LOADING : IDP_BUTTON_TEXT.LOGIN}
     </button>

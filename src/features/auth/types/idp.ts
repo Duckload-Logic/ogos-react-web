@@ -1,15 +1,6 @@
 /**
  * IDP (Identity Provider) OAuth 2.0 Type Definitions
- * Types for OAuth 2.0 Authorization Code flow with PKCE
  */
-
-/**
- * Response from GET /auth/idp/authorize-url endpoint
- * Contains the authorization URL to redirect user to IDP
- */
-export interface IDPAuthorizeResponse {
-  authorizationUrl: string;
-}
 
 /**
  * Request payload for POST /auth/idp/token endpoint
