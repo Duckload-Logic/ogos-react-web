@@ -164,7 +164,7 @@ export default function Navigation({
 
     return (
       <>
-        <nav className="sticky   bg-background border-t shrink-0 z-50">
+        <nav className="fixed bg-background border-t shrink-0 z-50">
           <div className="flex items-center justify-around h-16 px-2">
             {homeItem && (
               <NavItem
