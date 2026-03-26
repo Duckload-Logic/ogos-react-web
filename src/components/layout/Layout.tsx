@@ -165,7 +165,7 @@ export default function Layout({
   }, [location.pathname, sidebarHovered, setSidebarHovered]);
 
   const currentRole: string =
-    user?.roles.map((r) => {
+    user?.roles?.map((r) => {
       const key = r.toLowerCase().replace(" ", "");
       if (key === "superadmin") return "superadmin";
       if (key === "admin") return "admin";

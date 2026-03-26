@@ -35,7 +35,7 @@ export const Spinner: React.FC<SpinnerProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 h-full w-full bg-background">
+    <div className="flex flex-col items-center justify-center gap-4 h-full w-full bg-transparent">
       <style
         dangerouslySetInnerHTML={{
           __html: `

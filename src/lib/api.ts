@@ -1,7 +1,4 @@
-import axios, {
-  AxiosError,
-  InternalAxiosRequestConfig,
-} from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { decamelizeKeys, camelizeKeys } from "humps";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
@@ -49,20 +46,27 @@ apiClient.interceptors.response.use(
       response.headers["content-type"]?.includes("application/json")
     ) {
       response.data = camelizeKeys(response.data);
+
+      // Handle JSend 'success' pattern: unwrap 'data' payload
+      if (
+        response.data &&
+        typeof response.data === "object" &&
+        response.data.status === "success" &&
+        response.data.data !== undefined
+      ) {
+        response.data = response.data.data;
+      }
     }
     return response;
   },
   async (error: AxiosError) => {
     const originalRequest = error.config as AxiosConfigWithMeta;
-    const handlerName =
-      originalRequest?.handlerName || "Unknown";
+    const handlerName = originalRequest?.handlerName || "Unknown";
     const stepName = originalRequest?.stepName || "Request";
     const errorMsg = error.message || "Unknown error";
 
     // Log the error with precision format
-    console.error(
-      `[${handlerName}] {${stepName}}: ${errorMsg}`,
-    );
+    console.error(`[${handlerName}] {${stepName}}: ${errorMsg}`);
 
     // Only attempt refresh if:
     // - status is 401 (Unauthorized)
@@ -89,8 +93,7 @@ apiClient.interceptors.response.use(
         // to handle session expiration and redirect
         const refreshErr = refreshError as AxiosError;
         console.error(
-          `[${handlerName}] {Token Refresh}: ` +
-            `${refreshErr.message}`,
+          `[${handlerName}] {Token Refresh}: ` + `${refreshErr.message}`,
         );
         // CRITICAL: Return rejected promise so useMe
         // query transitions to "error" state

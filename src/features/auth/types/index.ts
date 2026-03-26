@@ -4,7 +4,6 @@
  */
 
 export type {
-  IDPAuthorizeResponse,
   IDPTokenExchangeRequest,
   IDPTokenExchangeResponse,
 } from "./idp";
