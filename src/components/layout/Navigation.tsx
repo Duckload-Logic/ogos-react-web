@@ -54,8 +54,8 @@ function NavItem({
         to={item.href}
         onClick={onClick}
         className={`flex items-center gap-3 p-4 rounded-xl transition-colors ${active
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted/50 hover:bg-muted"
+          ? "bg-primary text-primary-foreground"
+          : "bg-muted/50 hover:bg-muted"
           }`}
       >
         <div className="w-6 h-6 flex items-center justify-center">
@@ -100,12 +100,14 @@ export default function Navigation({
   location,
   user,
   handleLogout,
+  role,
   roleLabel,
 }: {
   navigationItems: any[];
   location: any;
   user: any;
   handleLogout: () => void;
+  role: string;
   roleLabel: string;
 }) {
   const {
@@ -187,8 +189,8 @@ export default function Navigation({
                 setOpenDrawer(true);
               }}
               className={`flex flex-col items-center p-2 group ${location.pathname.includes(SETTINGS_HREF)
-                  ? "text-primary"
-                  : "text-muted-foreground"
+                ? "text-primary"
+                : "text-muted-foreground"
                 }`}
             >
               <Settings className="w-6 h-6 group-hover:rotate-45 transition-transform" />
@@ -218,6 +220,7 @@ export default function Navigation({
             ) : (
               <MobileSettingsContent
                 user={user}
+                role={role}
                 roleLabel={roleLabel}
                 onLogout={handleLogout}
                 closeDrawer={() => setOpenDrawer(false)}
@@ -278,6 +281,7 @@ export default function Navigation({
 
 function MobileSettingsContent({
   user,
+  role,
   roleLabel,
   onLogout,
   closeDrawer,
@@ -289,7 +293,7 @@ function MobileSettingsContent({
       {/* Profile Section */}
       <div
         onClick={() => {
-          navigate(`/${roleLabel}/profile`);
+          navigate(`/${role}/profile`);
           closeDrawer();
         }}
         className="flex items-center gap-4 p-2 cursor-pointer hover:bg-muted/50 rounded-xl transition"

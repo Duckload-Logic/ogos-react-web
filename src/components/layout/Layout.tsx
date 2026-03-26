@@ -227,8 +227,8 @@ export default function Layout({
         <div
           ref={contentRef}
           className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${termsOpen
-              ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
-              : ""
+            ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
+            : ""
             }`}
         >
           <Header
@@ -254,6 +254,7 @@ export default function Layout({
                 location={location}
                 user={user}
                 handleLogout={handleLogout}
+                role={currentRole}
                 roleLabel={getRoleLabel()}
               />
             )}
