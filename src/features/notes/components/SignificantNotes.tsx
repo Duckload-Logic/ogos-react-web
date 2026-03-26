@@ -16,16 +16,16 @@ import InfoItem from "@/features/iir/components/profile/InfoItem";
 import SectionTitle from "@/features/iir/components/profile/SectionTitle";
 import { NOT_SPECIFIED } from "@/features/iir/constants";
 import { Spinner } from "@/components/shared";
+import { useToast } from "@/context";
 
 interface SignificantNotesProps {
   iirId: string;
-  onToast: (message: string) => void;
 }
 
 export default function SignificantNotes({
   iirId,
-  onToast,
 }: SignificantNotesProps) {
+  const { triggerToast } = useToast();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { data: notes, isLoading, isError } = useStudentNotes(iirId);
@@ -34,13 +34,13 @@ export default function SignificantNotes({
     iirId,
     () => {
       setIsModalOpen(false);
-      onToast("✓ Note saved successfully!");
+      triggerToast("✓ Note saved successfully!");
     },
     (error) => {
       const errorMessage =
         error?.response?.data?.error ||
         "Failed to save note. Please try again.";
-      onToast(errorMessage);
+      triggerToast(errorMessage);
     },
   );
 
