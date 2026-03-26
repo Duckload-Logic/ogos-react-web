@@ -3,13 +3,11 @@ import { Calendar, FileText, BarChart3, Bell, X } from "lucide-react";
 interface Props {
   showNotifications: boolean;
   setShowNotifications: (value: boolean) => void;
-  toasts: string[];
 }
 
 export default function NotificationModal({
   showNotifications,
   setShowNotifications,
-  toasts,
 }: Props) {
   if (!showNotifications) return null;
 
@@ -90,18 +88,6 @@ export default function NotificationModal({
             View All Notifications
           </button>
         </div>
-      </div>
-
-      <div className="fixed top-6 right-6 z-[99999] flex flex-col gap-3">
-        {toasts.map((toast, index) => (
-          <div
-            key={index}
-            className="bg-card border border-border shadow-xl rounded-xl px-5 py-3 text-sm flex items-center gap-3 animate-in slide-in-from-right fade-in zoom-in-95 duration-300"
-          >
-            <Bell size={16} className="text-primary" />
-            {toast}
-          </div>
-        ))}
       </div>
     </div>
   );
