@@ -8,7 +8,7 @@ import { Spinner } from "@/components/shared/Spinner";
 import React, { useMemo, useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate, Outlet } from "react-router-dom";
 
-import { useAuth, useUI, PageMetadata } from "@/context";
+import { useAuth, useUI, PageMetadata, useToast } from "@/context";
 import { ErrorBoundary } from "../shared/ErrorBoundary";
 import ConsentModal from "@/features/consents/components/ConsentModal";
 import { useGetLatestStatement } from "@/features/consents/hooks";
@@ -102,19 +102,12 @@ export default function Layout({
   }, [mustAcceptTerms]);
 
   const [showNotifications, setShowNotifications] = useState(false);
-  const [toasts, setToasts] = useState<string[]>([]);
+  const { toasts, triggerToast } = useToast();
   const [termsOpen, setTermsOpen] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
   const expanded = isExpanded;
 
-  const triggerToast = (message: string) => {
-    setToasts((prev) => [...prev, message]);
-
-    setTimeout(() => {
-      setToasts((prev) => prev.slice(1));
-    }, 4000);
-  };
 
   useEffect(() => {
     if (darkMode) {
@@ -252,7 +245,6 @@ export default function Layout({
           <NotificationModal
             showNotifications={showNotifications}
             setShowNotifications={setShowNotifications}
-            toasts={toasts}
           />
 
           <div className="flex flex-col-reverse md:flex-row min-h-0 w-full flex-1 bg-[radial-gradient(circle_at_bottom_left,rgba(220,38,38,0.1),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.1),transparent_28%)]">
