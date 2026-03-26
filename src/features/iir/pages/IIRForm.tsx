@@ -12,11 +12,11 @@ import { EMPTY_IIR_FORM } from "@/features/iir/constants";
 import { Spinner } from "@/components/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import Layout, { usePageMetadata } from "@/components/layout/Layout";
+import { useToast } from "@/context";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { HeroSection } from "@/components/ui/hero-section";
 import { AnimationStyles } from "@/components/ui/animations";
-import Toast from "@/components/ui/Toast";
 import {
   AlertDialog,
   AlertDialogContent,
@@ -104,7 +104,7 @@ export default function IIRForm() {
   const [sectionsWithErrors, setSectionsWithErrors] = useState<number[]>([]);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [draftData, setDraftData] = useState<IIRFormType | null>(null);
-  const [toasts, setToasts] = useState<string[]>([]);
+  const { triggerToast } = useToast();
 
   // Modal error state
   const [isErrorModalOpen, setIsErrorModalOpen] = useState(false);
@@ -195,12 +195,6 @@ export default function IIRForm() {
     }
   };
 
-  const addToast = (message: string, duration: number = 3000) => {
-    setToasts((prev) => [...prev, message]);
-    setTimeout(() => {
-      setToasts((prev) => prev.filter((_, i) => i !== prev.length - 1));
-    }, duration);
-  };
 
   const isLoading =
     isInitializing || isLoadingDraft || isSubmitting || isSaving;
@@ -299,7 +293,7 @@ export default function IIRForm() {
         setTotalErrors(total);
         setIsErrorModalOpen(true);
       } else if (validationResult.incompleteCompletionSections.length > 0) {
-        addToast("Please complete all sections before submitting.");
+        triggerToast("Please complete all sections before submitting.");
         if (
           !validationResult.incompleteCompletionSections.includes(
             currentSection,
@@ -308,7 +302,7 @@ export default function IIRForm() {
           setCurrentSection(validationResult.incompleteCompletionSections[0]);
         }
       } else {
-        addToast("Please fix errors before submitting.");
+        triggerToast("Please fix errors before submitting.");
         if (!validationResult.sectionsWithErrors.includes(currentSection)) {
           setCurrentSection(validationResult.sectionsWithErrors[0]);
         }
@@ -324,7 +318,7 @@ export default function IIRForm() {
 
   const handleLegalConsentAccept = async () => {
     if (!localFormData) {
-      addToast("Form data is missing. Please try again.");
+      triggerToast("Form data is missing. Please try again.");
       return;
     }
 
@@ -339,7 +333,7 @@ export default function IIRForm() {
 
       // Success
       setShowConsentDialog(false);
-      addToast("✓ Form submitted successfully!");
+      triggerToast("✓ Form submitted successfully!");
       setShowSuccessPopup(true);
 
       setTimeout(() => {
@@ -350,7 +344,7 @@ export default function IIRForm() {
       const errorMessage =
         err?.response?.data?.error ||
         "Failed to submit form. Please try again.";
-      addToast(errorMessage);
+      triggerToast(errorMessage);
     } finally {
       setIsSaving(false);
     }
@@ -365,7 +359,7 @@ export default function IIRForm() {
     setLocalFormData(resetData);
     setShowResetConfirm(false);
     resetTouched(); // Clear touched state on reset
-    addToast("Form reset.");
+    triggerToast("Form reset.");
   };
 
   const currentSectionDef = FORM_SECTIONS.find((s) => s.id === currentSection);
@@ -437,7 +431,6 @@ export default function IIRForm() {
               calculateCompletion={(sectionIndex: number) =>
                 calculateSectionCompletion(sectionIndex, localFormData ?? null)
               }
-              onToast={addToast}
               lastSaved={lastSaved}
             />
 
@@ -620,8 +613,6 @@ export default function IIRForm() {
           onNavigateToSection={(id) => setCurrentSection(id)}
         />
 
-        {/* Notification Toast Layer */}
-        <Toast toasts={toasts} />
       </div>
     </>
   );

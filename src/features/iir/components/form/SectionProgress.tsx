@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { Check, AlertCircle, ChevronDown, Lock } from "lucide-react";
+import { useToast } from "@/context";
 
 interface Section {
   id: number;
@@ -14,7 +15,6 @@ interface SectionProgressProps {
   visitedSections: number[];
   onNavigate: (sectionId: number) => void;
   calculateCompletion?: (sectionId: number) => number;
-  onToast?: (message: string) => void;
   lastSaved?: string;
 }
 
@@ -25,9 +25,9 @@ export function SectionProgress({
   visitedSections,
   onNavigate,
   calculateCompletion,
-  onToast,
   lastSaved,
 }: SectionProgressProps) {
+  const { triggerToast } = useToast();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [shakingSection, setShakingSection] = useState<number | null>(null);
 
@@ -82,7 +82,7 @@ export function SectionProgress({
       onNavigate(id);
     } else {
       setShakingSection(id);
-      if (onToast) onToast("Please complete the current section first.");
+      triggerToast("Please complete the current section first.");
       setTimeout(() => setShakingSection(null), 300);
     }
   };
