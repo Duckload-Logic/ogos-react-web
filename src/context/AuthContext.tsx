@@ -24,7 +24,7 @@ interface AuthContextType {
   refresh: () => Promise<void>;
 }
 
-const AuthContext = createContext<
+export const AuthContext = createContext<
   AuthContextType | undefined
 >(undefined);
 
@@ -131,19 +131,3 @@ export const AuthProvider: React.FC<{
   );
 };
 
-/**
- * Hook to access authentication context
- * Must be used within AuthProvider
- *
- * @returns Authentication context value
- * @throws Error if used outside AuthProvider
- */
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error(
-      "useAuth must be used within an AuthProvider",
-    );
-  }
-  return context;
-};

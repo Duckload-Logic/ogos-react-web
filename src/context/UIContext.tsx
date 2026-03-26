@@ -1,4 +1,4 @@
-import { useAuth } from "@/context/AuthContext";
+import { AuthContext } from "@/context/AuthContext";
 import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
 
 export interface PageMetadata {
@@ -37,7 +37,7 @@ interface UIContextType {
   setSpeechVoice: (voice: string) => void;
 }
 
-const UIContext = createContext<UIContextType | undefined>(undefined);
+export const UIContext = createContext<UIContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
   SIDEBAR_EXPANDED: "sidebar_expanded",
@@ -52,7 +52,9 @@ const STORAGE_KEYS = {
 export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   children,
 }) => {
-  const { user, isLoading } = useAuth();
+  const authContext = useContext(AuthContext);
+  const user = authContext?.user;
+  const isLoading = authContext?.isLoading;
   const userId = user?.id;
 
   const [sidebarPinned, setSidebarPinnedInternal] = useState(false);
@@ -250,10 +252,3 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   );
 };
 
-export const useUI = () => {
-  const context = useContext(UIContext);
-  if (!context) {
-    throw new Error("useUI must be used within a UIProvider");
-  }
-  return context;
-};
