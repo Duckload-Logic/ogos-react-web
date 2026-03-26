@@ -18,7 +18,7 @@ interface HeaderProps {
   isLoggedIn: boolean;
 }
 
-import { useUI } from "@/context/UIContext";
+import { useUI } from "@/context";
 
 export default function Header({
   title,

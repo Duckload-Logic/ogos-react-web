@@ -6,7 +6,7 @@ import {
   Type,
   Volume2,
 } from "lucide-react";
-import { useUI } from "@/context/UIContext";
+import { useUI } from "@/context";
 import { Slider } from "@/components/ui/slider";
 
 interface UISettingsModalProps {

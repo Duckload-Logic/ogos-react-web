@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { X, Settings as SettingsIcon, MousePointer2, Ear, AudioLines } from "lucide-react";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useIsMobile } from "@/hooks/useIsMobile";
-import { useUI } from "@/context/UIContext";
+import { useUI } from "@/context";
 
 export const SpeechControl: React.FC = () => {
   const isMobile = useIsMobile();
