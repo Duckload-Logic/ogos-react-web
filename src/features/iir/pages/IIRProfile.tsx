@@ -21,7 +21,7 @@ export default function IIRProfile() {
     data: sessionIir,
     isLoading: isSessionIirLoading,
     isFetched: isSessionIirFetched,
-  } = useUserIIR(!targetRecordId && me?.id ? me.id : "");
+  } = useUserIIR(targetRecordId || me?.id || undefined);
 
   const finalIirId = targetRecordId || sessionIir?.id;
 
@@ -45,7 +45,7 @@ export default function IIRProfile() {
 
   const isAdminOrSuper = me?.roles?.some((r) => {
     const role = r.toLowerCase().replace(/\s+/g, "");
-    return role === "admin" || role === "superadmin";
+    return role === "admin";
   });
 
   usePageMetadata({

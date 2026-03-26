@@ -1,5 +1,9 @@
 import { useQuery } from "@tanstack/react-query";
-import { GetIIRByUserId, GetIIRResource, GetStudents } from "../services/service";
+import {
+  GetIIRByUserId,
+  GetIIRResource,
+  GetStudents,
+} from "../services/service";
 import { useMe } from "@/features/users/hooks/useMe";
 import { QUERY_KEYS } from "@/config/queryKeys";
 import { CACHE_TIMING } from "@/config/constants";
@@ -30,15 +34,20 @@ export function useIIRStatus() {
  * Hook to fetch a specific user's IIR record
  */
 export function useUserIIR(userID?: string) {
+  console.debug("useUserIIR called with userID:", userID);
+
   return useQuery({
-    queryKey: QUERY_KEYS.iir.inventory.byUserId(userID || ""),
+    queryKey: QUERY_KEYS.iir.inventory.byUserId(userID ?? ""),
     queryFn: async () => {
-      if (!userID) return null;
-      return GetIIRByUserId(userID);
+      console.debug("Fetching IIR for userID:", userID);
+      return GetIIRByUserId(userID as string);
     },
     staleTime: CACHE_TIMING.LONG.staleTime,
     gcTime: CACHE_TIMING.LONG.gcTime,
-    enabled: !!userID,
+    enabled: Boolean(userID),
+    refetchOnMount: "always",
+    refetchOnReconnect: "always",
+    refetchOnWindowFocus: "always",
   });
 }
 
