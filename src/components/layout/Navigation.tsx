@@ -38,9 +38,8 @@ function NavItem({
       <Link
         to={item.href}
         onClick={onClick}
-        className={`flex flex-col items-center p-2 group ${
-          active ? "text-primary" : "text-muted-foreground"
-        }`}
+        className={`flex flex-col items-center p-2 group ${active ? "text-primary" : "text-muted-foreground"
+          }`}
       >
         <div className="w-6 h-6 flex items-center justify-center transition-transform group-hover:scale-110">
           {item.icon}
@@ -54,11 +53,10 @@ function NavItem({
       <Link
         to={item.href}
         onClick={onClick}
-        className={`flex items-center gap-3 p-4 rounded-xl transition-colors ${
-          active
+        className={`flex items-center gap-3 p-4 rounded-xl transition-colors ${active
             ? "bg-primary text-primary-foreground"
             : "bg-muted/50 hover:bg-muted"
-        }`}
+          }`}
       >
         <div className="w-6 h-6 flex items-center justify-center">
           {item.icon}
@@ -75,11 +73,10 @@ function NavItem({
       onClick={onClick}
       className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3
       transition-all duration-200 hover:shadow-sm
-      ${
-        active
+      ${active
           ? "bg-primary text-primary-foreground shadow-sm"
           : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-      }`}
+        }`}
     >
       <div
         className={`flex items-center justify-center min-w-[24px] transition-transform duration-200
@@ -164,7 +161,7 @@ export default function Navigation({
 
     return (
       <>
-        <nav className="fixed bg-background border-t shrink-0 z-50">
+        <nav className="fixt bottom-0 w-full bg-background border-t shrink-0 z-50">
           <div className="flex items-center justify-around h-16 px-2">
             {homeItem && (
               <NavItem
@@ -179,9 +176,8 @@ export default function Navigation({
                 setDrawerMode("menu");
                 setOpenDrawer(true);
               }}
-              className={`flex flex-col items-center p-2 group ${
-                isOverflowActive ? "text-primary" : "text-muted-foreground"
-              }`}
+              className={`flex flex-col items-center p-2 group ${isOverflowActive ? "text-primary" : "text-muted-foreground"
+                }`}
             >
               <MoreHorizontal className="w-6 h-6 group-aria-pressed:animate-spin transition-transform" />
             </button>
@@ -190,11 +186,10 @@ export default function Navigation({
                 setDrawerMode("settings");
                 setOpenDrawer(true);
               }}
-              className={`flex flex-col items-center p-2 group ${
-                location.pathname.includes(SETTINGS_HREF)
+              className={`flex flex-col items-center p-2 group ${location.pathname.includes(SETTINGS_HREF)
                   ? "text-primary"
                   : "text-muted-foreground"
-              }`}
+                }`}
             >
               <Settings className="w-6 h-6 group-hover:rotate-45 transition-transform" />
             </button>
@@ -261,10 +256,9 @@ export default function Navigation({
           onClick={toggleSidebarPinned}
           className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3 w-full
             transition-all duration-200 hover:shadow-sm
-            ${
-              sidebarPinned
-                ? "bg-primary/10 text-primary shadow-sm"
-                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+            ${sidebarPinned
+              ? "bg-primary/10 text-primary shadow-sm"
+              : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
             }`}
           title={sidebarPinned ? "Unpin Sidebar" : "Pin Sidebar"}
         >
