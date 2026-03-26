@@ -24,14 +24,12 @@ export default function InfoContent({
     interests: <InterestsHobbiesView data={studentData?.interests} />,
     testResults: <TestResultsView data={studentData?.testResults} />,
     ...(showSignificantNotes && {
-      significantNotes: (
-        <NotesView data={studentData?.significantNotes} />
-      ),
+      significantNotes: <NotesView data={studentData?.significantNotes} />,
     }),
   } as Record<TabId, JSX.Element>;
 
   return (
-    <div className="bg-card w-full border-2 border-border rounded-b-lg sm:rounded-t-lg shadow-lg p-4 sm:p-6 mb-4 z-10 min-h-[500px]">
+    <div className="bg-card w-full border-2 border-glass-border rounded-b-lg sm:rounded-t-lg shadow-lg p-4 sm:p-6 mb-4 z-10 min-h-[500px]">
       {views[activeTab]}
     </div>
   );

@@ -87,7 +87,7 @@ function ActivityCard({ title, list }: { title: string; list: any[] }) {
           {list.map((activity: any) => (
             <div
               key={activity.id}
-              className="rounded-lg bg-card border border-border/60 p-3"
+              className="rounded-lg bg-glass-bg border border-glass-border p-3"
             >
               <p className="text-xs font-semibold text-card-foreground">
                 {asText(activity.activityOptions?.[0]?.name || "Activity")}

@@ -54,7 +54,7 @@ export default function HealthView({
           {physicalStats.map((stat) => (
             <div
               key={stat.label}
-              className="p-4 rounded-xl border border-border bg-card shadow-sm hover:shadow-lg transition-shadow"
+              className="p-4 rounded-xl border border-glass-border bg-glass-bg shadow-sm hover:shadow-lg transition-shadow"
             >
               <div className="flex items-center gap-3 mb-3 min-h-[62px]">
                 <div className="p-2 rounded-lg bg-muted text-muted-foreground">

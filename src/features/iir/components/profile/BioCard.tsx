@@ -19,7 +19,7 @@ export default function BioCard({
         <DefaultProfileIcon className="h-24 w-24 rounded-full bg-background p-1 border-4 border-card shadow-xl text-muted-foreground" />
       </div>
 
-      <div className="w-full rounded-2xl border border-border bg-card px-6 pt-16 pb-6 shadow-xl">
+      <div className="w-full rounded-2xl border border-glass-border bg-glass-bg px-6 pt-16 pb-6 shadow-xl">
         <div className="text-center mb-6">
           <h2 className="text-xl font-black tracking-tight text-card-foreground">
             {data?.basicInfo?.firstName}{" "}
@@ -58,7 +58,7 @@ export default function BioCard({
           />
         </div>
       </div>
-      <div className="relative w-full overflow-hidden rounded-2xl border-2 border-border bg-gradient-to-b from-card/100 to-muted/100 px-6 py-5 mt-2">
+      <div className="relative w-full overflow-hidden rounded-2xl border-2 border-glass-border bg-gradient-to-b from-glass-bg via-glass-bg/30 to-muted/50 px-6 py-5 mt-2">
         <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-secondary" />
         <div className="mb-3 flex items-center gap-2">
           <AlertCircle size={20} className="text-primary" />
@@ -67,7 +67,7 @@ export default function BioCard({
           </p>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 border-l border-border/50 pl-4 sm:grid-cols-2 sm:pl-6">
+        <div className="grid grid-cols-1 gap-4 border-l border-glass-border pl-4 sm:grid-cols-2 sm:pl-6">
           <div className="space-y-2">
             <div>
               <p className="text-sm font-bold text-card-foreground leading-tight">
