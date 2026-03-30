@@ -34,7 +34,7 @@ export default function Header({
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
-    <header className="h-20 flex items-center justify-between px-6 bg-gradient-to-t from-primary/80 via-primary to-primary backdrop-blur-lg sticky top-0 z-30">
+    <header className="h-20 flex items-center justify-between px-6 bg-primary/90 to-primary backdrop-blur-lg sticky top-0 z-30 rounded-3xl rounded-tl-none rounded-tr-none">
       <div className="flex items-center gap-3 text-primary-foreground">
         <img
           src={LOGO_SRC}
