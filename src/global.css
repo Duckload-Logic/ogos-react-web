@@ -391,7 +391,6 @@
   /* Performance Mode: Disables expensive css features */
   .perf-mode * {
     backdrop-filter: none !important;
-    animation: none !important;
   }
 
   /* Custom Scrollbar - Webkit (Chrome, Safari, Edge) */
