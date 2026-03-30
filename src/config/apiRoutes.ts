@@ -181,6 +181,7 @@ export const API_ROUTES = Object.freeze({
       system: "/activity-meta/system",
       audit: "/activity-meta/audit",
       stats: "/activity-meta/stats",
+      myLogs: "/activity-meta/me",
     }),
   }),
 });
