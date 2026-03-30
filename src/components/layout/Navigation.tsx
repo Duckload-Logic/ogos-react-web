@@ -16,6 +16,7 @@ import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
 import { useUI } from "@/context";
+import { UISettingsModal } from "@/components/shared/UISettingsModal";
 
 const HOME_HREF = "/";
 const SETTINGS_HREF = "/settings";
@@ -79,7 +80,7 @@ function NavItem({
         }`}
     >
       <div
-        className={`flex items-center justify-center min-w-[24px] transition-transform duration-200
+        className={`flex items-center justify-center w-6 shrink-0 transition-transform duration-200
         ${isExpanded ? "scale-110" : ""}`}
       >
         {item.icon}
@@ -121,6 +122,7 @@ export default function Navigation({
   const isMobile = useIsMobile();
   const [openDrawer, setOpenDrawer] = useState(false);
   const [drawerMode, setDrawerMode] = useState<"menu" | "settings">("menu");
+  const [uiSettingsOpen, setUiSettingsOpen] = useState(false);
   const isActive = (item: any) => {
     if (
       location.pathname === item.href ||
@@ -224,58 +226,65 @@ export default function Navigation({
                 roleLabel={roleLabel}
                 onLogout={handleLogout}
                 closeDrawer={() => setOpenDrawer(false)}
+                onOpenUISettings={() => {
+                  setOpenDrawer(false);
+                  setUiSettingsOpen(true);
+                }}
               />
             )}
           </DrawerContent>
         </Drawer>
+        <UISettingsModal isOpen={uiSettingsOpen} onClose={() => setUiSettingsOpen(false)} />
       </>
     );
   }
 
   return (
-    <aside
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-      className={`relative flex flex-col bg-background/95 border-r transition-all duration-300 z-30
-        ${isExpanded ? "w-[260px]" : "w-[72px]"}`}
-    >
-      <nav className="flex flex-col gap-2 p-3 mt-2">
-        {navigationItems.map((item) => {
-          return (
-            <NavItem
-              key={item.href}
-              item={item}
-              active={isActive(item)}
-              isExpanded={isExpanded}
-              variant="desktop"
-            />
-          );
-        })}
-      </nav>
+    <div className="h-full flex items-center justify-center">
+      <aside
+        onMouseEnter={handleMouseEnter}
+        onMouseLeave={handleMouseLeave}
+        className={`relative flex flex-col bg-glass-bg border border-glass-border border-l-0 shadow-lg transition-all duration-300 z-30 h-[95%] rounded-3xl rounded-tl-none rounded-bl-none
+        ${isExpanded ? "w-[16.25rem]" : "w-[4.5rem]"}`}
+      >
+        <nav className="flex flex-col gap-2 p-3 mt-2">
+          {navigationItems.map((item) => {
+            return (
+              <NavItem
+                key={item.href}
+                item={item}
+                active={isActive(item)}
+                isExpanded={isExpanded}
+                variant="desktop"
+              />
+            );
+          })}
+        </nav>
 
-      {/* Pin Toggle (Desktop Only) - Balanced spacing */}
-      <div className="mt-auto p-3 mb-2">
-        <button
-          onClick={toggleSidebarPinned}
-          className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3 w-full
+        {/* Pin Toggle (Desktop Only) - Balanced spacing */}
+        <div className="mt-auto p-3 mb-2">
+          <button
+            onClick={toggleSidebarPinned}
+            className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3 w-full
             transition-all duration-200 hover:shadow-sm
             ${sidebarPinned
-              ? "bg-primary/10 text-primary shadow-sm"
-              : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-            }`}
-          title={sidebarPinned ? "Unpin Sidebar" : "Pin Sidebar"}
-        >
-          <div className="flex items-center justify-center min-w-[24px]">
-            {sidebarPinned ? <PinOff size={20} /> : <Pin size={20} />}
-          </div>
-          {isExpanded && (
-            <span className="font-medium truncate animate-in fade-in slide-in-from-left-2 duration-200">
-              {sidebarPinned ? "Unpin Sidebar" : "Pin Sidebar"}
-            </span>
-          )}
-        </button>
-      </div>
-    </aside>
+                ? "bg-primary/10 text-primary shadow-sm"
+                : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
+              }`}
+            title={sidebarPinned ? "Unpin Sidebar" : "Pin Sidebar"}
+          >
+            <div className="flex items-center justify-center w-6 shrink-0">
+              {sidebarPinned ? <PinOff size="1.25rem" /> : <Pin size="1.25rem" />}
+            </div>
+            {isExpanded && (
+              <span className="font-medium truncate animate-in fade-in slide-in-from-left-2 duration-200">
+                {sidebarPinned ? "Unpin Sidebar" : "Pin Sidebar"}
+              </span>
+            )}
+          </button>
+        </div>
+      </aside>
+    </div>
   );
 }
 
@@ -285,6 +294,7 @@ function MobileSettingsContent({
   roleLabel,
   onLogout,
   closeDrawer,
+  onOpenUISettings,
 }: any) {
   const navigate = useNavigate();
 
@@ -313,6 +323,13 @@ function MobileSettingsContent({
       </div>
       <div className="border-t border-border my-2" />
       <div className="flex flex-col gap-2">
+        <button
+          onClick={onOpenUISettings}
+          className="w-full flex items-center rounded-xl gap-3 px-4 py-3 text-sm hover:bg-muted transition"
+        >
+          <Settings size={16} />
+          <span>Settings</span>
+        </button>
         <a
           href="https://www.pup.edu.ph/terms/"
           target="_blank"
