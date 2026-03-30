@@ -108,7 +108,6 @@ export default function Layout({
   const contentRef = useRef<HTMLDivElement>(null);
   const expanded = isExpanded;
 
-
   useEffect(() => {
     if (darkMode) {
       document.documentElement.classList.add("dark");
@@ -247,7 +246,11 @@ export default function Layout({
             setShowNotifications={setShowNotifications}
           />
 
-          <div className="flex flex-col-reverse md:flex-row min-h-0 w-full flex-1 bg-[radial-gradient(circle_at_bottom_left,rgba(220,38,38,0.1),transparent_24%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.1),transparent_28%)]">
+          <div className="flex flex-col-reverse md:flex-row min-h-0 w-full flex-1 bg-background">
+            {/* <div
+              className="absolute inset-0 z-0 bg-[url('/src/assets/images/bg.png')]
+               bg-cover bg-center bg-no-repeat opacity-[0.15] dark:opacity-10 transform-gpu"
+            /> */}
             {isLoggedIn && (
               <Navigation
                 navigationItems={navigationItems}
@@ -260,10 +263,6 @@ export default function Layout({
             )}
 
             <div className="relative min-w-0 flex-1 overflow-hidden">
-              {/* <div
-                className="absolute inset-0 z-0 bg-[url('/src/assets/images/bg.png')]
-               bg-cover bg-center bg-no-repeat opacity-[0.15] dark:opacity-10 transform-gpu"
-              /> */}
               <div className="relative z-10 flex h-full flex-col overflow-x-hidden overflow-y-auto">
                 <main className="flex-1 p-4 md:p-6 lg:p-8">
                   {showHeader && (
