@@ -126,7 +126,6 @@ export default function Profile() {
     <div className="mx-auto flex w-full max-w-[1700px] flex-col space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700 pb-12">
       {/* Profile Header / Hero Section */}
       <div className="relative group overflow-hidden rounded-[32px] border border-white/20 bg-white/45 p-8 md:p-12 backdrop-blur-xl shadow-[0_8px_22px_rgba(15,23,42,0.06)] dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_22px_rgba(0,0,0,0.22)] transition-all duration-500 hover:shadow-primary/5">
-
         <div className="relative flex flex-col md:flex-row items-center md:items-start gap-10">
           {/* Avatar Section with Impact */}
           <div className="relative group/avatar shrink-0">
@@ -552,12 +551,13 @@ export default function Profile() {
                       className="flex gap-4 p-4 rounded-2xl bg-muted/20 border border-border/10 group hover:bg-muted/30 transition-all"
                     >
                       <div
-                        className={`p-2 h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${log.category === "SECURITY"
-                          ? "bg-blue-500/10 text-blue-500"
-                          : log.category === "AUDIT"
-                            ? "bg-amber-500/10 text-amber-500"
-                            : "bg-primary/10 text-primary"
-                          }`}
+                        className={`p-2 h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
+                          log.category === "SECURITY"
+                            ? "bg-blue-500/10 text-blue-500"
+                            : log.category === "AUDIT"
+                              ? "bg-amber-500/10 text-amber-500"
+                              : "bg-primary/10 text-primary"
+                        }`}
                       >
                         {log.action.includes("LOGIN") ? (
                           <Key size={20} />
@@ -584,8 +584,7 @@ export default function Profile() {
                   ))}
                   {activities.length > 10 && (
                     <p className="text-[10px] text-muted-foreground text-center pt-4 italic">
-                      Showing last 10 activities. View Archived Logs is
-                      currently disabled.
+                      Showing last 10 activities.
                     </p>
                   )}
                 </div>
