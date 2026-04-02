@@ -38,6 +38,7 @@ import {
   AuditLogs,
 } from "@/features/superadmin";
 import Callback from "@/features/auth/pages/Callback";
+import NotificationsPage from "@/features/notifications/pages/Notifications";
 
 const TermsContent = () => {
   usePageMetadata({
@@ -134,6 +135,10 @@ export const routes: RouteObject[] = [
         path: "profile",
         element: <Profile />,
       },
+      {
+        path: "notifications",
+        element: <NotificationsPage />,
+      },
     ],
   },
 
@@ -182,6 +187,10 @@ export const routes: RouteObject[] = [
         path: "profile",
         element: <Profile />,
       },
+      {
+        path: "notifications",
+        element: <NotificationsPage />,
+      },
     ],
   },
 
@@ -217,6 +226,10 @@ export const routes: RouteObject[] = [
       {
         path: "profile",
         element: <Profile />,
+      },
+      {
+        path: "notifications",
+        element: <NotificationsPage />,
       },
     ],
   },

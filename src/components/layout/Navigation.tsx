@@ -87,8 +87,8 @@ function NavItem({
       </div>
 
       <span
-        className={`opacity-0 translate-x-[-3px] transition-all duration-200 whitespace-nowrap
-        ${isExpanded ? "opacity-100 translate-x-0" : ""}`}
+        className={`transition-all duration-200 whitespace-nowrap overflow-hidden
+        ${isExpanded ? "opacity-100 translate-x-0 w-auto" : "opacity-0 translate-x-[-3px] w-0"}`}
       >
         {item.label}
       </span>
@@ -244,7 +244,7 @@ export default function Navigation({
       <aside
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={`relative flex flex-col bg-glass-bg border border-glass-border border-l-0 shadow-lg transition-all duration-300 z-30 h-[95%] rounded-3xl rounded-tl-none rounded-bl-none
+        className={`relative flex flex-col bg-glass-bg border border-glass-border border-l-0 shadow-lg transition-all duration-300 z-30 h-[95%] rounded-3xl rounded-tl-none rounded-bl-none overflow-x-hidden
         ${isExpanded ? "w-[16.25rem]" : "w-[4.5rem]"}`}
       >
         <nav className="flex flex-col gap-2 p-3 mt-2">
@@ -277,7 +277,7 @@ export default function Navigation({
               {sidebarPinned ? <PinOff size="1.25rem" /> : <Pin size="1.25rem" />}
             </div>
             {isExpanded && (
-              <span className="font-medium truncate animate-in fade-in slide-in-from-left-2 duration-200">
+              <span className="font-medium whitespace-nowrap overflow-hidden w-auto animate-in fade-in slide-in-from-left-2 duration-200">
                 {sidebarPinned ? "Unpin Sidebar" : "Pin Sidebar"}
               </span>
             )}

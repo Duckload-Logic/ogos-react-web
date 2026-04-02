@@ -5,13 +5,13 @@
 import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from '@/components/ui/dialog';
+  ResponsiveModal,
+  ResponsiveModalContent,
+  ResponsiveModalDescription,
+  ResponsiveModalFooter,
+  ResponsiveModalHeader,
+  ResponsiveModalTitle,
+} from '@/components/ui/responsive-modal';
 import { Button } from '@/components/ui/button';
 import { significantNoteSchema, SignificantNoteFormData } from '../validation/noteSchema';
 import { FormInput } from '@/components/form';
@@ -53,14 +53,14 @@ export default function AddNoteModal({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-[600px]">
-        <DialogHeader>
-          <DialogTitle>Add Significant Note</DialogTitle>
-          <DialogDescription>
+    <ResponsiveModal open={open} onOpenChange={handleClose}>
+      <ResponsiveModalContent className="sm:max-w-[600px]">
+        <ResponsiveModalHeader>
+          <ResponsiveModalTitle>Add Significant Note</ResponsiveModalTitle>
+          <ResponsiveModalDescription>
             Record a significant incident or note about the student. All fields are required.
-          </DialogDescription>
-        </DialogHeader>
+          </ResponsiveModalDescription>
+        </ResponsiveModalHeader>
 
         <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
           <Controller
@@ -93,7 +93,7 @@ export default function AddNoteModal({
             )}
           />
 
-          <DialogFooter>
+          <ResponsiveModalFooter>
             <Button
               type="button"
               variant="outline"
@@ -105,9 +105,9 @@ export default function AddNoteModal({
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting ? 'Saving...' : 'Save Note'}
             </Button>
-          </DialogFooter>
+          </ResponsiveModalFooter>
         </form>
-      </DialogContent>
-    </Dialog>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 }

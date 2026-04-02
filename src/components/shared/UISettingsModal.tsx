@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
+import {
+  ResponsiveModal,
+  ResponsiveModalContent,
+} from "@/components/ui/responsive-modal";
 import {
   X,
   Palette,
@@ -98,33 +101,6 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
     onClose();
   };
 
-  // Close on backdrop click or Escape
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (isOpen && modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        handleCancelSettings();
-      }
-    };
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        handleCancelSettings();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handler);
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handler);
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
-
   // Preview logic: Apply draft settings to the document root while open
   useEffect(() => {
     if (!isOpen) return;
@@ -185,16 +161,9 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
     }
   }, [isOpen, grayscale, dyslexiaMode, performanceMode, fontScale, mounted]);
 
-  if (!mounted || !isOpen) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" />
-
-      <div
-        ref={modalRef}
-        className="relative flex flex-col w-full h-[95dvh] sm:h-auto sm:max-h-[85vh] sm:max-w-2xl overflow-hidden rounded-t-[32px] sm:rounded-[32px] border-t sm:border border-slate-300/90 bg-[rgb(246,247,249)] text-slate-800 shadow-2xl animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 dark:border-white/10 dark:bg-[#1a1c1e] dark:text-white"
-      >
+  return (
+    <ResponsiveModal open={isOpen} onOpenChange={handleCancelSettings}>
+      <ResponsiveModalContent className="flex flex-col w-full h-[95dvh] sm:h-auto sm:max-h-[85vh] sm:max-w-2xl overflow-hidden p-0 border-t sm:border border-slate-300/90 bg-[rgb(246,247,249)] text-slate-800 shadow-2xl dark:border-white/10 dark:bg-[#1a1c1e] dark:text-white">
         {/* Header */}
         <div className="border-b border-slate-300/90 bg-white/50 px-5 py-4 sm:px-7 sm:py-6 dark:border-white/10 dark:bg-white/5 shrink-0">
           <div className="flex items-start justify-between gap-4">
@@ -206,12 +175,6 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
                 Customize your viewing and reading experience
               </p>
             </div>
-            <button
-              onClick={handleCancelSettings}
-              className="rounded-full p-2 text-slate-500 transition hover:bg-slate-200 dark:text-white/60 dark:hover:bg-white/10"
-            >
-              <X className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
-            </button>
           </div>
         </div>
 
@@ -400,8 +363,7 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
             Apply Changes
           </button>
         </div>
-      </div>
-    </div>,
-    document.body
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 };

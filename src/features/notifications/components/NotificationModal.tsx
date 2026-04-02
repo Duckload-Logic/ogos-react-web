@@ -1,4 +1,9 @@
 import { Calendar, FileText, BarChart3, Bell, X } from "lucide-react";
+import {
+  ResponsiveModal,
+  ResponsiveModalContent,
+} from "@/components/ui/responsive-modal";
+
 
 interface Props {
   showNotifications: boolean;
@@ -12,13 +17,12 @@ export default function NotificationModal({
   if (!showNotifications) return null;
 
   return (
-    <div className="fixed inset-0 z-[9999] flex items-center justify-center">
-      <div
-        className="absolute inset-0 bg-slate-950/12 backdrop-blur-sm transition-opacity animate-in fade-in duration-300"
-        onClick={() => setShowNotifications(false)}
-      />
+    <ResponsiveModal
+      open={showNotifications}
+      onOpenChange={setShowNotifications}
+    >
+      <ResponsiveModalContent className="flex flex-col w-[90%] sm:max-w-2xl h-[85vh] sm:h-[75vh] p-0 overflow-hidden shadow-2xl border-border bg-card outline-none">
 
-      <div className="relative bg-card w-[90%] max-w-2xl h-[75vh] rounded-2xl shadow-2xl border border-border flex flex-col animate-in fade-in zoom-in-95 slide-in-from-bottom-6 duration-300">
         <div className="flex items-center justify-between p-5 border-b border-border">
           <div>
             <h2 className="text-lg font-semibold flex items-center gap-2">
@@ -88,8 +92,8 @@ export default function NotificationModal({
             View All Notifications
           </button>
         </div>
-      </div>
-    </div>
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 }
 
