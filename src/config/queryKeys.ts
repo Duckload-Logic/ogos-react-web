@@ -141,4 +141,11 @@ export const QUERY_KEYS = {
     logStats: (startDate?: string, endDate?: string) =>
       ["superadmin", "log-stats", startDate, endDate] as const,
   },
+  /**
+   * Notifications-related query keys
+   */
+  notifications: {
+    all: ["notifications"] as const,
+    me: ["notifications", "me"] as const,
+  },
 } as const;

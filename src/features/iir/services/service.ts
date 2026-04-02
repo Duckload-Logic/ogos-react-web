@@ -153,6 +153,8 @@ const INVENTORY_GET_ROUTES = {
   testResults: (iirID: string) => API_ROUTES.iir.inventory.testResults(iirID),
   significantNotes: (iirID: string) =>
     API_ROUTES.iir.inventory.significantNotes(iirID),
+  download: (iirID: string) =>
+    API_ROUTES.iir.inventory.download(iirID),
 };
 
 const DRAFT_ROUTES = {
@@ -365,6 +367,47 @@ export const PostIIRSubmit = async (
   } catch (error) {
     const handlerName = config?.handlerName || "PostIIRSubmit";
     const stepName = config?.stepName || "Submit Form";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+    throw error;
+  }
+};
+
+/**
+ * Downloads the student's IIR as a PDF blob.
+ * @param iirID - The ID of the student's IIR.
+ * @param config - Optional Axios configuration with metadata.
+ * @returns Promise resolving to the PDF blob and the suggested filename.
+ */
+export const DownloadIIRPDF = async (
+  iirID: string,
+  config?: AxiosConfigWithMeta,
+): Promise<{ blob: Blob; fileName: string }> => {
+  try {
+    const response = await apiClient.get(
+      INVENTORY_GET_ROUTES.download(iirID),
+      {
+        ...config,
+        responseType: "blob",
+      },
+    );
+
+    // Extract filename from Content-Disposition header if available
+    let fileName = `IIR-Record-${iirID}.pdf`;
+    const contentDisposition = response.headers["content-disposition"];
+    if (contentDisposition) {
+      const fileNameMatch = contentDisposition.match(/filename=(.+)/);
+      if (fileNameMatch?.[1]) {
+        fileName = fileNameMatch[1].replace(/["']/g, "");
+      }
+    }
+
+    return {
+      blob: response.data,
+      fileName,
+    };
+  } catch (error) {
+    const handlerName = config?.handlerName || "DownloadIIRPDF";
+    const stepName = config?.stepName || "Download IIR PDF";
     console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }

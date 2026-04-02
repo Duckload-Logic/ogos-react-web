@@ -132,7 +132,7 @@ export default function SuperAdminDashboard() {
             return (
               <Card
                 key={item.title}
-                className="group overflow-hidden rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(15,23,42,0.09)] dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_22px_rgba(0,0,0,0.22)]"
+                className="group overflow-hidden rounded-[18px] shadow-[0_8px_22px_rgba(15,23,42,0.06)] transition-all duration-200 hover:-translate-y-0.5 hover:shadow-[0_10px_24px_rgba(15,23,42,0.09)] dark:border-white/10 dark:bg-white/[0.04] dark:shadow-[0_8px_22px_rgba(0,0,0,0.22)]"
               >
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-4">
@@ -181,23 +181,44 @@ export default function SuperAdminDashboard() {
 
               return (
                 <Link key={action.title} to={action.href} className="group">
-                  <div className="relative overflow-hidden rounded-[18px] border border-white/20 bg-white/45 p-4 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 hover:border-primary/25 hover:bg-white/55 hover:shadow-[0_10px_24px_rgba(15,23,42,0.09)] dark:border-white/10 dark:bg-white/[0.04] dark:hover:bg-white/[0.06]">
+                  <div
+                    className={`relative overflow-hidden rounded-[18px]
+                      transition-all duration-200 hover:-translate-y-0.5
+                      bg-glass-bg border border-glass-border
+                      hover:border-primary/25 hover:bg-white/55
+                      hover:shadow-[0_10px_24px_rgba(15,23,42,0.09)]
+                      dark:border-white/10 dark:bg-white/[0.04]
+                      dark:hover:bg-white/[0.06] shadow-sm`}
+                  >
                     <div
-                      className={`pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-br ${action.accent} opacity-90`}
+                      className={`pointer-events-none absolute inset-x-0 top-0
+                        h-20 bg-gradient-to-br ${action.accent} opacity-90`}
                     />
 
-                    <div className="relative flex min-h-[140px] flex-col justify-between">
+                    <div
+                      className={`relative flex min-h-[140px] flex-col
+                        justify-between p-4`}
+                    >
                       <div className="flex items-start justify-between gap-4">
                         <div
-                          className={`flex h-10 w-10 items-center justify-center rounded-xl border bg-white/70 backdrop-blur-md dark:bg-white/[0.06] ${accentBorder}`}
+                          className={`flex h-10 w-10 items-center
+                            justify-center rounded-xl border bg-white/70
+                            backdrop-blur-md dark:bg-white/[0.06]
+                            ${accentBorder}`}
                         >
                           <Icon className="h-5 w-5" />
                         </div>
 
-                        <ArrowUpRight className="h-5 w-5 text-muted-foreground transition-transform duration-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-foreground" />
+                        <ArrowUpRight
+                          className={`h-5 w-5 text-muted-foreground
+                            transition-transform duration-200
+                            group-hover:translate-x-0.5
+                            group-hover:-translate-y-0.5
+                            group-hover:text-foreground`}
+                        />
                       </div>
 
-                      <div className="space-y-1 pt-6">
+                      <div className="space-y-1 pt-10">
                         <h3 className="text-base font-semibold text-foreground">
                           {action.title}
                         </h3>

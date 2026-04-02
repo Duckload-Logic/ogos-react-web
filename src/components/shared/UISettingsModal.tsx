@@ -1,5 +1,8 @@
 import React, { useState, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
+import {
+  ResponsiveModal,
+  ResponsiveModalContent,
+} from "@/components/ui/responsive-modal";
 import {
   X,
   Palette,
@@ -39,7 +42,7 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
   const [draftFontScale, setDraftFontScale] = useState(fontScale);
   const [draftGrayscale, setDraftGrayscale] = useState(grayscale);
   const [draftDyslexic, setDraftDyslexic] = useState(dyslexiaMode);
-  const [draftQualityMode, setDraftQualityMode] = useState(performanceMode);
+  const [draftPerformanceMode, setDraftPerformanceMode] = useState(performanceMode);
   const [draftSpeechRate, setDraftSpeechRate] = useState(speechRate);
   const [draftSpeechVoice, setDraftSpeechVoice] = useState(speechVoice);
 
@@ -56,7 +59,7 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
       setDraftFontScale(fontScale);
       setDraftGrayscale(grayscale);
       setDraftDyslexic(dyslexiaMode);
-      setDraftQualityMode(performanceMode);
+      setDraftPerformanceMode(performanceMode);
       setDraftSpeechRate(speechRate);
       setDraftSpeechVoice(speechVoice);
     }
@@ -66,7 +69,7 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
     draftFontScale !== fontScale ||
     draftGrayscale !== grayscale ||
     draftDyslexic !== dyslexiaMode ||
-    draftQualityMode !== performanceMode ||
+    draftPerformanceMode !== performanceMode ||
     draftSpeechRate !== speechRate ||
     draftSpeechVoice !== speechVoice;
 
@@ -88,7 +91,7 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
     setFontScale(draftFontScale);
     setGrayscale(draftGrayscale);
     setDyslexiaMode(draftDyslexic);
-    setPerformanceMode(draftQualityMode);
+    setPerformanceMode(draftPerformanceMode);
     setSpeechRate(draftSpeechRate);
     setSpeechVoice(draftSpeechVoice);
     onClose();
@@ -97,33 +100,6 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
   const handleCancelSettings = () => {
     onClose();
   };
-
-  // Close on backdrop click or Escape
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (isOpen && modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        handleCancelSettings();
-      }
-    };
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        handleCancelSettings();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handler);
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handler);
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
 
   // Preview logic: Apply draft settings to the document root while open
   useEffect(() => {
@@ -145,8 +121,8 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
       root.classList.remove("dyslexic-mode");
     }
 
-    // Apply Performance Preview
-    if (!draftQualityMode) {
+    // Apply Performance Preview (Performance Mode ON = true = add perf-mode class)
+    if (draftPerformanceMode) {
       root.classList.add("perf-mode");
     } else {
       root.classList.remove("perf-mode");
@@ -156,7 +132,7 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
     root.style.fontSize = `${(draftFontScale / 100) * 16}px`;
 
     return () => { };
-  }, [isOpen, draftGrayscale, draftDyslexic, draftQualityMode, draftFontScale]);
+  }, [isOpen, draftGrayscale, draftDyslexic, draftPerformanceMode, draftFontScale]);
 
   // Revert preview on cancel/close
   useEffect(() => {
@@ -185,16 +161,9 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
     }
   }, [isOpen, grayscale, dyslexiaMode, performanceMode, fontScale, mounted]);
 
-  if (!mounted || !isOpen) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-[10000] flex items-end sm:items-center justify-center sm:p-4">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" />
-
-      <div
-        ref={modalRef}
-        className="relative flex flex-col w-full h-[95dvh] sm:h-auto sm:max-h-[85vh] sm:max-w-2xl overflow-hidden rounded-t-[32px] sm:rounded-[32px] border-t sm:border border-slate-300/90 bg-[rgb(246,247,249)] text-slate-800 shadow-2xl animate-in slide-in-from-bottom-10 sm:slide-in-from-bottom-0 sm:zoom-in-95 duration-300 dark:border-white/10 dark:bg-[#1a1c1e] dark:text-white"
-      >
+  return (
+    <ResponsiveModal open={isOpen} onOpenChange={handleCancelSettings}>
+      <ResponsiveModalContent className="flex flex-col w-full h-[95dvh] sm:h-auto sm:max-h-[80vh] sm:max-w-2xl overflow-hidden p-0 border-t sm:border border-slate-300/90 bg-[rgb(246,247,249)] text-slate-800 shadow-2xl dark:border-white/10 dark:bg-[#1a1c1e] dark:text-white">
         {/* Header */}
         <div className="border-b border-slate-300/90 bg-white/50 px-5 py-4 sm:px-7 sm:py-6 dark:border-white/10 dark:bg-white/5 shrink-0">
           <div className="flex items-start justify-between gap-4">
@@ -206,12 +175,6 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
                 Customize your viewing and reading experience
               </p>
             </div>
-            <button
-              onClick={handleCancelSettings}
-              className="rounded-full p-2 text-slate-500 transition hover:bg-slate-200 dark:text-white/60 dark:hover:bg-white/10"
-            >
-              <X className="w-5 h-5 sm:w-[22px] sm:h-[22px]" />
-            </button>
           </div>
         </div>
 
@@ -255,17 +218,17 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
           <div className="rounded-3xl border border-slate-200 bg-white/40 p-5 dark:border-white/5 dark:bg-white/[0.02]">
             <div className="mb-4 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                {draftQualityMode ? <Zap size={18} className="text-amber-500 shrink-0" /> : <Leaf size={18} className="text-emerald-500 shrink-0" />}
+                {draftPerformanceMode ? <Leaf size={18} className="text-emerald-500 shrink-0" /> : <Zap size={18} className="text-amber-500 shrink-0" />}
                 <p className="text-[17px] sm:text-lg font-thin text-slate-900 dark:text-white leading-tight">Graphics Quality</p>
               </div>
             </div>
             <button
-              onClick={() => setDraftQualityMode(!draftQualityMode)}
-              className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 transition hover:border-amber-500/50 dark:border-white/10 dark:bg-white/5"
+              onClick={() => setDraftPerformanceMode(!draftPerformanceMode)}
+              className={`flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 transition hover:border-amber-500/50 dark:border-white/10 dark:bg-white/5 ${draftPerformanceMode ? 'hover:border-emerald-500/50' : 'hover:border-amber-500/50'}`}
             >
-              <span className="font-medium">{draftQualityMode ? "High Quality" : "Performance"}</span>
-              <div className={`relative h-6 w-11 rounded-full p-1 transition-colors ${draftQualityMode ? 'bg-amber-500' : 'bg-emerald-500'}`}>
-                <div className={`h-4 w-4 rounded-full bg-white transition-transform ${draftQualityMode ? 'translate-x-5' : 'translate-x-0'}`} />
+              <span className="font-medium">{draftPerformanceMode ? "Performance" : "High Quality"}</span>
+              <div className={`relative h-6 w-11 rounded-full p-1 transition-colors ${draftPerformanceMode ? 'bg-emerald-500' : 'bg-amber-500'}`}>
+                <div className={`h-4 w-4 rounded-full bg-white transition-transform ${draftPerformanceMode ? 'translate-x-5' : 'translate-x-0'}`} />
               </div>
             </button>
           </div>
@@ -400,8 +363,7 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
             Apply Changes
           </button>
         </div>
-      </div>
-    </div>,
-    document.body
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 };

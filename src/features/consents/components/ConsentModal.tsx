@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 
 type ConsentModalProps = {
   open: boolean;
@@ -25,23 +26,19 @@ export default function ConsentModal({
   const accentClass = role === "admin" ? "bg-[#8f1113]" : "bg-[#c62828]";
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/45 px-4 backdrop-blur-md">
-      <div
-        className="w-full max-w-[640px] rounded-[28px] bg-white p-7 shadow-2xl sm:p-8"
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="terms-title"
-      >
-        <div className={`mb-6 rounded-2xl px-6 py-4 text-white ${accentClass}`}>
+    <Dialog open={open} onOpenChange={() => { }}>
+      <DialogContent className="w-[95vw] max-h-[70vh] overflow-y-auto sm:w-full max-w-[640px] rounded-3xl p-6 sm:p-8 outline-none border-glass-border bg-card" hasCloseButton={false}>
+
+        <div className={`mb-6 rounded-xl px-6 py-4 text-white ${accentClass}`}>
           <h2 id="terms-title" className="text-2xl font-bold">
             Terms and Conditions
           </h2>
         </div>
 
-        <div className="space-y-5 text-[16px] leading-9 text-slate-700">
+        <div className="space-y-5 text-[16px] leading-9 text-foreground">
           <p>
             By clicking{" "}
-            <span className="font-bold text-slate-900">“I Agree”</span>, you
+            <span className="font-bold text-secondary">“I Agree”</span>, you
             consent to the collection, use, and processing of your personal data
             for legitimate purposes related to this service.
           </p>
@@ -49,21 +46,21 @@ export default function ConsentModal({
           <p>
             Your information will be handled in accordance with our{" "}
             <a
-              className="font-bold text-primary hover:text-primary/60"
+              className="font-bold text-primary hover:text-primary/70 transition-colors cursor-pointer duration-200"
               target="_blank"
               href="https://www.pup.edu.ph/privacy"
             >
               Privacy Policy
             </a>{" "}
             and in compliance with the{" "}
-            <span className="font-bold text-slate-900">
+            <span className="font-bold text-secondary">
               Data Privacy Act of 2012
             </span>
             .
           </p>
         </div>
 
-        <div className="mt-7 rounded-2xl border border-slate-200 bg-slate-50 px-5 py-5">
+        <div className="mt-7 rounded-2xl border border-glass-border bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary-50 via-primary-100 to-primary-50 px-5 py-5">
           <label
             htmlFor="terms-agree"
             className="flex cursor-pointer items-start gap-4"
@@ -79,7 +76,7 @@ export default function ConsentModal({
             <span
               className="
                 mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-md
-                border border-slate-400 bg-white transition
+                border border-slate-400 bg-glass-bg transition
                 peer-checked:border-[#8f1113] peer-checked:bg-[#8f1113]
               "
             >
@@ -101,10 +98,10 @@ export default function ConsentModal({
               )}
             </span>
 
-            <span className="text-base leading-7 text-slate-800">
+            <span className="text-base leading-7 text-foreground">
               I agree and acknowledge the{" "}
               <a
-                className="font-bold text-primary hover:text-primary/60"
+                className="font-bold text-primary hover:text-primary/60 transition-colors cursor-pointer duration-200"
                 target="_blank"
                 href="https://www.pup.edu.ph/terms"
               >
@@ -125,7 +122,7 @@ export default function ConsentModal({
             {loading ? "Saving..." : "Continue"}
           </Button>
         </div>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }

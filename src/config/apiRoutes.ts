@@ -159,6 +159,8 @@ export const API_ROUTES = Object.freeze({
         `/students/inventory/records/iir/${iirId}/test-results`,
       significantNotes: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/significant-notes`,
+      download: (iirId: string) =>
+        `/students/inventory/records/iir/${iirId}/download`,
     }),
     draft: Object.freeze({
       save: "/students/inventory/records/iir/draft",
@@ -183,5 +185,12 @@ export const API_ROUTES = Object.freeze({
       stats: "/activity-meta/stats",
       myLogs: "/activity-meta/me",
     }),
+  }),
+  /**
+   * Notification related endpoints
+   */
+  notifications: Object.freeze({
+    me: "/notifications/me",
+    markAsRead: (id: string) => `/notifications/${id}/read`,
   }),
 });
