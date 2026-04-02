@@ -61,6 +61,7 @@ export default function Layout({
     dyslexiaMode,
     setDyslexiaMode,
     fontScale,
+    performanceMode,
     pageMetadata,
   } = useUI();
 
@@ -210,9 +211,21 @@ export default function Layout({
         className={`relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950 ${grayscale ? "grayscale" : ""
           }`}
       >
-        <div className="pointer-events-none absolute inset-0">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.08),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.06),transparent_24%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.10),transparent_22%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.07),transparent_24%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.14))] dark:bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.02))]" />
+        {/* Background Fallback / Graphics Quality Layers */}
+        <div className="pointer-events-none absolute inset-0 overflow-hidden">
+          {performanceMode ? (
+            // Lighter Fallback: Simple static gradients
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.03),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.02),transparent_25%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.05),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.03),transparent_25%)]" />
+          ) : (
+            // High Quality: Animated Mesh pattern
+            <div className="absolute inset-0 z-0">
+              <div className="absolute -left-[5%] -top-[5%] h-[30%] w-[30%] rounded-full bg-primary/5 blur-[100px] animate-pulse" />
+              <div className="absolute -right-[5%] -bottom-[5%] h-[30%] w-[30%] rounded-full bg-secondary/5 blur-[100px] animate-pulse [animation-delay:3s]" />
+              <div className="absolute left-1/2 top-1/2 h-[20%] w-[20%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/3 blur-[90px]" />
+            </div>
+          )}
+          {/* Global Light Overlay */}
+          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.08))] dark:bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.01))]" />
         </div>
 
         {mustAcceptTerms && (
@@ -248,7 +261,7 @@ export default function Layout({
 
           <div className="flex flex-col-reverse md:flex-row min-h-0 w-full flex-1 bg-background">
             {/* <div
-              className="absolute inset-0 z-0 bg-[url('/src/assets/images/bg.png')]
+              className="absolute inset-0 z-0 bg-[url('/src/assets/images/bg.gif')]
                bg-cover bg-center bg-no-repeat opacity-[0.15] dark:opacity-10 transform-gpu"
             /> */}
             {isLoggedIn && (

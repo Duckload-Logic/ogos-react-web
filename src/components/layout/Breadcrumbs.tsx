@@ -58,7 +58,7 @@ export default function Breadcrumbs() {
     >
       <BackNav to={parentPath} className="" />
 
-      <div className="h-4 w-[1px] bg-border mx-1 hidden sm:block" />
+      <div className="h-4 w-[1px] bg-border mx-1" />
 
       <ol className="flex items-center gap-2 overflow-hidden text-sm font-medium">
         <li className="flex items-center">
