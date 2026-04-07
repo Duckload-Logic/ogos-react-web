@@ -1,7 +1,26 @@
 /* stylelint-disable at-rule-no-unknown */
 /** @import must precede all other statements */
 @import url("https://fonts.googleapis.com/css2?family=Trajan+Pro:wght@400;700&display=swap");
-@import url('https://fonts.cdnfonts.com/css/open-dyslexic');
+@font-face {
+font-family: 'Open-Dyslexic';
+  src: url('./assets/fonts/OpenDyslexic-Regular.otf') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Open-Dyslexic';
+  src: url('./assets/fonts/OpenDyslexic-Bold.otf') format('opentype');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Open-Dyslexic';
+  src: url('./assets/fonts/OpenDyslexic-Italic.otf') format('opentype');
+  font-weight: normal;
+  font-style: italic;
+}
 
 /* Fade out animation for notifications */
 @keyframes fadeOut {
@@ -458,6 +477,6 @@
 
   .dyslexic-mode, 
   .dyslexic-mode * {
-    font-family: 'Open-Dyslexic', 'OpenDyslexic', sans-serif !important;
+    font-family: 'Open-Dyslexic', sans-serif !important;
   }
 }
