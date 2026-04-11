@@ -29,12 +29,15 @@ interface UIContextType {
   setDyslexiaMode: (value: boolean) => void;
   fontScale: number;
   setFontScale: (value: number) => void;
-  // Speech Settings
+  // Audio Settings
   voices: SpeechSynthesisVoice[];
   speechRate: number;
   setSpeechRate: (rate: number) => void;
   speechVoice: string;
   setSpeechVoice: (voice: string) => void;
+  // Performance
+  performanceMode: boolean;
+  setPerformanceMode: (value: boolean) => void;
 }
 
 export const UIContext = createContext<UIContextType | undefined>(undefined);
@@ -47,6 +50,7 @@ const STORAGE_KEYS = {
   FONT_SCALE: "fontScale",
   SPEECH_RATE: "speech_rate",
   SPEECH_VOICE: "speech_voice",
+  PERFORMANCE: "performance_mode",
 };
 
 export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
@@ -63,6 +67,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   const [grayscale, setGrayscaleInternal] = useState(false);
   const [dyslexiaMode, setDyslexiaModeInternal] = useState(false);
   const [fontScale, setFontScaleInternal] = useState(100);
+  const [performanceMode, setPerformanceModeInternal] = useState(false);
   const [speechRate, setSpeechRateState] = useState(1);
   const [speechVoice, setSpeechVoiceState] = useState("");
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -120,6 +125,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       setGrayscaleInternal(getPref(STORAGE_KEYS.GRAYSCALE, "false") === "true");
       setDyslexiaModeInternal(getPref(STORAGE_KEYS.DYSLEXIA, "false") === "true");
       setFontScaleInternal(parseInt(getPref(STORAGE_KEYS.FONT_SCALE, "100"), 10));
+      setPerformanceModeInternal(getPref(STORAGE_KEYS.PERFORMANCE, "false") === "true");
       setSpeechRateState(parseFloat(getPref(STORAGE_KEYS.SPEECH_RATE, "1")));
       setSpeechVoiceState(getPref(STORAGE_KEYS.SPEECH_VOICE, ""));
     }
@@ -168,6 +174,15 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     localStorage.setItem(STORAGE_KEYS.FONT_SCALE, val);
     if (userId) {
       localStorage.setItem(`${STORAGE_KEYS.FONT_SCALE}-${userId}`, val);
+    }
+  }, [userId]);
+
+  const setPerformanceMode = useCallback((value: boolean) => {
+    setPerformanceModeInternal(value);
+    const val = String(value);
+    localStorage.setItem(STORAGE_KEYS.PERFORMANCE, val);
+    if (userId) {
+      localStorage.setItem(`${STORAGE_KEYS.PERFORMANCE}-${userId}`, val);
     }
   }, [userId]);
 
@@ -220,7 +235,14 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     // Font Scale
     root.style.fontSize = `${(fontScale / 100) * 16}px`;
 
-  }, [darkMode, grayscale, dyslexiaMode, fontScale]);
+    // Performance Mode
+    if (performanceMode) {
+      root.classList.add("perf-mode");
+    } else {
+      root.classList.remove("perf-mode");
+    }
+
+  }, [darkMode, grayscale, dyslexiaMode, fontScale, performanceMode]);
 
   return (
     <UIContext.Provider
@@ -238,6 +260,8 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
         setDyslexiaMode,
         fontScale,
         setFontScale,
+        performanceMode,
+        setPerformanceMode,
         pageMetadata,
         setPageMetadata,
         voices,

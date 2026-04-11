@@ -39,6 +39,9 @@ apiClient.interceptors.request.use((config) => {
  * on 401, then rejects if refresh fails to allow
  * AuthProvider to handle session expiration.
  */
+// Module-level promise to coordinate concurrent refresh attempts
+let refreshPromise: Promise<void> | null = null;
+
 apiClient.interceptors.response.use(
   (response) => {
     if (
@@ -82,8 +85,26 @@ apiClient.interceptors.response.use(
       }
 
       try {
-        // Call refresh endpoint – cookies sent automatically
-        await apiClient.post("/auth/refresh");
+        // Handle concurrent refresh: multiple simultaneous 401s
+        // will await the same singleton refresh promise
+        if (!refreshPromise) {
+          console.debug(`[${handlerName}] {Session Refresh}: Initiating...`);
+          refreshPromise = apiClient
+            .post("/auth/refresh")
+            .then(() => {
+              refreshPromise = null;
+            })
+            .catch((refreshError) => {
+              refreshPromise = null;
+              throw refreshError;
+            });
+        } else {
+          console.debug(`[${handlerName}] {Session Refresh}: Waiting...`);
+        }
+
+        // Await the shared refresh effort (cookies updated by server)
+        await refreshPromise;
+
         // Retry the original request
         if (originalRequest) {
           return apiClient(originalRequest);
@@ -93,10 +114,9 @@ apiClient.interceptors.response.use(
         // to handle session expiration and redirect
         const refreshErr = refreshError as AxiosError;
         console.error(
-          `[${handlerName}] {Token Refresh}: ` + `${refreshErr.message}`,
+          `[${handlerName}] {Session Refresh Failed}: ${refreshErr.message}`,
         );
-        // CRITICAL: Return rejected promise so useMe
-        // query transitions to "error" state
+
         return Promise.reject(refreshError);
       }
     }

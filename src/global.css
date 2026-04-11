@@ -1,26 +1,7 @@
 /* stylelint-disable at-rule-no-unknown */
 /** @import must precede all other statements */
 @import url("https://fonts.googleapis.com/css2?family=Trajan+Pro:wght@400;700&display=swap");
-@font-face {
-font-family: 'Open-Dyslexic';
-  src: url('./assets/fonts/OpenDyslexic-Regular.otf') format('opentype');
-  font-weight: normal;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Open-Dyslexic';
-  src: url('./assets/fonts/OpenDyslexic-Bold.otf') format('opentype');
-  font-weight: bold;
-  font-style: normal;
-}
-
-@font-face {
-  font-family: 'Open-Dyslexic';
-  src: url('./assets/fonts/OpenDyslexic-Italic.otf') format('opentype');
-  font-weight: normal;
-  font-style: italic;
-}
+@import url("https://fonts.cdnfonts.com/css/open-dyslexic");
 
 /* Fade out animation for notifications */
 @keyframes fadeOut {
@@ -61,7 +42,7 @@ font-family: 'Open-Dyslexic';
   */
   :root {
     /* Softer, warmer light mode for eye comfort */
-    --background: 210 10% 96%;
+    --background: 19 100% 100%;
     --foreground: 224 12% 20%;
 
     /* Off-white cards instead of pure white */
@@ -130,10 +111,10 @@ font-family: 'Open-Dyslexic';
   }
 
   .dark {
-    --background: 0 0% 13%;
+    --background: 0 5.9% 6.5%;
     --foreground: 0 0% 95%;
 
-    --card: 0 0% 20%;
+    --card: 0 0% 10%;
     --card-foreground: 0 0% 95%;
     --card-hover-background: 0 0% 40%;
     --card-hover-foreground: 0 0% 95%;
@@ -407,6 +388,11 @@ font-family: 'Open-Dyslexic';
 }
 
 @layer utilities {
+  /* Performance Mode: Disables expensive css features */
+  .perf-mode * {
+    backdrop-filter: none !important;
+  }
+
   /* Custom Scrollbar - Webkit (Chrome, Safari, Edge) */
   ::-webkit-scrollbar {
     width: 10px;
@@ -475,8 +461,8 @@ font-family: 'Open-Dyslexic';
     animation: sidebar-tilt 0.35s ease-in-out;
   }
 
-  .dyslexic-mode, 
+  .dyslexic-mode,
   .dyslexic-mode * {
-    font-family: 'Open-Dyslexic', sans-serif !important;
+    font-family: "Open-Dyslexic", "OpenDyslexic", sans-serif !important;
   }
 }

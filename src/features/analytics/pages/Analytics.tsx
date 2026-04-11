@@ -346,15 +346,6 @@ export default function AnalyticsPage() {
           <AlertCircle className="h-4 w-4" />
           <AlertDescription>Error loading analytics: {error}</AlertDescription>
         </Alert>
-        <div className="text-sm text-muted-foreground p-4 bg-muted rounded-lg">
-          <p className="mb-3">Troubleshooting steps:</p>
-          <ul className="list-disc list-inside space-y-1 mb-4">
-            <li>Check that the backend API is running</li>
-            <li>Open browser console (F12) for detailed error information</li>
-            <li>Verify you are logged in as an admin</li>
-            <li>Try refreshing the page</li>
-          </ul>
-        </div>
       </div>
     );
   }
@@ -555,11 +546,10 @@ export default function AnalyticsPage() {
                     <button
                       key={page}
                       onClick={() => setReligionPage(page)}
-                      className={`px-2 py-1 text-xs rounded transition-colors ${
-                        religionPage === page
+                      className={`px-2 py-1 text-xs rounded transition-colors ${religionPage === page
                           ? `${STATUS_COLOR_MAP.info.bg} ${STATUS_COLOR_MAP.info.text}`
                           : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      }`}
+                        }`}
                     >
                       {page + 1}
                     </button>
@@ -606,11 +596,10 @@ export default function AnalyticsPage() {
                     <button
                       key={page}
                       onClick={() => setCityPage(page)}
-                      className={`px-2 py-1 text-xs rounded transition-colors ${
-                        cityPage === page
+                      className={`px-2 py-1 text-xs rounded transition-colors ${cityPage === page
                           ? `${STATUS_COLOR_MAP.success.bg} ${STATUS_COLOR_MAP.success.text}`
                           : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      }`}
+                        }`}
                     >
                       {page + 1}
                     </button>
@@ -663,11 +652,10 @@ export default function AnalyticsPage() {
                     <button
                       key={page}
                       onClick={() => setEducationPage(page)}
-                      className={`px-2 py-1 text-xs rounded transition-colors ${
-                        educationPage === page
+                      className={`px-2 py-1 text-xs rounded transition-colors ${educationPage === page
                           ? `${STATUS_COLOR_MAP.warning.bg} ${STATUS_COLOR_MAP.warning.text}`
                           : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      }`}
+                        }`}
                     >
                       {page + 1}
                     </button>
@@ -717,11 +705,10 @@ export default function AnalyticsPage() {
                     <button
                       key={page}
                       onClick={() => setStatusPage(page)}
-                      className={`px-2 py-1 text-xs rounded transition-colors ${
-                        statusPage === page
+                      className={`px-2 py-1 text-xs rounded transition-colors ${statusPage === page
                           ? `${STATUS_COLOR_MAP.notice.bg} ${STATUS_COLOR_MAP.notice.text}`
                           : "bg-muted text-muted-foreground hover:bg-muted/80"
-                      }`}
+                        }`}
                     >
                       {page + 1}
                     </button>

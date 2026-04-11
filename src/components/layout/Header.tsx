@@ -34,8 +34,8 @@ export default function Header({
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
-    <header className="h-20 flex items-center justify-between px-6 bg-gradient-to-t from-primary/80 via-primary to-primary backdrop-blur-lg sticky top-0 z-30">
-      <div className="flex items-center gap-3 text-primary-foreground">
+    <header className="h-20 flex items-center justify-between px-6 bg-glass-bg border border-glass-border backdrop-blur-lg sticky top-0 z-30 rounded-3xl rounded-tl-none rounded-tr-none">
+      <div className="flex items-center gap-3 text-foreground">
         <img
           src={LOGO_SRC}
           alt="Logo"
@@ -45,26 +45,26 @@ export default function Header({
           <p className="font-semibold">
             Polytechnic University of the Philippines – Taguig
           </p>
-          <p className="text-primary-foreground/50">
-            Online Guidance Office Services
-          </p>
+          <p className="text-foreground/50">Online Guidance Office Services</p>
         </div>
       </div>
 
       {isLoggedIn && (
         <div className="text-center md:block">
-          <p className="text-sm text-primary-foreground font-medium">{title}</p>
-          <p className="text-xs text-primary-foreground/50">
+          <p className="text-sm text-foreground font-medium">{title}</p>
+          <p className="text-xs text-foreground/50">
             Welcome back, {user?.firstName}
           </p>
         </div>
       )}
 
       <div className="flex items-center gap-3">
-        {/* <NotificationBell
-          showNotifications={showNotifications}
-          setShowNotifications={setShowNotifications}
-        /> */}
+        {isLoggedIn && (
+          <NotificationBell
+            showNotifications={showNotifications}
+            setShowNotifications={setShowNotifications}
+          />
+        )}
         {/* <button
           onClick={() => setSettingsOpen(true)}
           className="p-2 hover:bg-muted/30 rounded-lg transition-colors duration-300 text-primary-foreground"

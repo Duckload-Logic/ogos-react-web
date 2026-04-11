@@ -1,10 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import {
-  Settings,
-  LogOut,
-  Gavel,
-  ShieldCheck,
-} from "lucide-react";
+import { Settings, LogOut, Gavel, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UISettingsModal } from "@/components/shared/UISettingsModal";
@@ -37,7 +32,11 @@ export default function ProfileMenu({
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (open && menuRef.current && !menuRef.current.contains(e.target as Node)) {
+      if (
+        open &&
+        menuRef.current &&
+        !menuRef.current.contains(e.target as Node)
+      ) {
         setOpen(false);
       }
     };
@@ -54,12 +53,12 @@ export default function ProfileMenu({
           className="flex items-center gap-2 p-2 rounded hover:bg-muted/30 transition text-foreground"
         >
           <Avatar className="h-7 w-7">
-            <AvatarFallback className="text-xs font-semibold text-primary-foreground">
+            <AvatarFallback className="text-xs font-semibold text-foreground">
               {firstName?.charAt(0)}
               {lastName?.charAt(0)}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm hidden md:block text-primary-foreground">
+          <span className="text-sm hidden md:block text-foreground">
             {roleLabel}
           </span>
         </button>
@@ -142,9 +141,9 @@ export default function ProfileMenu({
         )}
       </div>
 
-      <UISettingsModal 
-        isOpen={settingsOpen} 
-        onClose={() => setSettingsOpen(false)} 
+      <UISettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
       />
     </>
   );

@@ -1,10 +1,15 @@
 import React, { useState, useEffect, useRef } from "react";
-import { createPortal } from "react-dom";
+import {
+  ResponsiveModal,
+  ResponsiveModalContent,
+} from "@/components/ui/responsive-modal";
 import {
   X,
   Palette,
   Type,
   Volume2,
+  Leaf,
+  Zap,
 } from "lucide-react";
 import { useUI } from "@/context";
 import { Slider } from "@/components/ui/slider";
@@ -29,12 +34,15 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
     setSpeechRate,
     speechVoice,
     setSpeechVoice,
+    performanceMode,
+    setPerformanceMode,
   } = useUI();
 
   // Draft states for pending changes
   const [draftFontScale, setDraftFontScale] = useState(fontScale);
   const [draftGrayscale, setDraftGrayscale] = useState(grayscale);
   const [draftDyslexic, setDraftDyslexic] = useState(dyslexiaMode);
+  const [draftPerformanceMode, setDraftPerformanceMode] = useState(performanceMode);
   const [draftSpeechRate, setDraftSpeechRate] = useState(speechRate);
   const [draftSpeechVoice, setDraftSpeechVoice] = useState(speechVoice);
 
@@ -51,15 +59,17 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
       setDraftFontScale(fontScale);
       setDraftGrayscale(grayscale);
       setDraftDyslexic(dyslexiaMode);
+      setDraftPerformanceMode(performanceMode);
       setDraftSpeechRate(speechRate);
       setDraftSpeechVoice(speechVoice);
     }
-  }, [isOpen, fontScale, grayscale, dyslexiaMode, speechRate, speechVoice]);
+  }, [isOpen, fontScale, grayscale, dyslexiaMode, performanceMode, speechRate, speechVoice]);
 
   const hasPendingChanges =
     draftFontScale !== fontScale ||
     draftGrayscale !== grayscale ||
     draftDyslexic !== dyslexiaMode ||
+    draftPerformanceMode !== performanceMode ||
     draftSpeechRate !== speechRate ||
     draftSpeechVoice !== speechVoice;
 
@@ -81,6 +91,7 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
     setFontScale(draftFontScale);
     setGrayscale(draftGrayscale);
     setDyslexiaMode(draftDyslexic);
+    setPerformanceMode(draftPerformanceMode);
     setSpeechRate(draftSpeechRate);
     setSpeechVoice(draftSpeechVoice);
     onClose();
@@ -89,33 +100,6 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
   const handleCancelSettings = () => {
     onClose();
   };
-
-  // Close on backdrop click or Escape
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (isOpen && modalRef.current && !modalRef.current.contains(e.target as Node)) {
-        handleCancelSettings();
-      }
-    };
-
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && isOpen) {
-        handleCancelSettings();
-      }
-    };
-
-    if (isOpen) {
-      document.addEventListener("mousedown", handler);
-      document.addEventListener("keydown", handleEscape);
-      document.body.style.overflow = "hidden";
-    }
-
-    return () => {
-      document.removeEventListener("mousedown", handler);
-      document.removeEventListener("keydown", handleEscape);
-      document.body.style.overflow = "";
-    };
-  }, [isOpen]);
 
   // Preview logic: Apply draft settings to the document root while open
   useEffect(() => {
@@ -137,11 +121,18 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
       root.classList.remove("dyslexic-mode");
     }
 
+    // Apply Performance Preview (Performance Mode ON = true = add perf-mode class)
+    if (draftPerformanceMode) {
+      root.classList.add("perf-mode");
+    } else {
+      root.classList.remove("perf-mode");
+    }
+
     // Apply Font Scale Preview
     root.style.fontSize = `${(draftFontScale / 100) * 16}px`;
 
     return () => { };
-  }, [isOpen, draftGrayscale, draftDyslexic, draftFontScale]);
+  }, [isOpen, draftGrayscale, draftDyslexic, draftPerformanceMode, draftFontScale]);
 
   // Revert preview on cancel/close
   useEffect(() => {
@@ -160,42 +151,35 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
         root.classList.remove("dyslexic-mode");
       }
 
+      if (performanceMode) {
+        root.classList.add("perf-mode");
+      } else {
+        root.classList.remove("perf-mode");
+      }
+
       root.style.fontSize = `${(fontScale / 100) * 16}px`;
     }
-  }, [isOpen, grayscale, dyslexiaMode, fontScale, mounted]);
+  }, [isOpen, grayscale, dyslexiaMode, performanceMode, fontScale, mounted]);
 
-  if (!mounted || !isOpen) return null;
-
-  return createPortal(
-    <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-black/40 backdrop-blur-sm transition-opacity" />
-
-      <div
-        ref={modalRef}
-        className="relative flex flex-col w-full max-w-2xl overflow-y-hidden rounded-[32px] border border-slate-300/90 bg-[rgb(246,247,249)] text-slate-800 shadow-2xl max-h-[90vh] overflow-y-auto dark:border-white/10 dark:bg-[#1a1c1e] dark:text-white"
-      >
+  return (
+    <ResponsiveModal open={isOpen} onOpenChange={handleCancelSettings}>
+      <ResponsiveModalContent className="flex flex-col w-full h-[95dvh] sm:h-auto sm:max-h-[80vh] sm:max-w-2xl overflow-hidden p-0 border-t sm:border border-slate-300/90 bg-[rgb(246,247,249)] text-slate-800 shadow-2xl dark:border-white/10 dark:bg-[#1a1c1e] dark:text-white">
         {/* Header */}
-        <div className="border-b border-slate-300/90 bg-white/50 px-7 py-6 dark:border-white/10 dark:bg-white/5">
+        <div className="border-b border-slate-300/90 bg-white/50 px-5 py-4 sm:px-7 sm:py-6 dark:border-white/10 dark:bg-white/5 shrink-0">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
                 Display & Accessibility
               </h2>
-              <p className="mt-1 text-sm text-slate-600 dark:text-white/60">
+              <p className="mt-1 text-xs sm:text-sm text-slate-600 dark:text-white/60">
                 Customize your viewing and reading experience
               </p>
             </div>
-            <button
-              onClick={handleCancelSettings}
-              className="rounded-full p-2 text-slate-500 transition hover:bg-slate-200 dark:text-white/60 dark:hover:bg-white/10"
-            >
-              <X size={22} />
-            </button>
           </div>
         </div>
 
         {/* Content */}
-        <div className="space-y-6 px-7 py-8 overflow-y-auto overflow-x-hidden h-[calc(100vh-400px)]">
+        <div className="space-y-4 sm:space-y-6 px-4 py-6 sm:px-7 sm:py-8 overflow-y-auto overflow-x-hidden flex-1">
           {/* Grayscale */}
           <div className="rounded-3xl border border-slate-200 bg-white/40 p-5 dark:border-white/5 dark:bg-white/[0.02]">
             <div className="mb-4 flex items-center gap-2">
@@ -230,6 +214,25 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
             </button>
           </div>
 
+          {/* Performance Mode */}
+          <div className="rounded-3xl border border-slate-200 bg-white/40 p-5 dark:border-white/5 dark:bg-white/[0.02]">
+            <div className="mb-4 flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2">
+                {draftPerformanceMode ? <Leaf size={18} className="text-emerald-500 shrink-0" /> : <Zap size={18} className="text-amber-500 shrink-0" />}
+                <p className="text-[17px] sm:text-lg font-thin text-slate-900 dark:text-white leading-tight">Graphics Quality</p>
+              </div>
+            </div>
+            <button
+              onClick={() => setDraftPerformanceMode(!draftPerformanceMode)}
+              className={`flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 transition hover:border-amber-500/50 dark:border-white/10 dark:bg-white/5 ${draftPerformanceMode ? 'hover:border-emerald-500/50' : 'hover:border-amber-500/50'}`}
+            >
+              <span className="font-medium">{draftPerformanceMode ? "Performance" : "High Quality"}</span>
+              <div className={`relative h-6 w-11 rounded-full p-1 transition-colors ${draftPerformanceMode ? 'bg-emerald-500' : 'bg-amber-500'}`}>
+                <div className={`h-4 w-4 rounded-full bg-white transition-transform ${draftPerformanceMode ? 'translate-x-5' : 'translate-x-0'}`} />
+              </div>
+            </button>
+          </div>
+
           {/* Font Size Section */}
           <div className="rounded-3xl border border-slate-300 bg-[rgb(241,243,246)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:border-white/10 dark:bg-white/[0.045] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
             <div className="mb-4 flex items-center gap-2">
@@ -239,12 +242,13 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-2 px-2">
-              <span className="text-2xl font-medium text-slate-900 dark:text-white">
+            <div className="flex items-center justify-center gap-3 px-2 md:px-6 w-full max-w-sm mx-auto min-h-[60px]">
+              {/* Desktop Font Scale Slider */}
+              <span className="hidden md:block text-xl font-medium text-slate-900 dark:text-white shrink-0">
                 A
               </span>
 
-              <div className="flex flex-[0.8] items-center justify-between px-2">
+              <div className="hidden md:flex flex-1 items-center justify-between px-1">
                 {fontSteps.map((step, index) => {
                   const isActive = step === draftFontScale;
 
@@ -264,7 +268,7 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
                         aria-label={`Set font size to ${step}%`}
                       >
                         <span
-                          className={`relative h-4 w-4 rounded-full border transition ${isActive
+                          className={`relative h-2 w-2 rounded-full border transition ${isActive
                             ? "scale-125 border-primary bg-primary shadow-[0_0_0_6px_rgba(128,0,0,0.18)]"
                             : "border-slate-300 bg-white hover:scale-110 hover:border-primary/50 hover:bg-primary/15 dark:border-white/15 dark:bg-white/80"
                             }`}
@@ -275,9 +279,19 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
                 })}
               </div>
 
-              <span className="text-5xl font-medium leading-none text-slate-900 dark:text-white">
+              <span className="hidden md:block text-5xl font-medium leading-none text-slate-900 dark:text-white shrink-0">
                 A
               </span>
+
+              {/* Mobile Text Preview */}
+              <div className="md:hidden flex items-center justify-center h-16 w-full rounded-2xl bg-white/50 border border-slate-200 dark:bg-black/20 dark:border-white/10 shadow-inner">
+                <span
+                  className="font-medium text-slate-900 dark:text-white transition-all duration-300"
+                  style={{ fontSize: `${(draftFontScale / 100) * 1.5}rem` }}
+                >
+                  Aa
+                </span>
+              </div>
             </div>
 
             <div className="mt-4 flex items-center justify-center gap-3">
@@ -326,22 +340,22 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Footer */}
-        <div className="sticky bottom-0 w-full border-t border-slate-300/90 bg-white/50 px-7 py-5 flex items-center justify-end gap-3 dark:border-white/10 dark:bg-white/5">
+        <div className="border-t border-slate-300/90 bg-white/50 p-4 sm:px-7 sm:py-5 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 dark:border-white/10 dark:bg-white/5 shrink-0 pb-6 sm:pb-5">
           {!hasPendingChanges && (
-            <p className="mr-auto text-xs font-medium text-slate-500 dark:text-white/40">
+            <p className="hidden sm:block mr-auto text-xs font-medium text-slate-500 dark:text-white/40">
               Settings are up to date
             </p>
           )}
           <button
             onClick={handleCancelSettings}
-            className="rounded-2xl border border-slate-300 bg-white px-6 py-2.5 text-sm font-thin transition hover:bg-slate-50 dark:border-white/10 dark:bg-white/5"
+            className="rounded-2xl border border-slate-300 bg-white px-6 py-3.5 sm:py-2.5 text-sm font-medium transition hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 w-full sm:w-auto"
           >
             Cancel
           </button>
           <button
             onClick={handleApplySettings}
             disabled={!hasPendingChanges}
-            className={`rounded-2xl px-8 py-2.5 text-sm font-bold transition shadow-lg ${hasPendingChanges
+            className={`rounded-2xl px-8 py-3.5 sm:py-2.5 text-sm font-bold transition shadow-lg w-full sm:w-auto ${hasPendingChanges
               ? 'bg-primary text-white hover:bg-primary/90'
               : 'bg-slate-200 text-slate-400 cursor-not-allowed dark:bg-white/5 dark:text-white/20'
               }`}
@@ -349,8 +363,7 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
             Apply Changes
           </button>
         </div>
-      </div>
-    </div>,
-    document.body
+      </ResponsiveModalContent>
+    </ResponsiveModal>
   );
 };

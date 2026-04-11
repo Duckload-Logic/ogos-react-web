@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Spinner } from "@/components/shared";
-import { useIIRProfile, useUserIIR } from "@/features/iir/hooks";
+import { useIIRProfile, useUserIIR, useIIRDownload } from "@/features/iir/hooks";
 import { useMe } from "@/features/users/hooks/useMe";
 import { TabId } from "../constants";
 import { asText } from "../utils";
-import { Trash, Edit, User } from "lucide-react";
+import { Trash, Edit, User, Printer, Loader2 } from "lucide-react";
 import { BioCard, InfoContent, InfoNavigation } from "../components/profile";
 import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
@@ -31,6 +31,8 @@ export default function IIRProfile() {
     isError,
     error,
   } = useIIRProfile(finalIirId || "");
+
+  const { downloadPDF, isDownloading } = useIIRDownload();
 
   const [activeTab, setActiveTab] = useState<TabId>("personal");
 
@@ -58,6 +60,22 @@ export default function IIRProfile() {
     isLoading,
     headerActions: (
       <div className="flex items-center gap-2">
+        <button
+          onClick={() => finalIirId && downloadPDF(finalIirId)}
+          disabled={isDownloading || !finalIirId}
+          className="flex items-center justify-center h-10 w-10 p-0 hover:bg-emerald-500/10 disabled:opacity-50 disabled:hover:bg-transparent transition-colors rounded-xl border border-emerald-500/20 group"
+          title="Download PDF"
+        >
+          {isDownloading ? (
+            <Loader2 size={ICON_SIZE} className="text-emerald-500 animate-spin" />
+          ) : (
+            <Printer
+              size={ICON_SIZE}
+              className="text-emerald-500 group-hover:scale-110 transition-transform"
+            />
+          )}
+        </button>
+
         {isAdminOrSuper ? (
           <button className="flex items-center justify-center h-10 w-10 p-0 hover:bg-red-500/10 transition-colors rounded-xl border border-red-500/20 group">
             <Trash

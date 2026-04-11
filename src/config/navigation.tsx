@@ -20,7 +20,7 @@ export interface NavItem {
   icon: React.ReactNode;
 }
 
-const ICON_SIZE = 20;
+const ICON_SIZE = "1.25rem";
 
 export const NAV_CONFIG: Record<string, NavItem[]>[] = [
   {
