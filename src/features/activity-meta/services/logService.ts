@@ -42,9 +42,14 @@ export interface SystemLogsResponse {
  * @param config - Optional axios config with metadata
  * @returns List of user activities
  */
-export async function GetMyActivities(config?: AxiosConfigWithMeta): Promise<SystemLogsResponse> {
+export async function GetMyActivities(
+  config?: AxiosConfigWithMeta,
+): Promise<SystemLogsResponse> {
   try {
-    const { data } = await apiClient.get(API_ROUTES.superadmin.logs.myLogs, config);
+    const { data } = await apiClient.get(
+      API_ROUTES.superadmin.logs.myLogs,
+      config,
+    );
     return data;
   } catch (error: any) {
     const handlerName = config?.handlerName || "GetMyActivities";

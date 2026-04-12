@@ -5,6 +5,7 @@ import { z } from 'zod';
  * Matches backend validation requirements
  */
 export const significantNoteSchema = z.object({
+  appointmentId: z.string().optional(),
   note: z
     .string()
     .min(1, 'Note description is required')

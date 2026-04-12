@@ -73,7 +73,7 @@ export default function Callback() {
           // Synchronize AuthContext state before proceeding
           await refresh();
 
-          roleKey = response.role.toLowerCase().replace(" ", "");
+          roleKey = response.role.name.toLowerCase().replace(" ", "");
         } else {
           // Synchronize AuthContext state (Native already refetched in Login.tsx
           // but we call it anyway for robustness)
@@ -81,10 +81,10 @@ export default function Callback() {
 
           // Fetch user profile to determine role (Native only)
           const user = await GetCurrentUser();
-          if (!user.roles || user.roles.length === 0) {
+          if (!user.role) {
             throw new Error("User has no roles assigned");
           }
-          roleKey = user.roles[0]?.toLowerCase().replace(" ", "");
+          roleKey = user.role.name.toLowerCase().replace(" ", "");
         }
 
         const dashboardRoute = (ROLE_ROUTES_INTERNAL as Record<string, string>)[

@@ -42,7 +42,7 @@ export const NAV_CONFIG: Record<string, NavItem[]>[] = [
       },
       {
         label: "Admission Slips",
-        href: "/admin/admission-slips",
+        href: "/admin/slips",
         icon: <FileText size={ICON_SIZE} />,
       },
       {
@@ -78,35 +78,6 @@ export const NAV_CONFIG: Record<string, NavItem[]>[] = [
         label: "IIR Profile",
         href: "/student/iir",
         icon: <User size={ICON_SIZE} />,
-      },
-    ],
-  },
-  {
-    superadmin: [
-      {
-        label: "Dashboard",
-        href: "/superadmin",
-        icon: <Home size={ICON_SIZE} />,
-      },
-      {
-        label: "API Management",
-        href: "/superadmin/api-management",
-        icon: <Key size={ICON_SIZE} />,
-      },
-      {
-        label: "Security Logs",
-        href: "/superadmin/security-logs",
-        icon: <Shield size={ICON_SIZE} />,
-      },
-      {
-        label: "System Logs",
-        href: "/superadmin/system-logs",
-        icon: <Server size={ICON_SIZE} />,
-      },
-      {
-        label: "Audit Logs",
-        href: "/superadmin/audit-logs",
-        icon: <ClipboardList size={ICON_SIZE} />,
       },
     ],
   },

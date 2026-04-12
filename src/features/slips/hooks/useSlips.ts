@@ -111,3 +111,17 @@ export function useSlipLogs(params?: SlipLogsParams) {
     refetchOnWindowFocus: false,
   });
 }
+
+/**
+ * Hook to fetch slip by ID
+ */
+export function useGetSlipById(id: string) {
+  return useQuery({
+    queryKey: [...QUERY_KEYS.slips.all, "byId", id],
+    queryFn: () => slipService.GetSlipById(id),
+    staleTime: CACHE_TIMING.SHORT.staleTime,
+    gcTime: CACHE_TIMING.SHORT.gcTime,
+    refetchOnWindowFocus: false,
+    enabled: !!id,
+  });
+}

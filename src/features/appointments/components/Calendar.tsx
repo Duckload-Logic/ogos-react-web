@@ -210,18 +210,17 @@ export default function Calendar({
       {/* Desktop View: Inline Card */}
       <div className="hidden sm:block">
         <Card
-          className={`shadow-sm bg-card border border-border h-fit
+          className={`shadow-2xl border-glass-border bg-glass-bg/40 backdrop-blur-2xl h-fit transition-all duration-500 hover:bg-glass-bg/50
         ${className ?? ""}`}
         >
           {hasHeader && (
             <CardHeader
-              className="bg-gradient-to-r from-muted/50 to-muted
-            border-b border-border rounded-t-md"
+              className="bg-muted/10 border-b border-glass-border/30 rounded-t-3xl px-6 py-5"
             >
-              <CardTitle className="text-xl text-foreground">{title}</CardTitle>
+              <CardTitle className="text-xl font-bold tracking-tight text-foreground/90">{title}</CardTitle>
             </CardHeader>
           )}
-          <CardContent className="pt-6 bg-card rounded-b-md">
+          <CardContent className="pt-8 px-6 pb-8">
             <CalendarContent />
           </CardContent>
         </Card>

@@ -5,8 +5,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Calendar } from "lucide-react";
 import { useSlipLogs, useGetSlipStats } from "../../hooks";
-import type { Slip, SlipStats } from "../../types";
-import { ViewModal, SlipList } from "../../components";
+import type { Slip, SlipStats, SlipStatus } from "../../types";
+import { SlipList } from "../../components";
 import { STATUS_COLORS } from "@/config/constants";
 import {
   getMonthsList,
@@ -17,6 +17,7 @@ import { Dropdown } from "@/components/form";
 import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 export default function SlipLogs() {
+  const navigate = useNavigate();
 
   // Memoize year and month lists to keep them stable across renders
   const monthsList = useMemo(() => getMonthsList(), []);
@@ -53,8 +54,6 @@ export default function SlipLogs() {
   };
 
   // State for other filters
-  const [selectedSlip, setSelectedSlip] = useState<Slip | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [statusFilter, setStatusFilter] = useState<string>("0");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
@@ -111,8 +110,7 @@ export default function SlipLogs() {
 
   // Handle actions
   const handleViewSlip = (slip: Slip) => {
-    setSelectedSlip(slip);
-    setIsModalOpen(true);
+    navigate(`/admin/slips/${slip.id}`);
   };
 
 
@@ -156,48 +154,8 @@ export default function SlipLogs() {
           </CardContent>
         </Card>
 
-        {/* Status Filter Cards */}
-        <div>
-          <h3 className="text-sm font-medium text-foreground mb-3">
-            Filter by Status
-          </h3>
-          <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-            {/* Status Cards */}
-            {slipStatusesWithAll.map((status: SlipStats) => {
-              const count = status.count || 0;
-              return (
-                <Card
-                  key={String(status.id)}
-                  className={`cursor-pointer transition-all ${
-                    statusFilter === String(status.id)
-                      ? `border-2 ${STATUS_COLORS[status.colorKey]}`
-                      : ""
-                  }`}
-                  onClick={() => {
-                    setStatusFilter(String(status.id));
-                    setCurrentPage(1);
-                  }}
-                >
-                  <CardContent className="pt-6">
-                    <div className="text-right">
-                      <Badge className="mb-2" variant="outline">
-                        {status.name}
-                      </Badge>
-                      <p className="text-2xl font-bold text-foreground">
-                        {count}
-                      </p>
-                      <p className="text-xs text-muted-foreground mt-1">
-                        {count === 1 ? "slip" : "slips"}
-                      </p>
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </div>
-
         {/* Slips List */}
+
         <SlipList
           title="Submission Details"
           slips={slips}
@@ -210,20 +168,11 @@ export default function SlipLogs() {
           }}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
-          totalPages={totalPages}
-        />
-
-        {/* View Modal */}
-        <ViewModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          slip={selectedSlip}
-          isAdmin={false}
-          onApprove={() => {}}
-          onReject={() => {}}
-          onForRevision={() => {}}
-          isLoading={false}
-        />
+          totalPages={totalPages} statuses={[]}
+          // @ts-ignore
+          selectedStatus={undefined} statusCounts={[]} onStatusChange={function (status: SlipStatus): void {
+            throw new Error("Function not implemented.");
+          }} />
       </div>
     </>
   );

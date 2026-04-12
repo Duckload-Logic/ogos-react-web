@@ -1,6 +1,4 @@
-/**
- * IDP (Identity Provider) OAuth 2.0 Type Definitions
- */
+import { UserRole } from "@/features/users/types/user";
 
 /**
  * Request payload for POST /auth/idp/token endpoint
@@ -12,8 +10,7 @@ export interface IDPTokenExchangeRequest {
 
 export interface IDPTokenExchangeResponse {
   message: string;
-  role: string;
-  roles: string[];
+  role: UserRole;
   userId: string;
   userEmail: string;
 }
@@ -25,7 +22,6 @@ export interface IDPTokenExchangeResponse {
 export const ROLE_ROUTES_INTERNAL = Object.freeze({
   student: "/student",
   admin: "/admin",
-  superadmin: "/superadmin",
 } as const);
 
 /**

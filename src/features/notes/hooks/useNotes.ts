@@ -47,11 +47,22 @@ export function useCreateNote(
         handlerName: "useCreateNote",
         stepName: "Create Note",
       }),
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       // Invalidate and refetch notes
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.notes.byIirId(iirId),
       });
+
+      // Invalidate related appointment if applicable
+      if (variables.appointmentId) {
+        queryClient.invalidateQueries({
+          queryKey: [...QUERY_KEYS.appointments.all, "byId", variables.appointmentId],
+        });
+        queryClient.invalidateQueries({
+          queryKey: QUERY_KEYS.appointments.all,
+        });
+      }
+
       onSuccess?.();
     },
     onError: (error: any) => {

@@ -167,7 +167,7 @@ export default function NotificationModal({
 
         <div className="border-t border-border p-4 text-center">
           <Link
-            to={`/${user?.roles?.[0]?.toLowerCase().replace(" ", "") || "student"}/notifications`}
+            to={`/${user?.role?.name?.toLowerCase().replace(" ", "") || "student"}/notifications`}
             onClick={() => setShowNotifications(false)}
             className="text-sm text-primary hover:underline transition inline-block w-full"
           >

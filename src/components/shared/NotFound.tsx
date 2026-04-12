@@ -14,7 +14,7 @@ const NotFound = () => {
     );
   }, [location.pathname]);
 
-  const userRole = user?.roles?.[0]?.toLowerCase() || "guest";
+  const userRole = user?.role || "guest";
   let homeRoute = ROLE_ROUTES[userRole as keyof typeof ROLE_ROUTES];
 
   return (

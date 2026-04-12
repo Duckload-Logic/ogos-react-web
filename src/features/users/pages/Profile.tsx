@@ -169,15 +169,13 @@ export default function Profile() {
                 >
                   {user.type.toUpperCase()} ACCOUNT
                 </Badge>
-                {user.roles.map((role) => (
-                  <Badge
-                    key={role}
-                    variant="secondary"
-                    className="px-3 py-1 rounded-full bg-muted/60 text-foreground font-semibold uppercase tracking-wider text-[10px]"
-                  >
-                    {role}
-                  </Badge>
-                ))}
+                <Badge
+                  key={user.role.id}
+                  variant="secondary"
+                  className="px-3 py-1 rounded-full bg-muted/60 text-foreground font-semibold uppercase tracking-wider text-[10px]"
+                >
+                  {user.role.name}
+                </Badge>
               </div>
               <h1 className="text-lg md:text-5xl font-black tracking-tight text-foreground bg-clip-text bg-gradient-to-r from-foreground to-foreground/60">
                 {user.firstName} {user.middleName && `${user.middleName[0]}. `}{" "}
@@ -551,13 +549,12 @@ export default function Profile() {
                       className="flex gap-4 p-4 rounded-2xl bg-muted/20 border border-border/10 group hover:bg-muted/30 transition-all"
                     >
                       <div
-                        className={`p-2 h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${
-                          log.category === "SECURITY"
-                            ? "bg-blue-500/10 text-blue-500"
-                            : log.category === "AUDIT"
-                              ? "bg-amber-500/10 text-amber-500"
-                              : "bg-primary/10 text-primary"
-                        }`}
+                        className={`p-2 h-10 w-10 rounded-xl flex items-center justify-center shrink-0 ${log.category === "SECURITY"
+                          ? "bg-blue-500/10 text-blue-500"
+                          : log.category === "AUDIT"
+                            ? "bg-amber-500/10 text-amber-500"
+                            : "bg-primary/10 text-primary"
+                          }`}
                       >
                         {log.action.includes("LOGIN") ? (
                           <Key size={20} />

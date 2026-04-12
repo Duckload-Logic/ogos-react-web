@@ -98,3 +98,14 @@ export const useUpdateAppointment = () => {
     },
   });
 };
+
+export const useAppointment = (id: string) => {
+  return useQuery<Appointment>({
+    queryKey: [...QUERY_KEYS.appointments.all, "byId", id],
+    queryFn: () => appointmentService.GetAppointmentById(id),
+    staleTime: CACHE_TIMING.SHORT.staleTime,
+    gcTime: CACHE_TIMING.SHORT.gcTime,
+    refetchOnWindowFocus: false,
+    enabled: !!id,
+  });
+};

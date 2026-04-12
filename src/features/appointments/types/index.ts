@@ -51,6 +51,7 @@ export interface PaginatedAppointmentsResponse {
 export interface Appointment {
   id?: string;
   iirId?: string;
+  studentNumber?: string;
   user?: User;
   reason: string;
   adminNotes?: string;
@@ -59,6 +60,7 @@ export interface Appointment {
   appointmentCategory: ConcernCategory;
   /** Status can be either an object or string */
   status?: AppointmentStatus;
+  hasSignificantNote?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

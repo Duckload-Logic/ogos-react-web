@@ -39,8 +39,9 @@ function NavItem({
       <Link
         to={item.href}
         onClick={onClick}
-        className={`flex flex-col items-center p-2 group ${active ? "text-primary" : "text-muted-foreground"
-          }`}
+        className={`flex flex-col items-center p-2 group ${
+          active ? "text-primary" : "text-muted-foreground"
+        }`}
       >
         <div className="w-6 h-6 flex items-center justify-center transition-transform group-hover:scale-110">
           {item.icon}
@@ -54,10 +55,11 @@ function NavItem({
       <Link
         to={item.href}
         onClick={onClick}
-        className={`flex items-center gap-3 p-4 rounded-xl transition-colors ${active
-          ? "bg-primary text-primary-foreground"
-          : "bg-muted/50 hover:bg-muted"
-          }`}
+        className={`flex items-center gap-3 p-4 rounded-xl transition-colors ${
+          active
+            ? "bg-primary text-primary-foreground"
+            : "bg-muted/50 hover:bg-muted"
+        }`}
       >
         <div className="w-6 h-6 flex items-center justify-center">
           {item.icon}
@@ -74,10 +76,11 @@ function NavItem({
       onClick={onClick}
       className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3
       transition-all duration-200 hover:shadow-sm
-      ${active
+      ${
+        active
           ? "bg-primary text-primary-foreground shadow-sm"
           : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-        }`}
+      }`}
     >
       <div
         className={`flex items-center justify-center w-6 shrink-0 transition-transform duration-200
@@ -131,9 +134,7 @@ export default function Navigation({
       return true;
     }
 
-    const isRootPath = ["/admin", "/student", "/superadmin", "/"].includes(
-      item.href,
-    );
+    const isRootPath = ["/admin", "/student", "/"].includes(item.href);
     if (isRootPath) {
       return false;
     }
@@ -180,8 +181,9 @@ export default function Navigation({
                 setDrawerMode("menu");
                 setOpenDrawer(true);
               }}
-              className={`flex flex-col items-center p-2 group ${isOverflowActive ? "text-primary" : "text-muted-foreground"
-                }`}
+              className={`flex flex-col items-center p-2 group ${
+                isOverflowActive ? "text-primary" : "text-muted-foreground"
+              }`}
             >
               <MoreHorizontal className="w-6 h-6 group-aria-pressed:animate-spin transition-transform" />
             </button>
@@ -190,10 +192,11 @@ export default function Navigation({
                 setDrawerMode("settings");
                 setOpenDrawer(true);
               }}
-              className={`flex flex-col items-center p-2 group ${location.pathname.includes(SETTINGS_HREF)
-                ? "text-primary"
-                : "text-muted-foreground"
-                }`}
+              className={`flex flex-col items-center p-2 group ${
+                location.pathname.includes(SETTINGS_HREF)
+                  ? "text-primary"
+                  : "text-muted-foreground"
+              }`}
             >
               <Settings className="w-6 h-6 group-hover:rotate-45 transition-transform" />
             </button>
@@ -234,7 +237,10 @@ export default function Navigation({
             )}
           </DrawerContent>
         </Drawer>
-        <UISettingsModal isOpen={uiSettingsOpen} onClose={() => setUiSettingsOpen(false)} />
+        <UISettingsModal
+          isOpen={uiSettingsOpen}
+          onClose={() => setUiSettingsOpen(false)}
+        />
       </>
     );
   }
@@ -267,14 +273,19 @@ export default function Navigation({
             onClick={toggleSidebarPinned}
             className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3 w-full
             transition-all duration-200 hover:shadow-sm
-            ${sidebarPinned
+            ${
+              sidebarPinned
                 ? "bg-primary/10 text-primary shadow-sm"
                 : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
-              }`}
+            }`}
             title={sidebarPinned ? "Unpin Sidebar" : "Pin Sidebar"}
           >
             <div className="flex items-center justify-center w-6 shrink-0">
-              {sidebarPinned ? <PinOff size="1.25rem" /> : <Pin size="1.25rem" />}
+              {sidebarPinned ? (
+                <PinOff size="1.25rem" />
+              ) : (
+                <Pin size="1.25rem" />
+              )}
             </div>
             {isExpanded && (
               <span className="font-medium whitespace-nowrap overflow-hidden w-auto animate-in fade-in slide-in-from-left-2 duration-200">

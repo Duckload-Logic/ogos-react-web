@@ -3,6 +3,7 @@
  * Handles login, registration, and logout operations
  */
 
+import { UserRole, User } from "@/features/users/types/user";
 import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
 import { API_ROUTES } from "@/config/apiRoutes";
 import type {
@@ -37,16 +38,6 @@ export interface RegisterResponse {
   userId: string;
   email: string;
   message: string;
-}
-
-export interface UserProfile {
-  id: string;
-  firstName: string;
-  lastName: string;
-  email: string;
-  roles: string[];
-  type: string;
-  createdAt: string;
 }
 
 /**
@@ -132,7 +123,7 @@ export const PostRegister = async (
  */
 export const GetCurrentUser = async (
   config?: AxiosConfigWithMeta,
-): Promise<UserProfile> => {
+): Promise<User> => {
   try {
     const { data } = await apiClient.get(API_ROUTES.auth.me, config);
     return data;
@@ -175,7 +166,7 @@ export const authService = {
     return PostRegister(payload);
   },
 
-  async getCurrentUser(): Promise<UserProfile> {
+  async getCurrentUser(): Promise<User> {
     return GetCurrentUser();
   },
 
