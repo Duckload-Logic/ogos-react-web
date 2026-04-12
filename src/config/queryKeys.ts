@@ -126,21 +126,6 @@ export const QUERY_KEYS = {
     all: ["notes"] as const,
     byIirId: (iirId: string) => ["notes", "iir", iirId] as const,
   },
-
-  /**
-   * Superadmin-related query keys
-   */
-  superadmin: {
-    apiKeys: (includeRevoked: boolean) =>
-      ["superadmin", "api-keys", includeRevoked] as const,
-    securityLogs: (params?: any) =>
-      ["superadmin", "security-logs", params] as const,
-    systemLogs: (params?: any) =>
-      ["superadmin", "system-logs", params] as const,
-    auditLogs: (params?: any) => ["superadmin", "audit-logs", params] as const,
-    logStats: (startDate?: string, endDate?: string) =>
-      ["superadmin", "log-stats", startDate, endDate] as const,
-  },
   /**
    * Notifications-related query keys
    */

@@ -32,8 +32,6 @@ export default function BackNav({
       // Default fallback based on path
       if (location.pathname.startsWith("/admin")) {
         navigate("/admin");
-      } else if (location.pathname.startsWith("/superadmin")) {
-        navigate("/superadmin");
       } else {
         navigate("/student");
       }

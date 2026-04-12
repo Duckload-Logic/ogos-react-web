@@ -90,6 +90,7 @@ export const API_ROUTES = Object.freeze({
   analytics: Object.freeze({
     all: "/analytics",
     reports: "/analytics/reports",
+    adminDashboard: "/analytics/admin-dashboard",
   }),
 
   /**
@@ -173,16 +174,7 @@ export const API_ROUTES = Object.freeze({
    * Superadmin related endpoints
    */
   superadmin: Object.freeze({
-    apiKeys: Object.freeze({
-      list: "/access-tokens",
-      create: "/access-tokens",
-      revoke: (id: number) => `/access-tokens/${id}`,
-    }),
     logs: Object.freeze({
-      security: "/activity-meta/security",
-      system: "/activity-meta/system",
-      audit: "/activity-meta/audit",
-      stats: "/activity-meta/stats",
       myLogs: "/activity-meta/me",
     }),
   }),

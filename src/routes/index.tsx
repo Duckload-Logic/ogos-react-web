@@ -19,7 +19,10 @@ import { StudentSlips, SubmitSlip } from "@/features/slips/pages/student";
 import Dashboard from "@/features/admin/pages/Dashboard";
 import StudentRecords from "@/features/admin/pages/StudentRecords";
 import AppointmentsManagement from "@/features/appointments/pages/admin/AppointmentsManagement";
+import AppointmentDetails from "@/features/appointments/pages/admin/AppointmentDetails";
+import AppointmentLogs from "@/features/appointments/pages/admin/AppointmentLogs";
 import ReviewSlips from "@/features/slips/pages/admin/ReviewSlips";
+import SlipDetails from "@/features/slips/pages/admin/SlipDetails";
 import SlipLogs from "@/features/slips/pages/admin/SlipLogs";
 import Reports from "@/features/analytics/pages/Reports";
 import Analytics from "@/features/analytics/pages/Analytics";
@@ -29,14 +32,6 @@ import { CreateAppointment } from "@/features/appointments";
 import StatementPage from "@/features/consents/pages/StatementPage";
 import Profile from "@/features/users/pages/Profile";
 
-// Super Admin Feature
-import {
-  SuperAdminDashboard,
-  APIManagement,
-  SecurityLogs,
-  SystemLogs,
-  AuditLogs,
-} from "@/features/superadmin";
 import Callback from "@/features/auth/pages/Callback";
 import NotificationsPage from "@/features/notifications/pages/Notifications";
 
@@ -168,11 +163,23 @@ export const routes: RouteObject[] = [
         element: <AppointmentsManagement />,
       },
       {
-        path: "admission-slips",
+        path: "appointments/:id",
+        element: <AppointmentDetails />,
+      },
+      {
+        path: "appointments/logs",
+        element: <AppointmentLogs />,
+      },
+      {
+        path: "slips",
         element: <ReviewSlips />,
       },
       {
-        path: "admission-slips/logs",
+        path: "slips/:id",
+        element: <SlipDetails />,
+      },
+      {
+        path: "slips/logs",
         element: <SlipLogs />,
       },
       {
@@ -182,46 +189,6 @@ export const routes: RouteObject[] = [
       {
         path: "analytics",
         element: <Analytics />,
-      },
-      {
-        path: "profile",
-        element: <Profile />,
-      },
-      {
-        path: "notifications",
-        element: <NotificationsPage />,
-      },
-    ],
-  },
-
-  // Super Admin routes
-  {
-    path: "/superadmin",
-    element: (
-      <ProtectedRoute requiredRole="superadmin">
-        <Layout />
-      </ProtectedRoute>
-    ),
-    children: [
-      {
-        index: true,
-        element: <SuperAdminDashboard />,
-      },
-      {
-        path: "api-management",
-        element: <APIManagement />,
-      },
-      {
-        path: "security-logs",
-        element: <SecurityLogs />,
-      },
-      {
-        path: "system-logs",
-        element: <SystemLogs />,
-      },
-      {
-        path: "audit-logs",
-        element: <AuditLogs />,
       },
       {
         path: "profile",

@@ -6,11 +6,10 @@ import BackNav from "./BackNav";
 const PATH_LABELS: Record<string, string> = {
   home: "Dashboard",
   appointments: "Appointments",
-  "admission-slips": "Admission Slips",
+  slips: "Admission Slips",
   "student-records": "Student Records",
   reports: "Reports",
   analytics: "Analytics",
-  slips: "Admission Slips",
   "api-management": "API Management",
   "security-logs": "Security Logs",
   "system-logs": "System Logs",
@@ -63,13 +62,7 @@ export default function Breadcrumbs() {
       <ol className="flex items-center gap-2 overflow-hidden text-sm font-medium">
         <li className="flex items-center">
           <Link
-            to={
-              pathnames[0] === "admin"
-                ? "/admin"
-                : pathnames[0] === "superadmin"
-                  ? "/superadmin"
-                  : "/student"
-            }
+            to={pathnames[0] === "admin" ? "/admin" : "/student"}
             className="flex items-center text-muted-foreground hover:text-primary transition-colors"
           >
             <Home size={14} className="mr-1.5" />
@@ -79,8 +72,7 @@ export default function Breadcrumbs() {
 
         {pathnames.map((value, index) => {
           // Skip first segment if it's just the role prefix
-          if (index === 0 && ["admin", "student", "superadmin"].includes(value))
-            return null;
+          if (index === 0 && ["admin", "student"].includes(value)) return null;
 
           const last = index === pathnames.length - 1;
           const to = `/${pathnames.slice(0, index + 1).join("/")}`;
