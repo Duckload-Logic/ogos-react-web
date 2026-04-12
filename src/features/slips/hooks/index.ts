@@ -6,6 +6,7 @@ export {
   useGetUrgentSlips,
   useGetSlipStats,
   useSlipLogs,
+  useGetSlipById,
 } from "./useSlips";
 
 export {
