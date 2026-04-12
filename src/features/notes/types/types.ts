@@ -4,7 +4,8 @@
  */
 
 export interface SignificantNote {
-  id?: number;
+  id?: string;
+  appointmentId?: string;
   note: string;
   remarks: string;
   createdAt?: string;
@@ -12,6 +13,7 @@ export interface SignificantNote {
 }
 
 export interface CreateNoteRequest {
+  appointmentId?: string;
   note: string;
   remarks: string;
 }

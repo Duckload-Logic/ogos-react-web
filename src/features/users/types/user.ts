@@ -5,12 +5,13 @@ export interface UserRole {
 
 export interface User {
   id: string;
-  roles: string[];
+  role: UserRole;
   firstName: string;
   middleName?: string;
   lastName: string;
   email: string;
   type: string;
+  studentNumber?: string;
   profilePicture?: string;
   createdAt?: string;
   updatedAt?: string;

@@ -3,8 +3,9 @@
  * Only visible to Admin and Counselor roles
  */
 
-import { useState } from "react";
-import { Plus } from "lucide-react";
+import { useEffect, useState } from "react";
+import { Plus, ExternalLink } from "lucide-react";
+import { Link, useSearchParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useStudentNotes, useCreateNote } from "../hooks/useNotes";
 import { SignificantNoteFormData } from "../validation/noteSchema";
@@ -26,7 +27,23 @@ export default function SignificantNotes({
   iirId,
 }: SignificantNotesProps) {
   const { triggerToast } = useToast();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
+
+  // Check for query parameters to trigger modal
+  const shouldOpenModal = searchParams.get("addNote") === "true";
+  const initialAppointmentId = searchParams.get("appointmentId") || undefined;
+
+  useEffect(() => {
+    if (shouldOpenModal) {
+      setIsModalOpen(true);
+      // Clean up URL parameters after opening
+      const newParams = new URLSearchParams(searchParams);
+      newParams.delete("addNote");
+      newParams.delete("appointmentId");
+      setSearchParams(newParams, { replace: true });
+    }
+  }, [shouldOpenModal, searchParams, setSearchParams]);
 
   const { data: notes, isLoading, isError } = useStudentNotes(iirId);
 
@@ -105,6 +122,21 @@ export default function SignificantNotes({
                   label="Action Taken / Remarks"
                   value={note.remarks || NOT_SPECIFIED}
                 />
+                {note.appointmentId && (
+                  <div className="flex justify-end pt-2">
+                    <Button
+                      variant="link"
+                      size="sm"
+                      className="h-auto p-0 flex items-center gap-1.5 text-xs text-primary/80 hover:text-primary transition-colors"
+                      asChild
+                    >
+                      <Link to={`/admin/appointments/${note.appointmentId}`}>
+                        <ExternalLink size={12} />
+                        View Related Appointment
+                      </Link>
+                    </Button>
+                  </div>
+                )}
               </div>
             </CardBlock>
           ))
@@ -118,6 +150,7 @@ export default function SignificantNotes({
         onClose={() => setIsModalOpen(false)}
         onSubmit={handleSubmit}
         isSubmitting={createNoteMutation.isPending}
+        appointmentId={initialAppointmentId}
       />
     </div>
   );

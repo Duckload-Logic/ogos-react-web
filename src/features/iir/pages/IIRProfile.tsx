@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useParams, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { useParams, Link, useSearchParams } from "react-router-dom";
 import { Spinner } from "@/components/shared";
 import { useIIRProfile, useUserIIR, useIIRDownload } from "@/features/iir/hooks";
 import { useMe } from "@/features/users/hooks/useMe";
@@ -33,8 +33,16 @@ export default function IIRProfile() {
   } = useIIRProfile(finalIirId || "");
 
   const { downloadPDF, isDownloading } = useIIRDownload();
+  const [searchParams] = useSearchParams();
 
   const [activeTab, setActiveTab] = useState<TabId>("personal");
+
+  // Switch to significantNotes tab if prompted by URL
+  useEffect(() => {
+    if (searchParams.get("addNote") === "true") {
+      setActiveTab("significantNotes");
+    }
+  }, [searchParams]);
 
   const isWaitingForMe = !targetRecordId && isMeLoading;
   const isWaitingForIirId =
@@ -45,17 +53,16 @@ export default function IIRProfile() {
 
   const isLoading = isWaitingForMe || isWaitingForIirId || isWaitingForProfile;
 
-  const isAdminOrSuper = me?.roles?.some((r) => {
-    const role = r.toLowerCase().replace(/\s+/g, "");
-    return role === "admin";
-  });
+  const isAdmin = me?.role.name.toLowerCase() === "admin";
+  const isCounselor = me?.role.name.toLowerCase() === "counselor";
+  const showSignificantNotes = isAdmin || isCounselor;
 
   usePageMetadata({
-    title: isAdminOrSuper ? "Individual Inventory Record" : "My IIR Profile",
-    description: isAdminOrSuper
+    title: isAdmin || isCounselor ? "Individual Inventory Record" : "My IIR Profile",
+    description: isAdmin || isCounselor
       ? "Comprehensive student record review for guidance purposes"
       : "Manage your personal guidance information and student record",
-    badgeText: isAdminOrSuper ? "Admin Audit" : "Student Profile",
+    badgeText: isAdmin || isCounselor ? "Admin Audit" : "Student Profile",
     badgeIcon: <User size={16} />,
     isLoading,
     headerActions: (
@@ -76,7 +83,7 @@ export default function IIRProfile() {
           )}
         </button>
 
-        {isAdminOrSuper ? (
+        {isAdmin ? (
           <button className="flex items-center justify-center h-10 w-10 p-0 hover:bg-red-500/10 transition-colors rounded-xl border border-red-500/20 group">
             <Trash
               size={ICON_SIZE}
@@ -122,7 +129,6 @@ export default function IIRProfile() {
       </div>
     );
 
-  const showSignificantNotes = isAdminOrSuper;
 
   return (
     <>
@@ -140,6 +146,7 @@ export default function IIRProfile() {
               activeTab={activeTab}
               studentData={studentData}
               showSignificantNotes={showSignificantNotes}
+              iirId={finalIirId}
             />
           </div>
         </div>

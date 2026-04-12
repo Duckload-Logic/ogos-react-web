@@ -34,12 +34,9 @@ export function useIIRStatus() {
  * Hook to fetch a specific user's IIR record
  */
 export function useUserIIR(userID?: string) {
-  console.debug("useUserIIR called with userID:", userID);
-
   return useQuery({
     queryKey: QUERY_KEYS.iir.inventory.byUserId(userID ?? ""),
     queryFn: async () => {
-      console.debug("Fetching IIR for userID:", userID);
       return GetIIRByUserId(userID as string);
     },
     staleTime: CACHE_TIMING.LONG.staleTime,

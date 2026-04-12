@@ -7,21 +7,12 @@ import { useToast } from "@/context";
 import SignificantNotes from "@/features/notes/components/SignificantNotes";
 import EmptyState from "./EmptyState";
 
-export default function NotesView({ data }: { data: any }) {
+export default function NotesView({ data, iirId }: { data: any; iirId?: string }) {
   const { data: me } = useMe({});
-  const location = useLocation();
-  const { iirId: hashedId } = useParams();
-  const { data: iir } = useUserIIR(!hashedId && me?.id ? me.id : "");
-  const { triggerToast } = useToast();
-
-  // Determine which resolved ID to use
-  const resolvedId =
-    location.state?.student?.iirId ||
-    (hashedId ? unhashId(decodeURIComponent(hashedId)) : undefined) ||
-    iir?.id;
+  const resolvedId = iirId;
 
   // Check if user has authorized role
-  const userRole = me?.roles?.[0]?.toLowerCase();
+  const userRole = me?.role.name.toLowerCase();
   const isAuthorized = userRole === "admin" || userRole === "counselor";
 
   // Don't render for unauthorized users

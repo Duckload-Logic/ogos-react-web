@@ -11,10 +11,12 @@ export default function InfoContent({
   activeTab,
   studentData,
   showSignificantNotes = true,
+  iirId,
 }: {
   activeTab: TabId;
   studentData: any;
   showSignificantNotes?: boolean;
+  iirId?: string;
 }) {
   const views: Record<TabId, JSX.Element> = {
     personal: <PersonalView data={studentData?.student} />,
@@ -24,7 +26,7 @@ export default function InfoContent({
     interests: <InterestsHobbiesView data={studentData?.interests} />,
     testResults: <TestResultsView data={studentData?.testResults} />,
     ...(showSignificantNotes && {
-      significantNotes: <NotesView data={studentData?.significantNotes} />,
+      significantNotes: <NotesView data={studentData?.significantNotes} iirId={iirId} />,
     }),
   } as Record<TabId, JSX.Element>;
 
