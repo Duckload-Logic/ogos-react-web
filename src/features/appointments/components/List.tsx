@@ -9,6 +9,9 @@ import { SearchInput } from "@/components/form";
 import { format12HourTime } from "../utils";
 import { formatDate } from "@/features/schedules/utils/formatters";
 import { Spinner } from "@/components/shared";
+import { Badge } from "@/components/ui/badge";
+import { cn } from "@/lib/utils";
+import { Dropdown } from "@/components/form";
 
 interface AppointmentListProps {
   title?: string;
@@ -51,96 +54,86 @@ export default function AppointmentList({
     return map;
   }, [statusCounts]);
 
+  const dropdownOptions = useMemo(() => {
+    return statuses.map(s => ({
+      ...s,
+      displayName: s.id === 0 ? "All Statuses" : `${s.name} (${statMap[s.id]?.count || 0})`
+    }));
+  }, [statuses, statMap]);
+
   return (
     <Card
-      className={`border border-border shadow-sm lg:col-span-3 flex flex-col ${className || ""}`}
+      className={`border-glass-border bg-glass-bg/40 shadow-2xl backdrop-blur-2xl lg:col-span-3 flex flex-col overflow-hidden transition-all duration-500 hover:bg-glass-bg/50 ${className || ""}`}
     >
-      <CardHeader className="border-b border-border px-5 py-5 space-y-5 bg-muted/45">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-          <div className="space-y-1 text-left">
-            <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-            <p className="text-sm text-muted-foreground">
-              Review, filter, and manage appointment requests.
-            </p>
+      <CardHeader className="border-b border-glass-border/30 px-8 py-7 space-y-6 bg-muted/10">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+          <div className="space-y-1.5 text-left">
+            <h2 className="text-xl font-bold tracking-tight text-foreground/90">{title}</h2>
           </div>
 
           {!isLoading && appointments.length > 0 && (
-            <div className="rounded-full border border-border bg-muted/40 px-3 py-1 text-xs font-medium text-muted-foreground self-start">
-              {appointments.length} appointment
-              {appointments.length !== 1 ? "s" : ""}
+            <div className="rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-[10px] font-bold tracking-wide text-primary self-start shadow-sm">
+              {appointments.length} Total Record{appointments.length !== 1 ? "s" : ""}
             </div>
           )}
         </div>
 
-        <div className="flex flex-col gap-4 w-full">
+        <div className="flex flex-col sm:flex-row gap-4 w-full items-center">
           <SearchInput
             searchTerm={searchTerm}
             onSearchChange={onSearchChange}
-            placeholder="Search student name"
-            className="w-full"
+            placeholder="Search student identity..."
+            className="w-full border-glass-border/40 focus:bg-glass-bg/60 rounded-2xl"
             hasHeader={false}
           />
 
-          <div className="flex flex-wrap gap-2">
-            {statuses?.map((filter) => (
-              <button
-                key={filter.id}
-                onClick={() => onStatusChange(filter)}
-                className={`px-3 py-2 rounded-full text-sm font-medium whitespace-nowrap border transition-colors duration-200 ${selectedStatus?.id === filter.id
-                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                  : "bg-background text-muted-foreground border-border hover:bg-muted/60 hover:text-foreground"
-                  }`}
-              >
-                {filter.name}
-                {statMap[filter.id] && (
-                  <span
-                    className={`ml-1 text-xs ${selectedStatus?.id === filter.id
-                      ? "text-primary-foreground/90"
-                      : "text-muted-foreground"
-                      }`}
-                  >
-                    ({statMap[filter.id].count})
-                  </span>
-                )}
-              </button>
-            ))}
+          <div className="w-full sm:w-64">
+            <Dropdown
+              options={dropdownOptions}
+              value={selectedStatus?.id}
+              onChange={(val) => {
+                const status = statuses.find(s => s.id === val);
+                if (status) onStatusChange(status);
+              }}
+              labelKey="displayName"
+              enabled={!isLoading}
+              formStyle={false}
+            />
           </div>
         </div>
       </CardHeader>
 
       <CardContent className="p-0 flex-1">
         {isLoading ? (
-          <div className="flex min-h-[320px] items-center justify-center px-4 text-center">
-            <p className="text-muted-foreground">
-              <Spinner size="sm" message="Loading appointments" />
-            </p>
+          <div className="flex min-h-[350px] items-center justify-center px-6 text-center">
+            <Spinner size="sm" message="Synchronizing sessions" />
           </div>
         ) : appointments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-16 px-4">
-            <div className="p-4 bg-muted rounded-full mb-4">
-              <CalendarX className="w-8 h-8 text-muted-foreground" />
+          <div className="flex flex-col items-center justify-center py-24 px-6 text-center space-y-6">
+            <div className="p-6 bg-muted/20 rounded-full border border-glass-border/40 border-dashed animate-pulse">
+              <CalendarX className="w-10 h-10 text-muted-foreground/50" />
             </div>
-            <h3 className="text-lg font-semibold text-foreground mb-1">
-              No appointments found
-            </h3>
-            <p className="text-sm text-muted-foreground text-center max-w-sm">
-              Try adjusting your filters or check back later.
-            </p>
+            <div className="space-y-2">
+              <h3 className="text-xl font-black tracking-tight text-foreground/80">
+                Inbox Empty
+              </h3>
+              <p className="text-xs font-semibold text-muted-foreground tracking-wide opacity-70 leading-relaxed">
+                No active records match the current telemetry filters.
+              </p>
+            </div>
           </div>
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block overflow-x-auto px-2 pb-2">
-              <table className="w-full text-sm border-separate border-spacing-y-2">
-                <thead className="text-muted-foreground text-[11px] uppercase tracking-[0.12em]">
+            <div className="hidden md:block overflow-x-auto px-6 pb-6 pt-4">
+              <table className="w-full text-sm border-separate border-spacing-y-3">
+                <thead className="text-muted-foreground text-[10px] font-bold tracking-wide opacity-60">
                   <tr>
-                    <th className="px-4 py-3 text-left font-medium">Student</th>
-                    <th className="px-4 py-3 text-left font-medium">Time</th>
-                    <th className="px-4 py-3 text-left font-medium">
-                      Category
-                    </th>
-                    <th className="px-4 py-3 text-left font-medium">Status</th>
-                    <th className="px-4 py-3 text-left font-medium">View</th>
+                    <th className="px-6 py-4 text-left">Student Name</th>
+                    <th className="px-6 py-4 text-left">Session Time</th>
+                    <th className="px-6 py-4 text-left">Category</th>
+                    <th className="px-6 py-4 text-left">Status</th>
+                    <th className="px-6 py-4 text-right pr-10">Actions</th>
                   </tr>
                 </thead>
 
@@ -148,9 +141,9 @@ export default function AppointmentList({
                   {appointments.map((apt) => (
                     <tr
                       key={apt.id}
-                      className="group rounded-xl bg-background shadow-sm ring-1 ring-border transition-colors duration-200 hover:bg-muted/20"
+                      className="group rounded-[20px] bg-glass-bg/20 backdrop-blur-sm border border-glass-border/20 shadow-sm transition-all duration-300 hover:bg-glass-bg/60 hover:shadow-xl hover:scale-[1.005] hover:border-primary/20"
                     >
-                      <td className="px-4 py-4 text-foreground font-medium rounded-l-xl">
+                      <td className="px-6 py-6 text-foreground font-bold text-sm rounded-l-[20px] tracking-tight">
                         {apt.user?.firstName}{" "}
                         {apt.user?.middleName?.[0]
                           ? `${apt.user?.middleName?.[0]}. `
@@ -158,7 +151,7 @@ export default function AppointmentList({
                         {apt.user?.lastName}
                       </td>
 
-                      <td className="px-4 py-4 text-foreground whitespace-nowrap">
+                      <td className="px-6 py-6 text-foreground/80 font-bold whitespace-nowrap text-xs tracking-wide">
                         {format12HourTime(apt.timeSlot?.time || "")}
                       </td>
 
@@ -198,56 +191,57 @@ export default function AppointmentList({
             </div>
 
             {/* Mobile Card View */}
-            <div className="block md:hidden divide-y divide-border">
+            <div className="block md:hidden space-y-4 px-4 pb-6">
               {appointments.map((apt) => (
                 <div
                   key={apt.id}
-                  className="p-4 space-y-3 hover:bg-muted/30 transition-colors duration-200"
+                  className="p-6 space-y-4 bg-glass-bg/20 backdrop-blur-md rounded-3xl border border-glass-border/20 shadow-sm transition-all duration-300 active:scale-[0.98]"
                 >
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="flex items-center gap-2 text-foreground font-medium">
-                      <User className="w-4 h-4 text-muted-foreground" />
-                      <span>
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-center gap-3 text-foreground font-bold text-sm">
+                      <div className="p-2 bg-primary/10 rounded-xl border border-primary/20">
+                        <User className="w-4 h-4 text-primary" />
+                      </div>
+                      <span className="tracking-tight">
                         {apt.user?.firstName} {apt.user?.lastName}
                       </span>
                     </div>
 
-                    <span
-                      className={`inline-block px-2 py-1 rounded-full text-xs font-medium border ${STATUS_COLORS[apt.status?.colorKey || "info"]
-                        }`}
+                    <Badge
+                      className={cn("px-3 py-1 text-[9px] font-bold tracking-wide rounded-full border shadow-sm", STATUS_COLORS[apt.status?.colorKey || "info"])}
                     >
                       {apt.status?.name}
-                    </span>
+                    </Badge>
                   </div>
 
-                  <div className="grid grid-cols-2 gap-2 text-sm">
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <CalendarDays className="w-4 h-4" />
+                  <div className="grid grid-cols-2 gap-4 text-[10px] font-bold">
+                    <div className="flex items-center gap-2 text-muted-foreground/80 bg-muted/20 px-3 py-2 rounded-xl border border-glass-border/10">
+                      <CalendarDays className="w-3.5 h-3.5 text-primary/60" />
                       <span>{formatDate(apt.whenDate || "")}</span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <Clock className="w-4 h-4" />
+                    <div className="flex items-center gap-2 text-muted-foreground/80 bg-muted/20 px-3 py-2 rounded-xl border border-glass-border/10">
+                      <Clock className="w-3.5 h-3.5 text-primary/60" />
                       <span>{format12HourTime(apt.timeSlot?.time || "")}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-2">
-                    <Tag className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-sm bg-muted px-2 py-1 rounded-md">
+                  <div className="flex items-center gap-3 bg-muted/20 px-4 py-3 rounded-2xl border border-glass-border/10">
+                    <Tag className="w-4 h-4 text-primary/60" />
+                    <span className="text-[10px] font-bold tracking-wide text-foreground/70">
                       {apt.appointmentCategory?.name}
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-2">
+                  <div className="pt-2">
                     <Button
                       variant="outline"
                       size="sm"
                       onClick={() => onViewClick(apt)}
-                      className="gap-1"
+                      className="w-full gap-2 rounded-2xl border-primary/20 bg-primary/5 text-primary font-bold tracking-wide text-[10px] h-11"
                     >
-                      <Eye className="w-4 h-4" />
-                      View
+                      <Eye className="w-3.5 h-3.5" />
+                      Access Interface
                     </Button>
                   </div>
                 </div>

@@ -1,4 +1,5 @@
 import { useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   useAppointments,
   useAppointmentsStats,
@@ -9,12 +10,12 @@ import {
   AppointmentList,
 } from "@/features/appointments/components";
 import { Appointment, AppointmentStatus } from "@/features/appointments/types";
-import ViewModal from "@/features/appointments/components/ViewModal";
 import { useStatuses } from "../../hooks/useLookups";
 import { useDebounce } from "@/hooks/useDebounce";
 import { toISODateString } from "../../utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { STATUS_COLORS } from "@/config/constants";
+import { Button } from "@/components/ui/button";
 import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 import {
@@ -27,7 +28,8 @@ import {
   Cell,
 } from "recharts";
 import { ChartContainer } from "@/components/ui/chart";
-import { CalendarPlus } from "lucide-react";
+import { CalendarPlus, Archive } from "lucide-react";
+import { formatDate } from "@/utils";
 
 const chartConfig = {
   pending: {
@@ -61,6 +63,7 @@ const chartConfig = {
 };
 
 export default function AppointmentsManagement() {
+  const navigate = useNavigate();
   const { data: appointmentStatuses, isLoading: isStatusesLoading } =
     useStatuses();
 
@@ -109,23 +112,6 @@ export default function AppointmentsManagement() {
       },
     });
 
-  const monthlyRange = useMemo(() => {
-    const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-    const end = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
-    return {
-      start: getLocalDateString(start),
-      end: getLocalDateString(end)
-    };
-  }, [currentMonth]);
-
-  const { data: monthlyStatusCounts, isLoading: isMonthlyStatsLoading } =
-    useAppointmentsStats({
-      params: {
-        startDate: monthlyRange.start,
-        endDate: monthlyRange.end,
-      },
-    });
-
   const { data, isLoading } = useAppointments({
     isMe: false,
     params: {
@@ -150,104 +136,12 @@ export default function AppointmentsManagement() {
     }),
   );
 
-  const { mutateAsync: updateAppointment } = useUpdateAppointment();
-
-  const [selectedAppointment, setSelectedAppointment] =
-    useState<Appointment | null>(null);
-  const [isViewOpen, setIsViewOpen] = useState(false);
-
   const handleViewAppointment = (apt: Appointment) => {
-    setSelectedAppointment(apt);
-    setIsViewOpen(true);
-  };
-
-  const getStatusIdByAction = (action: string): number | undefined => {
-    const statusMap: Record<string, number | undefined> = {
-      Approve: statusCounts?.find((s) =>
-        s.name.toLowerCase().includes("scheduled"),
-      )?.id,
-      Reject: statusCounts?.find((s) =>
-        s.name.toLowerCase().includes("rejected"),
-      )?.id,
-      Reschedule: statusCounts?.find((s) =>
-        s.name.toLowerCase().includes("rescheduled"),
-      )?.id,
-      Cancel: statusCounts?.find((s) =>
-        s.name.toLowerCase().includes("cancelled"),
-      )?.id,
-      Complete: statusCounts?.find((s) =>
-        s.name.toLowerCase().includes("completed"),
-      )?.id,
-      "No-show": statusCounts?.find((s) =>
-        s.name.toLowerCase().includes("no-show"),
-      )?.id,
-    };
-
-    return statusMap[action];
-  };
-
-  const handleStatusAction = async (
-    apt: Appointment,
-    action: string,
-    message?: string,
-  ): Promise<boolean> => {
-    const statusId = getStatusIdByAction(action);
-
-    if (!statusId) return false;
-
-    const payload: any = {
-      status: { id: statusId },
-    };
-
-    if (message) {
-      payload.adminNotes = message;
-    }
-
-    try {
-      await updateAppointment({
-        id: apt.id!,
-        data: payload,
-      });
-      setIsViewOpen(false);
-      return true;
-    } catch {
-      return false;
-    }
-  };
-
-  const isWeekend = (date: Date) => {
-    const day = date.getDay();
-    return day === 0 || day === 6;
-  };
-
-  const handleReschedule = async (
-    apt: Appointment,
-    newDate: string,
-    newTimeSlotId: number,
-  ): Promise<boolean> => {
-    if (isWeekend(new Date(newDate))) {
-      alert("Selected date falls on a weekend.");
-      return false;
-    }
-
-    try {
-      await updateAppointment({
-        id: apt.id!,
-        data: {
-          whenDate: newDate,
-          timeSlot: { id: newTimeSlotId },
-        } as any,
-      });
-
-      setIsViewOpen(false);
-      return true;
-    } catch {
-      return false;
-    }
+    navigate(`${apt.id}`);
   };
 
   const chartData = (statusCounts || []).map((stat) => {
-    const count = monthlyStatusCounts?.find((s) => s.id === stat.id)?.count || 0;
+    const count = statusCounts?.find((s) => s.id === stat.id)?.count || 0;
 
     let key: keyof typeof chartConfig = "noShow";
 
@@ -265,8 +159,7 @@ export default function AppointmentsManagement() {
     };
   });
 
-  const isPageLoading =
-    isStatusesLoading || isStatsLoading || isMonthlyStatsLoading || isLoading;
+  const isPageLoading = isStatusesLoading;
 
   usePageMetadata({
     title: "Appointments Management",
@@ -274,37 +167,76 @@ export default function AppointmentsManagement() {
     badgeText: "Admin Management",
     badgeIcon: <CalendarPlus className="h-4 w-4" />,
     isLoading: isPageLoading,
+    headerActions: (
+      <Button
+        variant="outline"
+        onClick={() => navigate("/admin/appointments/logs")}
+        className="h-10 rounded-xl px-4 shadow-sm gap-2"
+      >
+        <Archive className="h-4 w-4" />
+        View All Logs
+      </Button>
+    ),
   });
 
   return (
     <>
-      <div className="max-w-8xl mx-auto px-4 py-2 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-        <div className="bg-info-background border border-info-foreground shadow-sm rounded-lg p-4">
-          <p className="text-sm text-info-foreground">
-            <strong>Note:</strong> Students request appointments in their
-            portal. This page is for approving, rejecting, or managing
-            appointment requests.
-          </p>
-        </div>
+      <div className="py-2 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
 
-        <div className="grid grid-cols-1 lg:grid-cols-6 gap-4 items-stretch">
-          <Card className="lg:col-span-6 border border-border bg-background/80 shadow-sm overflow-hidden">
-            <div className="border-b border-border bg-muted/45 px-6 py-5">
-              <h2 className="text-xl font-bold tracking-tight text-foreground">
-                Appointment Overview
+        <div className="grid grid-cols-1 lg:grid-cols-6 gap-6 items-stretch">
+          <div className="lg:col-span-2 h-full">
+            <Calendar
+              title="Calendar"
+              className="h-full"
+              currentMonth={currentMonth}
+              selectedDate={selectedDate}
+              onMonthChange={setCurrentMonth}
+              onDateSelect={(date) => {
+                if (!date) return;
+
+                const dateStr = `${date.getFullYear()}-${String(
+                  date.getMonth() + 1,
+                ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+
+                setSelectedDate(date);
+                setStartDate(dateStr);
+                setEndDate(dateStr);
+                setCurrentPage(1);
+              }}
+              bookedDates={bookedDates}
+              legends={appointmentStatuses
+                ?.filter(
+                  (status) =>
+                    status.name.includes("Pending") ||
+                    status.name.includes("Scheduled") ||
+                    status.name.includes("Rescheduled"),
+                )
+                .map((status) => ({
+                  color: STATUS_COLORS[status.colorKey],
+                  label: status.name,
+                }))}
+              hasHeader
+              isAdmin
+            />
+          </div>
+
+          <Card className="lg:col-span-4 shadow-2xl overflow-hidden backdrop-blur-2xl transition-all duration-500 hover:bg-glass-bg/50">
+            <div className="border-b border-glass-border/40 bg-muted/20 px-8 py-5">
+              <h2 className="text-xl font-semibold text-foreground/90 flex items-center gap-3">
+                Overview
               </h2>
             </div>
 
-            <CardContent className="p-5 flex flex-col min-h-[250px]">
-              <p className="text-sm text-muted-foreground mb-4">
-                Appointment distribution for {currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+            <CardContent className="p-8 flex flex-col min-h-[300px]">
+              <p className="text-sm text-muted-foreground mb-6 font-medium italic opacity-70">
+                Visual distribution for {formatDate(startDate)}
               </p>
 
-              <div className="rounded-2xl border border-border bg-background/90 px-2 py-3 sm:px-3">
-                <div className="h-[236px]">
+              <div className="rounded-3xl border border-glass-border/30 bg-glass-bg/20 px-4 py-8 sm:px-6 shadow-inner backdrop-blur-md">
+                <div className="h-[280px]">
                   <ChartContainer
                     config={chartConfig}
-                    className="h-full w-full"
+                    className="h-full w-full drop-shadow-sm"
                   >
                     <BarChart
                       layout="vertical"
@@ -339,7 +271,7 @@ export default function AppointmentsManagement() {
                         tick={{
                           fontSize: 11,
                           fill: "#64748b",
-                          fontWeight: 600,
+                          fontWeight: 500,
                         }}
                       />
 
@@ -387,47 +319,10 @@ export default function AppointmentsManagement() {
             </CardContent>
           </Card>
 
-          <div className="lg:col-span-2 h-full">
-            <Calendar
-              title="Appointments Calendar"
-              className="col-span-1 h-full"
-              currentMonth={currentMonth}
-              selectedDate={selectedDate}
-              onMonthChange={setCurrentMonth}
-              onDateSelect={(date) => {
-                if (!date) return;
-
-                const dateStr = `${date.getFullYear()}-${String(
-                  date.getMonth() + 1,
-                ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
-
-                setSelectedDate(date);
-                setStartDate(dateStr);
-                setEndDate(dateStr);
-                setCurrentPage(1);
-              }}
-              bookedDates={bookedDates}
-              legends={appointmentStatuses
-                ?.filter(
-                  (status) =>
-                    status.name.includes("Pending") ||
-                    status.name.includes("Scheduled") ||
-                    status.name.includes("Rescheduled"),
-                )
-                .map((status) => ({
-                  color: STATUS_COLORS[status.colorKey],
-                  label: status.name,
-                }))}
-              hasHeader
-              isAdmin
-            />
-          </div>
-
-          <div className="lg:col-span-4 h-full">
+          <div className="lg:col-span-6">
             <AppointmentList
               title={`Appointment List - ${selectedDate ? selectedDate.toDateString() : "All Dates"
                 }`}
-              className="col-span-1 h-full"
               searchTerm={searchTerm}
               onSearchChange={(value: string) => {
                 setSearchTerm(value);
@@ -446,15 +341,6 @@ export default function AppointmentsManagement() {
             />
           </div>
         </div>
-
-        <ViewModal
-          appointment={selectedAppointment}
-          isOpen={isViewOpen}
-          onClose={() => setIsViewOpen(false)}
-          statuses={appointmentStatuses || []}
-          onStatusAction={handleStatusAction}
-          onReschedule={handleReschedule}
-        />
       </div>
     </>
   );
