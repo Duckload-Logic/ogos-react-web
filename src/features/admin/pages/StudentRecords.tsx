@@ -147,7 +147,7 @@ export default function StudentRecords() {
             <div className="flex justify-center pt-4">
               <Pagination
                 currentPage={page}
-                totalPages={data?.totalPages || 1}
+                totalPages={data?.meta?.totalPages || 1}
                 onPageChange={setPage}
               />
             </div>

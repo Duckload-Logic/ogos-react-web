@@ -2,54 +2,52 @@ import {
   Calendar,
   Users,
   FileText,
-  TrendingUp,
   Clock,
-  Tag,
-  AlertTriangle,
+  MoreHorizontal,
   Sparkles,
-  X,
-  Inbox,
 } from "lucide-react";
-import { Link } from "react-router-dom";
-import { useEffect, useMemo, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { useAppointments } from "@/features/appointments/hooks/useAppointments";
-import { Appointment } from "@/features/appointments/types";
-import ViewModal from "@/features/appointments/components/ViewModal";
-import { STATUS_COLORS } from "@/config/constants";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { useStatuses } from "@/features/appointments/hooks/useLookups";
+import { useAdminDashboard } from "@/features/analytics/hooks";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   format12HourTime,
   toISODateString,
 } from "@/features/appointments/utils";
-import Layout, { usePageMetadata } from "@/components/layout/Layout";
+import { usePageMetadata } from "@/components/layout/Layout";
+import { DashboardMetrics } from "@/features/admin/components/DashboardMetrics";
+import { SlipStatusTracker } from "@/features/admin/components/SlipStatusTracker";
+import { useGetSlipStats } from "@/features/slips/hooks/useSlips";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState, useMemo, useEffect } from "react";
+import { Dropdown } from "@/components/form";
+
 
 export default function Dashboard() {
-  const today = new Date();
-  const todayStr = toISODateString(today);
+  const navigate = useNavigate();
+  const todayStr = toISODateString(new Date());
 
-  const { data: statuses, isLoading: isStatusesLoading } = useStatuses();
-
-  const { data, isLoading: isAppointmentsLoading } = useAppointments({
+  const { data: appointmentData, isLoading: isAppointmentsLoading } = useAppointments({
     params: {
       startDate: todayStr,
       endDate: todayStr,
     },
   });
 
-  const appointments = data?.appointments || [];
-  const nextAppointment = appointments[0] || null;
-
-  const pendingCount = appointments.filter((a) =>
-    a.status?.name?.toLowerCase().includes("pending"),
-  ).length;
-
-  const [selectedAppointment, setSelectedAppointment] =
-    useState<Appointment | null>(null);
-  const [isViewOpen, setIsViewOpen] = useState(false);
-
+  const appointments = appointmentData?.appointments || [];
   const [showDailyTip, setShowDailyTip] = useState(false);
+
+  const { data: slipStats, isLoading: isSlipsLoading } = useGetSlipStats();
+  const { data: adminAnalytics, isLoading: isAnalyticsLoading } = useAdminDashboard();
 
   const tipQuotes = useMemo(
     () => [
@@ -78,41 +76,42 @@ export default function Dashboard() {
     }
   }, []);
 
-  const handleView = (apt: Appointment) => {
-    setSelectedAppointment(apt);
-    setIsViewOpen(true);
-  };
-
-  const quickActions = [
+  const metrics = [
     {
-      title: "View Appointments",
-      description: "Manage requests",
-      icon: Calendar,
-      href: "/admin/appointments",
-      border: "border-info-foreground/50",
-    },
-    {
-      title: "Student Records",
-      description: "Manage info",
+      title: "Students",
+      value: adminAnalytics?.totalStudents.toString() || "0",
+      trend: "+0",
       icon: Users,
-      href: "/admin/student-records",
-      border: "border-success-foreground/50",
-    },
-    {
-      title: "Review Excuses",
-      description: "Approve slips",
-      icon: FileText,
-      href: "/admin/review-excuses",
-      border: "border-warning-foreground/50",
+      iconColor: "text-blue-500",
     },
     {
       title: "Reports",
-      description: "Analyze data",
-      icon: TrendingUp,
-      href: "/admin/reports",
-      border: "border-notice-foreground/50",
+      value: adminAnalytics?.totalReports.toString() || "0",
+      trend: "+0",
+      icon: FileText,
+      iconColor: "text-emerald-500",
+    },
+    {
+      title: "Consultations",
+      value: adminAnalytics?.totalAppointments.toString() || "0",
+      trend: "+0",
+      icon: Calendar,
+      iconColor: "text-purple-500",
+    },
+    {
+      title: "Slips",
+      value: adminAnalytics?.totalSlips.toString() || "0",
+      trend: "+0",
+      icon: FileText,
+      iconColor: "text-amber-500",
     },
   ];
+
+  const visitorData = adminAnalytics?.monthlyVisitors.map((v: { month: string; count: number }) => ({
+    name: v.month,
+    visitors: v.count
+  })) || [];
+
 
   usePageMetadata({
     title: "Guidance Dashboard",
@@ -120,280 +119,168 @@ export default function Dashboard() {
     badgeText: "Admin Overview",
     badgeIcon: <Sparkles className="h-3.5 w-3.5" />,
     showDate: true,
-    isLoading: isStatusesLoading || isAppointmentsLoading,
+    isLoading: isAppointmentsLoading,
   });
 
-  if (isStatusesLoading || isAppointmentsLoading) {
+  if (isAppointmentsLoading || isSlipsLoading || isAnalyticsLoading) {
     return null;
   }
 
   return (
-    <>
-      <div className="max-w-[1600px] mx-auto space-y-10 relative">
-        {showDailyTip && (
-          <div className="fixed top-24 right-6 z-50 w-[340px] max-w-[calc(100vw-2rem)] animate-in fade-in slide-in-from-top-2 duration-300">
-            <Card className="border border-rose-100 shadow-lg bg-rose-50/95 backdrop-blur">
-              <CardContent className="p-4">
-                <div className="flex items-start justify-between gap-3">
-                  <div className="flex gap-3">
-                    <div className="mt-1 flex h-9 w-9 items-center justify-center rounded-lg bg-white/70 text-destructive">
-                      <Sparkles className="size-5" />
-                    </div>
-
-                    <div className="space-y-1">
-                      <p className="text-xs font-bold uppercase tracking-widest text-destructive">
-                        Tip of the Day
-                      </p>
-
-                      <p className="text-sm font-medium italic text-slate-700 leading-relaxed">
-                        "{dailyTip}"
-                      </p>
-                    </div>
-                  </div>
-
-                  <button
-                    onClick={() => setShowDailyTip(false)}
-                    className="text-muted-foreground hover:text-foreground transition"
-                    aria-label="Close daily tip"
-                  >
-                    <X className="size-4" />
-                  </button>
-                </div>
-              </CardContent>
-            </Card>
+    <div className="space-y-8 pb-10">
+      {/* Daily Tip Alert */}
+      {showDailyTip && (
+        <div className="relative group overflow-hidden p-6 rounded-3xl bg-gradient-to-r from-teal-500/10 to-emerald-500/10 border border-teal-500/20 backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-700">
+          <div className="flex items-start gap-5">
+            <div className="p-3 rounded-2xl bg-teal-500 text-white shadow-lg shadow-teal-500/20">
+              <Sparkles size={24} />
+            </div>
+            <div className="flex-1 pr-10">
+              <h4 className="text-sm font-bold text-teal-900 dark:text-teal-100 mb-1 flex items-center gap-2">
+                Daily Counseling Insight
+              </h4>
+              <p className="text-sm text-teal-800/80 dark:text-teal-200/80 font-medium leading-relaxed">
+                "{dailyTip}"
+              </p>
+            </div>
+            <button
+              onClick={() => setShowDailyTip(false)}
+              className="absolute top-4 right-4 p-2 rounded-xl text-teal-900/40 dark:text-teal-100/40 hover:bg-teal-500/10 hover:text-teal-900 dark:hover:text-teal-100 transition-all opacity-0 group-hover:opacity-100"
+            >
+              <MoreHorizontal size={20} />
+            </button>
           </div>
-        )}
+          {/* Subtle background decoration */}
+          <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-teal-500/5 rounded-full blur-2xl" />
+        </div>
+      )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <Card className="rounded-lg border border-border shadow-sm">
-            <CardContent className="p-6 space-y-5">
-              <div className="flex items-start justify-between">
-                <div className="space-y-1">
-                  <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                    Today's Load
-                  </p>
+      {/* Metrics Row */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <DashboardMetrics metrics={metrics} />
+        {/* Monthly Visitors Analytics */}
+        <Card className="shadow-lg backdrop-blur-md overflow-hidden">
+          <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardTitle className="text-base font-bold">Monthly Visitors</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-4 pb-4">
+            <div className="h-48 w-full">
+              <ResponsiveContainer width="100%" height="100%">
+                <LineChart data={visitorData}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.5} />
+                  <XAxis
+                    dataKey="name"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 10, fill: '#94A3B8' }}
+                    dy={10}
+                  />
+                  <YAxis hide={true} />
+                  <Tooltip
+                    contentStyle={{
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+                      fontSize: '12px'
+                    }}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="visitors"
+                    stroke="#00A18E"
+                    strokeWidth={3}
+                    dot={{ fill: '#00A18E', strokeWidth: 2, r: 4, stroke: '#fff' }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
 
-                  <p className="text-4xl font-bold tabular-nums">
-                    {appointments.length}
-                  </p>
-
-                  <p className="text-xs text-muted-foreground">
-                    Sessions scheduled today
-                  </p>
-                </div>
-
-                <div className="flex items-center justify-center h-10 w-10 rounded-lg bg-primary/10">
-                  <Calendar className="size-5 text-primary" />
-                </div>
+      <div className="flex flex-col xl:flex-row gap-8">
+        {/* Main Content: Upcoming Appointments */}
+        <div className="flex-1 space-y-8">
+          <Card className="shadow-lg backdrop-blur-md overflow-hidden">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-lg font-bold">Upcoming Appointments</CardTitle>
+              <button className="text-slate-400 hover:text-slate-600">
+                <MoreHorizontal size={20} />
+              </button>
+            </CardHeader>
+            <CardContent className="p-0">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left">
+                  <thead className="bg-slate-50/50 dark:bg-black/20 text-slate-400 text-[10px] uppercase font-bold tracking-widest">
+                    <tr>
+                      <th className="py-4 px-6">Name</th>
+                      <th className="py-4 px-6">Category</th>
+                      <th className="py-4 px-6">Date</th>
+                      <th className="py-4 px-6">Time</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 dark:divide-white/5">
+                    {appointments.slice(0, 5).map((apt) => (
+                      <tr
+                        key={apt.id}
+                        className="group bg-glass-bg transition-colors cursor-pointer"
+                        onClick={() => navigate(`/admin/appointments/${apt.id}`)}
+                      >
+                        <td className="py-4 px-6">
+                          <div className="flex items-center gap-3">
+                            <Avatar className="size-8 rounded-lg">
+                              <AvatarImage src={apt.user?.profilePicture} />
+                              <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase">
+                                {apt.user?.firstName?.[0]}{apt.user?.lastName?.[0]}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div>
+                              <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
+                                {apt.user?.firstName} {apt.user?.lastName}
+                              </p>
+                              <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap">
+                                {apt.user?.studentNumber}
+                              </p>
+                            </div>
+                          </div>
+                        </td>
+                        <td className="py-4 px-6 text-sm text-slate-500 font-medium">
+                          {apt.appointmentCategory.name}
+                        </td>
+                        <td className="py-4 px-6 text-sm text-slate-500 font-medium whitespace-nowrap">
+                          {new Date(apt.whenDate).toLocaleDateString()}
+                        </td>
+                        <td className="py-4 px-6 text-sm text-slate-700 dark:text-slate-300 font-bold">
+                          {format12HourTime(apt.timeSlot.time)}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                {appointments.length === 0 && (
+                  <div className="py-10 text-center text-slate-400 text-sm italic">
+                    No upcoming appointments for today
+                  </div>
+                )}
               </div>
-
-              {pendingCount > 0 && (
-                <div className="flex items-center justify-between bg-warning-foreground/10 border border-warning-foreground rounded-md px-3 py-2 text-xs">
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle
-                      size={14}
-                      className="text-warning-foreground"
-                    />
-
-                    <span className="font-medium">
-                      {pendingCount} requests need review
-                    </span>
-                  </div>
-
-                  <Link
-                    to="/admin/appointments"
-                    className="text-primary hover:underline"
-                  >
-                    Review
-                  </Link>
-                </div>
-              )}
-            </CardContent>
-          </Card>
-
-          <Card className="lg:col-span-2 border-border shadow-sm ring-1 ring-primary/10 bg-gradient-to-r from-card via-card to-primary/5">
-            <CardContent className="p-6">
-              {nextAppointment ? (
-                <div className="grid grid-cols-[1fr_auto] items-center gap-6">
-                  <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-xs font-medium text-primary">
-                      <span className="w-2 h-2 rounded-full bg-primary animate-pulse"></span>
-                      Next session coming up
-                    </div>
-
-                    <div className="flex items-center gap-2 text-primary text-sm">
-                      <Clock className="size-4" />
-                      {format12HourTime(nextAppointment.timeSlot.time)}
-                    </div>
-
-                    <h3 className="text-xl font-bold">
-                      {nextAppointment.user?.firstName}{" "}
-                      {nextAppointment.user?.lastName}
-                    </h3>
-
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <Tag className="size-3" />
-                      {nextAppointment.appointmentCategory.name}
-                    </div>
-                  </div>
-
-                  <div className="flex items-center">
-                    <Button
-                      onClick={() => handleView(nextAppointment)}
-                      className="px-6"
-                    >
-                      View Details
-                    </Button>
-                  </div>
-                </div>
-              ) : (
-                <div className="flex min-h-[96px] items-center">
-                  <p className="text-muted-foreground italic">
-                    No upcoming appointments
-                  </p>
-                </div>
-              )}
             </CardContent>
           </Card>
         </div>
 
-        <section className="space-y-5">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-            Management Actions
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-6">
-            {quickActions.map((action) => {
-              const Icon = action.icon;
-
-              return (
-                <Link
-                  key={action.title}
-                  to={action.href}
-                  className={`
-                    group
-                    bg-card
-                    border-2 ${action.border}
-                    p-5
-                    rounded-lg
-                    transition-all
-                    duration-200
-                    hover:-translate-y-1
-                    hover:shadow-md
-                    hover:bg-primary/5
-                    hover:border-primary
-                    flex items-center gap-4
-                  `}
-                >
-                  <div className="p-2 border rounded-md transition-transform group-hover:rotate-6">
-                    <Icon size={20} />
-                  </div>
-
-                  <div>
-                    <h3 className="font-semibold text-sm">{action.title}</h3>
-
-                    <p className="text-xs text-muted-foreground">
-                      {action.description}
-                    </p>
-                  </div>
-                </Link>
-              );
-            })}
-          </div>
-        </section>
-
-        <section className="space-y-4">
-          <h2 className="text-sm font-bold uppercase tracking-widest text-muted-foreground">
-            Daily Queue
-          </h2>
-
-          <Card className="border-border shadow-sm overflow-hidden">
-            {appointments.length > 0 ? (
-              <table className="w-full text-left">
-                <thead className="bg-muted/40 text-muted-foreground text-xs">
-                  <tr>
-                    <th className="py-4 px-5">Student</th>
-                    <th className="py-4 px-5">Schedule</th>
-                    <th className="py-4 px-5">Category</th>
-                    <th className="py-4 px-5">Status</th>
-                    <th className="py-4 px-5">Action</th>
-                  </tr>
-                </thead>
-
-                <tbody className="divide-y">
-                  {appointments.map((apt) => (
-                    <tr
-                      key={apt.id}
-                      className="group hover:bg-muted/30 transition-colors cursor-pointer"
-                    >
-                      <td className="py-5 px-5 font-semibold group-hover:text-primary relative">
-                        <span className="absolute left-0 top-0 h-full w-1 bg-primary opacity-0 group-hover:opacity-100 transition rounded-r" />
-                        {apt.user?.firstName} {apt.user?.lastName}
-                      </td>
-
-                      <td className="py-5 px-5 text-muted-foreground">
-                        {format12HourTime(apt.timeSlot.time)}
-                      </td>
-
-                      <td className="py-5 px-5 text-muted-foreground">
-                        {apt.appointmentCategory.name}
-                      </td>
-
-                      <td className="py-5 px-5">
-                        <span
-                          className={`px-2 py-1 text-xs rounded-full border ${STATUS_COLORS[apt.status?.colorKey || "info"]}`}
-                        >
-                          {apt.status?.name}
-                        </span>
-                      </td>
-
-                      <td className="py-5 px-5">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="opacity-80 group-hover:opacity-100"
-                          onClick={() => handleView(apt)}
-                        >
-                          View
-                        </Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            ) : (
-              <CardContent className="py-14 px-6">
-                <div className="flex flex-col items-center justify-center text-center space-y-3">
-                  <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-                    <Inbox className="size-6 text-muted-foreground" />
-                  </div>
-
-                  <div className="space-y-1">
-                    <h3 className="text-base font-semibold">
-                      No appointments in today's queue
-                    </h3>
-
-                    <p className="text-sm text-muted-foreground max-w-md">
-                      You’re all caught up for today. New appointments will
-                      appear here once scheduled.
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            )}
-          </Card>
-        </section>
-
-        <ViewModal
-          appointment={selectedAppointment}
-          isOpen={isViewOpen}
-          onClose={() => setIsViewOpen(false)}
-          statuses={statuses || []}
-          onStatusAction={async () => true}
-          onReschedule={async () => true}
-          hasActions={false}
-        />
+        {/* Sidebar: Slips & Analytics */}
+        <div className="w-full xl:w-96 space-y-8">
+          {/* Slip Status Tracker */}
+          <SlipStatusTracker
+            stats={{
+              pending: slipStats?.pending || 12,
+              approvedToday: slipStats?.approvedToday || 5,
+              rejectedToday: slipStats?.rejectedToday || 1,
+              urgentRequests: 3
+            }}
+          />
+        </div>
       </div>
-    </>
+    </div>
   );
 }
