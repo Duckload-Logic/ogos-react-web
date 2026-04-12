@@ -1,5 +1,5 @@
 import { AuthContext } from "@/context/AuthContext";
-import React, { createContext, useContext, useState, useCallback, useEffect, useRef } from "react";
+import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
 
 export interface PageMetadata {
   title: string;
@@ -10,6 +10,7 @@ export interface PageMetadata {
   headerStats?: React.ReactNode;
   showDate?: boolean;
   isLoading?: boolean;
+  showSubHeader?: boolean;
 }
 
 interface UIContextType {
@@ -82,25 +83,11 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
       return false;
     };
 
-    // Use addEventListener for better compatibility and to avoid overwriting
     window.speechSynthesis.addEventListener("voiceschanged", updateVoices);
-
-    // Initial check
-    const ready = updateVoices();
-
-    // Fallback polling for browsers that are slow to load voices
-    let attempts = 0;
-    const retryInterval = setInterval(() => {
-      attempts++;
-      const success = updateVoices();
-      if (success || attempts > 20) { // Stop after success or 10 seconds (20 * 500ms)
-        clearInterval(retryInterval);
-      }
-    }, 500);
+    updateVoices();
 
     return () => {
       window.speechSynthesis.removeEventListener("voiceschanged", updateVoices);
-      clearInterval(retryInterval);
     };
   }, []);
 
@@ -108,11 +95,9 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     title: "",
   });
 
-  // Re-initialize state whenever user changes or on mount
   useEffect(() => {
     if (!isLoading) {
       const getPref = (key: string, def: string) => {
-        // Priority: User-specific > Global (Guest) > Default
         if (userId) {
           const userPref = localStorage.getItem(`${key}-${userId}`);
           if (userPref !== null) return userPref;
@@ -207,41 +192,21 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     setSidebarPinned((prev) => !prev);
   }, [setSidebarPinned]);
 
-  // Apply UI preferences to document root
   useEffect(() => {
     const root = document.documentElement;
+    if (darkMode) root.classList.add("dark");
+    else root.classList.remove("dark");
 
-    // Dark Mode
-    if (darkMode) {
-      root.classList.add("dark");
-    } else {
-      root.classList.remove("dark");
-    }
+    if (grayscale) root.style.filter = "grayscale(100%)";
+    else root.style.filter = "";
 
-    // Grayscale
-    if (grayscale) {
-      root.style.filter = "grayscale(100%)";
-    } else {
-      root.style.filter = "";
-    }
+    if (dyslexiaMode) root.classList.add("dyslexic-mode");
+    else root.classList.remove("dyslexic-mode");
 
-    // Dyslexia Mode
-    if (dyslexiaMode) {
-      root.classList.add("dyslexic-mode");
-    } else {
-      root.classList.remove("dyslexic-mode");
-    }
-
-    // Font Scale
     root.style.fontSize = `${(fontScale / 100) * 16}px`;
 
-    // Performance Mode
-    if (performanceMode) {
-      root.classList.add("perf-mode");
-    } else {
-      root.classList.remove("perf-mode");
-    }
-
+    if (performanceMode) root.classList.add("perf-mode");
+    else root.classList.remove("perf-mode");
   }, [darkMode, grayscale, dyslexiaMode, fontScale, performanceMode]);
 
   return (
@@ -275,4 +240,3 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     </UIContext.Provider>
   );
 };
-

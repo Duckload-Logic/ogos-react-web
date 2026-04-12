@@ -7,7 +7,6 @@
 export const ROLE_ROUTES = {
   student: "/student", // Student role
   admin: "/admin", // Admin role
-  superadmin: "/superadmin", // Super Admin role
 } as const;
 
 // Excuse Slip status

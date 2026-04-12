@@ -75,10 +75,10 @@ export default function Dropdown({
 
   return (
     <div className="space-y-2 relative">
-      <div className="text-sm font-medium text-foreground">
+      {label && <div className="text-sm font-medium text-foreground">
         <span className="truncate">{label}</span>
         {required && <span className="text-red-500 flex-shrink-0"> *</span>}
-      </div>
+      </div>}
 
       <div id={id}>
         <Popover open={open} onOpenChange={setOpen}>

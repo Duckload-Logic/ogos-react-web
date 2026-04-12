@@ -371,7 +371,6 @@ setTimeout(() => setHasTimedOut(true), 5000);
 const ROLE_ROUTES = {
   1: "/student",
   2: "/student",
-  3: "/superadmin",
 };
 
 // ❌ WRONG: Magic numbers
@@ -507,14 +506,12 @@ export function useMyFeatures() {
 // src/config/constants.ts
 export const ROLE_ROUTES = {
   1: "/student",
-  2: "/student",
-  3: "/superadmin",
+  2: "/admin",
 } as const;
 
 const ROLE_MAP = {
   1: "student",
   2: "admin",
-  3: "superadmin",
 };
 ```
 

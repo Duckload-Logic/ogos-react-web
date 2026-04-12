@@ -18,6 +18,7 @@ import Navigation from "./Navigation";
 import SubHeader from "./SubHeader";
 import { SpeechControl } from "../shared/SpeechControl";
 import { AnimationStyles } from "../ui/animations";
+import ScrollToTop from "@/utils/componentUtils";
 
 interface LayoutProps {
   showHeader?: boolean;
@@ -83,6 +84,7 @@ export default function Layout({
     propsIsLoading !== undefined
       ? propsIsLoading
       : (pageMetadata.isLoading ?? false);
+  const showSubHeader = pageMetadata.showSubHeader !== false;
 
   const { user, logout } = useAuth();
   const location = useLocation();
@@ -107,6 +109,7 @@ export default function Layout({
   const [termsOpen, setTermsOpen] = useState(false);
 
   const contentRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const expanded = isExpanded;
 
   useEffect(() => {
@@ -136,9 +139,9 @@ export default function Layout({
   };
 
   const navigationItems = useMemo(() => {
-    if (!user || user.roles.length === 0) return [];
+    if (!user || !user.role.name) return [];
 
-    const roleKey = user.roles[0]?.toLowerCase().replace(" ", "");
+    const roleKey = user.role.name.toLowerCase();
     if (!roleKey) return [];
 
     const roleData = NAV_CONFIG.find((config) => !!config[roleKey]);
@@ -147,13 +150,9 @@ export default function Layout({
   }, [user]);
 
   const getRoleLabel = () => {
-    if (!user) return "";
-    if (
-      user.roles.some((r) => r.toLowerCase().replace(" ", "") === "superadmin")
-    )
-      return "Super Admin Account";
-    if (user.roles.some((r) => r.toLowerCase().replace(" ", "") === "admin"))
-      return "Admin Account";
+    if (!user || !user.role) return "";
+    const roleName = user.role.name.toLowerCase();
+    if (roleName === "admin") return "Admin Account";
     return "Student Account";
   };
 
@@ -164,14 +163,7 @@ export default function Layout({
     }
   }, [location.pathname, sidebarHovered, setSidebarHovered]);
 
-  const currentRole: string =
-    user?.roles?.map((r) => {
-      const key = r.toLowerCase().replace(" ", "");
-      if (key === "superadmin") return "superadmin";
-      if (key === "admin") return "admin";
-      if (key === "student") return "student";
-      return "";
-    })[0] || "";
+  const currentRole: string | undefined = user?.role?.name?.toLowerCase();
 
   useEffect(() => {
     const node = contentRef.current;
@@ -207,9 +199,11 @@ export default function Layout({
 
   return (
     <ErrorBoundary>
+      <ScrollToTop targetRef={scrollRef} />
       <div
-        className={`relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950 ${grayscale ? "grayscale" : ""
-          }`}
+        className={`relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950 ${
+          grayscale ? "grayscale" : ""
+        }`}
       >
         {/* Background Fallback / Graphics Quality Layers */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -231,22 +225,23 @@ export default function Layout({
         {mustAcceptTerms && (
           <ConsentModal
             open={termsOpen}
-            role={currentRole}
+            role={currentRole || ""}
             onAccept={handleAcceptTerms}
           />
         )}
 
         <div
           ref={contentRef}
-          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${termsOpen
-            ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
-            : ""
-            }`}
+          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${
+            termsOpen
+              ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
+              : ""
+          }`}
         >
           <Header
             title={title}
             user={user}
-            role={currentRole}
+            role={currentRole || ""}
             handleLogout={handleLogout}
             getRoleLabel={getRoleLabel}
             showNotifications={showNotifications}
@@ -270,15 +265,18 @@ export default function Layout({
                 location={location}
                 user={user}
                 handleLogout={handleLogout}
-                role={currentRole}
+                role={currentRole || ""}
                 roleLabel={getRoleLabel()}
               />
             )}
 
             <div className="relative min-w-0 flex-1 overflow-hidden">
-              <div className="relative z-10 flex h-full flex-col overflow-x-hidden overflow-y-auto">
+              <div
+                ref={scrollRef}
+                className="relative z-10 flex h-full flex-col overflow-x-hidden overflow-y-auto"
+              >
                 <main className="flex-1 p-4 md:p-6 lg:p-8">
-                  {showHeader && (
+                  {showHeader && showSubHeader && (
                     <SubHeader
                       title={title || ""}
                       description={description || propsSubTitle}

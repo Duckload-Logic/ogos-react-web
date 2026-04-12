@@ -51,11 +51,7 @@ export const ProtectedRoute = ({
    */
   if (
     requiredRole &&
-    !user.roles.some(
-      (r) =>
-        r.toLowerCase().replace(" ", "") ===
-        requiredRole.toLowerCase().replace(" ", ""),
-    )
+    user.role.name.toLowerCase() !== requiredRole.toLowerCase()
   ) {
     return <Navigate to="/" replace />;
   }
