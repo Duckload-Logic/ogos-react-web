@@ -135,7 +135,6 @@ export default function Layout({
   const handleLogout = () => {
     setSidebarHovered(false); // Reset sidebar state on logout
     logout();
-    navigate("/login");
   };
 
   const navigationItems = useMemo(() => {

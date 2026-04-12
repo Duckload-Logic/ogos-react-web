@@ -67,7 +67,7 @@ export const AuthProvider: React.FC<{
       const timeoutId = setTimeout(() => {
         console.warn(
           "[AuthProvider] {Timeout}: Auth check " +
-            "exceeded 5s, forcing loading state to false",
+          "exceeded 5s, forcing loading state to false",
         );
         setHasTimedOut(true);
       }, AUTH_TIMEOUT_MS);
@@ -87,7 +87,7 @@ export const AuthProvider: React.FC<{
       BootstrapApp().catch((error: any) => {
         console.error(
           "[AuthProvider] {Bootstrap}: " +
-            `${error.message}`,
+          `${error.message}`,
         );
       });
     }

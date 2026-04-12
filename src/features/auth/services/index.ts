@@ -41,6 +41,15 @@ export interface RegisterResponse {
 }
 
 /**
+ * Response from logout endpoint
+ * May contain a logoutUrl for IDP session termination
+ */
+export interface LogoutResponse {
+  message: string;
+  logoutUrl?: string;
+}
+
+/**
  * Exchanges authorization code for access tokens
  * @param payload - Authorization code and state from IDP
  * @param config - Optional axios config with metadata
@@ -142,9 +151,10 @@ export const GetCurrentUser = async (
  */
 export const PostLogout = async (
   config?: AxiosConfigWithMeta,
-): Promise<void> => {
+): Promise<LogoutResponse> => {
   try {
-    await apiClient.post(API_ROUTES.auth.logout, {}, config);
+    const { data } = await apiClient.post(API_ROUTES.auth.logout, {}, config);
+    return data;
   } catch (error) {
     const handlerName = config?.handlerName || "PostLogout";
     const stepName = config?.stepName || "Logout";
@@ -170,7 +180,7 @@ export const authService = {
     return GetCurrentUser();
   },
 
-  async logout(): Promise<void> {
+  async logout(): Promise<LogoutResponse> {
     return PostLogout();
   },
 };

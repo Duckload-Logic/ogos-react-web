@@ -4,7 +4,8 @@
  */
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { PostLogin, LoginPayload } from "../services/index";
+import { useNavigate } from "react-router-dom";
+import { PostLogin, LoginPayload, LogoutResponse } from "../services/index";
 import { BootstrapApp, ResetBootstrap } from "@/services/bootstrapper";
 import { QUERY_KEYS } from "@/config/queryKeys";
 
@@ -47,17 +48,24 @@ export function useLogin() {
  */
 export function useLogout() {
   const queryClient = useQueryClient();
+  const navigate = useNavigate();
 
   const mutation = useMutation({
     mutationFn: () => import("../services/index").then((m) => m.PostLogout()),
-    onSuccess: () => {
+    onSuccess: (data: LogoutResponse) => {
       // Reset bootstrap state
       ResetBootstrap();
 
       // Clear all cached queries
       queryClient.clear();
 
-      console.log("[useLogout] {Cleanup}: Logout complete");
+      // If an IDP logout URL is provided, redirect the browser to clear the session
+      if (data?.logoutUrl) {
+        window.location.href = data.logoutUrl;
+      } else {
+        // Standard logout: navigate to login page
+        navigate("/login");
+      }
     },
     onError: (error: any) => {
       console.error("[useLogout] {Logout}: " + `${error.message}`);
