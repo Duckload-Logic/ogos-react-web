@@ -80,7 +80,7 @@ export default function Callback() {
           await refresh();
 
           // Fetch user profile to determine role (Native only)
-          const user = await GetCurrentUser().then((res) => res);
+          const user = await GetCurrentUser();
           console.log(user)
           if (!user.role) {
             throw new Error("User has no roles assigned");
