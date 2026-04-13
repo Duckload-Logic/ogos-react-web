@@ -138,9 +138,9 @@ export default function Layout({
   };
 
   const navigationItems = useMemo(() => {
-    if (!user || !user.role.name) return [];
+    if (!user || !user.role?.name) return [];
 
-    const roleKey = user.role.name.toLowerCase();
+    const roleKey = user.role?.name?.toLowerCase();
     if (!roleKey) return [];
 
     const roleData = NAV_CONFIG.find((config) => !!config[roleKey]);
@@ -150,7 +150,7 @@ export default function Layout({
 
   const getRoleLabel = () => {
     if (!user || !user.role) return "";
-    const roleName = user.role.name.toLowerCase();
+    const roleName = user.role?.name?.toLowerCase();
     if (roleName === "admin") return "Admin Account";
     return "Student Account";
   };
@@ -200,9 +200,8 @@ export default function Layout({
     <ErrorBoundary>
       <ScrollToTop targetRef={scrollRef} />
       <div
-        className={`relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950 ${
-          grayscale ? "grayscale" : ""
-        }`}
+        className={`relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950 ${grayscale ? "grayscale" : ""
+          }`}
       >
         {/* Background Fallback / Graphics Quality Layers */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
@@ -231,11 +230,10 @@ export default function Layout({
 
         <div
           ref={contentRef}
-          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${
-            termsOpen
-              ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
-              : ""
-          }`}
+          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${termsOpen
+            ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
+            : ""
+            }`}
         >
           <Header
             title={title}
