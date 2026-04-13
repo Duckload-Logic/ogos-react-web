@@ -9,6 +9,7 @@ export interface User {
   firstName: string;
   middleName?: string;
   lastName: string;
+  suffixName?: string;
   email: string;
   type: string;
   studentNumber?: string;

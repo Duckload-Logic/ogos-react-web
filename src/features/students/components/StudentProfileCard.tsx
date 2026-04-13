@@ -19,6 +19,7 @@ import { User, Mail, ArrowRight } from "lucide-react";
 interface StudentProfileCardProps {
   firstName?: string;
   lastName?: string;
+  suffixName?: string;
   middleName?: string;
   email?: string;
   isFormIncomplete: boolean;
@@ -28,6 +29,7 @@ interface StudentProfileCardProps {
 export function StudentProfileCard({
   firstName,
   lastName,
+  suffixName,
   middleName,
   email,
   isFormIncomplete,
@@ -56,7 +58,8 @@ export function StudentProfileCard({
                   {lastName}, {firstName}{" "}
                   {middleName && typeof middleName === "string"
                     ? middleName.charAt(0) + "."
-                    : ""}
+                    : ""}{" "}
+                  {suffixName}
                 </p>
               </div>
             </div>

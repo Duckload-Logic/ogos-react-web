@@ -155,6 +155,7 @@ export function Dashboard() {
          <StudentProfileCard 
             firstName={me?.firstName} 
             lastName={me?.lastName} 
+            suffixName={me?.suffixName}
             middleName={me?.middleName} 
             email={me?.email} 
             isFormIncomplete={!iir || !iir.isSubmitted} 
