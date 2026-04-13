@@ -59,13 +59,7 @@ export function useLogout() {
       // Clear all cached queries
       queryClient.clear();
 
-      // If an IDP logout URL is provided, redirect the browser to clear the session
-      if (data?.logoutUrl) {
-        window.location.href = data.logoutUrl;
-      } else {
-        // Standard logout: navigate to login page
-        navigate("/login");
-      }
+      navigate("/login");
     },
     onError: (error: any) => {
       console.error("[useLogout] {Logout}: " + `${error.message}`);
