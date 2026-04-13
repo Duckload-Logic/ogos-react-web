@@ -68,20 +68,19 @@ export default function Callback() {
           }
 
           // Exchange code for tokens (OAuth only)
-          const response = await PostIDPTokenExchange({ code });
+          await PostIDPTokenExchange({ code });
+          const user = await GetCurrentUser();
 
           // Synchronize AuthContext state before proceeding
           await refresh();
 
-          roleKey = response.role?.name?.toLowerCase().replace(" ", "");
+          roleKey = user.role?.name?.toLowerCase().replace(" ", "");
         } else {
           // Synchronize AuthContext state (Native already refetched in Login.tsx
           // but we call it anyway for robustness)
           await refresh();
 
-          // Fetch user profile to determine role (Native only)
           const user = await GetCurrentUser();
-          console.log(user)
           if (!user.role) {
             throw new Error("User has no roles assigned");
           }
