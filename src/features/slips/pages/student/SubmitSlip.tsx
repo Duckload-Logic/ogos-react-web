@@ -40,6 +40,7 @@ interface FormData {
   reason: string;
   categoryId: number;
   files: {
+    cor: File[];
     excuseLetter: File[];
     parentId: File[];
     medicalCert: File[];
@@ -52,6 +53,7 @@ const EMPTY_FORM_DATA: FormData = {
   reason: "",
   categoryId: 0,
   files: {
+    cor: [],
     excuseLetter: [],
     parentId: [],
     medicalCert: [],
@@ -75,91 +77,6 @@ export default function SubmitSlip() {
 
   const datesComplete = !!(formData.dateOfAbsence && formData.dateNeeded);
   const categoryComplete = formData.categoryId > 0;
-  const documentsProvided = Object.values(formData.files).some(
-    (fileArray) => fileArray.length > 0,
-  );
-
-  const isFormValid = datesComplete && categoryComplete && documentsProvided;
-  const completedSteps: boolean[] = [datesComplete, categoryComplete, documentsProvided];
-
-  const handleDateChange = (field: string, value: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      [field]: value,
-    }));
-  };
-
-  const handleCategoryChange = (categoryId: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      categoryId,
-    }));
-  };
-
-  const handleFileAdd = (
-    documentType: "excuseLetter" | "parentId" | "medicalCert",
-    files: FileList | null,
-  ) => {
-    if (files) {
-      const newFiles = Array.from(files);
-      setFormData((prev) => ({
-        ...prev,
-        files: {
-          ...prev.files,
-          [documentType]: [...prev.files[documentType], ...newFiles],
-        },
-      }));
-    }
-  };
-
-  const handleFileRemove = (
-    documentType: "excuseLetter" | "parentId" | "medicalCert",
-    index: number,
-  ) => {
-    setFormData((prev) => ({
-      ...prev,
-      files: {
-        ...prev.files,
-        [documentType]: prev.files[documentType].filter((_, i) => i !== index),
-      },
-    }));
-  };
-
-  const handleSubmit = async () => {
-    if (!isFormValid) return;
-
-    const payload: CreateSlipRequest = {
-      reason: formData.reason,
-      dateOfAbsence: new Date(
-        formData.dateOfAbsence,
-      ).toISOString().split("T")[0],
-      dateNeeded: new Date(
-        formData.dateNeeded,
-      ).toISOString().split("T")[0],
-      categoryId: formData.categoryId,
-    };
-
-    submitSlip(payload, {
-      onSuccess: () => {
-        navigate("/student/slips");
-      },
-      onError: (error: any) => {
-        if (
-          error.message?.includes('IIR profile')
-        ) {
-          navigate('/iir-form');
-        }
-      },
-    });
-  };
-
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-    });
-  };
 
   const getSelectedCategory = () => {
     return categories.find((c) => c.id === formData.categoryId);
@@ -177,9 +94,110 @@ export default function SubmitSlip() {
     );
   };
 
+  const excuseLetterProvided = formData.files.excuseLetter.length > 0;
+  const parentIdProvided = formData.files.parentId.length > 0;
+  const medicalCertProvided =
+    !isMedicalCategory() || formData.files.medicalCert.length > 0;
+
+  const documentsProvided =
+    excuseLetterProvided &&
+    parentIdProvided &&
+    medicalCertProvided;
+
+  const isFormValid = datesComplete && categoryComplete && documentsProvided;
+  const completedSteps: boolean[] = [
+    datesComplete,
+    categoryComplete,
+    documentsProvided,
+  ];
+
+  const handleDateChange = (field: string, value: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
+  const handleCategoryChange = (categoryId: number) => {
+    setFormData((prev) => ({
+      ...prev,
+      categoryId,
+    }));
+  };
+
+  const handleFileAdd = (
+    documentType: "cor" | "excuseLetter" | "parentId" | "medicalCert",
+    files: FileList | null,
+  ) => {
+    if (files) {
+      const newFiles = Array.from(files);
+      setFormData((prev) => ({
+        ...prev,
+        files: {
+          ...prev.files,
+          [documentType]: [...prev.files[documentType], ...newFiles],
+        },
+      }));
+    }
+  };
+
+  const handleFileRemove = (
+    documentType: "cor" | "excuseLetter" | "parentId" | "medicalCert",
+    index: number,
+  ) => {
+    setFormData((prev) => ({
+      ...prev,
+      files: {
+        ...prev.files,
+        [documentType]: prev.files[documentType].filter((_, i) => i !== index),
+      },
+    }));
+  };
+
+  const handleSubmit = async () => {
+    if (!isFormValid) return;
+
+    const payload: CreateSlipRequest = {
+      reason: formData.reason,
+      dateOfAbsence: new Date(formData.dateOfAbsence)
+        .toISOString()
+        .split("T")[0],
+      dateNeeded: new Date(formData.dateNeeded)
+        .toISOString()
+        .split("T")[0],
+      categoryId: formData.categoryId,
+      files: {
+        cor: formData.files.cor,
+        excuseLetter: formData.files.excuseLetter,
+        parentId: formData.files.parentId,
+        medicalCert: formData.files.medicalCert,
+      },
+    };
+
+    submitSlip(payload, {
+      onSuccess: () => {
+        navigate("/student/slips");
+      },
+      onError: (error: any) => {
+        if (error.message?.includes("IIR profile")) {
+          navigate("/iir-form");
+        }
+      },
+    });
+  };
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
   usePageMetadata({
     title: "Submit Admission Slip",
-    description: "Provide the required information and supporting documents for your absence.",
+    description:
+      "Provide the required information and supporting documents for your absence.",
     badgeText: "New Request",
     badgeIcon: <Plus className="h-4 w-4" />,
     isLoading: isCategoriesLoading || isSubmitting,
@@ -189,13 +207,9 @@ export default function SubmitSlip() {
     <>
       <AnimationStyles />
       <div className="min-h-full bg-background pt-6">
-        {/* Main Content - Two Column Layout */}
         <div className="max-w-6xl mx-auto px-6 py-6">
-
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            {/* Left Column - Form */}
             <div className="lg:col-span-2 space-y-4">
-              {/* Progress Indicator */}
               <Card className="border-0 shadow-sm bg-muted/30 py-3 px-4">
                 <StepProgress
                   steps={steps}
@@ -204,7 +218,6 @@ export default function SubmitSlip() {
                 />
               </Card>
 
-              {/* Selection Summary */}
               {(datesComplete || categoryComplete) && (
                 <Card className="mb-4 border-primary/20 bg-primary/5">
                   <CardContent className="py-2.5 px-4">
@@ -239,7 +252,6 @@ export default function SubmitSlip() {
                 </Card>
               )}
 
-              {/* Step 1: Date Selection */}
               {currentStep === 1 && (
                 <div className="animate-in fade-in duration-200">
                   <Card className="border-0 shadow-sm">
@@ -248,7 +260,9 @@ export default function SubmitSlip() {
                         <Calendar className="w-4 h-4 text-red-500" />
                         <CardTitle className="text-base">Absence Dates</CardTitle>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-2">Tell us when you were absent and when you need approval by</p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Tell us when you were absent and when you need approval by
+                      </p>
                     </CardHeader>
                     <CardContent className="pt-5 space-y-4">
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -301,10 +315,11 @@ export default function SubmitSlip() {
                       <Button
                         onClick={() => setCurrentStep(2)}
                         disabled={!datesComplete}
-                        className={`w-full ${datesComplete
-                          ? "bg-red-500 hover:bg-red-600 text-white"
-                          : "bg-muted text-muted-foreground cursor-not-allowed"
-                          }`}
+                        className={`w-full ${
+                          datesComplete
+                            ? "bg-red-500 hover:bg-red-600 text-white"
+                            : "bg-muted text-muted-foreground cursor-not-allowed"
+                        }`}
                       >
                         Continue to Category
                       </Button>
@@ -313,7 +328,6 @@ export default function SubmitSlip() {
                 </div>
               )}
 
-              {/* Step 2: Category Selection */}
               {currentStep === 2 && (
                 <div className="animate-in fade-in duration-200">
                   <Card className="border-0 shadow-sm">
@@ -322,7 +336,9 @@ export default function SubmitSlip() {
                         <Layers className="w-4 h-4 text-red-500" />
                         <CardTitle className="text-base">Select Category</CardTitle>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-2">Choose the category that best describes your absence</p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Choose the category that best describes your absence
+                      </p>
                     </CardHeader>
                     <CardContent className="pt-4">
                       <div className="space-y-2">
@@ -336,9 +352,10 @@ export default function SubmitSlip() {
                             key={category.id}
                             onClick={() => handleCategoryChange(category.id)}
                             className={`w-full p-3 border rounded-md transition-all text-left text-sm
-                              ${formData.categoryId === category.id
-                                ? "border-primary bg-primary/5"
-                                : "border-border/60 hover:border-primary/50 hover:bg-muted/30"
+                              ${
+                                formData.categoryId === category.id
+                                  ? "border-primary bg-primary/5"
+                                  : "border-border/60 hover:border-primary/50 hover:bg-muted/30"
                               }
                             `}
                           >
@@ -375,21 +392,21 @@ export default function SubmitSlip() {
                 </div>
               )}
 
-              {/* Step 3: Document Upload */}
               {currentStep === 3 && (
                 <div className="animate-in fade-in duration-200 space-y-4">
-                  {/* Section Header Card */}
                   <Card className="border-0 shadow-sm">
                     <CardHeader className="bg-muted/30 border-b border-border/60 py-3">
                       <div className="flex items-center gap-2">
                         <FileUp className="w-4 h-4 text-red-500" />
                         <CardTitle className="text-base">Upload Documents</CardTitle>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-2">Upload all required documents to complete your admission slip request</p>
+                      <p className="text-xs text-muted-foreground mt-2">
+                        Upload all required documents to complete your admission
+                        slip request
+                      </p>
                     </CardHeader>
                   </Card>
 
-                  {/* Info Box */}
                   <Card className="border-amber-200/60 bg-amber-50/50 dark:border-amber-900/30 dark:bg-amber-950/10">
                     <CardContent className="py-3 px-4">
                       <div className="flex items-start gap-2.5">
@@ -401,12 +418,11 @@ export default function SubmitSlip() {
                     </CardContent>
                   </Card>
 
-                  {/* Document Sections */}
                   <Card className="border-0 shadow-sm">
                     <CardContent className="p-0">
                       <Accordion type="single" collapsible className="w-full">
-                        {/* Document 1: Excuse Letter */}
-                        <AccordionItem value="excuse-letter" className="border-b last:border-b-0">
+                        {/* Document 1: COR */}
+                        <AccordionItem value="cor" className="border-b last:border-b-0">
                           <AccordionTrigger className="flex items-center justify-between px-4 py-3 hover:bg-muted/30 hover:no-underline transition-colors">
                             <div className="flex items-center gap-3 flex-1">
                               <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-semibold text-foreground">
@@ -414,45 +430,61 @@ export default function SubmitSlip() {
                               </div>
                               <div className="text-left">
                                 <div className="flex items-center gap-2">
-                                  <h3 className="text-sm font-medium text-foreground">Excuse Letter</h3>
-                                  <Badge variant="destructive" className="text-xs">Required</Badge>
+                                  <h3 className="text-sm font-medium text-foreground">
+                                    Certificate of Registration (COR)
+                                  </h3>
+                                  <Badge variant="destructive" className="text-xs">
+                                    Required
+                                  </Badge>
                                 </div>
-                                <p className="text-xs text-muted-foreground mt-0.5">Upload an excuse letter explaining your absence</p>
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                  Upload your current COR as a separate requirement
+                                </p>
                               </div>
                             </div>
-                            {formData.files.excuseLetter.length > 0 && (
+                            {formData.files.cor.length > 0 && (
                               <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                             )}
                           </AccordionTrigger>
                           <AccordionContent className="px-4 py-3 bg-muted/20 border-t border-border/40">
                             <div className="space-y-3">
-                              {formData.files.excuseLetter.length === 0 ? (
+                              {formData.files.cor.length === 0 ? (
                                 <div className="relative border-2 border-dashed border-border/60 rounded-lg p-6 transition-colors cursor-pointer hover:border-primary/50 hover:bg-muted/20">
                                   <input
                                     type="file"
                                     multiple
-                                    onChange={(e) => handleFileAdd("excuseLetter", e.target.files)}
+                                    onChange={(e) => handleFileAdd("cor", e.target.files)}
                                     className="absolute inset-0 opacity-0 cursor-pointer"
                                     accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                                   />
                                   <div className="flex flex-col items-center justify-center text-center">
                                     <Folder className="w-8 h-8 text-muted-foreground mb-2" />
-                                    <p className="text-sm font-medium text-foreground">Click to upload or drag and drop</p>
-                                    <p className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG, DOC up to 5MB</p>
+                                    <p className="text-sm font-medium text-foreground">
+                                      Click to upload or drag and drop
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      PDF, JPG, PNG, DOC up to 5MB
+                                    </p>
                                   </div>
                                 </div>
                               ) : (
                                 <div className="space-y-2">
-                                  {formData.files.excuseLetter.map((file, index) => (
-                                    <div key={`excuse-${index}`} className="flex items-center justify-between p-3 bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 dark:border-green-900/40 rounded-md">
+                                  {formData.files.cor.map((file, index) => (
+                                    <div
+                                      key={`cor-${index}`}
+                                      className="flex items-center justify-between p-3 bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 dark:border-green-900/40 rounded-md"
+                                    >
                                       <div className="flex items-center gap-2 min-w-0">
                                         <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                                         <div className="min-w-0">
-                                          <p className="text-xs font-medium text-foreground truncate">{file.name}</p>
+                                          <p className="text-xs font-medium text-foreground truncate">
+                                            {file.name}
+                                          </p>
                                         </div>
                                       </div>
                                       <button
-                                        onClick={() => handleFileRemove("excuseLetter", index)}
+                                        type="button"
+                                        onClick={() => handleFileRemove("cor", index)}
                                         className="p-0.5 hover:bg-red-100/50 dark:hover:bg-red-950/30 rounded transition-colors shrink-0"
                                         aria-label="Remove file"
                                       >
@@ -466,8 +498,8 @@ export default function SubmitSlip() {
                           </AccordionContent>
                         </AccordionItem>
 
-                        {/* Document 2: Valid Parent's ID */}
-                        <AccordionItem value="parent-id" className="border-b last:border-b-0">
+                        {/* Document 2: Excuse Letter */}
+                        <AccordionItem value="excuse-letter" className="border-b last:border-b-0">
                           <AccordionTrigger className="flex items-center justify-between px-4 py-3 hover:bg-muted/30 hover:no-underline transition-colors">
                             <div className="flex items-center gap-3 flex-1">
                               <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-semibold text-foreground">
@@ -475,10 +507,89 @@ export default function SubmitSlip() {
                               </div>
                               <div className="text-left">
                                 <div className="flex items-center gap-2">
+                                  <h3 className="text-sm font-medium text-foreground">Excuse Letter</h3>
+                                  <Badge variant="destructive" className="text-xs">Required</Badge>
+                                </div>
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                  Upload an excuse letter explaining your absence
+                                </p>
+                              </div>
+                            </div>
+                            {formData.files.excuseLetter.length > 0 && (
+                              <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
+                            )}
+                          </AccordionTrigger>
+                          <AccordionContent className="px-4 py-3 bg-muted/20 border-t border-border/40">
+                            <div className="space-y-3">
+                              {formData.files.excuseLetter.length === 0 ? (
+                                <div className="relative border-2 border-dashed border-border/60 rounded-lg p-6 transition-colors cursor-pointer hover:border-primary/50 hover:bg-muted/20">
+                                  <input
+                                    type="file"
+                                    multiple
+                                    onChange={(e) =>
+                                      handleFileAdd("excuseLetter", e.target.files)
+                                    }
+                                    className="absolute inset-0 opacity-0 cursor-pointer"
+                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                  />
+                                  <div className="flex flex-col items-center justify-center text-center">
+                                    <Folder className="w-8 h-8 text-muted-foreground mb-2" />
+                                    <p className="text-sm font-medium text-foreground">
+                                      Click to upload or drag and drop
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      PDF, JPG, PNG, DOC up to 5MB
+                                    </p>
+                                  </div>
+                                </div>
+                              ) : (
+                                <div className="space-y-2">
+                                  {formData.files.excuseLetter.map((file, index) => (
+                                    <div
+                                      key={`excuse-${index}`}
+                                      className="flex items-center justify-between p-3 bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 dark:border-green-900/40 rounded-md"
+                                    >
+                                      <div className="flex items-center gap-2 min-w-0">
+                                        <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
+                                        <div className="min-w-0">
+                                          <p className="text-xs font-medium text-foreground truncate">
+                                            {file.name}
+                                          </p>
+                                        </div>
+                                      </div>
+                                      <button
+                                        type="button"
+                                        onClick={() =>
+                                          handleFileRemove("excuseLetter", index)
+                                        }
+                                        className="p-0.5 hover:bg-red-100/50 dark:hover:bg-red-950/30 rounded transition-colors shrink-0"
+                                        aria-label="Remove file"
+                                      >
+                                        <X className="w-3.5 h-3.5 text-red-500" />
+                                      </button>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </div>
+                          </AccordionContent>
+                        </AccordionItem>
+
+                        {/* Document 3: Valid Parent's ID */}
+                        <AccordionItem value="parent-id" className="border-b last:border-b-0">
+                          <AccordionTrigger className="flex items-center justify-between px-4 py-3 hover:bg-muted/30 hover:no-underline transition-colors">
+                            <div className="flex items-center gap-3 flex-1">
+                              <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-semibold text-foreground">
+                                3
+                              </div>
+                              <div className="text-left">
+                                <div className="flex items-center gap-2">
                                   <h3 className="text-sm font-medium text-foreground">Valid Parent's ID</h3>
                                   <Badge variant="destructive" className="text-xs">Required</Badge>
                                 </div>
-                                <p className="text-xs text-muted-foreground mt-0.5">Upload a copy of your parent's or guardian's valid ID</p>
+                                <p className="text-xs text-muted-foreground mt-0.5">
+                                  Upload a copy of your parent's or guardian's valid ID
+                                </p>
                               </div>
                             </div>
                             {formData.files.parentId.length > 0 && (
@@ -492,27 +603,39 @@ export default function SubmitSlip() {
                                   <input
                                     type="file"
                                     multiple
-                                    onChange={(e) => handleFileAdd("parentId", e.target.files)}
+                                    onChange={(e) =>
+                                      handleFileAdd("parentId", e.target.files)
+                                    }
                                     className="absolute inset-0 opacity-0 cursor-pointer"
                                     accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                                   />
                                   <div className="flex flex-col items-center justify-center text-center">
                                     <Folder className="w-8 h-8 text-muted-foreground mb-2" />
-                                    <p className="text-sm font-medium text-foreground">Click to upload or drag and drop</p>
-                                    <p className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG, DOC up to 5MB</p>
+                                    <p className="text-sm font-medium text-foreground">
+                                      Click to upload or drag and drop
+                                    </p>
+                                    <p className="text-xs text-muted-foreground mt-1">
+                                      PDF, JPG, PNG, DOC up to 5MB
+                                    </p>
                                   </div>
                                 </div>
                               ) : (
                                 <div className="space-y-2">
                                   {formData.files.parentId.map((file, index) => (
-                                    <div key={`parent-${index}`} className="flex items-center justify-between p-3 bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 dark:border-green-900/40 rounded-md">
+                                    <div
+                                      key={`parent-${index}`}
+                                      className="flex items-center justify-between p-3 bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 dark:border-green-900/40 rounded-md"
+                                    >
                                       <div className="flex items-center gap-2 min-w-0">
                                         <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                                         <div className="min-w-0">
-                                          <p className="text-xs font-medium text-foreground truncate">{file.name}</p>
+                                          <p className="text-xs font-medium text-foreground truncate">
+                                            {file.name}
+                                          </p>
                                         </div>
                                       </div>
                                       <button
+                                        type="button"
                                         onClick={() => handleFileRemove("parentId", index)}
                                         className="p-0.5 hover:bg-red-100/50 dark:hover:bg-red-950/30 rounded transition-colors shrink-0"
                                         aria-label="Remove file"
@@ -527,20 +650,26 @@ export default function SubmitSlip() {
                           </AccordionContent>
                         </AccordionItem>
 
-                        {/* Document 3: Medical Certificate - Only show if medical category */}
+                        {/* Document 4: Medical Certificate */}
                         {isMedicalCategory() && (
                           <AccordionItem value="medical-cert" className="border-b last:border-b-0">
                             <AccordionTrigger className="flex items-center justify-between px-4 py-3 hover:bg-muted/30 hover:no-underline transition-colors">
                               <div className="flex items-center gap-3 flex-1">
                                 <div className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-semibold text-foreground">
-                                  3
+                                  4
                                 </div>
                                 <div className="text-left">
                                   <div className="flex items-center gap-2">
-                                    <h3 className="text-sm font-medium text-foreground">Medical Certificate</h3>
-                                    <Badge variant="destructive" className="text-xs">Required</Badge>
+                                    <h3 className="text-sm font-medium text-foreground">
+                                      Medical Certificate
+                                    </h3>
+                                    <Badge variant="destructive" className="text-xs">
+                                      Required
+                                    </Badge>
                                   </div>
-                                  <p className="text-xs text-muted-foreground mt-0.5">Upload medical certificate (required)</p>
+                                  <p className="text-xs text-muted-foreground mt-0.5">
+                                    Upload medical certificate (required)
+                                  </p>
                                 </div>
                               </div>
                               {formData.files.medicalCert.length > 0 && (
@@ -554,28 +683,42 @@ export default function SubmitSlip() {
                                     <input
                                       type="file"
                                       multiple
-                                      onChange={(e) => handleFileAdd("medicalCert", e.target.files)}
+                                      onChange={(e) =>
+                                        handleFileAdd("medicalCert", e.target.files)
+                                      }
                                       className="absolute inset-0 opacity-0 cursor-pointer"
                                       accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
                                     />
                                     <div className="flex flex-col items-center justify-center text-center">
                                       <Folder className="w-8 h-8 text-muted-foreground mb-2" />
-                                      <p className="text-sm font-medium text-foreground">Click to upload or drag and drop</p>
-                                      <p className="text-xs text-muted-foreground mt-1">PDF, JPG, PNG, DOC up to 5MB</p>
+                                      <p className="text-sm font-medium text-foreground">
+                                        Click to upload or drag and drop
+                                      </p>
+                                      <p className="text-xs text-muted-foreground mt-1">
+                                        PDF, JPG, PNG, DOC up to 5MB
+                                      </p>
                                     </div>
                                   </div>
                                 ) : (
                                   <div className="space-y-2">
                                     {formData.files.medicalCert.map((file, index) => (
-                                      <div key={`cert-${index}`} className="flex items-center justify-between p-3 bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 dark:border-green-900/40 rounded-md">
+                                      <div
+                                        key={`cert-${index}`}
+                                        className="flex items-center justify-between p-3 bg-green-50/50 dark:bg-green-950/20 border border-green-200/50 dark:border-green-900/40 rounded-md"
+                                      >
                                         <div className="flex items-center gap-2 min-w-0">
                                           <CheckCircle2 className="w-4 h-4 text-green-500 shrink-0" />
                                           <div className="min-w-0">
-                                            <p className="text-xs font-medium text-foreground truncate">{file.name}</p>
+                                            <p className="text-xs font-medium text-foreground truncate">
+                                              {file.name}
+                                            </p>
                                           </div>
                                         </div>
                                         <button
-                                          onClick={() => handleFileRemove("medicalCert", index)}
+                                          type="button"
+                                          onClick={() =>
+                                            handleFileRemove("medicalCert", index)
+                                          }
                                           className="p-0.5 hover:bg-red-100/50 dark:hover:bg-red-950/30 rounded transition-colors shrink-0"
                                           aria-label="Remove file"
                                         >
@@ -593,7 +736,6 @@ export default function SubmitSlip() {
                     </CardContent>
                   </Card>
 
-                  {/* Submit Button */}
                   <div className="flex gap-3 mt-5 pt-2">
                     <Button
                       onClick={() => setCurrentStep(2)}
@@ -613,7 +755,6 @@ export default function SubmitSlip() {
                 </div>
               )}
 
-              {/* Need Help? Contact Card */}
               <Card className="border-0 shadow-sm">
                 <CardHeader className="pb-3 border-b border-border/60">
                   <CardTitle className="text-sm">NEED HELP?</CardTitle>
@@ -623,15 +764,16 @@ export default function SubmitSlip() {
                     <p className="font-medium text-foreground">Visit the Guidance Office</p>
                   </div>
                   <div className="space-y-1 text-xs">
-                    <p className="text-muted-foreground"><span className="font-medium text-foreground">Hours:</span> Mon-Fri, 7:30 AM - 4:00 PM</p>
+                    <p className="text-muted-foreground">
+                      <span className="font-medium text-foreground">Hours:</span>{" "}
+                      Mon-Fri, 7:30 AM - 4:00 PM
+                    </p>
                   </div>
                 </CardContent>
               </Card>
             </div>
 
-            {/* Right Column - Sidebar */}
             <div className="space-y-4">
-              {/* Tips Section */}
               <Card className="border-0 shadow-sm">
                 <CardHeader className="pb-3">
                   <div className="flex items-center gap-2">
@@ -642,15 +784,18 @@ export default function SubmitSlip() {
                 <CardContent className="space-y-3 text-sm">
                   <div>
                     <p className="font-medium text-foreground">
-                      <span className="text-primary">Date of Absence</span> is when you were actually absent.
+                      <span className="text-primary">Date of Absence</span> is when
+                      you were actually absent.
                     </p>
                     <p className="text-muted-foreground text-xs mt-1">
-                      <span className="font-medium">Date Needed</span> is your deadline for the approval.
+                      <span className="font-medium">Date Needed</span> is your
+                      deadline for the approval.
                     </p>
                   </div>
                   <div>
                     <p className="font-medium text-foreground">
-                      Be <span className="text-primary">specific and honest</span> in your reason.
+                      Be <span className="text-primary">specific and honest</span> in
+                      your reason.
                     </p>
                     <p className="text-muted-foreground text-xs mt-1">
                       Vague reasons may cause delays in approval.
@@ -659,7 +804,6 @@ export default function SubmitSlip() {
                 </CardContent>
               </Card>
 
-              {/* Requirements Section */}
               <Card className="border-0 shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="text-sm flex items-center gap-2">
@@ -671,59 +815,84 @@ export default function SubmitSlip() {
                     <li className="flex gap-3">
                       <span className="font-bold text-primary shrink-0">1</span>
                       <div>
-                        <p className="font-medium text-foreground">Medical Certificate</p>
-                        <p className="text-muted-foreground text-xs">required for illness-related absences</p>
+                        <p className="font-medium text-foreground">
+                          Certificate of Registration (COR)
+                        </p>
+                        <p className="text-muted-foreground text-xs">
+                          submitted through a separate field for admission slip requests
+                        </p>
                       </div>
                     </li>
                     <li className="flex gap-3">
                       <span className="font-bold text-primary shrink-0">2</span>
                       <div>
-                        <p className="font-medium text-foreground">Supporting Document</p>
-                        <p className="text-muted-foreground text-xs">any proof of related to your reason</p>
+                        <p className="font-medium text-foreground">Medical Certificate</p>
+                        <p className="text-muted-foreground text-xs">
+                          required for illness-related absences
+                        </p>
                       </div>
                     </li>
                     <li className="flex gap-3">
                       <span className="font-bold text-primary shrink-0">3</span>
                       <div>
+                        <p className="font-medium text-foreground">Supporting Document</p>
+                        <p className="text-muted-foreground text-xs">
+                          any proof related to your reason
+                        </p>
+                      </div>
+                    </li>
+                    <li className="flex gap-3">
+                      <span className="font-bold text-primary shrink-0">4</span>
+                      <div>
                         <p className="font-medium text-foreground">File formats</p>
-                        <p className="text-muted-foreground text-xs">PDF, JPG, PNG — max 5MB per file</p>
+                        <p className="text-muted-foreground text-xs">
+                          PDF, JPG, PNG — max 5MB per file
+                        </p>
                       </div>
                     </li>
                   </ol>
                 </CardContent>
               </Card>
 
-              {/* Approval Process Section */}
               <Card className="border-0 shadow-sm">
                 <CardHeader className="pb-3 border-b border-border/60">
                   <CardTitle className="text-sm">APPROVAL PROCESS</CardTitle>
                 </CardHeader>
                 <CardContent className="pt-3">
                   <div className="relative pl-6">
-                    {/* Step 1 - Active */}
                     <div className="relative pb-3">
                       <div className="absolute -left-5 top-0.5 w-2.5 h-2.5 rounded-full bg-primary z-10"></div>
                       <div>
-                        <p className="font-medium text-foreground text-sm leading-tight">You Submit</p>
-                        <p className="text-muted-foreground text-xs mt-1 leading-relaxed">Fill and submit your slip</p>
+                        <p className="font-medium text-foreground text-sm leading-tight">
+                          You Submit
+                        </p>
+                        <p className="text-muted-foreground text-xs mt-1 leading-relaxed">
+                          Fill and submit your slip
+                        </p>
                       </div>
                     </div>
 
-                    {/* Step 2 */}
                     <div className="relative pb-3">
                       <div className="absolute -left-5 top-0.5 w-2.5 h-2.5 rounded-full bg-border/30 z-10"></div>
                       <div>
-                        <p className="font-medium text-foreground text-sm leading-tight">Under Review</p>
-                        <p className="text-muted-foreground text-xs mt-1 leading-relaxed">School office reviews within 1-2 days</p>
+                        <p className="font-medium text-foreground text-sm leading-tight">
+                          Under Review
+                        </p>
+                        <p className="text-muted-foreground text-xs mt-1 leading-relaxed">
+                          School office reviews within 1-2 days
+                        </p>
                       </div>
                     </div>
 
-                    {/* Step 3 */}
                     <div className="relative">
                       <div className="absolute -left-5 top-0.5 w-2.5 h-2.5 rounded-full bg-border/30 z-10"></div>
                       <div>
-                        <p className="font-medium text-foreground text-sm leading-tight">Approved / Returned</p>
-                        <p className="text-muted-foreground text-xs mt-1 leading-relaxed">You'll be notified on status</p>
+                        <p className="font-medium text-foreground text-sm leading-tight">
+                          Approved / Returned
+                        </p>
+                        <p className="text-muted-foreground text-xs mt-1 leading-relaxed">
+                          You'll be notified on status
+                        </p>
                       </div>
                     </div>
                   </div>

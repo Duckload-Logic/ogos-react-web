@@ -10,13 +10,35 @@ export function useSubmitSlip() {
 
   return useMutation({
     mutationFn: async (data: CreateSlipRequest) => {
-      return PostSlip(data, {
+      const formData = new FormData();
+
+      formData.append("reason", data.reason);
+      formData.append("dateOfAbsence", data.dateOfAbsence);
+      formData.append("dateNeeded", data.dateNeeded);
+      formData.append("categoryId", String(data.categoryId));
+
+      data.files?.cor?.forEach((file) => {
+        formData.append("cor", file);
+      });
+
+      data.files?.excuseLetter?.forEach((file) => {
+        formData.append("excuseLetter", file);
+      });
+
+      data.files?.parentId?.forEach((file) => {
+        formData.append("parentId", file);
+      });
+
+      data.files?.medicalCert?.forEach((file) => {
+        formData.append("medicalCert", file);
+      });
+
+      return PostSlip(formData, {
         handlerName: "useSubmitSlip",
         stepName: "Submit Slip",
       });
     },
     onSuccess: () => {
-      // Invalidate my slips query to refetch
       queryClient.invalidateQueries({
         queryKey: ["my-slips"],
       });
@@ -46,7 +68,6 @@ export function useUpdateSlipStatus() {
       });
     },
     onSuccess: () => {
-      // Invalidate all related queries to refetch fresh data
       queryClient.invalidateQueries({
         queryKey: ["slips"],
       });
