@@ -46,7 +46,6 @@ export interface RegisterResponse {
  */
 export interface LogoutResponse {
   message: string;
-  logoutUrl?: string;
 }
 
 /**
