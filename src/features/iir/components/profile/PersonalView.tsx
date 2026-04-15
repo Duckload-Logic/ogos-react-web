@@ -37,7 +37,7 @@ export default function PersonalView({
     },
     {
       label: "Mobile Number",
-      value: `+63 ${asText(personalInfo?.mobileNumber)}`,
+      value: `${asText(personalInfo?.mobileNumber)}`,
     },
     {
       label: "Telephone Number",

@@ -170,11 +170,10 @@ export const FamilySection = forwardRef<
                         id: Number(option.id),
                       })
                     }
-                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
-                      isSelected
-                        ? "bg-primary/5 border-primary shadow-sm"
-                        : "bg-glass-bg/40 border-glass-border/20 hover:bg-glass-bg/60 hover:border-primary/20"
-                    }`}
+                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${isSelected
+                      ? "bg-primary/5 border-primary shadow-sm"
+                      : "bg-glass-bg/40 border-glass-border/20 hover:bg-glass-bg/60 hover:border-primary/20"
+                      }`}
                   >
                     <div className="flex items-center gap-3">
                       <div
@@ -260,11 +259,10 @@ export const FamilySection = forwardRef<
                             val === "yes",
                           )
                         }
-                        className={`py-2.5 px-4 rounded-xl border text-sm font-bold transition-all duration-300 ${
-                          isSelected
-                            ? "bg-indigo-500/10 border-indigo-500 text-indigo-600 shadow-sm"
-                            : "bg-white/20 border-glass-border/20 text-muted-foreground hover:bg-white/40"
-                        }`}
+                        className={`py-2.5 px-4 rounded-xl border text-sm font-bold transition-all duration-300 ${isSelected
+                          ? "bg-indigo-500/10 border-indigo-500 text-indigo-600 shadow-sm"
+                          : "bg-white/20 border-glass-border/20 text-muted-foreground hover:bg-white/40"
+                          }`}
                       >
                         {val.charAt(0).toUpperCase() + val.slice(1)}
                       </button>
@@ -297,11 +295,10 @@ export const FamilySection = forwardRef<
                             val === "yes",
                           )
                         }
-                        className={`py-2.5 px-4 rounded-xl border text-sm font-bold transition-all duration-300 ${
-                          isSelected
-                            ? "bg-indigo-500/10 border-indigo-500 text-indigo-600 shadow-sm"
-                            : "bg-white/20 border-glass-border/20 text-muted-foreground hover:bg-white/40"
-                        }`}
+                        className={`py-2.5 px-4 rounded-xl border text-sm font-bold transition-all duration-300 ${isSelected
+                          ? "bg-indigo-500/10 border-indigo-500 text-indigo-600 shadow-sm"
+                          : "bg-white/20 border-glass-border/20 text-muted-foreground hover:bg-white/40"
+                          }`}
                       >
                         {val.charAt(0).toUpperCase() + val.slice(1)}
                       </button>
@@ -361,11 +358,10 @@ export const FamilySection = forwardRef<
                           { id: Number(option.id) },
                         )
                       }
-                      className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 ${
-                        isSelected
-                          ? "bg-indigo-500/10 border-indigo-500 shadow-sm"
-                          : "bg-white/20 border-glass-border/20 hover:bg-white/40"
-                      }`}
+                      className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 ${isSelected
+                        ? "bg-indigo-500/10 border-indigo-500 shadow-sm"
+                        : "bg-white/20 border-glass-border/20 hover:bg-white/40"
+                        }`}
                     >
                       <div
                         className={`w-2 h-2 rounded-full transition-all duration-300 ${isSelected ? "bg-indigo-500 scale-110" : "bg-muted"}`}
@@ -433,13 +429,12 @@ export const FamilySection = forwardRef<
                           isLiving,
                         )
                       }
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border ${
-                        isSelected
-                          ? isLiving
-                            ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-600"
-                            : "bg-rose-500/10 border-rose-500/50 text-rose-600"
-                          : "bg-glass-bg/40 border-glass-border/20 text-muted-foreground"
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border ${isSelected
+                        ? isLiving
+                          ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-600"
+                          : "bg-rose-500/10 border-rose-500/50 text-rose-600"
+                        : "bg-glass-bg/40 border-glass-border/20 text-muted-foreground"
+                        }`}
                     >
                       {status}
                     </button>
@@ -659,13 +654,12 @@ export const FamilySection = forwardRef<
                           isLiving,
                         )
                       }
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border ${
-                        isSelected
-                          ? isLiving
-                            ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-600"
-                            : "bg-rose-500/10 border-rose-500/50 text-rose-600"
-                          : "bg-glass-bg/40 border-glass-border/20 text-muted-foreground"
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border ${isSelected
+                        ? isLiving
+                          ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-600"
+                          : "bg-rose-500/10 border-rose-500/50 text-rose-600"
+                        : "bg-glass-bg/40 border-glass-border/20 text-muted-foreground"
+                        }`}
                     >
                       {status}
                     </button>
@@ -890,13 +884,12 @@ export const FamilySection = forwardRef<
                           isLiving,
                         )
                       }
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border ${
-                        isSelected
-                          ? isLiving
-                            ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-600"
-                            : "bg-rose-500/10 border-rose-500/50 text-rose-600"
-                          : "bg-glass-bg/40 border-glass-border/20 text-muted-foreground"
-                      }`}
+                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border ${isSelected
+                        ? isLiving
+                          ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-600"
+                          : "bg-rose-500/10 border-rose-500/50 text-rose-600"
+                        : "bg-glass-bg/40 border-glass-border/20 text-muted-foreground"
+                        }`}
                     >
                       {status}
                     </button>
@@ -1096,379 +1089,329 @@ export const FamilySection = forwardRef<
             </div>
           </div>
 
-          <div className="border-t border-glass-border/20 my-6 sm:my-8"></div>
+          <div className="border-t border-border my-6"></div>
 
-          <div className="mb-4">
-            <h4 className="text-foreground mb-3">
-              Is your brother/sister who is gainfully employed providing support
-              to your:
-            </h4>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            {siblingSupportTypesOptions?.map((option: any) => {
-              const isChecked = family?.background?.siblingSupportTypes?.some(
-                (item: any) => String(item.id) === String(option.id),
-              );
-
-              return (
-                <Checkbox
-                  key={option.id}
-                  square
-                  id={`sibling-support-${option.id}`}
-                  label={option.name || option.text || option.code}
-                  name={`sibling-support-${option.id}`}
-                  checked={isChecked || false}
-                  onCheckedChange={(checked) => {
-                    const currentTypes =
-                      family?.background?.siblingSupportTypes || [];
-                    let newTypes;
-                    if (checked) {
-                      newTypes = [...currentTypes, { id: Number(option.id) }];
-                    } else {
-                      newTypes = currentTypes.filter(
-                        (item: any) => String(item.id) !== String(option.id),
-                      );
-                    }
-                    handleInputChange(
-                      "family.background.siblingSupportTypes",
-                      newTypes,
-                    );
-                  }}
-                />
-              );
-            })}
-          </div>
-          {errors["family.background.siblingSupportTypes"] && (
-            <p className="text-xs font-semibold text-red-600 mt-1">
-              {errors["family.background.siblingSupportTypes"]}
-            </p>
-          )}
-        </div>
-
-        <div className="border-t border-border my-6"></div>
-
-        {/* Sibling Information Card */}
-        <div className="group bg-glass-bg/60 backdrop-blur-glass rounded-[24px] border border-glass-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden p-5 sm:p-8">
-          <div className="flex items-center gap-3 mb-6 sm:mb-8">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-sm text-primary">
-              <Users className="w-5 h-5" />
+          {/* Sibling Information Card */}
+          <div className="group bg-glass-bg/60 backdrop-blur-glass rounded-[24px] border border-glass-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden p-5 sm:p-8">
+            <div className="flex items-center gap-3 mb-6 sm:mb-8">
+              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-sm text-primary">
+                <Users className="w-5 h-5" />
+              </div>
+              <h4 className="text-base font-bold text-foreground">
+                Sibling Information
+              </h4>
             </div>
-            <h4 className="text-base font-bold text-foreground">
-              Sibling Information
-            </h4>
-          </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
-            <FormInput
-              name="family.background.brothers"
-              label="Brothers"
-              type="number"
-              required
-              value={family?.background?.brothers ?? ""}
-              onChange={(val) =>
-                handleInputChange(
-                  "family.background.brothers",
-                  val === "" ? "" : Number(val),
-                )
-              }
-              onBlur={() => handleFieldBlur("family.background.brothers")}
-              placeholder="0"
-              error={getFieldError("family.background.brothers")}
-            />
-            <FormInput
-              name="family.background.sisters"
-              label="Sisters"
-              type="number"
-              required
-              value={family?.background?.sisters ?? ""}
-              onChange={(val) =>
-                handleInputChange(
-                  "family.background.sisters",
-                  val === "" ? "" : Number(val),
-                )
-              }
-              onBlur={() => handleFieldBlur("family.background.sisters")}
-              placeholder="0"
-              error={getFieldError("family.background.sisters")}
-            />
-            <FormInput
-              name="family.background.employedSiblings"
-              label="Employed Siblings"
-              type="number"
-              required
-              value={family?.background?.employedSiblings ?? ""}
-              onChange={(val) =>
-                handleInputChange(
-                  "family.background.employedSiblings",
-                  val === "" ? "" : Number(val),
-                )
-              }
-              onBlur={() => handleFieldBlur("family.background.employedSiblings")}
-              placeholder="0"
-              error={getFieldError("family.background.employedSiblings")}
-            />
-            <FormInput
-              name="family.background.ordinalPosition"
-              label="Your Birth Order"
-              type="number"
-              required
-              value={family?.background?.ordinalPosition ?? ""}
-              onChange={(val) =>
-                handleInputChange(
-                  "family.background.ordinalPosition",
-                  val === "" ? "" : Number(val),
-                )
-              }
-              onBlur={() => handleFieldBlur("family.background.ordinalPosition")}
-              placeholder="e.g. 1"
-              error={getFieldError("family.background.ordinalPosition")}
-            />
-          </div>
-
-          <div className="space-y-4">
-            <label className="text-sm font-bold text-foreground flex items-center gap-2">
-              Who supports your siblings' education?
-              <span className="text-rose-500">*</span>
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {siblingSupportTypesOptions?.map((option: any) => {
-                const isChecked = family?.background?.siblingSupportTypes?.some(
-                  (item: any) => String(item.id) === String(option.id),
-                );
-                return (
-                  <div
-                    key={option.id}
-                    onClick={() => {
-                      const currentTypes =
-                        family?.background?.siblingSupportTypes || [];
-                      let newTypes;
-                      if (!isChecked) {
-                        newTypes = [...currentTypes, { id: Number(option.id) }];
-                      } else {
-                        newTypes = currentTypes.filter(
-                          (item: any) => String(item.id) !== String(option.id),
-                        );
-                      }
-                      handleInputChange(
-                        "family.background.siblingSupportTypes",
-                        newTypes,
-                      );
-                    }}
-                    className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 cursor-pointer group/opt ${
-                      isChecked
-                        ? "bg-primary/5 border-primary shadow-sm"
-                        : "bg-glass-bg/20 border-glass-border/20 hover:border-primary/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${
-                        isChecked
-                          ? "bg-primary border-primary"
-                          : "bg-white border-muted-foreground/30"
-                      }`}
-                    >
-                      {isChecked && (
-                        <Check
-                          className="w-3.5 h-3.5 text-white"
-                          strokeWidth={3}
-                        />
-                      )}
-                    </div>
-                    <span
-                      className={`text-sm font-medium transition-colors ${isChecked ? "text-primary italic" : "text-muted-foreground"}`}
-                    >
-                      {option.name || option.text || option.code}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            {errors["family.background.siblingSupportTypes"] && (
-              <p className="text-xs font-bold text-rose-500 mt-2 flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-rose-500" />
-                {errors["family.background.siblingSupportTypes"]}
-              </p>
-            )}
-          </div>
-
-          <div className="mt-8 pt-8 border-t border-white/40">
-            <label className="text-sm font-bold text-foreground flex items-center gap-2 mb-4">
-              Who finances your schooling?
-              <span className="text-rose-500">*</span>
-            </label>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {studentSupportTypesOptions?.map((option: any) => {
-                const isChecked = family?.finance?.financialSupportTypes?.some(
-                  (item: any) => String(item.id) === String(option.id),
-                );
-                return (
-                  <div
-                    key={option.id}
-                    onClick={() => {
-                      const currentTypes =
-                        family?.finance?.financialSupportTypes || [];
-                      let newTypes;
-                      if (!isChecked) {
-                        newTypes = [...currentTypes, { id: Number(option.id) }];
-                      } else {
-                        newTypes = currentTypes.filter(
-                          (item: any) => String(item.id) !== String(option.id),
-                        );
-                      }
-                      handleInputChange(
-                        "family.finance.financialSupportTypes",
-                        newTypes,
-                      );
-                    }}
-                    className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 cursor-pointer group/opt ${
-                      isChecked
-                        ? "bg-primary/5 border-primary shadow-sm"
-                        : "bg-glass-bg/20 border-glass-border/20 hover:border-primary/20"
-                    }`}
-                  >
-                    <div
-                      className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${
-                        isChecked
-                          ? "bg-primary border-primary"
-                          : "bg-white border-muted-foreground/30"
-                      }`}
-                    >
-                      {isChecked && (
-                        <Check
-                          className="w-3.5 h-3.5 text-white"
-                          strokeWidth={3}
-                        />
-                      )}
-                    </div>
-                    <span
-                      className={`text-sm font-medium transition-colors ${isChecked ? "text-primary italic" : "text-muted-foreground"}`}
-                    >
-                      {option.name || option.text || option.code}
-                    </span>
-                  </div>
-                );
-              })}
-            </div>
-            {errors["family.finance.financialSupportTypes"] && (
-              <p className="text-xs font-bold text-rose-500 mt-2 flex items-center gap-1">
-                <span className="w-1 h-1 rounded-full bg-rose-500" />
-                {errors["family.finance.financialSupportTypes"]}
-              </p>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="border-t border-border my-8"></div>
-
-      {/* IV. Financial Information */}
-      <div className="space-y-8">
-        <div className="flex items-center gap-3 mb-2">
-          <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
-            <CircleDollarSign className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-lg font-bold text-foreground">
-              Financial Information
-            </h3>
-            <p className="text-xs text-muted-foreground font-medium">
-              Monthly household income and allowance
-            </p>
-          </div>
-        </div>
-
-        <div className="group bg-glass-bg/20 backdrop-blur-sm rounded-3xl border border-glass-border/20 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden p-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              <Dropdown
-                label="Parents' Combined Monthly Income"
-                name="family.finance.monthlyFamilyIncomeRange"
-                value={family?.finance?.monthlyFamilyIncomeRange?.id || ""}
-                onChange={(val) => {
-                  handleInputChange("family.finance.monthlyFamilyIncomeRange", {
-                    id: val,
-                  });
-                  if (val !== "others") {
-                    handleInputChange(
-                      "family.finance.monthlyFamilyIncomeRange.otherSpecification",
-                      "",
-                    );
-                    setOtherTouched(false);
-                  } else {
-                    setTimeout(() => otherInputRef.current?.focus(), 0);
-                  }
-                }}
-                options={monthlyFamilyIncomeRanges}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+              <FormInput
+                name="family.background.brothers"
+                label="Brothers"
+                type="number"
                 required
+                value={family?.background?.brothers ?? ""}
+                onChange={(val) =>
+                  handleInputChange(
+                    "family.background.brothers",
+                    val === "" ? "" : Number(val),
+                  )
+                }
+                onBlur={() => handleFieldBlur("family.background.brothers")}
+                placeholder="0"
+                error={getFieldError("family.background.brothers")}
               />
+              <FormInput
+                name="family.background.sisters"
+                label="Sisters"
+                type="number"
+                required
+                value={family?.background?.sisters ?? ""}
+                onChange={(val) =>
+                  handleInputChange(
+                    "family.background.sisters",
+                    val === "" ? "" : Number(val),
+                  )
+                }
+                onBlur={() => handleFieldBlur("family.background.sisters")}
+                placeholder="0"
+                error={getFieldError("family.background.sisters")}
+              />
+              <FormInput
+                name="family.background.employedSiblings"
+                label="Employed Siblings"
+                type="number"
+                required
+                value={family?.background?.employedSiblings ?? ""}
+                onChange={(val) =>
+                  handleInputChange(
+                    "family.background.employedSiblings",
+                    val === "" ? "" : Number(val),
+                  )
+                }
+                onBlur={() => handleFieldBlur("family.background.employedSiblings")}
+                placeholder="0"
+                error={getFieldError("family.background.employedSiblings")}
+              />
+              <FormInput
+                name="family.background.ordinalPosition"
+                label="Your Birth Order"
+                type="number"
+                required
+                value={family?.background?.ordinalPosition ?? ""}
+                onChange={(val) =>
+                  handleInputChange(
+                    "family.background.ordinalPosition",
+                    val === "" ? "" : Number(val),
+                  )
+                }
+                onBlur={() => handleFieldBlur("family.background.ordinalPosition")}
+                placeholder="e.g. 1"
+                error={getFieldError("family.background.ordinalPosition")}
+              />
+            </div>
 
-              {family?.finance?.monthlyFamilyIncomeRange?.id === "others" && (
-                <div className="pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
-                  <FormInput
-                    ref={otherInputRef}
-                    name="family.finance.monthlyFamilyIncomeRange.otherSpecification"
-                    label="Specify Income Range"
-                    required
-                    value={
-                      family?.finance?.monthlyFamilyIncomeRange
-                        ?.otherSpecification || ""
-                    }
-                    onChange={(val) =>
+            <div className="space-y-4">
+              <label className="text-sm font-bold text-foreground flex items-center gap-2">
+
+                Is your brother/sister who is gainfully employed providing support
+                to your:
+                <span className="text-rose-500">*</span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {siblingSupportTypesOptions?.map((option: any) => {
+                  const isChecked = family?.background?.siblingSupportTypes?.some(
+                    (item: any) => String(item.id) === String(option.id),
+                  );
+                  return (
+                    <div
+                      key={option.id}
+                      onClick={() => {
+                        const currentTypes =
+                          family?.background?.siblingSupportTypes || [];
+                        let newTypes;
+                        if (!isChecked) {
+                          newTypes = [...currentTypes, { id: Number(option.id) }];
+                        } else {
+                          newTypes = currentTypes.filter(
+                            (item: any) => String(item.id) !== String(option.id),
+                          );
+                        }
+                        handleInputChange(
+                          "family.background.siblingSupportTypes",
+                          newTypes,
+                        );
+                      }}
+                      className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 cursor-pointer group/opt ${isChecked
+                        ? "bg-primary/5 border-primary shadow-sm"
+                        : "bg-glass-bg/20 border-glass-border/20 hover:border-primary/20"
+                        }`}
+                    >
+                      <div
+                        className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${isChecked
+                          ? "bg-primary border-primary"
+                          : "bg-white border-muted-foreground/30"
+                          }`}
+                      >
+                        {isChecked && (
+                          <Check
+                            className="w-3.5 h-3.5 text-white"
+                            strokeWidth={3}
+                          />
+                        )}
+                      </div>
+                      <span
+                        className={`text-sm font-medium transition-colors ${isChecked ? "text-primary italic" : "text-muted-foreground"}`}
+                      >
+                        {option.name || option.text || option.code}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              {errors["family.background.siblingSupportTypes"] && (
+                <p className="text-xs font-bold text-rose-500 mt-2 flex items-center gap-1">
+                  <span className="w-1 h-1 rounded-full bg-rose-500" />
+                  {errors["family.background.siblingSupportTypes"]}
+                </p>
+              )}
+            </div>
+
+            <div className="mt-8 pt-8 border-t border-white/40">
+              <label className="text-sm font-bold text-foreground flex items-center gap-2 mb-4">
+                Who finances your schooling?
+                <span className="text-rose-500">*</span>
+              </label>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {studentSupportTypesOptions?.map((option: any) => {
+                  const isChecked = family?.finance?.financialSupportTypes?.some(
+                    (item: any) => String(item.id) === String(option.id),
+                  );
+                  return (
+                    <div
+                      key={option.id}
+                      onClick={() => {
+                        const currentTypes =
+                          family?.finance?.financialSupportTypes || [];
+                        let newTypes;
+                        if (!isChecked) {
+                          newTypes = [...currentTypes, { id: Number(option.id) }];
+                        } else {
+                          newTypes = currentTypes.filter(
+                            (item: any) => String(item.id) !== String(option.id),
+                          );
+                        }
+                        handleInputChange(
+                          "family.finance.financialSupportTypes",
+                          newTypes,
+                        );
+                      }}
+                      className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 cursor-pointer group/opt ${isChecked
+                        ? "bg-primary/5 border-primary shadow-sm"
+                        : "bg-glass-bg/20 border-glass-border/20 hover:border-primary/20"
+                        }`}
+                    >
+                      <div
+                        className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${isChecked
+                          ? "bg-primary border-primary"
+                          : "bg-white border-muted-foreground/30"
+                          }`}
+                      >
+                        {isChecked && (
+                          <Check
+                            className="w-3.5 h-3.5 text-white"
+                            strokeWidth={3}
+                          />
+                        )}
+                      </div>
+                      <span
+                        className={`text-sm font-medium transition-colors ${isChecked ? "text-primary italic" : "text-muted-foreground"}`}
+                      >
+                        {option.name || option.text || option.code}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+              {errors["family.finance.financialSupportTypes"] && (
+                <p className="text-xs font-bold text-rose-500 mt-2 flex items-center gap-1">
+                  <span className="w-1 h-1 rounded-full bg-rose-500" />
+                  {errors["family.finance.financialSupportTypes"]}
+                </p>
+              )}
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-border my-8"></div>
+
+        {/* IV. Financial Information */}
+        <div className="space-y-8">
+          <div className="flex items-center gap-3 mb-2">
+            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
+              <CircleDollarSign className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-foreground">
+                Financial Information
+              </h3>
+              <p className="text-xs text-muted-foreground font-medium">
+                Monthly household income and allowance
+              </p>
+            </div>
+          </div>
+
+          <div className="group bg-glass-bg/20 backdrop-blur-sm rounded-3xl border border-glass-border/20 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden p-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="space-y-4">
+                <Dropdown
+                  label="Parents' Combined Monthly Income"
+                  name="family.finance.monthlyFamilyIncomeRange"
+                  value={family?.finance?.monthlyFamilyIncomeRange?.id || ""}
+                  onChange={(val) => {
+                    handleInputChange("family.finance.monthlyFamilyIncomeRange", {
+                      id: val,
+                    });
+                    if (val !== "others") {
                       handleInputChange(
                         "family.finance.monthlyFamilyIncomeRange.otherSpecification",
-                        val,
-                      )
+                        "",
+                      );
+                      setOtherTouched(false);
+                    } else {
+                      setTimeout(() => otherInputRef.current?.focus(), 0);
                     }
-                    onBlur={() => setOtherTouched(true)}
-                    placeholder="Enter income range..."
-                    error={
-                      otherTouched &&
-                      !family?.finance?.monthlyFamilyIncomeRange
-                        ?.otherSpecification
-                        ? "Please specify"
-                        : errors[
-                            "family.finance.monthlyFamilyIncomeRange.otherSpecification"
-                          ]
-                    }
-                  />
-                </div>
-              )}
-            </div>
+                  }}
+                  options={monthlyFamilyIncomeRanges}
+                  required
+                />
 
-            <FormInput
-              name="family.finance.weeklyAllowance"
-              label="Weekly Allowance (PHP)"
-              type="text"
-              inputMode="decimal"
-              required={isFieldRequired(
-                familyValidationSchema,
-                "family.finance.weeklyAllowance",
-              )}
-              value={family?.finance?.weeklyAllowance ?? ""}
-              onChange={(val) =>
-                handleInputChange(
+                {family?.finance?.monthlyFamilyIncomeRange?.id === "others" && (
+                  <div className="pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                    <FormInput
+                      ref={otherInputRef}
+                      name="family.finance.monthlyFamilyIncomeRange.otherSpecification"
+                      label="Specify Income Range"
+                      required
+                      value={
+                        family?.finance?.monthlyFamilyIncomeRange
+                          ?.otherSpecification || ""
+                      }
+                      onChange={(val) =>
+                        handleInputChange(
+                          "family.finance.monthlyFamilyIncomeRange.otherSpecification",
+                          val,
+                        )
+                      }
+                      onBlur={() => setOtherTouched(true)}
+                      placeholder="Enter income range..."
+                      error={
+                        otherTouched &&
+                          !family?.finance?.monthlyFamilyIncomeRange
+                            ?.otherSpecification
+                          ? "Please specify"
+                          : errors[
+                          "family.finance.monthlyFamilyIncomeRange.otherSpecification"
+                          ]
+                      }
+                    />
+                  </div>
+                )}
+              </div>
+
+              <FormInput
+                name="family.finance.weeklyAllowance"
+                label="Weekly Allowance (PHP)"
+                type="text"
+                inputMode="decimal"
+                required={isFieldRequired(
+                  familyValidationSchema,
                   "family.finance.weeklyAllowance",
-                  String(val).replace(/[^0-9.]/g, ""),
-                )
-              }
-              onBlur={() => {
-                const wa = family?.finance?.weeklyAllowance;
-                if (wa !== undefined && wa !== null && wa !== "") {
+                )}
+                value={family?.finance?.weeklyAllowance ?? ""}
+                onChange={(val) =>
                   handleInputChange(
                     "family.finance.weeklyAllowance",
-                    Number(wa),
-                  );
-                } else if (wa === "") {
-                  handleInputChange("family.finance.weeklyAllowance", null);
+                    String(val).replace(/[^0-9.]/g, ""),
+                  )
                 }
-                handleFieldBlur("family.finance.weeklyAllowance");
-              }}
-              placeholder="0.00"
-              error={getFieldError("family.finance.weeklyAllowance")}
-            />
+                onBlur={() => {
+                  const wa = family?.finance?.weeklyAllowance;
+                  if (wa !== undefined && wa !== null && wa !== "") {
+                    handleInputChange(
+                      "family.finance.weeklyAllowance",
+                      Number(wa),
+                    );
+                  } else if (wa === "") {
+                    handleInputChange("family.finance.weeklyAllowance", null);
+                  }
+                  handleFieldBlur("family.finance.weeklyAllowance");
+                }}
+                placeholder="0.00"
+                error={getFieldError("family.finance.weeklyAllowance")}
+              />
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </SectionContainer>
+    </SectionContainer>
   );
 });
