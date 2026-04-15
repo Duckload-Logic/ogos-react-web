@@ -99,7 +99,7 @@ export const API_ROUTES = Object.freeze({
   auth: Object.freeze({
     me: "/auth/me",
     login: "/auth/login",
-    logout: "/auth/logout",
+    logout: (redirectUri: string) => `/auth/logout?redirect_uri=${redirectUri}`,
     refresh: "/auth/refresh",
     register: "/auth/register",
     idpAuthorizeUrl: "/auth/idp/authorize",

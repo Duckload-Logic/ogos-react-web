@@ -148,7 +148,9 @@ export const GetCurrentUser = async (
  * @returns The absolute URL for logout
  */
 export const GetLogoutURL = (): string => {
-  return `${import.meta.env.VITE_API_BASE_URL}${API_ROUTES.auth.logout}`;
+
+  const redirectUri = window.location.origin;
+  return `${import.meta.env.VITE_API_BASE_URL}${API_ROUTES.auth.logout(redirectUri)}`;
 };
 
 /**
