@@ -236,22 +236,39 @@ export const InterestsSection = forwardRef<
     handleInputChange("interests.hobbies", currentHobbies);
   };
 
-  const getSubjects = (isFavorite: boolean) =>
-    interests?.subjectPreferences
-      ?.filter((s: SubjectPreference) => s.isFavorite === isFavorite)
-      ?.map((s: SubjectPreference) => s.subjectName)
-      ?.join(", ") || "";
+  const getSubject = (isFavorite: boolean, slotIndex: number) => {
+    // We map Favorites to indices 0,1,2 and Least Liked to 3,4,5
+    const arrayIndex = isFavorite ? slotIndex : slotIndex + 3;
+    return (interests?.subjectPreferences || [])[arrayIndex]?.subjectName || "";
+  };
 
-  const updateSubjects = (isFavorite: boolean, subjectsStr: string) => {
-    const otherPreferences = (interests?.subjectPreferences || [])
-      .filter((s: SubjectPreference) => s.isFavorite !== isFavorite);
+  const updateSubject = (isFavorite: boolean, slotIndex: number, name: string) => {
+    const arrayIndex = isFavorite ? slotIndex : slotIndex + 3;
+    const currentPreferences = [...(interests?.subjectPreferences || [])];
 
-    const newPreferences = subjectsStr.split(",")
-      .map(s => s.trim())
-      .filter(s => s !== "")
-      .map(s => ({ subjectName: s, isFavorite }));
+    // Pad array with empty slots if necessary to reach the target index
+    while (currentPreferences.length <= arrayIndex) {
+      currentPreferences.push({
+        subjectName: "",
+        isFavorite: currentPreferences.length < 3
+      });
+    }
 
-    handleInputChange("interests.subjectPreferences", [...otherPreferences, ...newPreferences]);
+    currentPreferences[arrayIndex] = {
+      ...currentPreferences[arrayIndex],
+      subjectName: name,
+      isFavorite: isFavorite
+    };
+
+    handleInputChange("interests.subjectPreferences", currentPreferences);
+  };
+
+  const getSubjectFieldError = (isFavorite: boolean, slotIndex: number) => {
+    const arrayIndex = isFavorite ? slotIndex : slotIndex + 3;
+    const path = `interests.subjectPreferences.${arrayIndex}.subjectName`;
+    const error = errors[path];
+    const showError = shouldShowError ? shouldShowError(path) : true;
+    return error && showError ? error : undefined;
   };
 
   const getFieldError = (fieldPath: string): string | undefined => {
@@ -322,28 +339,40 @@ export const InterestsSection = forwardRef<
                 <Star size={14} className="text-primary" />
                 Favorite Subjects
               </h4>
-              <FormInput
-                label=""
-                value={getSubjects(true)}
-                onChange={(val: string) => updateSubjects(true, val)}
-                noSpecialCharacters={true}
-                placeholder="Math, Science, etc."
-                error={getFieldError("interests.academic.favoriteSubjects")}
-              />
+              <div className="space-y-4">
+                {[0, 1, 2].map((slot) => (
+                  <FormInput
+                    key={`fav-subject-${slot}`}
+                    label=""
+                    value={getSubject(true, slot)}
+                    onChange={(val: string) => updateSubject(true, slot, val)}
+                    noSpecialCharacters={true}
+                    placeholder={slot === 0 ? "e.g. Mathematics" : `Subject #${slot + 1}`}
+                    error={getSubjectFieldError(true, slot)}
+                    prefix={(slot + 1).toString()}
+                  />
+                ))}
+              </div>
             </div>
             <div className="bg-glass-bg/60 backdrop-blur-glass border border-glass-border/40 rounded-[24px] p-5 sm:p-6 hover:border-primary/20 transition-all duration-300 shadow-sm">
               <h4 className="flex items-center gap-2 text-xs font-black text-neutral-400 dark:text-neutral-500 uppercase tracking-widest mb-6">
                 <Heart size={14} className="text-primary opacity-50" />
                 Least Liked Subjects
               </h4>
-              <FormInput
-                label=""
-                value={getSubjects(false)}
-                onChange={(val: string) => updateSubjects(false, val)}
-                noSpecialCharacters={true}
-                placeholder="History, etc."
-                error={getFieldError("interests.academic.leastLikedSubjects")}
-              />
+              <div className="space-y-4">
+                {[0, 1, 2].map((slot) => (
+                  <FormInput
+                    key={`least-subject-${slot}`}
+                    label=""
+                    value={getSubject(false, slot)}
+                    onChange={(val: string) => updateSubject(false, slot, val)}
+                    noSpecialCharacters={true}
+                    placeholder={slot === 0 ? "e.g. History" : `Subject #${slot + 1}`}
+                    error={getSubjectFieldError(false, slot)}
+                    prefix={(slot + 1).toString()}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </section>
@@ -388,8 +417,7 @@ export const InterestsSection = forwardRef<
                           onChange={(val: string) => updateHobby(rank, val)}
                           noSpecialCharacters={true}
                           placeholder={`Preference #${rank}`}
-                          error={rank <= 2 ? getFieldError(`interests.hobbies.${rank - 1}.hobbyName`) : undefined}
-                          required={rank <= 2}
+                          error={getFieldError(`interests.hobbies.${rank - 1}.hobbyName`)}
                         />
                       </div>
                     </div>
@@ -482,12 +510,6 @@ export const InterestsSection = forwardRef<
                     )}
                   </div>
                 </div>
-                {getFieldError("interests.activities") && (
-                  <p className="mt-6 text-xs font-bold text-primary flex items-center gap-2">
-                    <CheckCircle2 size={12} />
-                    Select organization & role to complete
-                  </p>
-                )}
               </div>
             </div>
           </div>

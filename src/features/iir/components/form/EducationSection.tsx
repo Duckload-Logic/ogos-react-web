@@ -93,10 +93,18 @@ export const EducationSection = forwardRef<
       "yearStarted",
       "yearCompleted",
     ];
-    const filled = requiredFields.filter((field) => !!school[field]).length;
 
-    if (filled === 0) return { color: "bg-muted", text: "Empty", icon: null };
-    if (filled < requiredFields.length)
+    const filledCount = requiredFields.filter((field) => !!school[field]?.toString().trim()).length;
+
+    // Check if any field in this school slot has a validation error
+    const hasError = Object.keys(errors).some((path) =>
+      path.startsWith(`education.schools.${idx}.`),
+    );
+
+    if (filledCount === 0) return { color: "bg-muted", text: "Empty", icon: null };
+
+    // Incomplete if not all fields filled OR there's a validation error anywhere in the slot
+    if (filledCount < requiredFields.length || hasError)
       return { color: "bg-amber-500", text: "Incomplete", icon: AlertCircle };
 
     return { color: "bg-emerald-500", text: "Complete", icon: CheckCircle2 };

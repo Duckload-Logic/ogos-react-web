@@ -1,5 +1,5 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
-import { appointmentService } from "@/features/appointments/services";
+import { appointmentService, PostCancelAppointment } from "@/features/appointments/services";
 import { QUERY_KEYS } from "@/config/queryKeys";
 import { CACHE_TIMING } from "@/config/constants";
 import {
@@ -109,3 +109,20 @@ export const useAppointment = (id: string) => {
     enabled: !!id,
   });
 };
+
+export function useCancelAppointment() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: ({ id, reason }: { id: string; reason: string }) => 
+      PostCancelAppointment(id, { reason }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.appointments.myAppointments,
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.appointments.all,
+      });
+    },
+  });
+}

@@ -40,7 +40,7 @@ const normalizeIIRPayload = (iir: IIRForm) => {
       ...addr,
       addressType:
         addr.addressType?.toLowerCase() === "residential"
-          ? "residence"
+          ? "residential"
           : addr.addressType,
     }))
     : [];

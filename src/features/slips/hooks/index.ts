@@ -15,7 +15,11 @@ export {
 } from "./useLookups";
 
 // Mutation hooks
-export { useSubmitSlip, useUpdateSlipStatus } from "./useSlipMutations";
+export { 
+  useSubmitSlip, 
+  useUpdateSlipStatus, 
+  useUpdateSlip 
+} from "./useSlipMutations";
 
 // Attachment hooks
 export {

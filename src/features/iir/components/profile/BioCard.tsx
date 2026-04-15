@@ -49,7 +49,7 @@ export default function BioCard({
           <QuickInfo
             icon={Phone}
             label="Mobile Number"
-            value={`+63 ${asText(data?.personalInfo?.mobileNumber)}`}
+            value={`${asText(data?.personalInfo?.mobileNumber)}`}
           />
           <QuickInfo
             icon={School}
@@ -89,7 +89,6 @@ export default function BioCard({
                 Contact Number
               </span>
               <span className="text-xs font-semibold text-card-foreground">
-                +63{" "}
                 {asText(data?.personalInfo?.emergencyContact?.contactNumber)}
               </span>
             </div>

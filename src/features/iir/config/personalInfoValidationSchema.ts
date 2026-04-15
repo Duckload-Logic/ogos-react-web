@@ -93,18 +93,6 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
       message: "Employer address is required if employed",
     }
   ],
-  "student.personalInfo.employerNumber": [
-    {
-      type: "required",
-      validate: (value: any, rootData: any) => {
-        if (rootData?.student?.personalInfo?.isEmployed === true) {
-          return value && String(value).trim().length > 0;
-        }
-        return true;
-      },
-      message: "Employer phone number is required if employed",
-    }
-  ],
 
   // Emergency Contact
   "student.personalInfo.emergencyContact.firstName": [

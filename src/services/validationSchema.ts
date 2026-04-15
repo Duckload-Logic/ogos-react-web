@@ -78,7 +78,7 @@ export const commonRules = {
   decimalPlaces: (maxDecimalPlaces: number): ValidationRule => ({
     validate: (value: any) => {
       if (value === "" || value === null || value === undefined) return true;
-      
+
       const stringValue = String(value);
       if (!stringValue.includes(".")) return true;
 
@@ -225,7 +225,7 @@ export const commonRules = {
     validate: (value: any) => {
       if (value === undefined || value === null || value === "") return true;
       // Reusing the logic: false if it HAS special characters
-      return !/[^a-zA-Z0-9\s.-]/.test(String(value));
+      return !/[^a-zA-Z0-9\s.,-]/.test(String(value));
     },
     message: `${fieldName} cannot contain special characters`,
   }),

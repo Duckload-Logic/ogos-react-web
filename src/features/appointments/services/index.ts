@@ -313,6 +313,32 @@ export async function PatchAppointment(
 }
 
 /**
+ * Cancel an appointment (Student only)
+ * @param id - Appointment ID
+ * @param config - Axios config
+ * @returns Success message
+ */
+export async function PostCancelAppointment(
+  id: string,
+  data?: { reason: string },
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.post(
+      API_ROUTES.appointments.cancel(id),
+      data || {},
+      config,
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || "PostCancelAppointment";
+    const stepName = config?.stepName || "Cancel Appointment";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
+    throw error;
+  }
+}
+
+/**
  * Legacy service object for backward compatibility
  * Gradually migrate to direct function imports
  */
