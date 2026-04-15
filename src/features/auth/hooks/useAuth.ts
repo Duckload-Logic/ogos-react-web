@@ -5,8 +5,8 @@
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
-import { PostLogin, LoginPayload, LogoutResponse } from "../services/index";
-import { BootstrapApp, ResetBootstrap } from "@/services/bootstrapper";
+import { PostLogin, LoginPayload, GetLogoutURL } from "../services/index";
+import { ResetBootstrap } from "@/services/bootstrapper";
 import { QUERY_KEYS } from "@/config/queryKeys";
 
 /**
@@ -41,33 +41,23 @@ export function useLogin() {
 }
 
 /**
- * Logout mutation hook
- * Clears bootstrap state and all cached queries
+ * Logout hook
+ * Synchronizes with backend front-channel redirect by initiating
+ * direct browser navigation to the logout endpoint.
  *
- * @returns Logout mutation and state
+ * @returns Logout function and state
  */
 export function useLogout() {
-  const queryClient = useQueryClient();
-  const navigate = useNavigate();
+  const logout = () => {
+    // Clear bootstrap state before navigating
+    ResetBootstrap();
 
-  const mutation = useMutation({
-    mutationFn: () => import("../services/index").then((m) => m.PostLogout()),
-    onSuccess: (data: LogoutResponse) => {
-      // Reset bootstrap state
-      ResetBootstrap();
-
-      // Clear all cached queries
-      queryClient.clear();
-
-      navigate("/login");
-    },
-    onError: (error: any) => {
-      console.error("[useLogout] {Logout}: " + `${error.message}`);
-    },
-  });
+    // Trigger full page navigation to handle API redirect to IDP
+    window.location.href = GetLogoutURL();
+  };
 
   return {
-    logout: mutation.mutate,
-    isLoggingOut: mutation.isPending,
+    logout,
+    isLoggingOut: false,
   };
 }

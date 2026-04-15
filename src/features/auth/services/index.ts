@@ -144,22 +144,11 @@ export const GetCurrentUser = async (
 };
 
 /**
- * Post logout request
- * @param config - Optional axios config with metadata
- * @returns Promise resolving when logout completes
+ * Get logout URL for direct browser navigation
+ * @returns The absolute URL for logout
  */
-export const PostLogout = async (
-  config?: AxiosConfigWithMeta,
-): Promise<LogoutResponse> => {
-  try {
-    const { data } = await apiClient.post(API_ROUTES.auth.logout, {}, config);
-    return data;
-  } catch (error) {
-    const handlerName = config?.handlerName || "PostLogout";
-    const stepName = config?.stepName || "Logout";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
-    throw error;
-  }
+export const GetLogoutURL = (): string => {
+  return `${import.meta.env.VITE_API_BASE_URL}${API_ROUTES.auth.logout}`;
 };
 
 /**
@@ -179,7 +168,7 @@ export const authService = {
     return GetCurrentUser();
   },
 
-  async logout(): Promise<LogoutResponse> {
-    return PostLogout();
+  async logout(): Promise<void> {
+    window.location.href = GetLogoutURL();
   },
 };
