@@ -55,6 +55,12 @@ export interface CreateSlipRequest {
   dateOfAbsence: string;
   dateNeeded: string;
   categoryId: number;
+  files?: {
+    cor?: File[];
+    excuseLetter?: File[];
+    parentId?: File[];
+    medicalCert?: File[];
+  };
 }
 
 export interface SlipAttachment {

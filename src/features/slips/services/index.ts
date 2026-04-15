@@ -96,11 +96,10 @@ export async function GetMySlips(
   } catch (error: any) {
     const handlerName = config?.handlerName || "GetMySlips";
 
-    // Handle Day One student (403 Forbidden)
     if (error.response?.status === 403) {
       const stepName = config?.stepName || "Check IIR Profile";
       console.error(
-        `[${handlerName}] {${stepName}}: ` + `${error.response.data?.error}`,
+        `[${handlerName}] {${stepName}}: ${error.response.data?.error}`,
       );
       throw new Error("Please complete your IIR profile");
     }
@@ -203,27 +202,30 @@ export async function GetSlipAttachments(
 
 /**
  * Submit a new slip
- * @param data - Slip creation request
- *   (userId handled by middleware)
+ * @param data - Slip creation request as multipart form data
  * @param config - Axios config with logging metadata
  * @returns Created slip response
  * @throws Error on 403 (Day One student) or other failures
  */
 export async function PostSlip(
-  data: CreateSlipRequest,
+  data: FormData,
   config?: AxiosConfigWithMeta,
 ): Promise<Slip> {
   try {
-    const response = await apiClient.post(API_ROUTES.slips.all, data, config);
+    const { ["Content-Type"]: _contentType, ...headers } = config?.headers || {};
+
+    const response = await apiClient.post(API_ROUTES.slips.all, data, {
+      ...config,
+      headers,
+    });
     return response.data;
   } catch (error: any) {
     const handlerName = config?.handlerName || "PostSlip";
 
-    // Handle Day One student (403 Forbidden)
     if (error.response?.status === 403) {
       const stepName = config?.stepName || "Check IIR Profile";
       console.error(
-        `[${handlerName}] {${stepName}}: ` + `${error.response.data?.error}`,
+        `[${handlerName}] {${stepName}}: ${error.response.data?.error}`,
       );
       throw new Error("Please complete your IIR profile");
     }
@@ -252,9 +254,11 @@ export async function PatchSlipStatus(
     const payload: { status: string; adminNotes?: string } = {
       status,
     };
+
     if (adminNotes !== undefined) {
       payload.adminNotes = adminNotes;
     }
+
     const response = await apiClient.patch(
       API_ROUTES.slips.updateStatus(id),
       payload,
