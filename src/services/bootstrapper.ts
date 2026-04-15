@@ -98,10 +98,6 @@ export async function BootstrapApp(): Promise<BootstrapData> {
         regions,
       };
 
-      console.log(
-        '[BootstrapApp] {Initialize}: Bootstrap complete',
-      );
-
       return bootstrapData;
     } catch (error: any) {
       // Clear promise on error to allow retry
@@ -131,7 +127,6 @@ export async function BootstrapApp(): Promise<BootstrapData> {
  */
 export function ResetBootstrap(): void {
   bootstrapPromise = null;
-  console.log('[BootstrapApp] {Reset}: Bootstrap state cleared');
 }
 
 /**
