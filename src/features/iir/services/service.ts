@@ -36,7 +36,13 @@ const normalizeIIRPayload = (iir: IIRForm) => {
     : [];
 
   const addresses = Array.isArray(iir.student?.addresses)
-    ? iir.student.addresses
+    ? iir.student.addresses.map((addr) => ({
+      ...addr,
+      addressType:
+        addr.addressType?.toLowerCase() === "residential"
+          ? "residence"
+          : addr.addressType,
+    }))
     : [];
 
   return {

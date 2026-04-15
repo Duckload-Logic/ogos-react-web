@@ -23,7 +23,7 @@ import {
   Dropdown,
 } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
-import { validateObject, isFieldRequired } from "@/services/validationSchema";
+import { validateObject, isFieldRequired, validateField } from "@/services/validationSchema";
 import { familyValidationSchema } from "@/features/iir/config/familyValidationSchema";
 import {
   useIncomeRanges,
@@ -91,7 +91,22 @@ export const FamilySection = forwardRef<
 
   const handleInputChange = (fieldPath: string, value: any) => {
     onChange(fieldPath, value);
-    clearError(fieldPath);
+
+    // Instant validation
+    const fieldRules = familyValidationSchema[fieldPath];
+    if (fieldRules) {
+      const error = validateField(value, fieldRules, { family });
+      setErrors((prev: FormErrors) => {
+        const updated = { ...prev };
+        if (error) updated[fieldPath] = error;
+        else delete updated[fieldPath];
+        return updated;
+      });
+    }
+
+    if (onFieldBlur) {
+      onFieldBlur(fieldPath);
+    }
   };
 
   /**
@@ -311,6 +326,12 @@ export const FamilySection = forwardRef<
                           val,
                         )
                       }
+                      onBlur={() =>
+                        handleFieldBlur("family.background.roomSharingDetails")
+                      }
+                      error={getFieldError(
+                        "family.background.roomSharingDetails",
+                      )}
                       placeholder="e.g. siblings, parents..."
                       required
                     />
@@ -400,9 +421,8 @@ export const FamilySection = forwardRef<
               <div className="flex items-center gap-3 self-end sm:self-auto">
                 {["Living", "Deceased"].map((status) => {
                   const isLiving = status === "Living";
-                  const fatherStatus =
-                    family?.relatedPersons?.[FATHER_IDX]?.isLiving || true;
-                  const isSelected = fatherStatus === isLiving;
+                  const currentPerson = family?.relatedPersons?.[FATHER_IDX] || {};
+                  const isSelected = (currentPerson.isLiving ?? true) === isLiving;
                   return (
                     <button
                       key={status}
@@ -441,6 +461,7 @@ export const FamilySection = forwardRef<
                       val,
                     )
                   }
+                  noSpecialCharacters={true}
                   onBlur={() =>
                     handleFieldBlur(
                       `family.relatedPersons.${FATHER_IDX}.firstName`,
@@ -498,13 +519,13 @@ export const FamilySection = forwardRef<
                 <FormInput
                   name={`family.relatedPersons.${FATHER_IDX}.dateOfBirth`}
                   label="Date of Birth"
-                  inputMode="numeric"
+                  type="date"
                   required
                   value={family?.relatedPersons?.[FATHER_IDX]?.dateOfBirth || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${FATHER_IDX}.dateOfBirth`,
-                      val.replace(/[^0-9]/g, ""),
+                      val,
                     )
                   }
                   onBlur={() =>
@@ -512,7 +533,6 @@ export const FamilySection = forwardRef<
                       `family.relatedPersons.${FATHER_IDX}.dateOfBirth`,
                     )
                   }
-                  placeholder="YYYYMMDD"
                   error={getFieldError(
                     `family.relatedPersons.${FATHER_IDX}.dateOfBirth`,
                   )}
@@ -603,6 +623,7 @@ export const FamilySection = forwardRef<
                       )
                     }
                     placeholder="Company address"
+                    noSpecialCharacters={true}
                     error={getFieldError(
                       `family.relatedPersons.${FATHER_IDX}.employerAddress`,
                     )}
@@ -626,8 +647,8 @@ export const FamilySection = forwardRef<
               <div className="flex items-center gap-3 self-end sm:self-auto">
                 {["Living", "Deceased"].map((status) => {
                   const isLiving = status === "Living";
-                  const isSelected =
-                    family?.relatedPersons?.[MOTHER_IDX]?.isLiving === isLiving;
+                  const currentPerson = family?.relatedPersons?.[MOTHER_IDX] || {};
+                  const isSelected = (currentPerson.isLiving ?? true) === isLiving;
                   return (
                     <button
                       key={status}
@@ -724,13 +745,13 @@ export const FamilySection = forwardRef<
                 <FormInput
                   name={`family.relatedPersons.${MOTHER_IDX}.dateOfBirth`}
                   label="Date of Birth"
-                  inputMode="numeric"
+                  type="date"
                   required
                   value={family?.relatedPersons?.[MOTHER_IDX]?.dateOfBirth || ""}
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${MOTHER_IDX}.dateOfBirth`,
-                      val.replace(/[^0-9]/g, ""),
+                      val,
                     )
                   }
                   onBlur={() =>
@@ -738,7 +759,6 @@ export const FamilySection = forwardRef<
                       `family.relatedPersons.${MOTHER_IDX}.dateOfBirth`,
                     )
                   }
-                  placeholder="YYYYMMDD"
                   error={getFieldError(
                     `family.relatedPersons.${MOTHER_IDX}.dateOfBirth`,
                   )}
@@ -957,7 +977,7 @@ export const FamilySection = forwardRef<
                 <FormInput
                   name={`family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`}
                   label="Date of Birth"
-                  inputMode="numeric"
+                  type="date"
                   required
                   value={
                     family?.relatedPersons?.[GUARDIAN_IDX]?.dateOfBirth || ""
@@ -965,7 +985,7 @@ export const FamilySection = forwardRef<
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
-                      String(val).replace(/[^0-9]/g, ""),
+                      val,
                     )
                   }
                   onBlur={() =>
@@ -973,7 +993,6 @@ export const FamilySection = forwardRef<
                       `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
                     )
                   }
-                  placeholder="YYYYMMDD"
                   error={getFieldError(
                     `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
                   )}
@@ -1079,106 +1098,12 @@ export const FamilySection = forwardRef<
 
           <div className="border-t border-glass-border/20 my-6 sm:my-8"></div>
 
-          {/* Sibling Information Section */}
-          <div className="bg-glass-bg/40 backdrop-blur-sm rounded-[24px] p-5 sm:p-6 border border-glass-border/20 transition-all duration-300 hover:bg-glass-bg/60">
-            <h4 className="text-sm font-bold text-foreground/80 mb-6 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-rose-500" />
-              Sibling Information
+          <div className="mb-4">
+            <h4 className="text-foreground mb-3">
+              Is your brother/sister who is gainfully employed providing support
+              to your:
             </h4>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <FormInput
-                label="Number of Brothers"
-                value={family?.background?.brothers ?? ""}
-                type="number"
-                inputMode="numeric"
-                required={isFieldRequired(
-                  familyValidationSchema,
-                  "family.background.brothers",
-                )}
-                onChange={function (val: string): void {
-                  const cleanVal = val.replace(/[^0-9]/g, "");
-                  handleInputChange(
-                    "family.background.brothers",
-                    cleanVal === "" ? null : Number(cleanVal),
-                  );
-                }}
-                onBlur={() => handleFieldBlur("family.background.brothers")}
-                error={getFieldError("family.background.brothers")}
-              />
-              <FormInput
-                label="Number of Sisters"
-                value={family?.background?.sisters ?? ""}
-                type="number"
-                inputMode="numeric"
-                required={isFieldRequired(
-                  familyValidationSchema,
-                  "family.background.sisters",
-                )}
-                onChange={function (val: string): void {
-                  const cleanVal = val.replace(/[^0-9]/g, "");
-                  handleInputChange(
-                    "family.background.sisters",
-                    cleanVal === "" ? null : Number(cleanVal),
-                  );
-                }}
-                onBlur={() => handleFieldBlur("family.background.sisters")}
-                error={getFieldError("family.background.sisters")}
-              />
-              <FormInput
-                label="Employed Siblings"
-                value={family?.background?.employedSiblings ?? ""}
-                type="number"
-                inputMode="numeric"
-                required={isFieldRequired(
-                  familyValidationSchema,
-                  "family.background.employedSiblings",
-                )}
-                onChange={function (val: string): void {
-                  const cleanVal = val.replace(/[^0-9]/g, "");
-                  handleInputChange(
-                    "family.background.employedSiblings",
-                    cleanVal === "" ? null : Number(cleanVal),
-                  );
-                }}
-                onBlur={() =>
-                  handleFieldBlur("family.background.employedSiblings")
-                }
-                error={getFieldError("family.background.employedSiblings")}
-              />
-              <FormInput
-                label="Ordinal Position"
-                value={family?.background?.ordinalPosition ?? ""}
-                type="text"
-                inputMode="numeric"
-                required={isFieldRequired(
-                  familyValidationSchema,
-                  "family.background.ordinalPosition",
-                )}
-                onChange={(val) => {
-                  const cleanVal = val.replace(/[^0-9]/g, "");
-                  handleInputChange(
-                    "family.background.ordinalPosition",
-                    cleanVal === "" ? null : Number(cleanVal),
-                  );
-                }}
-                onBlur={() =>
-                  handleFieldBlur("family.background.ordinalPosition")
-                }
-                error={getFieldError("family.background.ordinalPosition")}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="border-t border-border my-6"></div>
-
-        {/* Sibling Support Section */}
-        <div className="mb-4">
-          <h4 className="text-foreground mb-3">
-            Is your brother/sister who is gainfully employed providing support
-            to your:
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
             {siblingSupportTypesOptions?.map((option: any) => {
               const isChecked = family?.background?.siblingSupportTypes?.some(
                 (item: any) => String(item.id) === String(option.id),
@@ -1232,24 +1157,54 @@ export const FamilySection = forwardRef<
             </h4>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
             <FormInput
-              name="family.background.numberOfSiblings"
-              label="Number of Siblings"
+              name="family.background.brothers"
+              label="Brothers"
               type="number"
               required
-              value={family?.background?.numberOfSiblings ?? ""}
+              value={family?.background?.brothers ?? ""}
               onChange={(val) =>
                 handleInputChange(
-                  "family.background.numberOfSiblings",
+                  "family.background.brothers",
                   val === "" ? "" : Number(val),
                 )
               }
-              onBlur={() =>
-                handleFieldBlur("family.background.numberOfSiblings")
-              }
+              onBlur={() => handleFieldBlur("family.background.brothers")}
               placeholder="0"
-              error={getFieldError("family.background.numberOfSiblings")}
+              error={getFieldError("family.background.brothers")}
+            />
+            <FormInput
+              name="family.background.sisters"
+              label="Sisters"
+              type="number"
+              required
+              value={family?.background?.sisters ?? ""}
+              onChange={(val) =>
+                handleInputChange(
+                  "family.background.sisters",
+                  val === "" ? "" : Number(val),
+                )
+              }
+              onBlur={() => handleFieldBlur("family.background.sisters")}
+              placeholder="0"
+              error={getFieldError("family.background.sisters")}
+            />
+            <FormInput
+              name="family.background.employedSiblings"
+              label="Employed Siblings"
+              type="number"
+              required
+              value={family?.background?.employedSiblings ?? ""}
+              onChange={(val) =>
+                handleInputChange(
+                  "family.background.employedSiblings",
+                  val === "" ? "" : Number(val),
+                )
+              }
+              onBlur={() => handleFieldBlur("family.background.employedSiblings")}
+              placeholder="0"
+              error={getFieldError("family.background.employedSiblings")}
             />
             <FormInput
               name="family.background.ordinalPosition"
@@ -1263,10 +1218,8 @@ export const FamilySection = forwardRef<
                   val === "" ? "" : Number(val),
                 )
               }
-              onBlur={() =>
-                handleFieldBlur("family.background.ordinalPosition")
-              }
-              placeholder="e.g. 1 for First born"
+              onBlur={() => handleFieldBlur("family.background.ordinalPosition")}
+              placeholder="e.g. 1"
               error={getFieldError("family.background.ordinalPosition")}
             />
           </div>
@@ -1430,8 +1383,7 @@ export const FamilySection = forwardRef<
                 label="Parents' Combined Monthly Income"
                 name="family.finance.monthlyFamilyIncomeRange"
                 value={family?.finance?.monthlyFamilyIncomeRange?.id || ""}
-                onChange={(e) => {
-                  const val = e.target.value;
+                onChange={(val) => {
                   handleInputChange("family.finance.monthlyFamilyIncomeRange", {
                     id: val,
                   });
@@ -1516,6 +1468,7 @@ export const FamilySection = forwardRef<
           </div>
         </div>
       </div>
-    </SectionContainer>
+    </div>
+  </SectionContainer>
   );
 });

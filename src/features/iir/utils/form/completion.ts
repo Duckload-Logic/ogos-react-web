@@ -19,20 +19,21 @@ function calculateCompletionFromSchema(schema: FieldValidationSchema, data: any)
   let filledCount = 0;
 
   Object.entries(schema).forEach(([fieldPath, rules]) => {
-    // Find the required rule
+    // A field is "active required" if the required rule is present 
+    // AND passes when the field is empty (meaning it's technically optional under current conditions)
+    // Actually, isActive logic in line 29 was: !requiredRule.validate(null, data);
+    // This means "if I pass null, does it fail?". If yes, it's currently required.
     const requiredRule = rules.find(r => r.type === 'required');
     if (!requiredRule) return;
 
-    // A field is considered "active required" if the required rule 
-    // would return false when the value is empty/null.
-    // This correctly handles conditional requirements.
     const isActive = !requiredRule.validate(null, data);
     
     if (isActive) {
       totalCount++;
-      // Check if it's currently filled using the same required rule
+      // Check if it's currently valid against ALL rules
       const value = getValueByPath(data, fieldPath);
-      if (requiredRule.validate(value, data)) {
+      const isValid = rules.every(r => r.validate(value, data));
+      if (isValid) {
         filledCount++;
       }
     }

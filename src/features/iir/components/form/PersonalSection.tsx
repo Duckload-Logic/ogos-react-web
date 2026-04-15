@@ -1,12 +1,12 @@
 import { forwardRef, useImperativeHandle, useState, useCallback, useMemo } from "react";
 import { Dropdown, FormInput, Checkbox } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
-import { 
-  User, 
-  MapPin, 
-  Phone, 
-  ShieldCheck, 
-  Briefcase, 
+import {
+  User,
+  MapPin,
+  Phone,
+  ShieldCheck,
+  Briefcase,
   GraduationCap,
   Info,
   Mail,
@@ -37,7 +37,7 @@ import {
   Region,
   StudentSection,
 } from "@/features/iir/types";
-import { validateObject, commonRules, isFieldRequired, FieldValidationSchema } from "@/services/validationSchema";
+import { validateObject, commonRules, isFieldRequired, FieldValidationSchema, validateField } from "@/services/validationSchema";
 import { personalInformationValidationSchema } from "@/features/iir/config/personalInfoValidationSchema";
 
 interface FormErrors {
@@ -288,7 +288,24 @@ export const PersonalSection = forwardRef<
 
   const handleInputChange = (fieldPath: string, value: any) => {
     onChange(fieldPath, value);
-    clearError(fieldPath);
+
+    // Instant validation
+    const runtimeSchema = getRuntimeSchema();
+    const fieldRules = runtimeSchema[fieldPath];
+    if (fieldRules) {
+      const error = validateField(value, fieldRules, { student: studentInfo });
+      setErrors((prev: FormErrors) => {
+        const updated = { ...prev };
+        if (error) updated[fieldPath] = error;
+        else delete updated[fieldPath];
+        return updated;
+      });
+    }
+
+    // Mark as touched instantly so it shows while active
+    if (onFieldBlur) {
+      onFieldBlur(fieldPath);
+    }
   };
 
   /**
@@ -313,8 +330,8 @@ export const PersonalSection = forwardRef<
   return (
     <div className="flex flex-col gap-2">
       {/* 1. Primary Information */}
-      <SectionContainer 
-        title="Primary Information" 
+      <SectionContainer
+        title="Primary Information"
         description="Official academic identity and name"
         icon={User}
       >
@@ -335,7 +352,7 @@ export const PersonalSection = forwardRef<
               label="Middle Name"
               value={
                 studentInfo?.basicInfo?.middleName == null ||
-                typeof studentInfo.basicInfo.middleName === "object"
+                  typeof studentInfo.basicInfo.middleName === "object"
                   ? ""
                   : studentInfo.basicInfo.middleName
               }
@@ -355,13 +372,15 @@ export const PersonalSection = forwardRef<
               disabled
             />
           </div>
-          
+
           <div className="md:col-span-1">
             <FormInput
               label="Suffix"
               value={studentInfo?.personalInfo?.suffix || ""}
               onChange={(val: any) => handleInputChange("student.personalInfo.suffix", val)}
               placeholder="Jr/Sr/III"
+              noSpecialCharacters={true}
+              error={getFieldError("student.personalInfo.suffix")}
             />
           </div>
           <div className="md:col-span-2">
@@ -376,7 +395,7 @@ export const PersonalSection = forwardRef<
             />
           </div>
           <div className="md:col-span-3">
-             <Dropdown
+            <Dropdown
               formStyle
               label="Course"
               options={courses}
@@ -386,7 +405,7 @@ export const PersonalSection = forwardRef<
               required={isFieldRequired(runtimeSchema, "student.personalInfo.course")}
             />
           </div>
-          
+
           <div className="md:col-span-3">
             <FormInput
               label="Year Level"
@@ -410,14 +429,16 @@ export const PersonalSection = forwardRef<
           <div className="md:col-span-3">
             <FormInput
               label="Section"
+              type="number"
+              inputMode="numeric"
               value={studentInfo?.personalInfo?.section || ""}
               onChange={(val: any) => {
-                const parsed = parseInt(String(val), 10);
+                const parsed = parseInt(val, 10);
                 handleInputChange("student.personalInfo.section", isNaN(parsed) ? "" : parsed);
               }}
               onBlur={() => {
                 const val = studentInfo?.personalInfo?.section;
-                handleInputChange("student.personalInfo.section", val === "" || val == null ? null : Number(val));
+                handleInputChange("student.personalInfo.section", val == null ? null : Number(val));
                 handleFieldBlur("student.personalInfo.section");
               }}
               error={getFieldError("student.personalInfo.section")}
@@ -429,8 +450,8 @@ export const PersonalSection = forwardRef<
       </SectionContainer>
 
       {/* 2. Personal Profile */}
-      <SectionContainer 
-        title="Personal Profile" 
+      <SectionContainer
+        title="Personal Profile"
         description="Detailed personal characteristics"
         icon={Activity}
       >
@@ -486,6 +507,7 @@ export const PersonalSection = forwardRef<
               onChange={(val: any) => handleInputChange("student.personalInfo.placeOfBirth", val)}
               error={errors["student.personalInfo.placeOfBirth"]}
               placeholder="City/Municipality, Province"
+              noSpecialCharacters={true}
               required={isFieldRequired(runtimeSchema, "student.personalInfo.placeOfBirth")}
             />
           </div>
@@ -513,7 +535,10 @@ export const PersonalSection = forwardRef<
               type="text"
               inputMode="decimal"
               value={studentInfo?.personalInfo?.heightFt || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.heightFt", String(val).replace(/[^0-9.]/g, ""))}
+              onChange={(val: any) => {
+                // TODO: some validation for height
+                handleInputChange("student.personalInfo.heightFt", String(val).replace(/[^0-9.]/g, ""))
+              }}
               onBlur={() => {
                 const val = studentInfo?.personalInfo?.heightFt;
                 handleInputChange("student.personalInfo.heightFt", val === "" ? null : Number(val));
@@ -530,7 +555,10 @@ export const PersonalSection = forwardRef<
               type="text"
               inputMode="decimal"
               value={studentInfo?.personalInfo?.weightKg || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.weightKg", String(val).replace(/[^0-9.]/g, ""))}
+              onChange={(val: any) => {
+                // TODO: some validation for weight
+                handleInputChange("student.personalInfo.weightKg", String(val).replace(/[^0-9.]/g, ""))
+              }}
               onBlur={() => {
                 const val = studentInfo?.personalInfo?.weightKg;
                 handleInputChange("student.personalInfo.weightKg", val === "" ? null : Number(val));
@@ -541,7 +569,7 @@ export const PersonalSection = forwardRef<
               required={isFieldRequired(runtimeSchema, "student.personalInfo.weightKg")}
             />
           </div>
-          
+
           <div className="md:col-span-6">
             <FormInput
               label="Complexion"
@@ -550,6 +578,7 @@ export const PersonalSection = forwardRef<
               onBlur={() => handleFieldBlur("student.personalInfo.complexion")}
               error={getFieldError("student.personalInfo.complexion")}
               placeholder="e.g. Fair, Tan"
+              noSpecialCharacters={true}
               required={isFieldRequired(runtimeSchema, "student.personalInfo.complexion")}
             />
           </div>
@@ -557,8 +586,8 @@ export const PersonalSection = forwardRef<
       </SectionContainer>
 
       {/* 3. Contact Details */}
-      <SectionContainer 
-        title="Contact Details" 
+      <SectionContainer
+        title="Contact Details"
         description="Channels for communication"
         icon={Mail}
       >
@@ -576,7 +605,7 @@ export const PersonalSection = forwardRef<
             />
           </div>
           <div className="md:col-span-3">
-             <FormInput
+            <FormInput
               label="Mobile Number"
               inputMode="numeric"
               value={studentInfo?.personalInfo?.mobileNumber || ""}
@@ -606,8 +635,8 @@ export const PersonalSection = forwardRef<
       </SectionContainer>
 
       {/* 4. Employment Profile */}
-      <SectionContainer 
-        title="Employment Profile" 
+      <SectionContainer
+        title="Employment Profile"
         description="Current employment status and details"
         icon={Briefcase}
       >
@@ -625,7 +654,7 @@ export const PersonalSection = forwardRef<
           />
 
           {studentInfo?.personalInfo?.isEmployed && (
-            <div 
+            <div
               className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-border/10 animate-fade-in"
             >
               <FormInput
@@ -650,8 +679,8 @@ export const PersonalSection = forwardRef<
       </SectionContainer>
 
       {/* 5. Address Information */}
-      <SectionContainer 
-        title="Address Information" 
+      <SectionContainer
+        title="Address Information"
         description="Permanent and current residential addresses"
         icon={MapPin}
       >
@@ -758,6 +787,7 @@ export const PersonalSection = forwardRef<
                   value={provincialAddr?.streetDetail || ""}
                   placeholder="Street name, Lot, Blk, or House No."
                   onChange={(val: any) => onChange(`student.addresses.${PROVINCIAL_IDX}.address.streetDetail`, val)}
+                  noSpecialCharacters={true}
                 />
               </div>
             </div>
@@ -779,7 +809,7 @@ export const PersonalSection = forwardRef<
                 className="text-xs"
               />
             </div>
-            
+
             <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 transition-opacity duration-300 ${residentialSync.isReadOnly ? "opacity-60 pointer-events-none" : ""}`}>
               <Dropdown
                 formStyle
@@ -878,6 +908,7 @@ export const PersonalSection = forwardRef<
                   placeholder="Street name, Lot, Blk, or House No."
                   onChange={(val: any) => onChange(`student.addresses.${RESIDENTIAL_IDX}.address.streetDetail`, val)}
                   disabled={residentialSync.isReadOnly}
+                  noSpecialCharacters={true}
                 />
               </div>
             </div>
@@ -886,8 +917,8 @@ export const PersonalSection = forwardRef<
       </SectionContainer>
 
       {/* 6. Emergency Contact */}
-      <SectionContainer 
-        title="Emergency Contact" 
+      <SectionContainer
+        title="Emergency Contact"
         description="Person to contact in case of emergency"
         icon={Phone}
       >
@@ -899,6 +930,7 @@ export const PersonalSection = forwardRef<
               onChange={(val: any) => handleInputChange("student.personalInfo.emergencyContact.lastName", val)}
               error={errors["student.personalInfo.emergencyContact.lastName"]}
               placeholder="Last name"
+              noSpecialCharacters={true}
               required
             />
             <FormInput
@@ -907,6 +939,7 @@ export const PersonalSection = forwardRef<
               onChange={(val: any) => handleInputChange("student.personalInfo.emergencyContact.firstName", val)}
               error={errors["student.personalInfo.emergencyContact.firstName"]}
               placeholder="First name"
+              noSpecialCharacters={true}
               required
             />
             <FormInput
@@ -915,6 +948,7 @@ export const PersonalSection = forwardRef<
               onChange={(val: any) => handleInputChange("student.personalInfo.emergencyContact.middleName", val)}
               error={errors["student.personalInfo.emergencyContact.middleName"]}
               placeholder="Middle name"
+              noSpecialCharacters={true}
             />
             <FormInput
               label="Contact Number"

@@ -1,13 +1,13 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { 
-  Star, 
-  Library, 
-  Trophy, 
-  Users, 
-  CheckCircle2, 
-  Heart, 
-  BookOpen, 
-  Music, 
+import {
+  Star,
+  Library,
+  Trophy,
+  Users,
+  CheckCircle2,
+  Heart,
+  BookOpen,
+  Music,
   Palette,
   Briefcase,
   ChevronRight,
@@ -15,7 +15,7 @@ import {
 } from "lucide-react";
 import { FormInput, Checkbox } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
-import { validateObject } from "@/services/validationSchema";
+import { validateObject, validateField } from "@/services/validationSchema";
 import { interestsValidationSchema } from "@/features/iir/config/interestsValidationSchema";
 import { useActivityOptions } from "@/features/iir/hooks/useLookups";
 import { Activity, Hobby, SubjectPreference } from "@/features/iir/types";
@@ -33,8 +33,10 @@ export const InterestsSection = forwardRef<
   {
     interests: any;
     onChange: (path: string, value: any) => void;
+    onFieldBlur?: (fieldPath: string) => void;
+    shouldShowError?: (fieldPath: string) => boolean;
   }
->(function InterestsSection({ interests, onChange }, ref) {
+>(function InterestsSection({ interests, onChange, onFieldBlur, shouldShowError }, ref) {
   const [errors, setErrors] = useState<FormErrors>({});
   const { data: activityOptions = [] } = useActivityOptions();
 
@@ -61,7 +63,22 @@ export const InterestsSection = forwardRef<
 
   const handleInputChange = (fieldPath: string, value: any) => {
     onChange(fieldPath, value);
-    clearError(fieldPath);
+
+    // Instant validation
+    const fieldRules = interestsValidationSchema[fieldPath];
+    if (fieldRules) {
+      const error = validateField(value, fieldRules, { interests });
+      setErrors((prev: FormErrors) => {
+        const updated = { ...prev };
+        if (error) updated[fieldPath] = error;
+        else delete updated[fieldPath];
+        return updated;
+      });
+    }
+
+    if (onFieldBlur) {
+      onFieldBlur(fieldPath);
+    }
   };
 
   // Activity Constants
@@ -174,6 +191,14 @@ export const InterestsSection = forwardRef<
     if (index > -1) {
       newRoles.splice(index, 1);
     } else {
+      // Logic for mutual exclusivity: Officer and Member and Others cannot both be selected
+      if (role === "Officer") {
+        newRoles = newRoles.filter(r => !namesMatch(r, "Member") && !namesMatch(r, "Others"));
+      } else if (role === "Member") {
+        newRoles = newRoles.filter(r => !namesMatch(r, "Officer") && !namesMatch(r, "Others"));
+      } else if (role === "Others") {
+        newRoles = newRoles.filter(r => !namesMatch(r, "Officer") && !namesMatch(r, "Member"));
+      }
       newRoles.push(role);
     }
 
@@ -229,11 +254,15 @@ export const InterestsSection = forwardRef<
     handleInputChange("interests.subjectPreferences", [...otherPreferences, ...newPreferences]);
   };
 
-  const getFieldError = (field: string) => errors[field];
+  const getFieldError = (fieldPath: string): string | undefined => {
+    const hasError = errors[fieldPath];
+    const showError = shouldShowError ? shouldShowError(fieldPath) : true;
+    return hasError && showError ? errors[fieldPath] : undefined;
+  };
 
   return (
-    <SectionContainer 
-      title="Interests & Activities" 
+    <SectionContainer
+      title="Interests & Activities"
       description="Tell us about your passions and involvement"
       icon={Sparkles}
     >
@@ -247,12 +276,12 @@ export const InterestsSection = forwardRef<
 
           <div className="bg-glass-bg/60 backdrop-blur-glass border border-glass-border/40 rounded-[24px] p-5 sm:p-8 mb-8 relative overflow-hidden transition-all duration-300">
             <div className="absolute top-0 right-0 -mr-16 -mt-16 w-48 h-48 bg-primary/5 rounded-full blur-3xl pointer-events-none" />
-            
+
             <h4 className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-widest mb-6 sm:mb-8">
               <Library size={16} />
               School Clubs & Organizations
             </h4>
-            
+
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
               {ACADEMIC_CLUBS.map((club, idx) => (
                 <div key={club} className="flex items-center">
@@ -280,6 +309,7 @@ export const InterestsSection = forwardRef<
                   label="Please specify club name"
                   value={getOtherSpecification(true)}
                   onChange={(val: string) => updateOtherSpecification(true, val)}
+                  noSpecialCharacters={true}
                   placeholder="e.g. Journalism Club"
                 />
               </div>
@@ -296,6 +326,7 @@ export const InterestsSection = forwardRef<
                 label=""
                 value={getSubjects(true)}
                 onChange={(val: string) => updateSubjects(true, val)}
+                noSpecialCharacters={true}
                 placeholder="Math, Science, etc."
                 error={getFieldError("interests.academic.favoriteSubjects")}
               />
@@ -309,6 +340,7 @@ export const InterestsSection = forwardRef<
                 label=""
                 value={getSubjects(false)}
                 onChange={(val: string) => updateSubjects(false, val)}
+                noSpecialCharacters={true}
                 placeholder="History, etc."
                 error={getFieldError("interests.academic.leastLikedSubjects")}
               />
@@ -329,7 +361,7 @@ export const InterestsSection = forwardRef<
             {/* Hobbies Card */}
             <div className="lg:col-span-1 bg-glass-bg/60 backdrop-blur-glass border border-glass-border/40 rounded-[24px] p-6 sm:p-8 overflow-hidden relative group transition-all duration-300 shadow-sm">
               <div className="absolute -bottom-10 -right-10 w-32 h-32 bg-primary/10 rounded-full blur-3xl transition-transform duration-700 group-hover:scale-150" />
-              
+
               <h4 className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-widest mb-2">
                 <Palette size={16} />
                 My Hobbies
@@ -354,6 +386,7 @@ export const InterestsSection = forwardRef<
                           label=""
                           value={getHobby(rank)}
                           onChange={(val: string) => updateHobby(rank, val)}
+                          noSpecialCharacters={true}
                           placeholder={`Preference #${rank}`}
                           error={rank <= 2 ? getFieldError(`interests.hobbies.${rank - 1}.hobbyName`) : undefined}
                           required={rank <= 2}
@@ -367,7 +400,7 @@ export const InterestsSection = forwardRef<
 
             {/* Organizations Card */}
             <div className="lg:col-span-2 bg-glass-bg/60 backdrop-blur-glass border border-glass-border/40 rounded-[24px] p-6 sm:p-8 relative overflow-hidden transition-all duration-300 shadow-sm">
-               <h4 className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-widest mb-8">
+              <h4 className="flex items-center gap-2 text-sm font-bold text-primary uppercase tracking-widest mb-8">
                 <Users size={16} />
                 Organizations Participated In
               </h4>
@@ -405,10 +438,10 @@ export const InterestsSection = forwardRef<
 
               {/* Roles Section Sub-Card */}
               <div className="mt-8 sm:mt-10 p-5 sm:p-8 rounded-[20px] bg-primary/5 border border-primary/10 relative overflow-hidden">
-                 <div className="absolute top-0 right-0 p-3 opacity-10">
-                   <Briefcase size={64} className="text-primary" />
-                 </div>
-                 <h5 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6 sm:mb-8">
+                <div className="absolute top-0 right-0 p-3 opacity-10">
+                  <Briefcase size={64} className="text-primary" />
+                </div>
+                <h5 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] mb-6 sm:mb-8">
                   Occupational Role/Position:
                 </h5>
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-5 sm:gap-6 items-start">
@@ -450,10 +483,10 @@ export const InterestsSection = forwardRef<
                   </div>
                 </div>
                 {getFieldError("interests.activities") && (
-                   <p className="mt-6 text-xs font-bold text-primary flex items-center gap-2">
-                     <CheckCircle2 size={12} />
-                     Select organization & role to complete
-                   </p>
+                  <p className="mt-6 text-xs font-bold text-primary flex items-center gap-2">
+                    <CheckCircle2 size={12} />
+                    Select organization & role to complete
+                  </p>
                 )}
               </div>
             </div>

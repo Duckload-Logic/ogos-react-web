@@ -1,5 +1,6 @@
 import { FieldValidationSchema, commonRules, ValidationRule } from "@/services/validationSchema";
 const currentYear = new Date().getFullYear();
+
 export const validYearRule = (): ValidationRule => ({
   type: "validYear",
   validate: (value: any) => {
@@ -7,8 +8,9 @@ export const validYearRule = (): ValidationRule => ({
     const year = Number(value);
     return !isNaN(year) && Number.isInteger(year) && year >= 1900 && year <= currentYear;
   },
-  message: `Must be a valid year (1900–${currentYear})`,
+  message: `Must be a valid year (2002-${currentYear})`,
 });
+
 export const yearCompletedRule = (startedKey: string): ValidationRule => ({
   type: "yearCompleted",
   validate: (value: any, rootData: any) => {
@@ -26,9 +28,10 @@ export const yearCompletedRule = (startedKey: string): ValidationRule => ({
   },
   message: "Year completed cannot be before year started",
 });
+
 export const educationValidationSchema: FieldValidationSchema = {
   "education.natureOfSchooling": [commonRules.required("Nature of schooling")],
-  "education.interruptedDetails": [
+  "education.natureOfInterruption": [
     {
       type: "required",
       validate: (value: any, rootData: any) => {
@@ -38,28 +41,30 @@ export const educationValidationSchema: FieldValidationSchema = {
         return true;
       },
       message: "Reason for interruption is required and must be at least 2 characters",
-    }
+    },
+    commonRules.noSpecialChars("Reason for interruption")
   ],
 };
+
 // Add schools dynamically
 for (let i = 0; i < 5; i++) {
   educationValidationSchema[`education.schools.${i}.schoolName`] = [
-    // commonRules.required("School name"),
     commonRules.minLength(2),
+    commonRules.noSpecialChars("School name"),
   ];
   educationValidationSchema[`education.schools.${i}.schoolAddress`] = [
-    // commonRules.required("School address"),
     commonRules.minLength(2),
+    commonRules.noSpecialChars("School address"),
+  ];
+  educationValidationSchema[`education.schools.${i}.awards`] = [
+    commonRules.noSpecialChars("Awards"),
   ];
   educationValidationSchema[`education.schools.${i}.schoolType`] = [
-    // commonRules.required("School type"),
   ];
   educationValidationSchema[`education.schools.${i}.yearStarted`] = [
-    // commonRules.required("Year started"),
     validYearRule(),
   ];
   educationValidationSchema[`education.schools.${i}.yearCompleted`] = [
-    // commonRules.required("Year completed"),
     validYearRule(),
     yearCompletedRule(`education.schools.${i}.yearStarted`),
   ];

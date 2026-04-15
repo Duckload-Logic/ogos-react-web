@@ -18,6 +18,22 @@ export const familyValidationSchema: FieldValidationSchema = {
     }
   ],
 
+  "family.background.roomSharingDetails": [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        if (rootData?.family?.background?.isSharingRoom === true) {
+          return value && String(value).trim().length > 2;
+        }
+        return true;
+      },
+      message: "Please specify who you share a room with",
+    },
+    commonRules.noSpecialChars("Room sharing details"),
+    commonRules.minLength(2),
+    commonRules.maxLength(100),
+  ],
+
   "family.finance.monthlyFamilyIncomeRange": [
     {
       type: "required",
@@ -37,24 +53,26 @@ export const familyValidationSchema: FieldValidationSchema = {
         return true;
       },
       message: "Please specify the income range",
-    }
+    },
+    commonRules.noSpecialChars("Income range")
   ],
   "family.finance.weeklyAllowance": [
     commonRules.required("Weekly allowance"),
-    {
-      type: "positiveNumber",
-      validate: (value: any) => {
-        if (value === undefined || value === null || value === "") return true;
-        const num = Number(value);
-        return !isNaN(num) && num > 0;
-      },
-      message: "Weekly allowance must be a positive number",
-    }
+    commonRules.positiveNumber(),
+    commonRules.maxValue(50000),
   ],
-  "family.background.brothers": [commonRules.required("Number of brothers")],
-  "family.background.sisters": [commonRules.required("Number of sisters")],
-  "family.background.employedSiblings": [commonRules.required("Number of gainfully employed")],
-  "family.background.ordinalPosition": [commonRules.required("Ordinal position")],
+  "family.background.brothers": [commonRules.required("Number of brothers"), commonRules.minValue(0)],
+  "family.background.sisters": [commonRules.required("Number of sisters"), commonRules.minValue(0)],
+  "family.background.employedSiblings": [
+    commonRules.required("Number of gainfully employed"),
+    commonRules.minValue(0),
+    commonRules.siblingCount("family.background.brothers", "family.background.sisters")
+  ],
+  "family.background.ordinalPosition": [
+    commonRules.required("Ordinal position"),
+    commonRules.minValue(1),
+    commonRules.ordinalPosition("family.background.brothers", "family.background.sisters")
+  ],
   "family.background.haveQuietPlaceToStudy": [commonRules.required("Quiet place to study")],
   "family.background.isSharingRoom": [commonRules.required("Shares room")],
   "family.background.natureOfResidence": [
@@ -97,21 +115,19 @@ const RELATIONS = [
 ];
 
 RELATIONS.forEach(({ prefix, label }) => {
-  // Guardian is often optional unless father/mother are deceased or not living with student
-  // But for this IIR, let's at least require Father and Mother names
   const isRequired = label !== "Guardian";
 
   if (isRequired) {
-    familyValidationSchema[`${prefix}.firstName`] = [commonRules.required(`${label} first name`), commonRules.nameFormat()];
-    familyValidationSchema[`${prefix}.lastName`] = [commonRules.required(`${label} last name`), commonRules.nameFormat()];
+    familyValidationSchema[`${prefix}.firstName`] = [commonRules.required(`${label} first name`), commonRules.minLength(2), commonRules.nameFormat(), commonRules.noSpecialChars(`${label} first name`)];
+    familyValidationSchema[`${prefix}.lastName`] = [commonRules.required(`${label} last name`), commonRules.minLength(2), commonRules.nameFormat(), commonRules.noSpecialChars(`${label} last name`)];
     familyValidationSchema[`${prefix}.dateOfBirth`] = [commonRules.required(`${label} date of birth`)];
-    familyValidationSchema[`${prefix}.educationalLevel`] = [commonRules.required(`${label} educational attainment`)];
-    familyValidationSchema[`${prefix}.occupation`] = [commonRules.required(`${label} occupation`)];
-    familyValidationSchema[`${prefix}.employerName`] = [commonRules.required(`${label} employer name`)];
+    familyValidationSchema[`${prefix}.educationalLevel`] = [commonRules.required(`${label} educational attainment`), commonRules.noSpecialChars(`${label} educational attainment`)];
+    familyValidationSchema[`${prefix}.occupation`] = [commonRules.required(`${label} occupation`), commonRules.noSpecialChars(`${label} occupation`)];
+    familyValidationSchema[`${prefix}.employerName`] = [commonRules.required(`${label} employer name`), commonRules.noSpecialChars(`${label} employer name`)];
+    familyValidationSchema[`${prefix}.employerAddress`] = [commonRules.noSpecialChars(`${label} employer address`)];
     familyValidationSchema[`${prefix}.isLiving`] = [commonRules.required(`${label} status (Living/Deceased)`)];
   } else {
-    // Guardian is only required if SOME fields are filled (partially filled)
-    const guardianFields = ["firstName", "lastName", "occupation"];
+    const guardianFields = ["firstName", "lastName", "occupation", "educationalLevel", "employerName", "employerAddress"];
     guardianFields.forEach(field => {
       familyValidationSchema[`${prefix}.${field}`] = [
         {
@@ -119,13 +135,14 @@ RELATIONS.forEach(({ prefix, label }) => {
           validate: (value: any, rootData: any) => {
             const guardian = rootData?.family?.relatedPersons?.[2];
             const isAnyFilled = guardian && (guardian.firstName || guardian.lastName || guardian.occupation);
-            if (isAnyFilled) {
+            if (isAnyFilled && (field === "firstName" || field === "lastName" || field === "occupation")) {
               return !!value && String(value).trim().length > 0;
             }
             return true;
           },
           message: `${label} ${field} is required if guardian info is being provided`,
-        }
+        },
+        commonRules.noSpecialChars(`${label} ${field}`)
       ];
     });
   }

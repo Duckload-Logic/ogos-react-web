@@ -18,7 +18,8 @@ export const healthValidationSchema: FieldValidationSchema = {
         return true;
       },
       message: "Please specify the problem",
-    }
+    },
+    commonRules.noSpecialChars("Vision details")
   ],
 
   "health.healthRecord.hearingHasProblem": [
@@ -38,7 +39,8 @@ export const healthValidationSchema: FieldValidationSchema = {
         return true;
       },
       message: "Please specify the problem",
-    }
+    },
+    commonRules.noSpecialChars("Hearing details")
   ],
 
   "health.healthRecord.speechHasProblem": [
@@ -58,7 +60,8 @@ export const healthValidationSchema: FieldValidationSchema = {
         return true;
       },
       message: "Please specify the problem",
-    }
+    },
+    commonRules.noSpecialChars("Speech details")
   ],
 
   "health.healthRecord.generalHealthHasProblem": [
@@ -78,7 +81,8 @@ export const healthValidationSchema: FieldValidationSchema = {
         return true;
       },
       message: "Please specify the problem",
-    }
+    },
+    commonRules.noSpecialChars("General health details")
   ],
   ...["Psychiatrist", "Psychologist", "Counselor"].reduce((acc, type) => {
     acc[`_consultations.${type}.hasConsulted`] = [
@@ -98,7 +102,8 @@ export const healthValidationSchema: FieldValidationSchema = {
           return true;
         },
         message: `Please specify when`,
-      }
+      },
+      commonRules.pattern(/^(0[1-9]|1[0-2])\/\d{4}$/, "Must be in MM/YYYY format"),
     ];
     acc[`_consultations.${type}.forWhat`] = [
       {
@@ -110,7 +115,8 @@ export const healthValidationSchema: FieldValidationSchema = {
           return true;
         },
         message: `Please specify reason`,
-      }
+      },
+      commonRules.noSpecialChars(`Reason for consultation`),
     ];
     return acc;
   }, {} as any),

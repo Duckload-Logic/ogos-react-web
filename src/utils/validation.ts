@@ -13,6 +13,18 @@ export interface ValidationResult {
   errors: ValidationError[];
 }
 
+
+// invalidate inputs with special characters
+// Matches anything that is NOT: alphanumeric, space, period, comma, or hyphen
+export const SPECIAL_CHARS_REGEX = /[^a-zA-Z0-9\s.,-]/;
+
+/**
+ * Checks if a string contains special characters
+ */
+export const hasSpecialCharacters = (value: string): boolean => {
+  return SPECIAL_CHARS_REGEX.test(value);
+};
+
 // Email validation
 export const isValidEmail = (email: string): boolean => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

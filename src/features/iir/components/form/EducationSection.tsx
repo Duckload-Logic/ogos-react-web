@@ -1,4 +1,4 @@
-﻿import { forwardRef, useImperativeHandle, useState } from "react";
+import { forwardRef, useImperativeHandle, useState } from "react";
 import {
   GraduationCap,
   School,
@@ -9,7 +9,7 @@ import {
 } from "lucide-react";
 import { FormInput, Dropdown } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
-import { validateObject, isFieldRequired } from "@/services/validationSchema";
+import { validateObject, isFieldRequired, validateField } from "@/services/validationSchema";
 import { educationValidationSchema } from "@/features/iir/config/educationValidationSchema";
 
 interface FormErrors {
@@ -26,10 +26,10 @@ export const EducationSection = forwardRef<
     education: any;
     onChange: (path: string, value: any) => void;
     onFieldBlur?: (path: string) => void;
-    shouldShowError?: boolean;
+    shouldShowError?: (fieldPath: string) => boolean;
   }
 >(function EducationSection(
-  { education, onChange, onFieldBlur, shouldShowError = false },
+  { education, onChange, onFieldBlur, shouldShowError },
   ref,
 ) {
   const [errors, setErrors] = useState<FormErrors>({});
@@ -60,7 +60,28 @@ export const EducationSection = forwardRef<
 
   const handleInputChange = (fieldPath: string, value: any) => {
     onChange(fieldPath, value);
-    clearError(fieldPath);
+
+    // Instant validation
+    const fieldRules = educationValidationSchema[fieldPath];
+    if (fieldRules) {
+      const error = validateField(value, fieldRules, { education });
+      setErrors((prev: FormErrors) => {
+        const updated = { ...prev };
+        if (error) updated[fieldPath] = error;
+        else delete updated[fieldPath];
+        return updated;
+      });
+    }
+
+    if (onFieldBlur) {
+      onFieldBlur(fieldPath);
+    }
+  };
+
+  const getFieldError = (fieldPath: string): string | undefined => {
+    const hasError = errors[fieldPath];
+    const showError = shouldShowError ? shouldShowError(fieldPath) : true;
+    return hasError && showError ? errors[fieldPath] : undefined;
   };
 
   const getCompletionStatus = (idx: number) => {
@@ -96,8 +117,12 @@ export const EducationSection = forwardRef<
       <div className="space-y-12">
         {/* Nature of Schooling */}
         <div className="bg-glass-bg backdrop-blur-glass rounded-[24px] p-5 sm:p-8 border border-glass-border/40 shadow-sm transition-all duration-300">
-          <label className="text-sm font-bold text-foreground/80 mb-6 flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+          <label className={`text-sm font-bold mb-6 flex items-center gap-2 transition-colors duration-300 ${getFieldError("education.natureOfSchooling") ? "text-destructive" : "text-foreground/80"}`}>
+            {getFieldError("education.natureOfSchooling") ? (
+              <AlertCircle className="w-4 h-4" />
+            ) : (
+              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+            )}
             Nature of Schooling
           </label>
 
@@ -107,14 +132,15 @@ export const EducationSection = forwardRef<
               onClick={() =>
                 handleInputChange("education.natureOfSchooling", "Continuous")
               }
-              className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
-                education?.natureOfSchooling === "Continuous"
-                  ? "bg-primary/5 border-primary shadow-sm"
+              className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${education?.natureOfSchooling === "Continuous"
+                ? "bg-primary/5 border-primary shadow-sm"
+                : getFieldError("education.natureOfSchooling")
+                  ? "bg-destructive/5 border-destructive/50 shadow-[0_0_10px_rgba(var(--destructive),0.05)]"
                   : "bg-glass-bg/60 border-glass-border/20 hover:bg-glass-bg/80 hover:border-primary/20"
-              }`}
+                }`}
             >
               <span
-                className={`text-sm font-bold ${education?.natureOfSchooling === "Continuous" ? "text-primary" : "text-foreground/70"}`}
+                className={`text-sm font-bold ${education?.natureOfSchooling === "Continuous" ? "text-primary" : getFieldError("education.natureOfSchooling") ? "text-destructive/80" : "text-foreground/70"}`}
               >
                 Continuous
               </span>
@@ -128,14 +154,15 @@ export const EducationSection = forwardRef<
               onClick={() =>
                 handleInputChange("education.natureOfSchooling", "Interrupted")
               }
-              className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${
-                education?.natureOfSchooling === "Interrupted"
-                  ? "bg-primary/5 border-primary shadow-sm"
+              className={`flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${education?.natureOfSchooling === "Interrupted"
+                ? "bg-primary/5 border-primary shadow-sm"
+                : getFieldError("education.natureOfSchooling")
+                  ? "bg-destructive/5 border-destructive/50 shadow-[0_0_10px_rgba(var(--destructive),0.05)]"
                   : "bg-glass-bg/60 border-glass-border/20 hover:bg-glass-bg/80 hover:border-primary/20"
-              }`}
+                }`}
             >
               <span
-                className={`text-sm font-bold ${education?.natureOfSchooling === "Interrupted" ? "text-primary" : "text-foreground/70"}`}
+                className={`text-sm font-bold ${education?.natureOfSchooling === "Interrupted" ? "text-primary" : getFieldError("education.natureOfSchooling") ? "text-destructive/80" : "text-foreground/70"}`}
               >
                 Interrupted
               </span>
@@ -145,9 +172,9 @@ export const EducationSection = forwardRef<
             </button>
           </div>
 
-          {errors["education.natureOfSchooling"] && (
+          {getFieldError("education.natureOfSchooling") && (
             <p className="text-xs font-medium text-destructive mt-2 ml-1">
-              {errors["education.natureOfSchooling"]}
+              {getFieldError("education.natureOfSchooling")}
             </p>
           )}
 
@@ -169,8 +196,9 @@ export const EducationSection = forwardRef<
                 onChange={(val) =>
                   handleInputChange("education.interruptedDetails", val)
                 }
+                noSpecialCharacters={true}
                 placeholder="Please describe why your schooling was interrupted..."
-                error={errors["education.interruptedDetails"]}
+                error={getFieldError("education.interruptedDetails")}
               />
             </div>
           )}
@@ -183,7 +211,7 @@ export const EducationSection = forwardRef<
             { name: "Elementary" },
             { name: "High School" },
             { name: "Vocational" },
-            { name: "College" },
+            // { name: "College" },
           ].map((level: any, idx: number) => {
             const school = education?.schools?.[idx] || {};
             const status = getCompletionStatus(idx);
@@ -237,8 +265,9 @@ export const EducationSection = forwardRef<
                             val,
                           )
                         }
+                        noSpecialCharacters={true}
                         placeholder="e.g. Philippine Science High School"
-                        error={errors[`education.schools.${idx}.schoolName`]}
+                        error={getFieldError(`education.schools.${idx}.schoolName`)}
                       />
                     </div>
 
@@ -257,8 +286,9 @@ export const EducationSection = forwardRef<
                             val,
                           )
                         }
+                        noSpecialCharacters={true}
                         placeholder="Street, City, Province"
-                        error={errors[`education.schools.${idx}.schoolAddress`]}
+                        error={getFieldError(`education.schools.${idx}.schoolAddress`)}
                       />
                     </div>
 
@@ -273,7 +303,7 @@ export const EducationSection = forwardRef<
                           val,
                         )
                       }
-                      error={errors[`education.schools.${idx}.schoolType`]}
+                      error={getFieldError(`education.schools.${idx}.schoolType`)}
                       required={isFieldRequired(
                         educationValidationSchema,
                         `education.schools.${idx}.schoolType`,
@@ -297,7 +327,7 @@ export const EducationSection = forwardRef<
                           )
                         }
                         placeholder="YYYY"
-                        error={errors[`education.schools.${idx}.yearStarted`]}
+                        error={getFieldError(`education.schools.${idx}.yearStarted`)}
                       />
                       <FormInput
                         name={`education.schools.${idx}.yearCompleted`}
@@ -315,7 +345,7 @@ export const EducationSection = forwardRef<
                           )
                         }
                         placeholder="YYYY"
-                        error={errors[`education.schools.${idx}.yearCompleted`]}
+                        error={getFieldError(`education.schools.${idx}.yearCompleted`)}
                       />
                     </div>
 
@@ -330,6 +360,7 @@ export const EducationSection = forwardRef<
                             val,
                           )
                         }
+                        noSpecialCharacters={true}
                         placeholder="e.g. With Honors, Academic Excellence..."
                       />
                     </div>

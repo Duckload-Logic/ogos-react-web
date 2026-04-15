@@ -10,18 +10,32 @@ import {
 
 export const personalInformationValidationSchema: FieldValidationSchema = {
   // Basic Information
-  "student.basicInfo.firstName": [commonRules.required("First name"), commonRules.minLength(2), commonRules.nameFormat()],
-  "student.basicInfo.lastName": [commonRules.required("Last name"), commonRules.minLength(2), commonRules.nameFormat()],
+  "student.basicInfo.firstName": [commonRules.required("First name"), commonRules.minLength(2), commonRules.nameFormat(), commonRules.noSpecialChars("First name")],
+  "student.basicInfo.lastName": [commonRules.required("Last name"), commonRules.minLength(2), commonRules.nameFormat(), commonRules.noSpecialChars("Last name")],
   "student.basicInfo.email": [commonRules.required("Email"), commonRules.email()],
 
   // Personal Details
   "student.personalInfo.studentNumber": [commonRules.required("Student number"), commonRules.studentNumber()],
+  "student.personalInfo.suffix": [commonRules.suffixFormat()],
   "student.personalInfo.dateOfBirth": [commonRules.required("Date of birth"), commonRules.validDate()],
-  "student.personalInfo.placeOfBirth": [commonRules.required("Place of birth"), commonRules.minLength(2)],
+  "student.personalInfo.placeOfBirth": [commonRules.required("Place of birth"), commonRules.minLength(2), commonRules.noSpecialChars("Place of birth")],
   "student.personalInfo.gender": [commonRules.required("Gender")],
   "student.personalInfo.civilStatus": [commonRules.required("Civil status")],
   "student.personalInfo.religion": [commonRules.required("Religion")],
   "student.personalInfo.course": [commonRules.required("Course")],
+  "student.personalInfo.yearLevel": [commonRules.required("Year level"), commonRules.minValue(1), commonRules.maxValue(4)],
+  "student.personalInfo.section": [
+    commonRules.required("Section"),
+    commonRules.numeric(),
+    commonRules.minValue(1),
+    commonRules.maxValue(5)
+  ],
+  "student.personalInfo.complexion": [
+    commonRules.required("Complexion"),
+    commonRules.noSpecialChars("Complexion"),
+    commonRules.minLength(2),
+    commonRules.complexionFormat(),
+  ],
   "student.personalInfo.highSchoolGWA": [
     commonRules.required("High school GWA"),
     commonRules.numeric(),
@@ -31,10 +45,14 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
   "student.personalInfo.heightFt": [
     commonRules.required("Height"),
     commonRules.positiveNumber(),
+    commonRules.maxValue(8),
+    commonRules.decimalPlaces(2),
   ],
   "student.personalInfo.weightKg": [
     commonRules.required("Weight"),
     commonRules.positiveNumber(),
+    commonRules.maxValue(300),
+    commonRules.decimalPlaces(2),
   ],
   "student.personalInfo.mobileNumber": [
     commonRules.required("Mobile number"),
@@ -60,7 +78,8 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
         return true;
       },
       message: "Employer name is required if employed",
-    }
+    },
+    commonRules.noSpecialChars("Employer name"),
   ],
   "student.personalInfo.employerAddress": [
     {
@@ -123,7 +142,7 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
   ],
   "student.addresses.0.address.city": [commonRules.required("City/Municipality (Provincial)")],
   "student.addresses.0.address.barangay": [commonRules.required("Barangay (Provincial)")],
-  "student.addresses.0.address.streetDetail": [commonRules.required("Street (Provincial)")],
+  "student.addresses.0.address.streetDetail": [commonRules.required("Street (Provincial)"), commonRules.noSpecialChars("Street (Provincial)")],
 
   // Addresses – Residential
   "student.addresses.1.address.region": [commonRules.required("Region (Residential)")],
@@ -142,5 +161,5 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
   ],
   "student.addresses.1.address.city": [commonRules.required("City/Municipality (Residential)")],
   "student.addresses.1.address.barangay": [commonRules.required("Barangay (Residential)")],
-  "student.addresses.1.address.streetDetail": [commonRules.required("Street (Residential)")],
+  "student.addresses.1.address.streetDetail": [commonRules.required("Street (Residential)"), commonRules.noSpecialChars("Street (Residential)")],
 };

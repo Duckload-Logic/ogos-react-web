@@ -1,18 +1,18 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { 
-  Activity, 
-  Eye, 
-  Ear, 
-  MessageSquare, 
-  HeartPulse, 
-  Brain, 
-  User, 
-  Users, 
+import {
+  Activity,
+  Eye,
+  Ear,
+  MessageSquare,
+  HeartPulse,
+  Brain,
+  User,
+  Users,
   Calendar,
   ChevronDown,
   Check
 } from "lucide-react";
-import { validateObject, isFieldRequired } from "@/services/validationSchema";
+import { validateObject, isFieldRequired, validateField } from "@/services/validationSchema";
 import { healthValidationSchema } from "@/features/iir/config/healthValidationSchema";
 import { FormInput } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
@@ -30,8 +30,10 @@ export const HealthSection = forwardRef<
   {
     health: any;
     onChange: (path: string, value: any) => void;
+    onFieldBlur?: (fieldPath: string) => void;
+    shouldShowError?: (fieldPath: string) => boolean;
   }
->(function HealthSection({ health, onChange }, ref) {
+>(function HealthSection({ health, onChange, onFieldBlur, shouldShowError }, ref) {
   const [errors, setErrors] = useState<FormErrors>({});
 
   const validate = (): { isValid: boolean; errors: FormErrors } => {
@@ -63,7 +65,27 @@ export const HealthSection = forwardRef<
 
   const handleInputChange = (fieldPath: string, value: any) => {
     onChange(fieldPath, value);
-    clearError(fieldPath);
+
+    // Instant validation
+    const fieldRules = healthValidationSchema[fieldPath];
+    if (fieldRules) {
+      const _consultations = (health?.consultations || []).reduce((acc: any, c: any) => {
+        acc[c.professionalType] = c;
+        return acc;
+      }, {});
+
+      const error = validateField(value, fieldRules, { health, _consultations });
+      setErrors((prev: FormErrors) => {
+        const updated = { ...prev };
+        if (error) updated[fieldPath] = error;
+        else delete updated[fieldPath];
+        return updated;
+      });
+    }
+
+    if (onFieldBlur) {
+      onFieldBlur(fieldPath);
+    }
   };
 
   const handleConsultationChange = (
@@ -96,10 +118,31 @@ export const HealthSection = forwardRef<
     }
 
     onChange("health.consultations", consultations);
-    
-    // Clear the specific error for this field
+
+    // Instant validation for the specific field
     const errorField = `_consultations.${professionalType}.${field === "consulted" ? "hasConsulted" : field}`;
-    clearError(errorField);
+    const fieldRules = healthValidationSchema[errorField];
+    if (fieldRules) {
+      // Re-map consultations for current context
+      const _consultationsMap = consultations.reduce((acc: any, c: any) => {
+        acc[c.professionalType] = c;
+        return acc;
+      }, {});
+
+      const val = field === "consulted" ? value : value; // Simplified, value is already correct
+      const error = validateField(value, fieldRules, { health, _consultations: _consultationsMap });
+
+      setErrors((prev: FormErrors) => {
+        const updated = { ...prev };
+        if (error) updated[errorField] = error;
+        else delete updated[errorField];
+        return updated;
+      });
+    }
+
+    if (onFieldBlur) {
+      onFieldBlur(errorField);
+    }
   };
 
   // Array of physical health items for A. Physical
@@ -156,11 +199,15 @@ export const HealthSection = forwardRef<
     };
   });
 
-  const getFieldError = (field: string) => errors[field];
+  const getFieldError = (fieldPath: string): string | undefined => {
+    const hasError = errors[fieldPath];
+    const showError = shouldShowError ? shouldShowError(fieldPath) : true;
+    return hasError && showError ? errors[fieldPath] : undefined;
+  };
 
   return (
-    <SectionContainer 
-      title="Health Information" 
+    <SectionContainer
+      title="Health Information"
       description="Physical and Psychological Well-being"
       icon={Activity}
     >
@@ -172,15 +219,15 @@ export const HealthSection = forwardRef<
             <h3 className="text-xl font-bold text-neutral-900 dark:text-white">A. Physical Health</h3>
           </div>
           <p className="text-sm text-neutral-500 font-medium mb-6">Do you have any existing or previous problems with:</p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {physicalItems.map((item, idx) => (
-              <div 
+              <div
                 key={idx}
                 className={`
                   relative overflow-hidden bg-glass-bg/60 backdrop-blur-glass border rounded-[24px] p-5 sm:p-8 transition-all duration-300
-                  ${item.yesValue === true 
-                    ? "border-primary/30 shadow-sm ring-1 ring-primary/10" 
+                  ${item.yesValue === true
+                    ? "border-primary/30 shadow-sm ring-1 ring-primary/10"
                     : "border-glass-border/40 hover:border-primary/20 hover:bg-glass-bg/80"
                   }
                 `}
@@ -232,6 +279,7 @@ export const HealthSection = forwardRef<
                       placeholder="Type details here..."
                       value={item.detailsValue}
                       onChange={(val: string) => handleInputChange(item.detailsKey, val)}
+                      noSpecialCharacters={true}
                       error={getFieldError(item.detailsKey)}
                       required={isFieldRequired(healthValidationSchema, item.detailsKey)}
                     />
@@ -257,15 +305,15 @@ export const HealthSection = forwardRef<
             <h3 className="text-xl font-bold text-neutral-900 dark:text-white">B. Psychological Consultations</h3>
           </div>
           <p className="text-sm text-neutral-500 font-medium mb-6">Have you ever consulted a:</p>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {consultationTypes.map((type, idx) => (
-              <div 
+              <div
                 key={idx}
                 className={`
                   relative overflow-hidden bg-glass-bg/60 backdrop-blur-glass border rounded-[24px] p-5 sm:p-8 transition-all duration-300
-                  ${type.consulted === true 
-                    ? "border-primary/30 shadow-sm ring-1 ring-primary/10" 
+                  ${type.consulted === true
+                    ? "border-primary/30 shadow-sm ring-1 ring-primary/10"
                     : "border-glass-border/40 hover:border-primary/20 hover:bg-glass-bg/80"
                   }
                 `}
@@ -309,7 +357,7 @@ export const HealthSection = forwardRef<
                   <div className="space-y-4 animate-in fade-in slide-in-from-top-2 duration-300">
                     <FormInput
                       label="When"
-                      placeholder="mm/yyyy"
+                      type="date"
                       value={type.when}
                       onChange={(val: string) => handleConsultationChange(type.type, "whenDate", val)}
                       error={getFieldError(`_consultations.${type.type}.whenDate`)}
@@ -320,6 +368,7 @@ export const HealthSection = forwardRef<
                       placeholder="Specify reason..."
                       value={type.forWhat}
                       onChange={(val: string) => handleConsultationChange(type.type, "forWhat", val)}
+                      noSpecialCharacters={true}
                       error={getFieldError(`_consultations.${type.type}.forWhat`)}
                       required={isFieldRequired(healthValidationSchema, `_consultations.${type.type}.forWhat`)}
                     />

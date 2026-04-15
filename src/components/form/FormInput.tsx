@@ -1,6 +1,7 @@
 import { Info, Check, Mic, MicOff, Banknote } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSpeechToText } from "@/hooks/useSpeechToText";
+import { SPECIAL_CHARS_REGEX } from "@/utils/validation";
 
 import { forwardRef } from "react";
 
@@ -33,6 +34,7 @@ const FormInput = forwardRef<
     disabled?: boolean;
     info?: string;
     prefix?: string;
+    noSpecialCharacters?: boolean;
   }
 >(
   (
@@ -55,6 +57,7 @@ const FormInput = forwardRef<
       disabled = false,
       info = "",
       prefix,
+      noSpecialCharacters = true,
     },
     ref,
   ) => {
@@ -101,10 +104,23 @@ const FormInput = forwardRef<
       }
     };
 
+    const [internalError, setInternalError] = useState("");
+
+    const validateContent = (val: string) => {
+      if (noSpecialCharacters && SPECIAL_CHARS_REGEX.test(val)) {
+        setInternalError("Special characters are not allowed");
+      } else {
+        setInternalError("");
+      }
+    };
+
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+      const newValue = e.target.value;
+      validateContent(newValue);
+
       // Try string first, then event (RHF)
       try {
-        onChange(e.target.value);
+        onChange(newValue);
       } catch (err) {
         onChange(e);
       }
@@ -192,9 +208,9 @@ const FormInput = forwardRef<
             </div>
           </div>
         </div>
-        {error && (
+        {(error || internalError) && (
           <p className="text-[11px] font-medium text-destructive mt-1.5 ml-1 animate-in fade-in slide-in-from-top-1 duration-200">
-            {error}
+            {error || internalError}
           </p>
         )}
       </div>

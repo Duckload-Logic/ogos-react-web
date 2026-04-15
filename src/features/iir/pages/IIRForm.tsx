@@ -223,6 +223,7 @@ export default function IIRForm() {
     const validation = validateSection(sectionRefs[currentSection]);
     if (!validation.isValid) {
       console.debug("Validation errors:", validation.errors);
+      markAllTouched(); // Reveal inline errors in the current section
       setValidationErrorList(Object.values(validation.errors));
       setShowValidationError(true);
       return;
@@ -467,6 +468,8 @@ export default function IIRForm() {
                       ref={educationSectionRef}
                       education={localFormData.education}
                       onChange={handleInputChange}
+                      onFieldBlur={markFieldTouched}
+                      shouldShowError={shouldShowError}
                     />
                   )}
                   {currentSection === 3 && localFormData?.family && (
@@ -483,6 +486,8 @@ export default function IIRForm() {
                       ref={healthSectionRef}
                       health={localFormData.health}
                       onChange={handleInputChange}
+                      onFieldBlur={markFieldTouched}
+                      shouldShowError={shouldShowError}
                     />
                   )}
                   {currentSection === 5 && localFormData?.interests && (
@@ -490,6 +495,8 @@ export default function IIRForm() {
                       ref={interestsSectionRef}
                       interests={localFormData.interests}
                       onChange={handleInputChange}
+                      onFieldBlur={markFieldTouched}
+                      shouldShowError={shouldShowError}
                     />
                   )}
                 </div>
