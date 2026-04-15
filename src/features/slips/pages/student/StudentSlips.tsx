@@ -29,9 +29,8 @@ import {
   useGetSlipStatuses,
 } from "@/features/slips/hooks";
 import { Slip, SlipStatus } from "@/features/slips/types";
-import { Pagination } from "@/components/shared";
-import Layout, { usePageMetadata } from "@/components/layout/Layout";
-import { Spinner } from "@/components/shared";
+import { Pagination, Spinner } from "@/components/shared";
+import { usePageMetadata } from "@/components/layout/Layout";
 
 interface StatusCount {
   id: string | number;
@@ -40,12 +39,13 @@ interface StatusCount {
   count: number;
 }
 
+const GLASS_CARD =
+  "overflow-hidden rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]";
+
 export default function StudentSlips() {
   const { data: slipStatuses = [] } = useGetSlipStatuses();
-  const filterStatuses = [
-    { id: "0", name: "All", colorKey: "stale" },
-    ...slipStatuses,
-  ];
+  const filterStatuses = [{ id: "0", name: "All", colorKey: "stale" }, ...slipStatuses];
+
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState<SlipStatus | any>(
     filterStatuses[0],
@@ -55,10 +55,12 @@ export default function StudentSlips() {
     page: currentPage,
     statusId: selectedStatus?.id === "0" ? undefined : selectedStatus?.id,
   });
+
   const { data: slipStats, isLoading: isStatsLoading } = useGetSlipStats({});
   const { isLoading: isStatusesLoading } = useGetSlipStatuses();
 
   const isLoading = isStatsLoading || isStatusesLoading;
+
   const statsWithAll = [
     {
       id: "0",
@@ -90,6 +92,25 @@ export default function StudentSlips() {
     return STATUS_COLORS[key] || STATUS_COLORS.secondary;
   };
 
+  const getStatAccent = (colorKey: string) => {
+    switch (colorKey) {
+      case "warning":
+      case "yellow":
+        return "from-amber-500/15 to-yellow-500/5 text-amber-700 dark:text-amber-300 border-amber-500/20";
+      case "danger":
+      case "red":
+        return "from-rose-500/15 to-red-500/5 text-rose-700 dark:text-rose-300 border-rose-500/20";
+      case "success":
+      case "green":
+        return "from-emerald-500/15 to-green-500/5 text-emerald-700 dark:text-emerald-300 border-emerald-500/20";
+      case "purple":
+      case "violet":
+        return "from-violet-500/15 to-fuchsia-500/5 text-violet-700 dark:text-violet-300 border-violet-500/20";
+      default:
+        return "from-slate-500/15 to-slate-500/5 text-slate-700 dark:text-slate-300 border-slate-500/20";
+    }
+  };
+
   usePageMetadata({
     title: "My Admission Slips",
     description: "Manage your admission slip requests and track their status",
@@ -112,65 +133,94 @@ export default function StudentSlips() {
   return (
     <>
       <AnimationStyles />
+
       <div className="space-y-6">
         {/* Stats Cards */}
-        <div
-          className={`grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in-up`}
-        >
-          {slipStatuses.map((stat: SlipStatus, index: number) => (
-            <Card
-              key={stat.id}
-              className={`${STATUS_COLORS[stat.colorKey]} border-0 hover:shadow-md transition-shadow`}
-              style={{
-                animationDelay: `${0.1 * (index + 1)}s`,
-                animationFillMode: "both",
-              }}
-            >
-              <CardContent className="py-4 px-4">
-                <p className="text-xs font-medium uppercase tracking-wide">
-                  {stat.name}
-                </p>
-                <p className="text-2xl font-bold text-foreground mt-2">
-                  {statusCounts?.find((s) => String(s.id) === String(stat.id))
-                    ?.count || 0}
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {slipStatuses.map((stat: SlipStatus, index: number) => {
+            const count =
+              statusCounts?.find((s) => String(s.id) === String(stat.id))?.count || 0;
 
-        {/* Main Content Card */}
-        <Card className="border border-border shadow-sm overflow-hidden animate-fade-in-up">
+            return (
+              <Card
+                key={stat.id}
+                className={`${GLASS_CARD} group animate-fade-in-up transition-all duration-200 hover:-translate-y-0.5`}
+                style={{
+                  animationDelay: `${0.08 * (index + 1)}s`,
+                  animationFillMode: "both",
+                }}
+              >
+                <CardContent className="relative p-5">
+                  <div
+                    className={`pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-br ${getStatAccent(
+                      stat.colorKey,
+                    )} opacity-90`}
+                  />
+                  <div className="relative flex items-start justify-between gap-4">
+                    <div className="space-y-2.5">
+                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
+                        {stat.name}
+                      </p>
+                      <div className="space-y-1">
+                        <p className="text-4xl font-bold tracking-tight tabular-nums text-foreground">
+                          {count}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div
+                      className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-white/70 backdrop-blur-md transition-transform duration-200 group-hover:scale-105 dark:bg-white/[0.06] ${getStatAccent(
+                        stat.colorKey,
+                      )
+                        .split(" ")
+                        .pop()}`}
+                    >
+                      <FileUp className="h-5 w-5" />
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </section>
+
+        {/* Main Content */}
+        <Card className={`${GLASS_CARD} animate-fade-in-up overflow-hidden`}>
           {/* Filter Tabs */}
-          <CardHeader className="border-b border-border py-2 px-4">
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-hide">
-              {statsWithAll?.map((filter: any) => (
-                <Button
-                  key={filter.id}
-                  onClick={() => {
-                    setSelectedStatus(filter);
-                    setCurrentPage(1);
-                  }}
-                  variant={
-                    String(selectedStatus.id) === String(filter.id)
-                      ? "default"
-                      : "ghost"
-                  }
-                  size="sm"
-                  className="shrink-0 whitespace-nowrap h-9 px-3 text-xs font-medium flex items-center gap-1.5"
-                >
-                  <span>{filter.name}</span>
-                  <Badge
-                    className={`h-5 min-w-[20px] px-1.5 text-[10px] font-bold flex items-center justify-center ${
-                      String(selectedStatus.id) === String(filter.id)
-                        ? "bg-primary-foreground/40 text-primary-foreground"
-                        : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+          <CardHeader className="border-b border-white/20 px-4 py-3 dark:border-white/10">
+            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide sm:pb-0">
+              {statsWithAll?.map((filter: any) => {
+                const isActive =
+                  String(selectedStatus.id) === String(filter.id);
+
+                return (
+                  <Button
+                    key={filter.id}
+                    onClick={() => {
+                      setSelectedStatus(filter);
+                      setCurrentPage(1);
+                    }}
+                    variant={isActive ? "default" : "ghost"}
+                    size="sm"
+                    className={`h-9 shrink-0 whitespace-nowrap rounded-xl px-3 text-xs font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                      isActive
+                        ? "shadow-md shadow-primary/20"
+                        : "hover:bg-white/60 dark:hover:bg-white/[0.06]"
                     }`}
                   >
-                    {filter?.count}
-                  </Badge>
-                </Button>
-              ))}
+                    <span>{filter.name}</span>
+                    <Badge
+                      className={`flex h-5 min-w-[20px] items-center justify-center px-1.5 text-[10px] font-bold ${
+                        isActive
+                          ? "bg-primary-foreground/40 text-primary-foreground"
+                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+                      }`}
+                    >
+                      {filter?.count}
+                    </Badge>
+                  </Button>
+                );
+              })}
             </div>
           </CardHeader>
 
@@ -180,128 +230,136 @@ export default function StudentSlips() {
                 <Spinner size="md" message="Loading your slips..." />
               </div>
             ) : slips.length > 0 ? (
-              <>
-                {/* Slips List */}
-                <div className="divide-y divide-border">
-                  {slips.map((slip: Slip, index: number) => (
-                    <div
-                      key={slip.id}
-                      className="p-4 sm:p-5 hover:bg-muted/30 transition-colors animate-fade-in-up"
-                      style={{
-                        animationDelay: `${0.05 * (index + 1)}s`,
-                        animationFillMode: "both",
-                      }}
-                    >
-                      <div className="flex items-start gap-4">
-                        {/* Category Badge */}
-                        <div className="hidden sm:flex flex-col items-center justify-center w-20 h-20 bg-primary/10 rounded-lg shrink-0 border border-primary/20">
-                          <FileUp className="w-7 h-7 text-primary mb-2" />
-                          <span className="text-[10px] font-bold text-primary text-center line-clamp-2">
-                            {slip.category?.name || "N/A"}
-                          </span>
+              <div className="divide-y divide-white/20 dark:divide-white/10">
+                {slips.map((slip: Slip, index: number) => (
+                  <div
+                    key={slip.id}
+                    className="animate-fade-in-up p-4 transition-colors duration-200 hover:bg-white/35 dark:hover:bg-white/[0.03] sm:p-5"
+                    style={{
+                      animationDelay: `${0.05 * (index + 1)}s`,
+                      animationFillMode: "both",
+                    }}
+                  >
+                    <div className="flex items-start gap-4">
+                      {/* Category Icon Card */}
+                      <div className="hidden h-20 w-20 shrink-0 flex-col items-center justify-center rounded-[18px] border border-white/20 bg-white/50 shadow-[0_8px_22px_rgba(15,23,42,0.05)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] sm:flex">
+                        <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary backdrop-blur-md">
+                          <FileUp className="h-5 w-5" />
                         </div>
+                        <span className="line-clamp-2 px-2 text-center text-[10px] font-bold text-primary">
+                          {slip.category?.name || "N/A"}
+                        </span>
+                      </div>
 
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="space-y-1.5 flex-1">
-                              <div className="flex items-center gap-2 flex-wrap">
-                                <Badge
-                                  variant="outline"
-                                  className="text-xs font-medium"
-                                >
-                                  <Tag className="w-3 h-3 mr-1" />
-                                  {slip.category?.name}
-                                </Badge>
-                                <Badge
-                                  className={`text-xs ${getStatusColor(
-                                    slip.status?.colorKey || "",
-                                  )} hover:opacity-80`}
-                                >
-                                  {slip.status?.name}
-                                </Badge>
-                              </div>
-                              <p className="text-sm font-medium text-foreground line-clamp-2">
-                                {slip.reason}
-                              </p>
+                      {/* Content */}
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1 space-y-1.5">
+                            <div className="flex flex-wrap items-center gap-2">
+                              <Badge
+                                variant="outline"
+                                className="border-white/30 bg-white/60 text-xs font-medium backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
+                              >
+                                <Tag className="mr-1 h-3 w-3" />
+                                {slip.category?.name}
+                              </Badge>
+
+                              <Badge
+                                className={`text-xs ${getStatusColor(
+                                  slip.status?.colorKey || "",
+                                )} hover:opacity-90`}
+                              >
+                                {slip.status?.name}
+                              </Badge>
                             </div>
 
-                            {/* Actions Dropdown */}
-                            <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button
-                                  variant="ghost"
-                                  size="icon"
-                                  className="shrink-0 h-8 w-8"
-                                >
-                                  <MoreHorizontal className="w-4 h-4" />
-                                </Button>
-                              </DropdownMenuTrigger>
-                              <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
-                                  <Eye className="w-4 h-4 mr-2" />
-                                  View Details
-                                </DropdownMenuItem>
-                                <DropdownMenuItem>
-                                  <Download className="w-4 h-4 mr-2" />
-                                  Download Attachments
-                                </DropdownMenuItem>
-                              </DropdownMenuContent>
-                            </DropdownMenu>
+                            <p className="line-clamp-2 text-sm font-medium text-foreground">
+                              {slip.reason}
+                            </p>
                           </div>
 
-                          {/* Date Info */}
-                          <div className="flex items-center gap-3 mt-2 text-xs text-muted-foreground flex-wrap">
-                            <div className="flex items-center gap-1.5">
-                              <Calendar className="w-3.5 h-3.5" />
-                              <span>{formatDate(slip.dateOfAbsence)}</span>
-                            </div>
-                            <span className="text-muted-foreground/40">•</span>
-                            <div className="flex items-center gap-1.5">
-                              <Calendar className="w-3.5 h-3.5" />
-                              <span>
-                                Needed by: {formatDate(slip.dateNeeded)}
-                              </span>
-                            </div>
+                          <DropdownMenu>
+                            <DropdownMenuTrigger asChild>
+                              <Button
+                                variant="ghost"
+                                size="icon"
+                                className="h-8 w-8 shrink-0 rounded-xl hover:bg-white/60 dark:hover:bg-white/[0.06]"
+                              >
+                                <MoreHorizontal className="h-4 w-4" />
+                              </Button>
+                            </DropdownMenuTrigger>
+                            <DropdownMenuContent
+                              align="end"
+                              className="rounded-xl border-white/20 bg-white/85 backdrop-blur-xl dark:border-white/10 dark:bg-[#111]/80"
+                            >
+                              <DropdownMenuItem>
+                                <Eye className="mr-2 h-4 w-4" />
+                                View Details
+                              </DropdownMenuItem>
+                              <DropdownMenuItem>
+                                <Download className="mr-2 h-4 w-4" />
+                                Download Attachments
+                              </DropdownMenuItem>
+                            </DropdownMenuContent>
+                          </DropdownMenu>
+                        </div>
+
+                        {/* Date Info */}
+                        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5" />
+                            <span>{formatDate(slip.dateOfAbsence)}</span>
+                          </div>
+                          <span className="text-muted-foreground/40">•</span>
+                          <div className="flex items-center gap-1.5">
+                            <Calendar className="h-3.5 w-3.5" />
+                            <span>Needed by: {formatDate(slip.dateNeeded)}</span>
                           </div>
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
-              </>
+                  </div>
+                ))}
+              </div>
             ) : (
-              /* Empty State */
-              <div className="flex flex-col items-center justify-center py-16 px-4">
-                <div className="p-4 bg-muted rounded-full mb-4">
-                  <FileX className="w-8 h-8 text-muted-foreground" />
+            <div className="px-4 py-10 sm:px-6 sm:py-12">
+              <div className="mx-auto flex max-w-md flex-col items-center text-center">
+                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border border-white/20 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+                  <FileX className="h-9 w-9 text-muted-foreground" />
                 </div>
-                <h3 className="text-lg font-semibold text-foreground mb-1">
+
+                <h3 className="mb-2 text-xl font-semibold text-foreground">
                   No slips found
                 </h3>
-                <p className="text-sm text-muted-foreground text-center max-w-sm mb-6">
+
+                <p className="mb-6 text-sm text-muted-foreground">
                   {String(selectedStatus?.id) === "0"
                     ? "You haven't submitted any admission slips yet. Submit your first slip now."
                     : `No ${selectedStatus.name.toLowerCase()} slips found.`}
                 </p>
+
                 {String(selectedStatus?.id) === "0" && (
-                  <Button asChild>
+                  <Button
+                    asChild
+                    className="rounded-xl shadow-lg shadow-primary/20"
+                  >
                     <Link to="/student/slips/submit">
-                      <Plus className="w-4 h-4 mr-2" />
+                      <Plus className="mr-2 h-4 w-4" />
                       Submit Admission Slip
                     </Link>
                   </Button>
                 )}
               </div>
+            </div>
             )}
 
-            <Separator />
+            <Separator className="bg-white/20 dark:bg-white/10" />
 
             <Pagination
               currentPage={currentPage}
               totalPages={data?.totalPages || 1}
               onPageChange={(page) => setCurrentPage(page)}
-              className="px-4 py-3 border-t-0 mt-0"
+              className="mt-0 border-t-0 px-4 py-3"
             />
           </CardContent>
         </Card>
