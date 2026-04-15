@@ -216,11 +216,9 @@ export async function PostSlip(
 
     const response = await apiClient.post(API_ROUTES.slips.all, data, {
       ...config,
-      headers: {
-        ...config?.headers,
-        "Content-Type": undefined,
-      },
+      headers,
     });
+
     return response.data;
   } catch (error: any) {
     const handlerName = config?.handlerName || "PostSlip";
@@ -252,13 +250,13 @@ export async function PatchSlip(
   config?: AxiosConfigWithMeta,
 ): Promise<Slip> {
   try {
+    const { ["Content-Type"]: _contentType, ...headers } = config?.headers || {};
+
     const response = await apiClient.patch(API_ROUTES.slips.update(id), data, {
       ...config,
-      headers: {
-        ...config?.headers,
-        "Content-Type": undefined,
-      },
+      headers,
     });
+
     return response.data;
   } catch (error: any) {
     const handlerName = config?.handlerName || "PatchSlip";

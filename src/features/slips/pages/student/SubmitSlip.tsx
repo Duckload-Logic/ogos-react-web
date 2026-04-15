@@ -139,45 +139,76 @@ export default function SubmitSlip() {
   };
 
   const handleCategoryChange = (categoryId: number) => {
-    setFormData((prev) => ({
-      ...prev,
-      categoryId,
-    }));
-  };
+  setFormData((prev) => ({
+    ...prev,
+    categoryId,
+    files: {
+      cor: [],
+      excuseLetter: [],
+      parentId: [],
+      medicalCert: [],
+    },
+  }));
+
+  triggerToast("Uploaded documents were reset after changing the request type.");
+};
 
   const handleFileAdd = (
-    documentType: "cor" | "excuseLetter" | "parentId" | "medicalCert",
-    files: FileList | null,
-  ) => {
-    if (!files) return;
+  documentType: "cor" | "excuseLetter" | "parentId" | "medicalCert",
+  files: FileList | null,
+) => {
+  if (!files) return;
 
-    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
-    const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png"];
-    const allFiles = Array.from(files);
+  const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+  const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png"];
+  const incomingFiles = Array.from(files);
 
-    const validFiles = allFiles.filter((file) => {
-      const isValidSize = file.size <= MAX_SIZE;
-      const isValidType = ALLOWED_TYPES.includes(file.type);
+  const validFiles = incomingFiles.filter((file) => {
+    const isValidSize = file.size <= MAX_SIZE;
+    const isValidType = ALLOWED_TYPES.includes(file.type);
 
-      if (!isValidSize) {
-        triggerToast(`File "${file.name}" exceeds the 5MB limit.`);
-      } else if (!isValidType) {
-        triggerToast(`File "${file.name}" has an unsupported format.`);
-      }
+    if (!isValidSize) {
+      triggerToast(`File "${file.name}" exceeds the 5MB limit.`);
+      return false;
+    }
 
-      return isValidSize && isValidType;
-    });
+    if (!isValidType) {
+      triggerToast(`File "${file.name}" has an unsupported format.`);
+      return false;
+    }
 
-    if (validFiles.length === 0) return;
+    return true;
+  });
 
-    setFormData((prev) => ({
+  if (validFiles.length === 0) return;
+
+  setFormData((prev) => {
+    const existingFiles = prev.files[documentType];
+
+    const dedupedNewFiles = validFiles.filter(
+      (newFile) =>
+        !existingFiles.some(
+          (existing) =>
+            existing.name === newFile.name &&
+            existing.size === newFile.size &&
+            existing.lastModified === newFile.lastModified,
+        ),
+    );
+
+    if (dedupedNewFiles.length === 0) {
+      triggerToast("This file has already been added.");
+      return prev;
+    }
+
+    return {
       ...prev,
       files: {
         ...prev.files,
-        [documentType]: [...prev.files[documentType], ...validFiles],
+        [documentType]: [...existingFiles, ...dedupedNewFiles],
       },
-    }));
-  };
+    };
+  });
+};
 
   const handleFileRemove = (
     documentType: "cor" | "excuseLetter" | "parentId" | "medicalCert",

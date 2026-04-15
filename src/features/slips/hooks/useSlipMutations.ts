@@ -72,12 +72,15 @@ export function useUpdateSlip() {
       data.files?.cor?.forEach((file) => {
         formData.append("cor", file);
       });
+
       data.files?.excuseLetter?.forEach((file) => {
         formData.append("excuseLetter", file);
       });
+
       data.files?.parentId?.forEach((file) => {
         formData.append("parentId", file);
       });
+
       data.files?.medicalCert?.forEach((file) => {
         formData.append("medicalCert", file);
       });
@@ -87,12 +90,12 @@ export function useUpdateSlip() {
         stepName: "Update Slip",
       });
     },
-    onSuccess: () => {
+    onSuccess: (_, variables) => {
       queryClient.invalidateQueries({
         queryKey: ["my-slips"],
       });
       queryClient.invalidateQueries({
-        queryKey: ["slip-details"],
+        queryKey: ["slip-details", variables.id],
       });
     },
   });
