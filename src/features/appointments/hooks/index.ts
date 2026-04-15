@@ -6,4 +6,5 @@ export {
   useUpdateAppointmentStatus,
   useUpdateAppointment,
   useAppointment,
+  useCancelAppointment,
 } from "./useAppointments";

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -22,12 +22,13 @@ import {
   Folder,
   Plus,
 } from "lucide-react";
-import { useGetSlipCategories, useSubmitSlip } from "@/features/slips/hooks";
+import { useGetSlipCategories, useSubmitSlip, useUpdateSlip, useGetSlipById } from "@/features/slips/hooks";
 import { StepProgress } from "@/features/slips/components";
 import { AnimationStyles } from "@/components/ui/animations";
 import { CreateSlipRequest } from "@/features/slips/types";
 import { usePageMetadata } from "@/components/layout/Layout";
 import FormInput from "@/components/form/FormInput";
+import { useToast } from "@/context";
 
 interface SubmitSlipFormState {
   dateOfAbsence: string;
@@ -59,10 +60,32 @@ export default function SubmitSlip() {
   const [formData, setFormData] = useState<SubmitSlipFormState>(EMPTY_FORM_DATA);
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
+  const { id } = useParams<{ id: string }>();
+  const isEditMode = !!id;
+  const { triggerToast } = useToast();
 
   const { data: categories = [], isLoading: isCategoriesLoading } =
     useGetSlipCategories();
+  const { data: existingSlip, isLoading: isSlipLoading } = useGetSlipById(id || "");
   const { mutate: submitSlip, isPending: isSubmitting } = useSubmitSlip();
+  const { mutate: updateSlip, isPending: isUpdating } = useUpdateSlip();
+
+  useEffect(() => {
+    if (isEditMode && existingSlip) {
+      setFormData({
+        dateOfAbsence: existingSlip.dateOfAbsence ? new Date(existingSlip.dateOfAbsence).toISOString().split("T")[0] : "",
+        dateNeeded: existingSlip.dateNeeded ? new Date(existingSlip.dateNeeded).toISOString().split("T")[0] : "",
+        reason: existingSlip.reason,
+        categoryId: existingSlip.categoryId,
+        files: {
+          cor: [],
+          excuseLetter: [],
+          parentId: [],
+          medicalCert: [],
+        },
+      });
+    }
+  }, [isEditMode, existingSlip]);
 
   const steps = [
     { id: 1, label: "Dates", icon: Calendar },
@@ -128,12 +151,30 @@ export default function SubmitSlip() {
   ) => {
     if (!files) return;
 
-    const newFiles = Array.from(files);
+    const MAX_SIZE = 5 * 1024 * 1024; // 5MB
+    const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png"];
+    const allFiles = Array.from(files);
+
+    const validFiles = allFiles.filter((file) => {
+      const isValidSize = file.size <= MAX_SIZE;
+      const isValidType = ALLOWED_TYPES.includes(file.type);
+
+      if (!isValidSize) {
+        triggerToast(`File "${file.name}" exceeds the 5MB limit.`);
+      } else if (!isValidType) {
+        triggerToast(`File "${file.name}" has an unsupported format.`);
+      }
+
+      return isValidSize && isValidType;
+    });
+
+    if (validFiles.length === 0) return;
+
     setFormData((prev) => ({
       ...prev,
       files: {
         ...prev.files,
-        [documentType]: [...prev.files[documentType], ...newFiles],
+        [documentType]: [...prev.files[documentType], ...validFiles],
       },
     }));
   };
@@ -167,16 +208,34 @@ export default function SubmitSlip() {
       },
     };
 
-    submitSlip(payload, {
-      onSuccess: () => {
-        navigate("/student/slips");
-      },
-      onError: (error: any) => {
-        if (error.message?.includes("IIR profile")) {
-          navigate("/iir-form");
+    if (isEditMode && id) {
+      updateSlip(
+        { id, data: payload },
+        {
+          onSuccess: () => {
+            triggerToast("Admission slip updated successfully");
+            navigate(`/student/slips/${id}`);
+          },
+          onError: (error: any) => {
+            triggerToast(error.message || "Failed to update slip");
+          },
         }
-      },
-    });
+      );
+    } else {
+      submitSlip(payload, {
+        onSuccess: () => {
+          triggerToast("Admission slip submitted successfully");
+          navigate("/student/slips");
+        },
+        onError: (error: any) => {
+          if (error.message?.includes("IIR profile")) {
+            navigate("/iir-form");
+          } else {
+            triggerToast(error.message || "Failed to submit slip");
+          }
+        },
+      });
+    }
   };
 
   const formatDate = (dateStr: string) => {
@@ -188,12 +247,13 @@ export default function SubmitSlip() {
   };
 
   usePageMetadata({
-    title: "Submit Admission Slip",
-    description:
-      "Provide the required information and supporting documents for your absence.",
-    badgeText: "New Request",
-    badgeIcon: <Plus className="h-4 w-4" />,
-    isLoading: isCategoriesLoading || isSubmitting,
+    title: isEditMode ? "Update Admission Slip" : "Submit Admission Slip",
+    description: isEditMode 
+      ? "Update your information or re-upload your document links as requested by the guidance counselor."
+      : "Provide the required information and supporting documents for your absence.",
+    badgeText: isEditMode ? "Revision" : "New Request",
+    badgeIcon: isEditMode ? <Edit2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />,
+    isLoading: isCategoriesLoading || (isEditMode && isSlipLoading) || isSubmitting || isUpdating,
   });
 
   return (
@@ -406,7 +466,7 @@ export default function SubmitSlip() {
                       <div className="flex items-start gap-2.5">
                         <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                         <p className="text-xs text-amber-700 dark:text-amber-200">
-                          Accepted: PDF, JPG, PNG, DOC, DOCX (Max 5MB per file)
+                          Accepted: PDF, JPG, PNG (Max 5MB per file)
                         </p>
                       </div>
                     </CardContent>
@@ -448,7 +508,7 @@ export default function SubmitSlip() {
                                     multiple
                                     onChange={(e) => handleFileAdd("cor", e.target.files)}
                                     className="absolute inset-0 cursor-pointer opacity-0"
-                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                    accept=".pdf,.jpg,.jpeg,.png"
                                   />
                                   <div className="flex flex-col items-center justify-center text-center">
                                     <Folder className="mb-2 h-8 w-8 text-muted-foreground" />
@@ -456,7 +516,7 @@ export default function SubmitSlip() {
                                       Click to upload or drag and drop
                                     </p>
                                     <p className="mt-1 text-xs text-muted-foreground">
-                                      PDF, JPG, PNG, DOC up to 5MB
+                                      PDF, JPG, PNG up to 5MB
                                     </p>
                                   </div>
                                 </div>
@@ -526,7 +586,7 @@ export default function SubmitSlip() {
                                       handleFileAdd("excuseLetter", e.target.files)
                                     }
                                     className="absolute inset-0 cursor-pointer opacity-0"
-                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                    accept=".pdf,.jpg,.jpeg,.png"
                                   />
                                   <div className="flex flex-col items-center justify-center text-center">
                                     <Folder className="mb-2 h-8 w-8 text-muted-foreground" />
@@ -534,7 +594,7 @@ export default function SubmitSlip() {
                                       Click to upload or drag and drop
                                     </p>
                                     <p className="mt-1 text-xs text-muted-foreground">
-                                      PDF, JPG, PNG, DOC up to 5MB
+                                      PDF, JPG, PNG up to 5MB
                                     </p>
                                   </div>
                                 </div>
@@ -607,7 +667,7 @@ export default function SubmitSlip() {
                                       handleFileAdd("parentId", e.target.files)
                                     }
                                     className="absolute inset-0 cursor-pointer opacity-0"
-                                    accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                    accept=".pdf,.jpg,.jpeg,.png"
                                   />
                                   <div className="flex flex-col items-center justify-center text-center">
                                     <Folder className="mb-2 h-8 w-8 text-muted-foreground" />
@@ -615,7 +675,7 @@ export default function SubmitSlip() {
                                       Click to upload or drag and drop
                                     </p>
                                     <p className="mt-1 text-xs text-muted-foreground">
-                                      PDF, JPG, PNG, DOC up to 5MB
+                                      PDF, JPG, PNG up to 5MB
                                     </p>
                                   </div>
                                 </div>
@@ -686,7 +746,7 @@ export default function SubmitSlip() {
                                         handleFileAdd("medicalCert", e.target.files)
                                       }
                                       className="absolute inset-0 cursor-pointer opacity-0"
-                                      accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                                      accept=".pdf,.jpg,.jpeg,.png"
                                     />
                                     <div className="flex flex-col items-center justify-center text-center">
                                       <Folder className="mb-2 h-8 w-8 text-muted-foreground" />
@@ -694,7 +754,7 @@ export default function SubmitSlip() {
                                         Click to upload or drag and drop
                                       </p>
                                       <p className="mt-1 text-xs text-muted-foreground">
-                                        PDF, JPG, PNG, DOC up to 5MB
+                                        PDF, JPG, PNG up to 5MB
                                       </p>
                                     </div>
                                   </div>
@@ -745,10 +805,14 @@ export default function SubmitSlip() {
                     </Button>
                     <Button
                       onClick={handleSubmit}
-                      disabled={!isFormValid || isSubmitting}
+                      disabled={!isFormValid || isSubmitting || isUpdating}
                       className="flex-1"
                     >
-                      {isSubmitting ? "Submitting..." : "Submit Admission Slip"}
+                      {isSubmitting || isUpdating
+                        ? "Saving..."
+                        : isEditMode
+                        ? "Update & Resubmit"
+                        : "Submit Admission Slip"}
                     </Button>
                   </div>
                 </div>

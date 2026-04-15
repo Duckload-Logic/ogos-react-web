@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -43,6 +43,7 @@ const GLASS_CARD =
   "overflow-hidden rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]";
 
 export default function StudentSlips() {
+  const navigate = useNavigate();
   const { data: slipStatuses = [] } = useGetSlipStatuses();
   const filterStatuses = [{ id: "0", name: "All", colorKey: "stale" }, ...slipStatuses];
 
@@ -292,11 +293,15 @@ export default function StudentSlips() {
                               align="end"
                               className="rounded-xl border-white/20 bg-white/85 backdrop-blur-xl dark:border-white/10 dark:bg-[#111]/80"
                             >
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => navigate(`/student/slips/${slip.id}`)}
+                              >
                                 <Eye className="mr-2 h-4 w-4" />
                                 View Details
                               </DropdownMenuItem>
-                              <DropdownMenuItem>
+                              <DropdownMenuItem
+                                onClick={() => navigate(`/student/slips/${slip.id}`)}
+                              >
                                 <Download className="mr-2 h-4 w-4" />
                                 Download Attachments
                               </DropdownMenuItem>

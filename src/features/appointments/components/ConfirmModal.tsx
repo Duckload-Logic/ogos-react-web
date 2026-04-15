@@ -26,22 +26,35 @@ export default function ActionConfirmModal({
   requiresMessage,
 }: ActionConfirmModalProps) {
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
 
   const handleConfirm = async () => {
+    if (requiresMessage && !message.trim()) {
+      setError("A reason or justification is required for this action.");
+      return;
+    }
+
     const success = await onConfirm(requiresMessage ? message : undefined);
     if (success) {
       setMessage("");
+      setError("");
     }
   };
 
+  const handleClose = () => {
+    setMessage("");
+    setError("");
+    onClose();
+  };
+
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
       <DialogContent className="sm:max-w-md animate-in fade-in zoom-in-95 duration-200">
         <DialogHeader>
           <DialogTitle>Confirm {action}</DialogTitle>
           <DialogDescription className="text-sm leading-relaxed">
             Are you sure you want to {action.toLowerCase()} this appointment?
-            {requiresMessage && " Please provide a reason (optional)."}
+            {requiresMessage && " Please provide a reason for this decision."}
           </DialogDescription>
         </DialogHeader>
 
@@ -50,14 +63,21 @@ export default function ActionConfirmModal({
             <FormInput
               placeholder="Enter reason or message..."
               value={message}
-              onChange={(val) => setMessage(val)}
-              isTextarea label={"Reason"} />
+              onChange={(val) => {
+                setMessage(val);
+                if (val.trim()) setError("");
+              }}
+              isTextarea
+              label={"Reason"}
+              required={requiresMessage}
+              error={error}
+            />
           </div>
         )}
 
         <DialogFooter>
           <Button variant="outline"
-            onClick={onClose}
+            onClick={handleClose}
             className="transition-all duration-200 hover:scale-105"
           >
             Cancel

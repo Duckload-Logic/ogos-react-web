@@ -28,6 +28,7 @@ export const API_ROUTES = Object.freeze({
     attachments: (id: string) => `/slips/id/${id}/attachments`,
     downloadAttachment: (id: string, attachmentId: string) =>
       `/slips/id/${id}/attachments/${attachmentId}`,
+    update: (id: string) => `/slips/id/${id}`,
     lookups: Object.freeze({
       statuses: "/slips/lookups/statuses",
       categories: "/slips/lookups/categories",
@@ -49,6 +50,8 @@ export const API_ROUTES = Object.freeze({
       categories: "/appointments/lookups/categories",
       slots: "/appointments/lookups/slots",
     }),
+    cancel: (id: string) => `/appointments/id/${id}/cancel`,
+    patch: (id: string) => `/appointments/id/${id}`,
   }),
 
   /**

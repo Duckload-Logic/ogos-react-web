@@ -216,7 +216,10 @@ export async function PostSlip(
 
     const response = await apiClient.post(API_ROUTES.slips.all, data, {
       ...config,
-      headers,
+      headers: {
+        ...config?.headers,
+        "Content-Type": undefined,
+      },
     });
     return response.data;
   } catch (error: any) {
@@ -231,6 +234,35 @@ export async function PostSlip(
     }
 
     const stepName = config?.stepName || "Submit Slip";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
+    throw error;
+  }
+}
+
+/**
+ * Update an existing slip (multipart/form-data)
+ * @param id - Slip ID
+ * @param data - Updated data
+ * @param config - Axios config
+ * @returns Updated slip
+ */
+export async function PatchSlip(
+  id: string,
+  data: FormData,
+  config?: AxiosConfigWithMeta,
+): Promise<Slip> {
+  try {
+    const response = await apiClient.patch(API_ROUTES.slips.update(id), data, {
+      ...config,
+      headers: {
+        ...config?.headers,
+        "Content-Type": undefined,
+      },
+    });
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || "PatchSlip";
+    const stepName = config?.stepName || "Update Slip";
     console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }

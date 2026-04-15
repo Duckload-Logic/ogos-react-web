@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +33,7 @@ import { format12HourTime } from "../../utils";
 import Layout, { usePageMetadata } from "@/components/layout/Layout";
 
 export default function StudentAppointments() {
+  const navigate = useNavigate();
   const { data: appointmentStatuses = [] } = useStatuses();
   const filterStatuses = [
     { id: 0, name: "All", colorKey: "stale" },
@@ -204,14 +205,24 @@ export default function StudentAppointments() {
                                 </Button>
                               </DropdownMenuTrigger>
                               <DropdownMenuContent align="end">
-                                <DropdownMenuItem>
+                                <DropdownMenuItem
+                                  onClick={() =>
+                                    navigate(`/student/appointments/${appointment.id}`)
+                                  }
+                                >
                                   <Eye className="w-4 h-4 mr-2" />
                                   View Details
                                 </DropdownMenuItem>
-                                {appointment.status?.name === "Pending" && (
-                                  <DropdownMenuItem className="text-destructive">
+                                {(appointment.status?.name === "Pending" ||
+                                  appointment.status?.name === "Scheduled") && (
+                                  <DropdownMenuItem
+                                    className="text-destructive"
+                                    onClick={() =>
+                                      navigate(`/student/appointments/${appointment.id}`)
+                                    }
+                                  >
                                     <X className="w-4 h-4 mr-2" />
-                                    Cancel
+                                    Manage / Cancel
                                   </DropdownMenuItem>
                                 )}
                               </DropdownMenuContent>

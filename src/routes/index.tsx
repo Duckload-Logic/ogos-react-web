@@ -13,7 +13,9 @@ import Register from "@/features/auth/pages/Register";
 // Student Features
 import { Dashboard as StudentDashboard } from "@/features/students/pages/Dashboard";
 import StudentAppointments from "@/features/appointments/pages/student/StudentAppointments";
+import StudentAppointmentDetails from "@/features/appointments/pages/student/AppointmentDetails";
 import { StudentSlips, SubmitSlip } from "@/features/slips/pages/student";
+import StudentSlipDetails from "@/features/slips/pages/student/SlipDetails";
 
 // Admin Feature
 import Dashboard from "@/features/admin/pages/Dashboard";
@@ -95,6 +97,14 @@ export const routes: RouteObject[] = [
         ),
       },
       {
+        path: "appointments/:id",
+        element: (
+          <IIRGate>
+            <StudentAppointmentDetails />
+          </IIRGate>
+        ),
+      },
+      {
         path: "appointments/schedule",
         element: (
           <IIRGate>
@@ -111,11 +121,27 @@ export const routes: RouteObject[] = [
         ),
       },
       {
+        path: "slips/:id",
+        element: (
+          <IIRGate>
+            <StudentSlipDetails />
+          </IIRGate>
+        ),
+      },
+      {
         path: "slips/submit",
         element: (
           <IIRGate>
             <SubmitSlip />
           </IIRGate >
+        ),
+      },
+      {
+        path: "slips/edit/:id",
+        element: (
+          <IIRGate>
+            <SubmitSlip />
+          </IIRGate>
         ),
       },
       {
