@@ -212,14 +212,12 @@ export async function PostSlip(
   config?: AxiosConfigWithMeta,
 ): Promise<Slip> {
   try {
+    const { ["Content-Type"]: _contentType, ...headers } = config?.headers || {};
+
     const response = await apiClient.post(API_ROUTES.slips.all, data, {
       ...config,
-      headers: {
-        ...(config?.headers || {}),
-        "Content-Type": "multipart/form-data",
-      },
+      headers,
     });
-
     return response.data;
   } catch (error: any) {
     const handlerName = config?.handlerName || "PostSlip";
