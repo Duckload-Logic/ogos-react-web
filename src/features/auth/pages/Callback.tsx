@@ -14,6 +14,8 @@ import {
   ERROR_DISMISS_TIMEOUT,
 } from "../types/idp";
 import { useAuth } from "@/context";
+import { useRef } from "react";
+import { useLogout } from "../hooks";
 
 /**
  * OAuth callback page component
@@ -32,8 +34,13 @@ export default function Callback() {
   const { refresh } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const authStarted = useRef(false);
+  const { logout } = useLogout();
 
   useEffect(() => {
+    if (authStarted.current) return;
+    authStarted.current = true;
+
     /**
      * Processes OAuth callback and routes user
      * Runs once on component mount
@@ -96,6 +103,7 @@ export default function Callback() {
             `[AuthCallback] {Route User}: ` + `unknown role ${roleKey}`,
           );
           setError(IDP_ERROR_MESSAGES.UNKNOWN_ROLE);
+          await logout();
           setIsLoading(false);
           return;
         }
