@@ -401,9 +401,10 @@ export const DownloadIIRPDF = async (
     let fileName = `IIR-Record-${iirID}.pdf`;
     const contentDisposition = response.headers["content-disposition"];
     if (contentDisposition) {
-      const fileNameMatch = contentDisposition.match(/filename=(.+)/);
+      // Handles filename="name.pdf" or filename=name.pdf
+      const fileNameMatch = contentDisposition.match(/filename=["']?([^"']+)["']?/);
       if (fileNameMatch?.[1]) {
-        fileName = fileNameMatch[1].replace(/["']/g, "");
+        fileName = fileNameMatch[1].trim();
       }
     }
 
