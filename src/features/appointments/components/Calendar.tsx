@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import { CalendarIcon, ChevronLeft, ChevronRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useCalendarStats } from "../hooks/useCalendar";
@@ -8,8 +8,8 @@ import {
   DialogTrigger,
   DialogContent,
   DialogTitle,
-} from "@radix-ui/react-dialog";
-import { Button } from "react-day-picker";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface Legend {
   color: string;
@@ -118,7 +118,7 @@ export default function Calendar({
     year: "numeric",
   });
 
-  const isDateDisabled = (day: number): boolean => {
+  const isDateDisabled = useCallback((day: number): boolean => {
     const date = new Date(currentYear, currentMonthIndex, day);
     const dayOfWeek = date.getDay();
     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
@@ -129,11 +129,21 @@ export default function Calendar({
     if (!allowPastDates && isPast) return true;
     if (!allowCurrentDate && isToday) return true;
     return false;
-  };
+  }, [
+    currentYear,
+    currentMonthIndex,
+    isCurrentMonth,
+    todayDate,
+    currentMonth,
+    today,
+    allowWeekends,
+    allowPastDates,
+    allowCurrentDate,
+  ]);
 
-  const formatDateKey = (day: number): string => {
+  const formatDateKey = useCallback((day: number): string => {
     return `${currentYear}-${String(currentMonthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-  };
+  }, [currentYear, currentMonthIndex]);
 
   const handleDateClick = (day: number) => {
     if (!isDateDisabled(day)) {
@@ -202,7 +212,24 @@ export default function Calendar({
           rounded-2xl border-none"
           >
             <DialogTitle className="sr-only">Select Date</DialogTitle>
-            <CalendarContent />
+            <CalendarContent
+              monthName={monthName}
+              handlePrevMonth={handlePrevMonth}
+              handleNextMonth={handleNextMonth}
+              emptyDays={emptyDays}
+              days={days}
+              formatDateKey={formatDateKey}
+              isCurrentMonth={isCurrentMonth}
+              todayDate={todayDate}
+              selectedDate={selectedDate}
+              currentMonthIndex={currentMonthIndex}
+              currentYear={currentYear}
+              isDateDisabled={isDateDisabled}
+              handleDateClick={handleDateClick}
+              isAdmin={isAdmin}
+              statsMap={statsMap}
+              displayLegends={displayLegends}
+            />
           </DialogContent>
         </Dialog>
       </div>
@@ -221,73 +248,121 @@ export default function Calendar({
             </CardHeader>
           )}
           <CardContent className="pt-8 px-6 pb-8">
-            <CalendarContent />
+            <CalendarContent
+              monthName={monthName}
+              handlePrevMonth={handlePrevMonth}
+              handleNextMonth={handleNextMonth}
+              emptyDays={emptyDays}
+              days={days}
+              formatDateKey={formatDateKey}
+              isCurrentMonth={isCurrentMonth}
+              todayDate={todayDate}
+              selectedDate={selectedDate}
+              currentMonthIndex={currentMonthIndex}
+              currentYear={currentYear}
+              isDateDisabled={isDateDisabled}
+              handleDateClick={handleDateClick}
+              isAdmin={isAdmin}
+              statsMap={statsMap}
+              displayLegends={displayLegends}
+            />
           </CardContent>
         </Card>
       </div>
     </>
   );
 
-  // Internal Component to avoid code duplication
-  function CalendarContent() {
-    return (
-      <div className="flex flex-col p-4 sm:p-0">
-        {/* Month Navigation */}
-        <div className="flex items-center justify-between mb-6">
-          <button
-            onClick={handlePrevMonth}
-            className="p-2 hover:bg-muted rounded transition-colors"
-          >
-            <ChevronLeft className="w-5 h-5" />
-          </button>
-          <h2 className="text-lg font-semibold min-w-40 text-center">
-            {monthName}
-          </h2>
-          <button
-            onClick={handleNextMonth}
-            className="p-2 hover:bg-muted rounded transition-colors"
-          >
-            <ChevronRight className="w-5 h-5" />
-          </button>
+}
+
+interface CalendarContentProps {
+  monthName: string;
+  handlePrevMonth: () => void;
+  handleNextMonth: () => void;
+  emptyDays: any[];
+  days: number[];
+  formatDateKey: (day: number) => string;
+  isCurrentMonth: boolean;
+  todayDate: number;
+  selectedDate?: Date;
+  currentMonthIndex: number;
+  currentYear: number;
+  isDateDisabled: (day: number) => boolean;
+  handleDateClick: (day: number) => void;
+  isAdmin: boolean;
+  statsMap: any;
+  displayLegends: Legend[];
+}
+
+function CalendarContent({
+  monthName,
+  handlePrevMonth,
+  handleNextMonth,
+  emptyDays,
+  days,
+  formatDateKey,
+  isCurrentMonth,
+  todayDate,
+  selectedDate,
+  currentMonthIndex,
+  currentYear,
+  isDateDisabled,
+  handleDateClick,
+  isAdmin,
+  statsMap,
+  displayLegends,
+}: CalendarContentProps) {
+  return (
+    <div className="flex flex-col p-4 sm:p-0">
+      {/* Month Navigation */}
+      <div className="flex items-center justify-between mb-6">
+        <button
+          onClick={handlePrevMonth}
+          className="p-2 hover:bg-muted rounded transition-colors"
+        >
+          <ChevronLeft className="w-5 h-5" />
+        </button>
+        <h2 className="text-lg font-semibold min-w-40 text-center">
+          {monthName}
+        </h2>
+        <button
+          onClick={handleNextMonth}
+          className="p-2 hover:bg-muted rounded transition-colors"
+        >
+          <ChevronRight className="w-5 h-5" />
+        </button>
+      </div>
+
+      {/* Calendar Grid */}
+      <div className="space-y-4">
+        {/* Day Headers */}
+        <div className="grid grid-cols-7 text-center">
+          {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
+            <div key={day} className="font-bold text-xs text-muted-foreground">
+              {day}
+            </div>
+          ))}
         </div>
 
-        {/* Calendar Grid */}
-        <div className="space-y-4">
-          {/* Day Headers */}
-          <div className="grid grid-cols-7 text-center">
-            {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
-              <div
-                key={day}
-                className="font-bold text-xs text-muted-foreground"
-              >
-                {day}
-              </div>
-            ))}
-          </div>
+        {/* Calendar Days */}
+        <div className="grid grid-cols-7 gap-1 sm:gap-2">
+          {emptyDays.map((_, idx) => (
+            <div key={`empty-${idx}`} className="p-1" />
+          ))}
+          {days.map((day) => {
+            const dateKey = formatDateKey(day);
+            const isToday = isCurrentMonth && day === todayDate;
+            const isSelected =
+              selectedDate?.getDate() === day &&
+              selectedDate.getMonth() === currentMonthIndex &&
+              selectedDate.getFullYear() === currentYear;
+            const isDisabled = isDateDisabled(day);
 
-          {/* Calendar Days */}
-          <div className="grid grid-cols-7 gap-1 sm:gap-2">
-            {emptyDays.map((_, idx) => (
-              <div key={`empty-${idx}`} className="p-1" />
-            ))}
-            {days.map((day) => {
-              const dateKey = formatDateKey(day);
-              const isToday = isCurrentMonth && day === todayDate;
-              const isSelected =
-                selectedDate?.getDate() === day &&
-                selectedDate.getMonth() === currentMonthIndex &&
-                selectedDate.getFullYear() === currentYear;
-              const isDisabled = isDateDisabled(day);
-
-              return (
-                <div
-                  key={day}
-                  className="relative group p-1 flex justify-center"
-                >
-                  <button
-                    onClick={() => handleDateClick(day)}
-                    disabled={isDisabled}
-                    className={`
+            return (
+              <div key={day} className="relative group p-1 flex justify-center">
+                <button
+                  onClick={() => handleDateClick(day)}
+                  disabled={isDisabled}
+                  className={`
                       size-12
                       rounded-lg font-semibold transition-colors text-sm
                       flex items-center justify-center
@@ -295,61 +370,60 @@ export default function Calendar({
                       text-nowrap
                       ${isDisabled ? "opacity-50 cursor-not-allowed" : "hover:ring-1 hover:ring-primary"}
                       ${isSelected
-                        ? "bg-primary text-primary-foreground ring-1 ring-primary"
-                        : isDisabled
-                          ? "bg-muted/50 text-muted-foreground"
-                          : "bg-muted hover:bg-muted/80 text-foreground"
-                      }
+                      ? "bg-primary text-primary-foreground ring-1 ring-primary"
+                      : isDisabled
+                        ? "bg-muted/50 text-muted-foreground"
+                        : "bg-muted hover:bg-muted/80 text-foreground"
+                    }
                       ${isToday ? "ring-1 ring-primary" : ""}
                     `}
-                    aria-label={`${day} ${monthName}`}
-                    aria-pressed={isSelected}
-                  >
-                    {day}
-                  </button>
-                  {isAdmin && statsMap[dateKey] && (
-                    <div className="absolute flex -space-x-1 transform -translate-y-1 justify-center pointer-events-none">
-                      {/* Rescheduled is first in row-reverse order to be on top-right */}
-                      {statsMap[dateKey].rescheduledCount > 0 && (
-                        <div
-                          className="size-3 rounded-full bg-notice-background border-2 border-notice-foreground"
-                          title="Rescheduled"
-                        />
-                      )}
+                  aria-label={`${day} ${monthName}`}
+                  aria-pressed={isSelected}
+                >
+                  {day}
+                </button>
+                {isAdmin && statsMap[dateKey] && (
+                  <div className="absolute flex -space-x-1 transform -translate-y-1 justify-center pointer-events-none">
+                    {/* Rescheduled is first in row-reverse order to be on top-right */}
+                    {statsMap[dateKey].rescheduledCount > 0 && (
+                      <div
+                        className="size-3 rounded-full bg-notice-background border-2 border-notice-foreground"
+                        title="Rescheduled"
+                      />
+                    )}
 
-                      {/* Scheduled is rendered second (middle) */}
-                      {statsMap[dateKey].scheduledCount > 0 && (
-                        <div
-                          className="size-3 rounded-full bg-info-background border-2 border-info-foreground"
-                          title="Scheduled"
-                        />
-                      )}
+                    {/* Scheduled is rendered second (middle) */}
+                    {statsMap[dateKey].scheduledCount > 0 && (
+                      <div
+                        className="size-3 rounded-full bg-info-background border-2 border-info-foreground"
+                        title="Scheduled"
+                      />
+                    )}
 
-                      {/* Pending is rendered last (right-most, top of stack) */}
-                      {statsMap[dateKey].pendingCount > 0 && (
-                        <div
-                          className="size-3 rounded-full bg-warning-background border-2 border-warning-foreground"
-                          title="Pending"
-                        />
-                      )}
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Legend */}
-        <div className="mt-8 pt-4 border-t border-border flex flex-wrap gap-3">
-          {displayLegends.map(({ color, label }) => (
-            <div key={label} className="flex items-center gap-2 text-xs">
-              <div className={`size-3 rounded-full border ${color}`} />
-              <span>{label}</span>
-            </div>
-          ))}
+                    {/* Pending is rendered last (right-most, top of stack) */}
+                    {statsMap[dateKey].pendingCount > 0 && (
+                      <div
+                        className="size-3 rounded-full bg-warning-background border-2 border-warning-foreground"
+                        title="Pending"
+                      />
+                    )}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </div>
       </div>
-    );
-  }
+
+      {/* Legend */}
+      <div className="mt-8 pt-4 border-t border-border flex flex-wrap gap-3">
+        {displayLegends.map(({ color, label }) => (
+          <div key={label} className="flex items-center gap-2 text-xs">
+            <div className={`size-3 rounded-full border ${color}`} />
+            <span>{label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
 }
