@@ -272,7 +272,7 @@ export default function Layout({
                 ref={scrollRef}
                 className="relative z-10 flex h-full flex-col overflow-x-hidden overflow-y-auto"
               >
-                <main className="flex-1 p-4 md:p-6 lg:p-8 h-full">
+                <main className="flex-1 p-4 md:p-6 lg:p-8">
                   {showHeader && showSubHeader && (
                     <SubHeader
                       title={title || ""}
