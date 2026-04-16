@@ -59,7 +59,6 @@ import {
   FormErrorModal,
   groupErrorsBySection,
 } from "@/features/iir/components/form/FormErrorModal";
-import { completeIIRForm } from "../tests/test";
 import { SectionProgress } from "../components/form/SectionProgress";
 import ConsentDialog from "../components/form/ConsentDialog";
 
