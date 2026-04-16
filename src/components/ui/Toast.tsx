@@ -23,7 +23,7 @@ export default function Toast({
           <div
             key={index}
             style={{ opacity }}
-            className="bg-glass-bg border-glass-border shadow-xl rounded-xl px-5 py-3 text-sm flex items-center gap-3 animate-toast-slide-in-right transition-opacity duration-300"
+            className="bg-card border-glass-border shadow-xl rounded-xl px-5 py-3 text-sm flex items-center gap-3 animate-toast-slide-in-right transition-opacity duration-300"
           >
             <div className="flex-shrink-0 animate-ring origin-top">{icon}</div>
             {toast}
