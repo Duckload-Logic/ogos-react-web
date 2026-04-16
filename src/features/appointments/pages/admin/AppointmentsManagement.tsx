@@ -84,16 +84,26 @@ export default function AppointmentsManagement() {
     useState<AppointmentStatus>(defaultStatus);
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [startDate, setStartDate] = useState(toISODateString(new Date()));
+  const [startDate, setStartDate] = useState(() => {
+    const now = new Date();
+    return toISODateString(
+      new Date(now.getFullYear(), now.getMonth(), 1),
+    );
+  });
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 500);
 
-  const [endDate, setEndDate] = useState(
-    toISODateString(new Date(new Date().setMonth(new Date().getMonth() + 1))),
-  );
+  const [endDate, setEndDate] = useState(() => {
+    const now = new Date();
+    // Day 0 of next month resolves to the last day of current month
+    return toISODateString(
+      new Date(now.getFullYear(), now.getMonth() + 1, 0),
+    );
+  });
 
+  // No pre-selected date — show the full month overview by default
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    startDate ? new Date(startDate) : undefined,
+    undefined,
   );
 
   const getLocalDateString = (date?: Date, fallback?: string) => {
@@ -141,6 +151,7 @@ export default function AppointmentsManagement() {
   };
 
   const chartData = (statusCounts || []).map((stat) => {
+
     let key: keyof typeof chartConfig = "noShow";
     const name = stat.name.toLowerCase();
 
@@ -160,13 +171,16 @@ export default function AppointmentsManagement() {
 
   const isPageLoading = isStatusesLoading || isStatsLoading;
 
-  usePageMetadata({
-    title: "Appointments Management",
-    description: "View and manage all counseling appointments",
-    badgeText: "Admin Management",
-    badgeIcon: <CalendarPlus className="h-4 w-4" />,
-    isLoading: isPageLoading,
-    headerActions: (
+  // These must be stable references — usePageMetadata's useEffect uses
+  // referential equality (===) to detect changes. Inline JSX creates a new
+  // object on every render, causing an infinite setState → re-render loop.
+  const pageBadgeIcon = useMemo(
+    () => <CalendarPlus className="h-4 w-4" />,
+    [],
+  );
+
+  const pageHeaderActions = useMemo(
+    () => (
       <Button
         variant="outline"
         onClick={() => navigate("/admin/appointments/logs")}
@@ -176,6 +190,16 @@ export default function AppointmentsManagement() {
         View All Logs
       </Button>
     ),
+    [navigate],
+  );
+
+  usePageMetadata({
+    title: "Appointments Management",
+    description: "View and manage all counseling appointments",
+    badgeText: "Admin Management",
+    badgeIcon: pageBadgeIcon,
+    isLoading: isPageLoading,
+    headerActions: pageHeaderActions,
   });
 
   return (
@@ -262,11 +286,11 @@ export default function AppointmentsManagement() {
               </p>
 
               <div className="rounded-3xl border border-glass-border/30 bg-glass-bg/20 px-4 py-8 sm:px-6 shadow-inner backdrop-blur-md">
-                <div className="h-[280px] flex items-center justify-center relative">
+                <div className="h-[280px] relative">
                   {chartData.length > 0 && chartData.some(d => d.count > 0) ? (
                     <ChartContainer
                       config={chartConfig}
-                      className="h-full w-full drop-shadow-sm"
+                      className="h-[280px] w-full drop-shadow-sm"
                     >
                       <BarChart
                         layout="vertical"
@@ -325,7 +349,7 @@ export default function AppointmentsManagement() {
                       </BarChart>
                     </ChartContainer>
                   ) : (
-                    <div className="flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-700">
+                    <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-700">
                       <div className="rounded-full bg-primary/5 p-6 mb-4">
                         <Archive className="h-10 w-10 text-muted-foreground/40" />
                       </div>
@@ -333,7 +357,7 @@ export default function AppointmentsManagement() {
                         No activity recorded for this period
                       </p>
                       <p className="text-[10px] text-muted-foreground/40 mt-1 uppercase tracking-widest font-bold">
-                         Appointments Stats
+                        Appointments Stats
                       </p>
                     </div>
                   )}
