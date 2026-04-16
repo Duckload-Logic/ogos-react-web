@@ -95,7 +95,8 @@ export async function GetAppointmentStats(
       ...config,
       params,
     });
-    return response.data;
+    // Fallback unwrap if interceptor hasn't handled it
+    return response.data?.data || response.data || [];
   } catch (error: any) {
     const handlerName = config?.handlerName || "GetAppointmentStats";
     const stepName = config?.stepName || "Fetch Stats";

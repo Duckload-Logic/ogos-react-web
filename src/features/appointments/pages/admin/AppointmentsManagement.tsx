@@ -141,25 +141,24 @@ export default function AppointmentsManagement() {
   };
 
   const chartData = (statusCounts || []).map((stat) => {
-    const count = statusCounts?.find((s) => s.id === stat.id)?.count || 0;
-
     let key: keyof typeof chartConfig = "noShow";
+    const name = stat.name.toLowerCase();
 
-    if (stat.name.toLowerCase() === "pending") key = "pending";
-    else if (stat.name.toLowerCase() === "scheduled") key = "scheduled";
-    else if (stat.name.toLowerCase() === "completed") key = "completed";
-    else if (stat.name.toLowerCase() === "cancelled") key = "cancelled";
-    else if (stat.name.toLowerCase() === "rejected") key = "rejected";
-    else if (stat.name.toLowerCase() === "rescheduled") key = "rescheduled";
+    if (name === "pending") key = "pending";
+    else if (name === "scheduled") key = "scheduled";
+    else if (name === "completed") key = "completed";
+    else if (name === "cancelled") key = "cancelled";
+    else if (name === "rejected") key = "rejected";
+    else if (name === "rescheduled") key = "rescheduled";
 
     return {
       status: stat.name,
-      count,
+      count: stat.count || 0,
       fill: chartConfig[key].color,
     };
   });
 
-  const isPageLoading = isStatusesLoading;
+  const isPageLoading = isStatusesLoading || isStatsLoading;
 
   usePageMetadata({
     title: "Appointments Management",
@@ -263,67 +262,81 @@ export default function AppointmentsManagement() {
               </p>
 
               <div className="rounded-3xl border border-glass-border/30 bg-glass-bg/20 px-4 py-8 sm:px-6 shadow-inner backdrop-blur-md">
-                <div className="h-[280px]">
-                  <ChartContainer
-                    config={chartConfig}
-                    className="h-full w-full drop-shadow-sm"
-                  >
-                    <BarChart
-                      layout="vertical"
-                      accessibilityLayer
-                      data={chartData}
-                      margin={{ top: 4, right: 8, left: 0, bottom: 2 }}
-                      barCategoryGap="16%"
+                <div className="h-[280px] flex items-center justify-center relative">
+                  {chartData.length > 0 && chartData.some(d => d.count > 0) ? (
+                    <ChartContainer
+                      config={chartConfig}
+                      className="h-full w-full drop-shadow-sm"
                     >
-                      <CartesianGrid
-                        horizontal
-                        vertical={false}
-                        strokeDasharray="3 3"
-                        stroke="rgba(148,163,184,0.10)"
-                      />
-
-                      <XAxis
-                        type="number"
-                        tickLine={false}
-                        axisLine={false}
-                        tick={{ fontSize: 10, fill: "#94a3b8" }}
-                        allowDecimals={false}
-                      />
-
-                      <YAxis
-                        type="category"
-                        dataKey="status"
-                        tickLine={false}
-                        axisLine={false}
-                        width={88}
-                        interval={0}
-                        tickMargin={6}
-                        tick={{
-                          fontSize: 11,
-                          fill: "#64748b",
-                          fontWeight: 500,
-                        }}
-                      />
-
-                      <Bar
-                        dataKey="count"
-                        radius={[999, 999, 999, 999]}
-                        maxBarSize={18}
+                      <BarChart
+                        layout="vertical"
+                        accessibilityLayer
+                        data={chartData}
+                        margin={{ top: 4, right: 8, left: 0, bottom: 2 }}
+                        barCategoryGap="16%"
                       >
-                        {chartData.map((item) => (
-                          <Cell key={item.status} fill={item.fill} />
-                        ))}
-
-                        <LabelList
-                          dataKey="count"
-                          position="right"
-                          offset={8}
-                          className="fill-foreground"
-                          fontSize={11}
+                        <CartesianGrid
+                          horizontal
+                          vertical={false}
+                          strokeDasharray="3 3"
+                          stroke="rgba(148,163,184,0.10)"
                         />
-                      </Bar>
-                    </BarChart>
-                  </ChartContainer>
+
+                        <XAxis
+                          type="number"
+                          tickLine={false}
+                          axisLine={false}
+                          tick={{ fontSize: 10, fill: "#94a3b8" }}
+                          allowDecimals={false}
+                        />
+
+                        <YAxis
+                          type="category"
+                          dataKey="status"
+                          tickLine={false}
+                          axisLine={false}
+                          width={88}
+                          interval={0}
+                          tickMargin={6}
+                          tick={{
+                            fontSize: 11,
+                            fill: "#64748b",
+                            fontWeight: 500,
+                          }}
+                        />
+
+                        <Bar
+                          dataKey="count"
+                          radius={[999, 999, 999, 999]}
+                          maxBarSize={18}
+                        >
+                          {chartData.map((item) => (
+                            <Cell key={item.status} fill={item.fill} />
+                          ))}
+
+                          <LabelList
+                            dataKey="count"
+                            position="right"
+                            offset={8}
+                            className="fill-foreground font-semibold"
+                            fontSize={11}
+                          />
+                        </Bar>
+                      </BarChart>
+                    </ChartContainer>
+                  ) : (
+                    <div className="flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-700">
+                      <div className="rounded-full bg-primary/5 p-6 mb-4">
+                        <Archive className="h-10 w-10 text-muted-foreground/40" />
+                      </div>
+                      <p className="text-sm font-medium text-muted-foreground/60">
+                        No activity recorded for this period
+                      </p>
+                      <p className="text-[10px] text-muted-foreground/40 mt-1 uppercase tracking-widest font-bold">
+                         Appointments Stats
+                      </p>
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-3 flex flex-wrap gap-2">
