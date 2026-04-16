@@ -190,13 +190,20 @@ export default function AppointmentsManagement() {
               className="h-full"
               currentMonth={currentMonth}
               selectedDate={selectedDate}
-              onMonthChange={setCurrentMonth}
+              onMonthChange={(date) => {
+                setCurrentMonth(date);
+                // When navigating months, if no specific date was recently clicked,
+                // we should update the range to encompass the whole month
+                const start = new Date(date.getFullYear(), date.getMonth(), 1);
+                const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+                setStartDate(toISODateString(start));
+                setEndDate(toISODateString(end));
+                setSelectedDate(undefined);
+              }}
               onDateSelect={(date) => {
                 if (!date) return;
 
-                const dateStr = `${date.getFullYear()}-${String(
-                  date.getMonth() + 1,
-                ).padStart(2, "0")}-${String(date.getDate()).padStart(2, "0")}`;
+                const dateStr = toISODateString(date);
 
                 setSelectedDate(date);
                 setStartDate(dateStr);
@@ -221,15 +228,31 @@ export default function AppointmentsManagement() {
           </div>
 
           <Card className="lg:col-span-4 shadow-2xl overflow-hidden backdrop-blur-2xl transition-all duration-500 hover:bg-glass-bg/50">
-            <div className="border-b border-glass-border/40 bg-muted/20 px-8 py-5">
+            <div className="border-b border-glass-border/40 bg-muted/20 px-8 py-4 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-foreground/90 flex items-center gap-3">
                 Overview
               </h2>
+              {selectedDate && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => {
+                    setSelectedDate(undefined);
+                    const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
+                    const end = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+                    setStartDate(toISODateString(start));
+                    setEndDate(toISODateString(end));
+                  }}
+                  className="text-xs h-8 px-3 rounded-lg hover:bg-primary/10 text-primary font-semibold"
+                >
+                  View Monthly View
+                </Button>
+              )}
             </div>
 
             <CardContent className="p-8 flex flex-col min-h-[300px]">
               <p className="text-sm text-muted-foreground mb-6 font-medium italic opacity-70">
-                Visual distribution for {formatDate(startDate)}
+                Visual distribution for {selectedDate ? formatDate(startDate) : currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
               </p>
 
               <div className="rounded-3xl border border-glass-border/30 bg-glass-bg/20 px-4 py-8 sm:px-6 shadow-inner backdrop-blur-md">

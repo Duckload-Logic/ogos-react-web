@@ -60,6 +60,9 @@ export function useSubmitAppointment() {
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.appointments.myAppointments,
       });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.appointments.stats,
+      });
     },
   });
 }
@@ -77,6 +80,9 @@ export function useUpdateAppointmentStatus() {
       });
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.appointments.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.appointments.stats,
       });
     },
   });
@@ -122,6 +128,9 @@ export function useCancelAppointment() {
       });
       queryClient.invalidateQueries({
         queryKey: QUERY_KEYS.appointments.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.appointments.stats,
       });
     },
   });
