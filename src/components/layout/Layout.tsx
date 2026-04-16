@@ -350,7 +350,10 @@ export function usePageMetadata(metadata: Partial<PageMetadata>) {
     metadata.title,
     metadata.description,
     metadata.badgeText,
+    metadata.headerActions,
+    metadata.headerStats,
     metadata.showDate,
+    metadata.showSubHeader,
     metadata.isLoading,
     setPageMetadata,
   ]);

@@ -69,13 +69,8 @@ export default function ReviewSlips() {
 
   const isPageLoading = isStatusesLoading;
 
-  usePageMetadata({
-    title: "Review Excuse Slips",
-    description: "Review submissions, filter the queue, and process student requests.",
-    badgeText: "Slip Management",
-    badgeIcon: <FileText className="h-4 w-4" />,
-    isLoading: isPageLoading,
-    headerActions: (
+  const headerActions = useMemo(
+    () => (
       <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
         {(["today", "week", "month"] as TimeFilter[]).map((filter) => (
           <Button
@@ -101,6 +96,16 @@ export default function ReviewSlips() {
         </Button>
       </div>
     ),
+    [timeFilter, navigate]
+  );
+
+  usePageMetadata({
+    title: "Review Excuse Slips",
+    description: "Review submissions, filter the queue, and process student requests.",
+    badgeText: "Slip Management",
+    badgeIcon: <FileText className="h-4 w-4" />,
+    isLoading: isPageLoading,
+    headerActions,
   });
 
   return (
