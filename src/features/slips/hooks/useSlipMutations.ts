@@ -3,6 +3,7 @@ import { apiClient } from "@/lib/api";
 import { API_ROUTES } from "@/config/apiRoutes";
 import { PostSlip, PatchSlip, PatchSlipStatus } from "../services";
 import type { CreateSlipRequest } from "../types";
+import { QUERY_KEYS } from "@/config/queryKeys";
 
 /**
  * Hook to submit a new admission slip
@@ -42,7 +43,16 @@ export function useSubmitSlip() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["my-slips"],
+        queryKey: QUERY_KEYS.slips.mySlips,
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.slips.all,
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.slips.stats,
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.analytics.all,
       });
     },
   });
@@ -89,10 +99,16 @@ export function useUpdateSlip() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["my-slips"],
+        queryKey: QUERY_KEYS.slips.mySlips,
       });
       queryClient.invalidateQueries({
-        queryKey: ["slip-details"],
+        queryKey: [...QUERY_KEYS.slips.all, "byId"],
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.slips.stats,
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.analytics.all,
       });
     },
   });
@@ -121,10 +137,16 @@ export function useUpdateSlipStatus() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({
-        queryKey: ["slips"],
+        queryKey: QUERY_KEYS.slips.all,
       });
       queryClient.invalidateQueries({
-        queryKey: ["my-slips"],
+        queryKey: QUERY_KEYS.slips.mySlips,
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.slips.stats,
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.analytics.all,
       });
     },
   });

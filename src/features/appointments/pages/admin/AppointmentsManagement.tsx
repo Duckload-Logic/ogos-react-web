@@ -254,12 +254,12 @@ export default function AppointmentsManagement() {
 
             <CardContent className="p-8 flex flex-col min-h-[300px]">
               <p className="text-sm text-muted-foreground mb-6 font-medium italic opacity-70">
-                Visual distribution for {selectedDate 
-                  ? formatDate(startDate) 
-                  : currentMonth.toLocaleString('default', { 
-                      month: 'long', 
-                      year: 'numeric' 
-                    })}
+                Visual distribution for {selectedDate
+                  ? formatDate(startDate)
+                  : currentMonth.toLocaleString('default', {
+                    month: 'long',
+                    year: 'numeric'
+                  })}
               </p>
 
               <div className="rounded-3xl border border-glass-border/30 bg-glass-bg/20 px-4 py-8 sm:px-6 shadow-inner backdrop-blur-md">
