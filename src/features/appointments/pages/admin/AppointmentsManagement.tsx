@@ -192,10 +192,10 @@ export default function AppointmentsManagement() {
               selectedDate={selectedDate}
               onMonthChange={(date) => {
                 setCurrentMonth(date);
-                // When navigating months, if no specific date was recently clicked,
-                // we should update the range to encompass the whole month
-                const start = new Date(date.getFullYear(), date.getMonth(), 1);
-                const end = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+                const year = date.getFullYear();
+                const month = date.getMonth();
+                const start = new Date(year, month, 1);
+                const end = new Date(year, month + 1, 0);
                 setStartDate(toISODateString(start));
                 setEndDate(toISODateString(end));
                 setSelectedDate(undefined);
@@ -238,8 +238,10 @@ export default function AppointmentsManagement() {
                   size="sm"
                   onClick={() => {
                     setSelectedDate(undefined);
-                    const start = new Date(currentMonth.getFullYear(), currentMonth.getMonth(), 1);
-                    const end = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 0);
+                    const y = currentMonth.getFullYear();
+                    const m = currentMonth.getMonth();
+                    const start = new Date(y, m, 1);
+                    const end = new Date(y, m + 1, 0);
                     setStartDate(toISODateString(start));
                     setEndDate(toISODateString(end));
                   }}
@@ -252,7 +254,12 @@ export default function AppointmentsManagement() {
 
             <CardContent className="p-8 flex flex-col min-h-[300px]">
               <p className="text-sm text-muted-foreground mb-6 font-medium italic opacity-70">
-                Visual distribution for {selectedDate ? formatDate(startDate) : currentMonth.toLocaleString('default', { month: 'long', year: 'numeric' })}
+                Visual distribution for {selectedDate 
+                  ? formatDate(startDate) 
+                  : currentMonth.toLocaleString('default', { 
+                      month: 'long', 
+                      year: 'numeric' 
+                    })}
               </p>
 
               <div className="rounded-3xl border border-glass-border/30 bg-glass-bg/20 px-4 py-8 sm:px-6 shadow-inner backdrop-blur-md">
