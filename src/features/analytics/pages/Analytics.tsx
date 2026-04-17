@@ -1,11 +1,10 @@
-import { useState, useEffect } from "react";
-import { useStudentAnalytics } from "../hooks/useStudentAnalytics";
+import React, { useState, useMemo } from "react";
+import { useAnalyticsDashboard } from "../hooks/useAnalyticsDashboard";
 import Layout, { usePageMetadata } from "@/components/layout/Layout";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, TrendingUp, Users, Percent } from "lucide-react";
-import { apiClient } from "@/lib/api";
+import { AlertCircle, TrendingUp, Users, MapPin, GraduationCap, Home, DollarSign, Network } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { StudentAnalytics } from "../types/analytics.types";
 import {
   BarChart,
   Bar,
@@ -15,838 +14,533 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
   Legend,
-  ResponsiveContainer,
 } from "recharts";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Dropdown } from "@/components/form";
+import { useCourses, useStudentStatuses } from "@/features/iir/hooks";
+
+// --- THEME COLORS ---
+const COLORS = [
+  "hsl(var(--primary))",
+  "hsl(var(--secondary))",
+  "hsl(var(--accent))",
+  "hsl(var(--muted-foreground))",
+  "#3b82f6", // male
+  "#ec4899", // female
+  "#94a3b8", // total/muted
+  "#10b981", // emerald
+];
+
+// --- CHART CONFIGURATIONS ---
+const genderSplitConfig = {
+  maleCount: {
+    label: "Male",
+    color: "#3b82f6",
+  },
+  femaleCount: {
+    label: "Female",
+    color: "#ec4899",
+  },
+  total: {
+    label: "Total Students",
+    color: "#94a3b8",
+  },
+} satisfies ChartConfig;
+
+const genderDistributionConfig = {
+  Male: {
+    label: "Male",
+    color: "#3b82f6",
+  },
+  Female: {
+    label: "Female",
+    color: "#ec4899",
+  },
+} satisfies ChartConfig;
 
 export default function AnalyticsPage() {
-  const { students, loading, error } = useStudentAnalytics();
+  const [selectedYear, setSelectedYear] = useState<string>("0");
+  const [selectedCourse, setSelectedCourse] = useState<string>("0");
+  const [selectedStatus, setSelectedStatus] = useState<string>("0");
 
-  const [selectedYear, setSelectedYear] = useState<number>(
-    new Date().getFullYear(),
-  );
-  const [religionPage, setReligionPage] = useState(0);
-  const [cityPage, setCityPage] = useState(0);
-  const [educationPage, setEducationPage] = useState(0);
-  const [statusPage, setStatusPage] = useState(0);
+  const { data, loading, error, refresh } = useAnalyticsDashboard();
+  const { data: courses } = useCourses();
 
-  // color palette using CSS variables
-  const STATUS_COLOR_MAP = {
-    info: { bg: "bg-info-background", text: "text-info-foreground" },
-    success: { bg: "bg-success-background", text: "text-success-foreground" },
-    warning: { bg: "bg-warning-background", text: "text-warning-foreground" },
-    danger: { bg: "bg-danger-background", text: "text-danger-foreground" },
-    notice: { bg: "bg-notice-background", text: "text-notice-foreground" },
-    stale: { bg: "bg-stale-background", text: "text-stale-foreground" },
+  // Update filters and refresh
+  const handleYearChange = (val: string) => {
+    setSelectedYear(val);
+    refresh(parseInt(val), parseInt(selectedCourse), parseInt(selectedStatus));
   };
 
-  // color palette for charts
-  const SOFT_COLORS = [
-    "#93c5fd", // Blue (info) - soft blue
-    "#bbf7d0", // Green (success) - soft green
-    "#fef08a", // Yellow (warning) - soft yellow
-    "#fca5a5", // Red (danger) - soft red
-    "#d8b4fe", // Purple (notice) - soft purple
-    "#d1d5db", // Gray (stale) - soft gray
-  ];
-
-  // Color palette for KPI cards
-  const KPI_COLORS = [
-    STATUS_COLOR_MAP.info,
-    STATUS_COLOR_MAP.success,
-    STATUS_COLOR_MAP.warning,
-    STATUS_COLOR_MAP.notice,
-  ];
-
-  // Calculate age statistics
-  const getAgeStats = () => {
-    const ages = students
-      .filter((s) => s.dateOfBirth)
-      .map((s) => {
-        const dob = new Date(s.dateOfBirth!);
-        return new Date().getFullYear() - dob.getFullYear();
-      });
-
-    if (ages.length === 0) return { avg: 0, min: 0, max: 0, count: 0 };
-
-    const sorted = ages.sort((a, b) => a - b);
-    return {
-      avg: Math.round(ages.reduce((a, b) => a + b, 0) / ages.length),
-      min: sorted[0],
-      max: sorted[sorted.length - 1],
-      count: ages.length,
-    };
+  const handleCourseChange = (val: string) => {
+    setSelectedCourse(val);
+    refresh(parseInt(selectedYear), parseInt(val), parseInt(selectedStatus));
   };
 
-  // Prepare age distribution chart data
-  const getAgeDistributionData = () => {
-    const ageRanges: Record<string, number> = {
-      "15-17": 0,
-      "18-20": 0,
-      "21-25": 0,
-      "26-30": 0,
-      "31+": 0,
-    };
-
-    students.forEach((s) => {
-      if (s.dateOfBirth) {
-        const dob = new Date(s.dateOfBirth);
-        const age = new Date().getFullYear() - dob.getFullYear();
-        if (age <= 17) ageRanges["15-17"]++;
-        else if (age <= 20) ageRanges["18-20"]++;
-        else if (age <= 25) ageRanges["21-25"]++;
-        else if (age <= 30) ageRanges["26-30"]++;
-        else ageRanges["31+"]++;
-      }
-    });
-
-    return Object.entries(ageRanges).map(([range, count]) => ({
-      name: range,
-      value: count,
-    }));
-  };
-
-  // Prepare civil status data
-  const getCivilStatusData = () => {
-    const statusMap: Record<string, number> = {};
-    students.forEach((s) => {
-      if (s.civilStatus) {
-        statusMap[s.civilStatus] = (statusMap[s.civilStatus] || 0) + 1;
-      }
-    });
-
-    return Object.entries(statusMap)
-      .sort((a, b) => b[1] - a[1])
-      .map(([name, value]) => ({ name, value }));
-  };
-
-  // Prepare religion data
-  const getReligionData = () => {
-    const religionMap: Record<string, number> = {};
-    students.forEach((s) => {
-      if (s.religion) {
-        religionMap[s.religion] = (religionMap[s.religion] || 0) + 1;
-      }
-    });
-
-    return Object.entries(religionMap)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 8)
-      .map(([name, value]) => ({ name, value }));
-  };
-
-  // Prepare city/municipality data
-  const getCityData = () => {
-    const cityMap: Record<string, number> = {};
-    students.forEach((student) => {
-      if (student.addresses && Array.isArray(student.addresses)) {
-        student.addresses.forEach((addr: any) => {
-          const city = addr.municipality || addr.city || "Unknown";
-          cityMap[city] = (cityMap[city] || 0) + 1;
-        });
-      }
-    });
-
-    return Object.entries(cityMap)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 10)
-      .map(([name, value]) => ({ name, value }));
-  };
-
-  // Prepare father's education data
-  const getFatherEducationData = () => {
-    const eduMap: Record<string, number> = {};
-    students.forEach((s) => {
-      if (s.family?.fatherEducation) {
-        eduMap[s.family.fatherEducation] =
-          (eduMap[s.family.fatherEducation] || 0) + 1;
-      }
-    });
-
-    return Object.entries(eduMap)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
-      .map(([name, value]) => ({ name: name.substring(0, 15), value }));
-  };
-
-  // Prepare mother's education data
-  const getMotherEducationData = () => {
-    const eduMap: Record<string, number> = {};
-    students.forEach((s) => {
-      if (s.family?.motherEducation) {
-        eduMap[s.family.motherEducation] =
-          (eduMap[s.family.motherEducation] || 0) + 1;
-      }
-    });
-
-    return Object.entries(eduMap)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 6)
-      .map(([name, value]) => ({ name: name.substring(0, 15), value }));
-  };
-
-  // Prepare income data
-  const getIncomeData = () => {
-    const incomeMap: Record<string, number> = {};
-    students.forEach((s) => {
-      const income = s.family?.monthlyFamilyIncome || "Not Specified";
-      incomeMap[income] = (incomeMap[income] || 0) + 1;
-    });
-
-    return Object.entries(incomeMap)
-      .sort((a, b) => b[1] - a[1])
-      .slice(0, 7)
-      .map(([name, value]) => ({
-        name: name.length > 20 ? name.substring(0, 17) + "..." : name,
-        value,
-      }));
-  };
-
-  // Get all available years from student data
-  const getAvailableYears = () => {
-    const years = new Set<number>();
-    students.forEach((s) => {
-      if (s.dateOfBirth) {
-        const year = new Date(s.dateOfBirth).getFullYear();
-        years.add(year);
-      }
-    });
-    return Array.from(years).sort((a, b) => b - a);
-  };
-
-  // Filter students by selected year (year of enrollment/birth)
-  const getStudentsByYear = () => {
-    if (selectedYear === new Date().getFullYear() || students.length === 0) {
-      return students;
-    }
-    // Filter students by birth year
-    return students.filter((s) => {
-      if (!s.dateOfBirth) return false;
-      return new Date(s.dateOfBirth).getFullYear() === selectedYear;
-    });
-  };
-
-  const filteredStudents = getStudentsByYear();
-
-  // Get breakdown stats with pagination support
-  const getReligionBreakdown = () => {
-    const religionMap: Record<string, number> = {};
-    filteredStudents.forEach((s) => {
-      if (s.religion) {
-        religionMap[s.religion] = (religionMap[s.religion] || 0) + 1;
-      }
-    });
-    const entries = Object.entries(religionMap).sort((a, b) => b[1] - a[1]);
-    const itemsPerPage = 5;
-    const start = religionPage * itemsPerPage;
-    return {
-      data: entries.slice(start, start + itemsPerPage),
-      total: entries.length,
-      page: religionPage,
-      pages: Math.ceil(entries.length / itemsPerPage),
-    };
-  };
-
-  const getCityBreakdown = () => {
-    const cityMap: Record<string, number> = {};
-    filteredStudents.forEach((s) => {
-      if (s.addresses && Array.isArray(s.addresses)) {
-        s.addresses.forEach((addr: any) => {
-          const city = addr.municipality || addr.city || "Unknown";
-          cityMap[city] = (cityMap[city] || 0) + 1;
-        });
-      }
-    });
-    const entries = Object.entries(cityMap).sort((a, b) => b[1] - a[1]);
-    const itemsPerPage = 5;
-    const start = cityPage * itemsPerPage;
-    return {
-      data: entries.slice(start, start + itemsPerPage),
-      total: entries.length,
-      page: cityPage,
-      pages: Math.ceil(entries.length / itemsPerPage),
-    };
-  };
-
-  const getCivilStatusBreakdown = () => {
-    const statusMap: Record<string, number> = {};
-    filteredStudents.forEach((s) => {
-      if (s.civilStatus) {
-        statusMap[s.civilStatus] = (statusMap[s.civilStatus] || 0) + 1;
-      }
-    });
-    const entries = Object.entries(statusMap).sort((a, b) => b[1] - a[1]);
-    const itemsPerPage = 5;
-    const start = statusPage * itemsPerPage;
-    return {
-      data: entries.slice(start, start + itemsPerPage),
-      total: entries.length,
-      page: statusPage,
-      pages: Math.ceil(entries.length / itemsPerPage),
-    };
-  };
-
-  const getEducationBreakdown = () => {
-    const eduMap: Record<string, number> = {};
-    filteredStudents.forEach((s) => {
-      if (s.family?.fatherEducation) {
-        const edu = s.family.fatherEducation.substring(0, 20);
-        eduMap[edu] = (eduMap[edu] || 0) + 1;
-      }
-    });
-    const entries = Object.entries(eduMap).sort((a, b) => b[1] - a[1]);
-    const itemsPerPage = 5;
-    const start = educationPage * itemsPerPage;
-    return {
-      data: entries.slice(start, start + itemsPerPage),
-      total: entries.length,
-      page: educationPage,
-      pages: Math.ceil(entries.length / itemsPerPage),
-    };
+  const handleStatusChange = (val: string) => {
+    setSelectedStatus(val);
+    refresh(parseInt(selectedYear), parseInt(selectedCourse), parseInt(val));
   };
 
   usePageMetadata({
-    title: "Guidance Analytics",
-    description: "Detailed analysis of student demographics, distributions, and trends",
-    badgeText: "Analytics",
+    title: "Student Analytics",
+    description: "Holistic analysis of student demographics, academic background, and social profiles",
+    badgeText: "Real-time Metrics",
     badgeIcon: <TrendingUp className="h-4 w-4" />,
     isLoading: loading,
     headerActions: (
-      <div className="flex flex-col gap-1 min-w-[140px]">
-        <label className="text-xs font-medium text-foreground/70 px-1">
-          Filter by Year
-        </label>
-        <select
+      <div className="flex gap-4">
+        <Dropdown
+          name="year"
+          label="Enrollment Year"
+          get="value"
+          identifier="value"
           value={selectedYear}
-          onChange={(e) => {
-            setSelectedYear(parseInt(e.target.value));
-            setReligionPage(0);
-            setCityPage(0);
-            setEducationPage(0);
-            setStatusPage(0);
-          }}
-          className="px-3 py-2 rounded-xl border border-border bg-background/50 backdrop-blur-sm text-foreground text-sm shadow-sm focus:ring-2 focus:ring-primary/20 outline-none transition-all"
-        >
-          <option value={new Date().getFullYear()}>All Years</option>
-          {getAvailableYears().map((year) => (
-            <option key={year} value={year}>
-              {year}
-            </option>
-          ))}
-        </select>
+          onChange={handleYearChange}
+          options={Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => ({
+            value: year.toString(),
+            label: year.toString(),
+          }))}
+          formStyle={false}
+        />
+
+        <Dropdown
+          name="course"
+          label="Course"
+          get="id"
+          identifier="id"
+          value={selectedCourse}
+          onChange={handleCourseChange}
+          options={courses}
+          formStyle={false}
+        />
       </div>
     ),
   });
 
   if (error) {
     return (
-      <div className="space-y-4">
-        <Alert variant="destructive">
-          <AlertCircle className="h-4 w-4" />
-          <AlertDescription>Error loading analytics: {error}</AlertDescription>
+      <div className="p-8 max-w-2xl mx-auto">
+        <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
+          <AlertCircle className="h-5 w-5" />
+          <AlertDescription className="ml-2 font-medium">
+            Could not retrieve analytics data: {error}
+          </AlertDescription>
         </Alert>
+        <Button
+          variant="outline"
+          onClick={() => refresh(parseInt(selectedYear), parseInt(selectedCourse), parseInt(selectedStatus))}
+          className="mt-4 border-primary/20 hover:bg-primary/5"
+        >
+          Try Again
+        </Button>
       </div>
     );
   }
 
+  if (loading && !data) {
+    return <AnalyticsSkeleton />;
+  }
+
+  if (!data) return null;
 
   return (
-    <>
-      <div className="space-y-6 pb-8">
-
-        {/* Top KPI Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {/* Total Students */}
-          <div
-            className={`${KPI_COLORS[0].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}
-          >
-            <p
-              className={`text-xs font-semibold ${KPI_COLORS[0].text} uppercase tracking-wide mb-3 opacity-80`}
-            >
-              Total Students
-            </p>
-            <p className={`text-5xl font-bold ${KPI_COLORS[0].text} mb-2`}>
-              {filteredStudents.length.toLocaleString()}
-            </p>
-            <p className={`text-xs ${KPI_COLORS[0].text} opacity-70`}>
-              For selected year
-            </p>
-          </div>
-
-          {/* Average Age */}
-          <div
-            className={`${KPI_COLORS[1].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}
-          >
-            <p
-              className={`text-xs font-semibold ${KPI_COLORS[1].text} uppercase tracking-wide mb-3 opacity-80`}
-            >
-              Average Age
-            </p>
-            <p className={`text-5xl font-bold ${KPI_COLORS[1].text} mb-2`}>
-              {getAgeStats().avg}
-            </p>
-            <p className={`text-xs ${KPI_COLORS[1].text} opacity-70`}>
-              Range: {getAgeStats().min}-{getAgeStats().max} years
-            </p>
-          </div>
-
-          {/* Completion Rate */}
-          <div
-            className={`${KPI_COLORS[2].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}
-          >
-            <p
-              className={`text-xs font-semibold ${KPI_COLORS[2].text} uppercase tracking-wide mb-3 opacity-80`}
-            >
-              Data Completeness
-            </p>
-            <p className={`text-5xl font-bold ${KPI_COLORS[2].text} mb-2`}>
-              {Math.round(
-                ((filteredStudents.filter(
-                  (s) => s.religion && s.addresses?.length,
-                ).length /
-                  filteredStudents.length) *
-                  100) as any,
-              )}
-              <span className="text-2xl">%</span>
-            </p>
-            <p className={`text-xs ${KPI_COLORS[2].text} opacity-70`}>
-              Religion + Address data
-            </p>
-          </div>
-
-          {/* With Addresses */}
-          <div
-            className={`${KPI_COLORS[3].bg} rounded-md shadow border border-transparent p-6 hover:shadow-lg transition-shadow`}
-          >
-            <p
-              className={`text-xs font-semibold ${KPI_COLORS[3].text} uppercase tracking-wide mb-3 opacity-80`}
-            >
-              Locations Mapped
-            </p>
-            <p className={`text-5xl font-bold ${KPI_COLORS[3].text} mb-2`}>
-              {filteredStudents
-                .filter((s) => s.addresses?.length)
-                .length.toLocaleString()}
-            </p>
-            <p className="text-xs opacity-70">Students with addresses</p>
-          </div>
+    <div className="space-y-8 animate-in fade-in duration-700">
+      <Tabs defaultValue="overview" className="space-y-8 ">
+        <div className="flex items-center justify-between border-b pb-4">
+          <TabsList className="bg-background/50 backdrop-blur-sm">
+            <TabsTrigger value="overview" className="text-xs font-bold uppercase tracking-widest px-6 data-[state=active]:bg-primary/50">Overview</TabsTrigger>
+            <TabsTrigger value="demographics" className="text-xs font-bold uppercase tracking-widest px-6 data-[state=active]:bg-primary/50">Demographics</TabsTrigger>
+            <TabsTrigger value="academic" className="text-xs font-bold uppercase tracking-widest px-6 data-[state=active]:bg-primary/50">Academic</TabsTrigger>
+            <TabsTrigger value="family" className="text-xs font-bold uppercase tracking-widest px-6 data-[state=active]:bg-primary/50">Family & Social</TabsTrigger>
+          </TabsList>
         </div>
 
-        {/* Overview Charts - 2x2 Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Age Distribution Chart */}
-          <div className="bg-card rounded-md shadow border border-border p-6">
-            <h2 className="text-lg font-semibold text-card-foreground mb-4">
-              Age Distribution
-            </h2>
-            {getAgeDistributionData().some((d) => d.value > 0) ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={getAgeDistributionData()}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="name" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "6px",
-                    }}
-                    formatter={(value) => [value, "Students"]}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill={SOFT_COLORS[0]}
-                    radius={[8, 8, 0, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-muted-foreground text-center py-12">
-                No age data available
-              </p>
-            )}
+        <TabsContent value="overview" className="space-y-8 focus-visible:outline-none focus-visible:ring-0">
+          {/* --- KPI SECTION --- */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            <KPICard
+              title="Total Population"
+              value={data?.totalStudents?.toLocaleString() ?? "0"}
+              subtitle="Enrolled Students"
+              icon={<Users className="h-5 w-5 text-primary" />}
+              gradient="from-primary/10 via-background to-background"
+            />
+            <KPICard
+              title="Gender Balance"
+              value={data?.genderDistribution?.[0] ? `${data.genderDistribution[0].totalPct}%` : "0%"}
+              subtitle={`${data?.genderDistribution?.[0]?.category || "N/A"} Majority`}
+              icon={<Network className="h-5 w-5 text-indigo-500" />}
+              gradient="from-indigo-500/10 via-background to-background"
+            />
+            <KPICard
+              title="Top Location"
+              value={data?.cityAddress?.[0]?.category || "None"}
+              subtitle="Primary Residence"
+              icon={<MapPin className="h-5 w-5 text-emerald-500" />}
+              gradient="from-emerald-500/10 via-background to-background"
+            />
+            <KPICard
+              title="Metric Depth"
+              value={(Object.keys(data || {}).length - 1).toString()}
+              subtitle="Datasets Analyzed"
+              icon={<TrendingUp className="h-5 w-5 text-amber-500" />}
+              gradient="from-amber-500/10 via-background to-background"
+            />
           </div>
 
-          {/* Civil Status Chart */}
-          <div className="bg-card rounded-md shadow border border-border p-6">
-            <h2 className="text-lg font-semibold text-card-foreground mb-4">
-              Civil Status
-            </h2>
-            {getCivilStatusData().length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <ChartCard title="Gender Distribution" description="Total student body split">
+              <ChartContainer config={genderDistributionConfig} className="mx-auto aspect-square max-h-[300px]">
                 <PieChart>
+                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
                   <Pie
-                    data={getCivilStatusData()}
+                    data={data?.genderDistribution ?? []}
                     cx="50%"
                     cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name}: ${value}`}
+                    innerRadius={60}
                     outerRadius={100}
-                    fill="#8884d8"
-                    dataKey="value"
+                    paddingAngle={5}
+                    dataKey="total"
+                    nameKey="category"
+                    isAnimationActive={false}
                   >
-                    {getCivilStatusData().map((_, index) => (
-                      <Cell
-                        key={`cell-${index}`}
-                        fill={SOFT_COLORS[index % SOFT_COLORS.length]}
-                      />
+                    {(data?.genderDistribution ?? []).map((gender) => (
+                      <Cell key={gender.category} fill={gender.category === "Male" ? "var(--color-Male)" : "var(--color-Female)"} />
                     ))}
                   </Pie>
-                  <Tooltip formatter={(value) => [value, "Count"]} />
+                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
                 </PieChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-muted-foreground text-center py-12">
-                No civil status data available
-              </p>
-            )}
+              </ChartContainer>
+            </ChartCard>
+            <StatSummaryCard title="Top Global Rankings" data={data} className="lg:col-span-2" />
           </div>
-        </div>
+        </TabsContent>
 
-        {/* Breakdown Cards - 2x2 Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Religion Breakdown */}
-          <div
-            className={`${STATUS_COLOR_MAP.info.bg} rounded-md shadow border border-border p-6`}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3
-                className={`text-lg font-semibold ${STATUS_COLOR_MAP.info.text}`}
-              >
-                Religion Distribution
-              </h3>
-              <span className="text-xs font-medium opacity-70">
-                ({getReligionBreakdown().total})
-              </span>
-            </div>
-            <div className="space-y-2">
-              {getReligionBreakdown().data.length > 0 ? (
-                getReligionBreakdown().data.map(([religion, count]) => (
-                  <div
-                    key={religion}
-                    className="flex justify-between items-center"
-                  >
-                    <span className="text-sm">{religion}</span>
-                    <span
-                      className={`text-sm font-semibold ${STATUS_COLOR_MAP.info.text}`}
-                    >
-                      {count}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm opacity-70">No data available</p>
-              )}
-            </div>
-            {getReligionBreakdown().pages > 1 && (
-              <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-                {Array.from({ length: getReligionBreakdown().pages }).map(
-                  (_, page) => (
-                    <button
-                      key={page}
-                      onClick={() => setReligionPage(page)}
-                      className={`px-2 py-1 text-xs rounded transition-colors ${religionPage === page
-                          ? `${STATUS_COLOR_MAP.info.bg} ${STATUS_COLOR_MAP.info.text}`
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }`}
-                    >
-                      {page + 1}
-                    </button>
-                  ),
-                )}
-              </div>
-            )}
-          </div>
+        <TabsContent value="demographics" className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <ChartCard
+              title="Age Distribution"
+              description="Grouped by Gender vs Total per age group"
+              className="lg:col-span-2"
+            >
+              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[300px] w-full">
+                <BarChart data={data?.ageDistribution ?? []} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                  <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend verticalAlign="top" height={36} />
+                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[4, 4, 0, 0]} barSize={20} opacity={0.3} />
+                </BarChart>
+              </ChartContainer>
+            </ChartCard>
 
-          {/* Location Breakdown */}
-          <div
-            className={`${STATUS_COLOR_MAP.success.bg} rounded-md shadow border border-border p-6`}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3
-                className={`text-lg font-semibold ${STATUS_COLOR_MAP.success.text}`}
-              >
-                Top Locations
-              </h3>
-              <span className="text-xs font-medium opacity-70">
-                ({getCityBreakdown().total})
-              </span>
-            </div>
-            <div className="space-y-2">
-              {getCityBreakdown().data.length > 0 ? (
-                getCityBreakdown().data.map(([city, count]) => (
-                  <div key={city} className="flex justify-between items-center">
-                    <span className="text-sm truncate">{city}</span>
-                    <span
-                      className={`text-sm font-semibold ${STATUS_COLOR_MAP.success.text}`}
-                    >
-                      {count}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm opacity-70">No data available</p>
-              )}
-            </div>
-            {getCityBreakdown().pages > 1 && (
-              <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-                {Array.from({ length: getCityBreakdown().pages }).map(
-                  (_, page) => (
-                    <button
-                      key={page}
-                      onClick={() => setCityPage(page)}
-                      className={`px-2 py-1 text-xs rounded transition-colors ${cityPage === page
-                          ? `${STATUS_COLOR_MAP.success.bg} ${STATUS_COLOR_MAP.success.text}`
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }`}
-                    >
-                      {page + 1}
-                    </button>
-                  ),
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Education & Income Breakdown */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Father's Education */}
-          <div
-            className={`${STATUS_COLOR_MAP.warning.bg} rounded-md shadow border border-border p-6`}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3
-                className={`text-lg font-semibold ${STATUS_COLOR_MAP.warning.text}`}
-              >
-                Father's Education
-              </h3>
-              <span className="text-xs font-medium opacity-70">
-                ({getEducationBreakdown().total})
-              </span>
-            </div>
-            <div className="space-y-2">
-              {getEducationBreakdown().data.length > 0 ? (
-                getEducationBreakdown().data.map(([education, count]) => (
-                  <div
-                    key={education}
-                    className="flex justify-between items-center"
-                  >
-                    <span className="text-sm">{education}</span>
-                    <span
-                      className={`text-sm font-semibold ${STATUS_COLOR_MAP.warning.text}`}
-                    >
-                      {count}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm opacity-70">No data available</p>
-              )}
-            </div>
-            {getEducationBreakdown().pages > 1 && (
-              <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-                {Array.from({ length: getEducationBreakdown().pages }).map(
-                  (_, page) => (
-                    <button
-                      key={page}
-                      onClick={() => setEducationPage(page)}
-                      className={`px-2 py-1 text-xs rounded transition-colors ${educationPage === page
-                          ? `${STATUS_COLOR_MAP.warning.bg} ${STATUS_COLOR_MAP.warning.text}`
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }`}
-                    >
-                      {page + 1}
-                    </button>
-                  ),
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Civil Status Breakdown */}
-          <div
-            className={`${STATUS_COLOR_MAP.notice.bg} rounded-md shadow border border-border p-6`}
-          >
-            <div className="flex justify-between items-center mb-4">
-              <h3
-                className={`text-lg font-semibold ${STATUS_COLOR_MAP.notice.text}`}
-              >
-                Civil Status Breakdown
-              </h3>
-              <span className="text-xs font-medium opacity-70">
-                ({getCivilStatusBreakdown().total})
-              </span>
-            </div>
-            <div className="space-y-2">
-              {getCivilStatusBreakdown().data.length > 0 ? (
-                getCivilStatusBreakdown().data.map(([status, count]) => (
-                  <div
-                    key={status}
-                    className="flex justify-between items-center"
-                  >
-                    <span className="text-sm">{status}</span>
-                    <span
-                      className={`text-sm font-semibold ${STATUS_COLOR_MAP.notice.text}`}
-                    >
-                      {count}
-                    </span>
-                  </div>
-                ))
-              ) : (
-                <p className="text-sm opacity-70">No data available</p>
-              )}
-            </div>
-            {getCivilStatusBreakdown().pages > 1 && (
-              <div className="flex gap-1 mt-4 pt-4 border-t border-border/50">
-                {Array.from({ length: getCivilStatusBreakdown().pages }).map(
-                  (_, page) => (
-                    <button
-                      key={page}
-                      onClick={() => setStatusPage(page)}
-                      className={`px-2 py-1 text-xs rounded transition-colors ${statusPage === page
-                          ? `${STATUS_COLOR_MAP.notice.bg} ${STATUS_COLOR_MAP.notice.text}`
-                          : "bg-muted text-muted-foreground hover:bg-muted/80"
-                        }`}
-                    >
-                      {page + 1}
-                    </button>
-                  ),
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Full Width Charts */}
-        <div className="grid grid-cols-1 gap-6">
-          {/* Religion Distribution Chart */}
-          <div className="bg-card rounded-md shadow border border-border p-6">
-            <h2 className="text-lg font-semibold text-card-foreground mb-4">
-              Religion Distribution
-            </h2>
-            {getReligionData().length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart
-                  data={getReligionData()}
-                  layout="vertical"
-                  margin={{ top: 5, right: 30, left: 150, bottom: 5 }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis type="number" stroke="#6b7280" />
+            <ChartCard
+              title="Religion"
+              description="Spiritual background distribution with gender split"
+              className="lg:col-span-1"
+            >
+              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[300px] w-full">
+                <BarChart layout="vertical" data={(data?.religions ?? []).slice(0, 5)} margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
+                  <XAxis type="number" hide />
                   <YAxis
-                    dataKey="name"
                     type="category"
-                    width={150}
-                    stroke="#6b7280"
+                    dataKey="category"
+                    axisLine={false}
+                    tickLine={false}
+                    width={100}
+                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                   />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "6px",
-                    }}
-                    formatter={(value) => [value, "Students"]}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill={SOFT_COLORS[1]}
-                    radius={[0, 8, 8, 0]}
-                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={8} />
+                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={8} />
+                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={8} opacity={0.3} />
                 </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-muted-foreground text-center py-12">
-                No religion data available
-              </p>
-            )}
+              </ChartContainer>
+            </ChartCard>
           </div>
+        </TabsContent>
+
+        <TabsContent value="academic" className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <ChartCard title="High School GWA" description="Academic performance with gender split" className="lg:col-span-2">
+              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[300px] w-full">
+                <BarChart data={data?.highSchoolGWA ?? []} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+                  <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend verticalAlign="top" height={36} />
+                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[4, 4, 0, 0]} barSize={20} />
+                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[4, 4, 0, 0]} barSize={20} opacity={0.3} />
+                </BarChart>
+              </ChartContainer>
+            </ChartCard>
+
+            <ChartCard title="Performance Brackets" description="Secondary GWA with gender breakdown">
+              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[300px] w-full">
+                <BarChart layout="vertical" data={data?.highSchoolGWA ?? []} margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
+                  <XAxis type="number" hide />
+                  <YAxis
+                    type="category"
+                    dataKey="category"
+                    axisLine={false}
+                    tickLine={false}
+                    width={80}
+                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={8} />
+                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={8} />
+                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={8} opacity={0.3} />
+                </BarChart>
+              </ChartContainer>
+            </ChartCard>
+
+            <CityDistributionCard data={data?.cityAddress ?? []} />
+          </div>
+        </TabsContent>
+
+        <TabsContent value="family" className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <ChartCard
+              title="Monthly Family Income"
+              description="Grouped by gender and income bracket"
+              className="lg:col-span-2"
+            >
+              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[300px] w-full">
+                <BarChart layout="vertical" data={data?.monthlyIncome ?? []} margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
+                  <XAxis type="number" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+                  <YAxis
+                    type="category"
+                    dataKey="category"
+                    axisLine={false}
+                    tickLine={false}
+                    width={100}
+                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Legend verticalAlign="top" height={36} />
+                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={10} />
+                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={10} />
+                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={10} opacity={0.3} />
+                </BarChart>
+              </ChartContainer>
+            </ChartCard>
+
+            <ChartCard title="Parent Marital Status" description="Family structure indicators by gender">
+              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[250px] w-full">
+                <BarChart layout="vertical" data={data?.parentsMaritalStatus ?? []} margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
+                  <XAxis type="number" hide />
+                  <YAxis
+                    type="category"
+                    dataKey="category"
+                    axisLine={false}
+                    tickLine={false}
+                    width={100}
+                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={8} />
+                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={8} />
+                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={8} opacity={0.3} />
+                </BarChart>
+              </ChartContainer>
+            </ChartCard>
+
+            <ChartCard title="Study Environment" description="Quiet place to study (Yes/No) by gender">
+              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[200px] w-full">
+                <BarChart layout="vertical" data={data?.quietStudyPlace ?? []} margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
+                  <XAxis type="number" hide />
+                  <YAxis
+                    type="category"
+                    dataKey="category"
+                    axisLine={false}
+                    tickLine={false}
+                    width={80}
+                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={8} />
+                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={8} />
+                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={8} opacity={0.3} />
+                </BarChart>
+              </ChartContainer>
+            </ChartCard>
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+// --- HELPER COMPONENTS ---
+
+const KPICard = React.memo(({ title, value, subtitle, icon, gradient }: any) => {
+  return (
+    <Card className={`overflow-hidden border-none shadow-premium bg-gradient-to-br ${gradient}`}>
+      <CardHeader className="flex flex-row items-center justify-between pb-2">
+        <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+          {title}
+        </CardTitle>
+        <div className="p-2 bg-background/80 rounded-xl shadow-sm">
+          {icon}
         </div>
+      </CardHeader>
+      <CardContent>
+        <div className="text-3xl font-black">{value}</div>
+        <p className="text-[10px] text-muted-foreground mt-1 font-medium">{subtitle}</p>
+      </CardContent>
+    </Card>
+  );
+});
 
-        {/* Location & Income Charts */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Top Cities Chart */}
-          <div className="bg-card rounded-md shadow border border-border p-6">
-            <h2 className="text-lg font-semibold text-card-foreground mb-4">
-              Top Student Locations
-            </h2>
-            {getCityData().length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={getCityData()}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis
-                    dataKey="name"
-                    angle={-45}
-                    textAnchor="end"
-                    height={80}
-                    interval={0}
-                    tick={{ fontSize: 12, fill: "#6b7280" }}
-                  />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "6px",
-                    }}
-                    formatter={(value) => [value, "Students"]}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill={SOFT_COLORS[2]}
-                    radius={[0, 8, 8, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-muted-foreground text-center py-12">
-                No location data available
-              </p>
-            )}
-          </div>
+const ChartCard = React.memo(({ title, description, children, className }: any) => {
+  return (
+    <Card className={`border-primary/5 shadow-premium bg-card/40 backdrop-blur-sm overflow-hidden ${className}`}>
+      <CardHeader className="pb-2 border-b border-primary/5 bg-muted/5">
+        <CardTitle className="text-base font-bold">{title}</CardTitle>
+        <CardDescription className="text-xs">{description}</CardDescription>
+      </CardHeader>
+      <CardContent className="pt-6">
+        {children}
+      </CardContent>
+    </Card>
+  );
+});
 
-          {/* Monthly Income Chart */}
-          <div className="bg-card rounded-md shadow border border-border p-6">
-            <h2 className="text-lg font-semibold text-card-foreground mb-4">
-              Monthly Family Income Distribution
-            </h2>
-            {getIncomeData().length > 0 ? (
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={getIncomeData()}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis
-                    dataKey="name"
-                    angle={-45}
-                    textAnchor="end"
-                    height={100}
-                    interval={0}
-                    tick={{ fontSize: 11, fill: "#6b7280" }}
-                  />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "hsl(var(--background))",
-                      border: "1px solid hsl(var(--border))",
-                      borderRadius: "6px",
-                    }}
-                    formatter={(value) => [value, "Students"]}
-                  />
-                  <Bar
-                    dataKey="value"
-                    fill={SOFT_COLORS[3]}
-                    radius={[0, 8, 8, 0]}
-                  />
-                </BarChart>
-              </ResponsiveContainer>
-            ) : (
-              <p className="text-muted-foreground text-center py-12">
-                No income data available
-              </p>
-            )}
+const CityDistributionCard = React.memo(({ data }: { data: any[] }) => {
+  const [cityPage, setCityPage] = useState(0);
+  const CITY_PAGE_SIZE = 10;
+
+  return (
+    <ChartCard
+      title="City Distribution"
+      description={`Page ${cityPage + 1} of ${Math.ceil((data?.length || 0) / CITY_PAGE_SIZE)} cities`}
+      className="lg:col-span-3"
+    >
+      <div className="space-y-6">
+        <ChartContainer config={genderSplitConfig} className="aspect-auto h-[400px] w-full">
+          <BarChart
+            layout="vertical"
+            data={data.slice(cityPage * CITY_PAGE_SIZE, (cityPage + 1) * CITY_PAGE_SIZE)}
+            margin={{ top: 5, right: 30, left: 120, bottom: 5 }}
+          >
+            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
+            <XAxis type="number" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+            <YAxis
+              type="category"
+              dataKey="category"
+              axisLine={false}
+              tickLine={false}
+              width={110}
+              tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+            />
+            <ChartTooltip content={<ChartTooltipContent />} />
+            <Legend verticalAlign="top" height={36} />
+            <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={15} />
+            <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={15} />
+            <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={15} opacity={0.3} />
+          </BarChart>
+        </ChartContainer>
+
+        <div className="flex justify-center items-center gap-4">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCityPage(p => Math.max(0, p - 1))}
+            disabled={cityPage === 0}
+            className="h-8 text-[10px] uppercase font-bold tracking-wider"
+          >
+            Previous
+          </Button>
+          <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">
+            Showing {cityPage * CITY_PAGE_SIZE + 1} - {Math.min((cityPage + 1) * CITY_PAGE_SIZE, data?.length || 0)} of {data?.length || 0}
           </div>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setCityPage(p => p + 1)}
+            disabled={(cityPage + 1) * CITY_PAGE_SIZE >= (data?.length || 0)}
+            className="h-8 text-[10px] uppercase font-bold tracking-wider"
+          >
+            Next
+          </Button>
         </div>
       </div>
-    </>
+    </ChartCard>
+  );
+});
+
+function StatSummaryCard({ title, data, className }: any) {
+  const topAddress = data.cityAddress[0]?.category || "N/A";
+  const topNature = data.natureOfSchooling[0]?.category || "N/A";
+  const topOrdinal = data.ordinalPosition[0]?.category || "N/A";
+
+  return (
+    <StatCard title={title} description="Key insights and dominant categories" className={className}>
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <InsightItem label="Primary Location" value={topAddress} icon={<MapPin className="h-4 w-4" />} />
+        <InsightItem label="Enrollment Nature" value={topNature} icon={<Home className="h-4 w-4" />} />
+        <InsightItem label="Family Position" value={`${topOrdinal} Child`} icon={<Network className="h-4 w-4" />} />
+      </div>
+    </StatCard>
+  );
+}
+
+function StatCard({ title, description, children, className }: any) {
+  return (
+    <Card className={`border-primary/5 shadow-premium bg-card/40 backdrop-blur-sm overflow-hidden ${className}`}>
+      <CardHeader className="pb-2 border-b border-primary/5 bg-muted/5">
+        <CardTitle className="text-base font-bold">{title}</CardTitle>
+        <CardDescription className="text-xs">{description}</CardDescription>
+      </CardHeader>
+      <CardContent className="pt-6">
+        {children}
+      </CardContent>
+    </Card>
+  );
+}
+
+function InsightItem({ label, value, icon }: any) {
+  return (
+    <div className="p-4 bg-background rounded-2xl border border-primary/10 flex items-start gap-3">
+      <div className="p-2 bg-primary/10 rounded-lg text-primary">{icon}</div>
+      <div>
+        <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">{label}</p>
+        <p className="text-sm font-bold text-foreground mt-0.5">{value}</p>
+      </div>
+    </div>
+  );
+}
+
+function AnalyticsSkeleton() {
+  return (
+    <div className="space-y-8 p-6">
+      <div className="grid grid-cols-4 gap-4">
+        {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 w-full rounded-2xl" />)}
+      </div>
+      <div className="grid grid-cols-3 gap-6">
+        <Skeleton className="col-span-2 h-[400px] rounded-2xl" />
+        <Skeleton className="h-[400px] rounded-2xl" />
+      </div>
+    </div>
   );
 }
