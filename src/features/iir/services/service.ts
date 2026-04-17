@@ -131,6 +131,7 @@ const LOOKUP_GET_ROUTES = {
   natureOfResidenceTypes: API_ROUTES.iir.lookups.natureOfResidenceTypes,
   studentRelationshipTypes: API_ROUTES.iir.lookups.studentRelationshipTypes,
   activityOptions: API_ROUTES.iir.lookups.activityOptions,
+  studentStatuses: API_ROUTES.iir.lookups.studentStatuses,
 };
 
 const INVENTORY_GET_ROUTES = {
@@ -462,5 +463,21 @@ export const iirService = {
 
   async submitIIRForm(iir: IIRForm): Promise<void> {
     return PostIIRSubmit(iir);
+  },
+
+  async bulkUpdateStudentStatus(payload: {
+    iirIds?: string[];
+    excludedIirIds?: string[];
+    selectAllMatching?: boolean;
+    statusId: number;
+    graduationYear?: number;
+    filters?: {
+      search?: string;
+      courseId?: number;
+      yearLevel?: number;
+      enrollYear?: number;
+    };
+  }): Promise<void> {
+    await apiClient.patch(API_ROUTES.iir.bulkStatus, payload);
   },
 };
