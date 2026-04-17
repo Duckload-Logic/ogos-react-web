@@ -27,7 +27,11 @@ import {
   YAxis,
   Cell,
 } from "recharts";
-import { ChartContainer } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 import { CalendarPlus, Archive } from "lucide-react";
 import { formatDate } from "@/utils";
 
@@ -310,7 +314,7 @@ export default function AppointmentsManagement() {
                           type="number"
                           tickLine={false}
                           axisLine={false}
-                          tick={{ fontSize: 10, fill: "#94a3b8" }}
+                          tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
                           allowDecimals={false}
                         />
 
@@ -324,10 +328,12 @@ export default function AppointmentsManagement() {
                           tickMargin={6}
                           tick={{
                             fontSize: 11,
-                            fill: "#64748b",
+                            fill: "hsl(var(--muted-foreground))",
                             fontWeight: 500,
                           }}
                         />
+
+                        <ChartTooltip content={<ChartTooltipContent />} />
 
                         <Bar
                           dataKey="count"

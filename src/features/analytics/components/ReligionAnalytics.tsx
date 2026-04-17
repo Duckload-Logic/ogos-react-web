@@ -8,7 +8,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { ChartContainer, ChartConfig } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartConfig,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 interface StudentAnalytics {
   religion?: string;
@@ -70,12 +75,7 @@ export default function ReligionAnalytics({
                   interval={0}
                 />
                 <YAxis />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                  }}
-                />
+                <ChartTooltip content={<ChartTooltipContent />} />
                 <Bar dataKey="count" fill="hsl(var(--color-count))" />
               </BarChart>
             </ChartContainer>

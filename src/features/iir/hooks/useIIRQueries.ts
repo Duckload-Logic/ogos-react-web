@@ -74,6 +74,7 @@ export function useIIRPagination(params: QueryParam) {
       params.search,
       params.genderId,
       params.yearLevel,
+      params.statusId,
       params.page,
     ],
     queryFn: () =>

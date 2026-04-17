@@ -20,6 +20,12 @@ import {
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
+  ChartContainer,
+  ChartTooltip,
+  ChartTooltipContent,
+  type ChartConfig,
+} from "@/components/ui/chart";
+import {
   format12HourTime,
   toISODateString,
 } from "@/features/appointments/utils";
@@ -29,7 +35,6 @@ import { SlipStatusTracker } from "@/features/admin/components/SlipStatusTracker
 import { useGetSlipStats } from "@/features/slips/hooks/useSlips";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useMemo, useEffect } from "react";
-import { Dropdown } from "@/components/form";
 
 
 export default function Dashboard() {
@@ -112,6 +117,12 @@ export default function Dashboard() {
     visitors: v.count
   })) || [];
 
+  const visitorConfig = {
+    visitors: {
+      label: "Visitors",
+      color: "#00A18E",
+    },
+  } satisfies ChartConfig;
 
   usePageMetadata({
     title: "Guidance Dashboard",
@@ -165,35 +176,28 @@ export default function Dashboard() {
           </CardHeader>
           <CardContent className="pt-4 pb-4">
             <div className="h-48 w-full">
-              <ResponsiveContainer width="100%" height="100%">
+              <ChartContainer config={visitorConfig}>
                 <LineChart data={visitorData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" opacity={0.5} />
+                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
                   <XAxis
                     dataKey="name"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 10, fill: '#94A3B8' }}
+                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
                     dy={10}
                   />
                   <YAxis hide={true} />
-                  <Tooltip
-                    contentStyle={{
-                      borderRadius: '12px',
-                      border: 'none',
-                      boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
-                      fontSize: '12px'
-                    }}
-                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
                   <Line
                     type="monotone"
                     dataKey="visitors"
-                    stroke="#00A18E"
+                    stroke="var(--color-visitors)"
                     strokeWidth={3}
-                    dot={{ fill: '#00A18E', strokeWidth: 2, r: 4, stroke: '#fff' }}
+                    dot={{ fill: 'var(--color-visitors)', strokeWidth: 2, r: 4, stroke: 'hsl(var(--background))' }}
                     activeDot={{ r: 6, strokeWidth: 0 }}
                   />
                 </LineChart>
-              </ResponsiveContainer>
+              </ChartContainer>
             </div>
           </CardContent>
         </Card>

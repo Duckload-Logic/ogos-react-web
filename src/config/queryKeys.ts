@@ -107,6 +107,7 @@ export const QUERY_KEYS = {
         "student-relationship-types",
       ] as const,
       activityOptions: ["iir", "lookups", "activity-options"] as const,
+      studentStatuses: ["iir", "lookups", "student-statuses"] as const,
     },
     inventory: {
       all: ["iir", "inventory", "all"] as const,
