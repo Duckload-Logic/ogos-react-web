@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Users } from "lucide-react";
-import { useCourses, useGenders, useIIRPagination } from "@/features/iir/hooks";
+import { useCourses, useGenders, useIIRPagination, useStudentStatuses } from "@/features/iir/hooks";
 import { IIRProfileView } from "@/features/iir/types";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Spinner } from "@/components/shared";
@@ -33,6 +33,11 @@ export default function StudentRecords() {
     isLoading: isGendersLoading,
     isError: isGendersError,
   } = useGenders();
+  const {
+    data: statuses,
+    isLoading: isStatusesLoading,
+    isError: isStatusesError,
+  } = useStudentStatuses();
   const yearLevels = [
     { id: 1, name: "1st Year" },
     { id: 2, name: "2nd Year" },
@@ -45,6 +50,7 @@ export default function StudentRecords() {
   const [selectedCourseId, setSelectedCourseId] = useState(0);
   const [selectedGenderId, setSelectedGenderId] = useState(0);
   const [selectedYearLevelId, setSelectedYearLevelId] = useState(0);
+  const [selectedStatusId, setSelectedStatusId] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 500);
 
@@ -60,6 +66,7 @@ export default function StudentRecords() {
     courseId: selectedCourseId,
     genderId: selectedGenderId,
     yearLevel: selectedYearLevelId,
+    statusId: selectedStatusId,
   });
 
   const allStudents = data?.students || [];
@@ -114,6 +121,13 @@ export default function StudentRecords() {
           onYearLevelChange={(level) => {
             if (level === selectedYearLevelId) return;
             setSelectedYearLevelId(level);
+            setPage(1);
+          }}
+          statuses={statuses}
+          selectedStatusId={selectedStatusId}
+          onStatusChange={(id) => {
+            if (id === selectedStatusId) return;
+            setSelectedStatusId(id);
             setPage(1);
           }}
         />

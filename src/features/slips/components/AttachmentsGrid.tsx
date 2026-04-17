@@ -50,6 +50,7 @@ function PreviewModal({
     <Dialog open={isOpen} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-xl">
         <DialogHeader>
+          <DialogTitle>File Preview</DialogTitle>
           <DialogDescription>
             File preview - Use download button to save the file
           </DialogDescription>

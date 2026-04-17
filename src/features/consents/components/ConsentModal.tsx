@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 type ConsentModalProps = {
   open: boolean;
@@ -30,9 +30,11 @@ export default function ConsentModal({
       <DialogContent className="w-[95vw] max-h-[70vh] overflow-y-auto sm:w-full max-w-[640px] rounded-3xl p-6 sm:p-8 outline-none border-glass-border bg-card" hasCloseButton={false}>
 
         <div className={`mb-6 rounded-xl px-6 py-4 text-white ${accentClass}`}>
-          <h2 id="terms-title" className="text-2xl font-bold">
-            Terms and Conditions
-          </h2>
+          <DialogTitle asChild>
+            <h2 id="terms-title" className="text-2xl font-bold">
+              Terms and Conditions
+            </h2>
+          </DialogTitle>
         </div>
 
         <div className="space-y-5 text-[16px] leading-9 text-foreground">

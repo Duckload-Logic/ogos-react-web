@@ -12,7 +12,12 @@ import {
   Pie,
   Cell,
 } from "recharts";
-import { ChartContainer, ChartConfig } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartConfig,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 const COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981"];
 
@@ -113,12 +118,7 @@ export default function AgeAnalytics({ students }: { students: StudentAnalytics[
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="range" />
             <YAxis />
-            <Tooltip
-              contentStyle={{
-                backgroundColor: "hsl(var(--card))",
-                border: "1px solid hsl(var(--border))",
-              }}
-            />
+            <ChartTooltip content={<ChartTooltipContent />} />
             <Bar dataKey="count" fill="hsl(var(--color-count))" />
           </BarChart>
         </ChartContainer>

@@ -63,6 +63,11 @@ export interface ActivityOption {
   isAcademic?: boolean;
 }
 
+export interface StudentStatus {
+  id: number;
+  name: string;
+}
+
 export interface SubjectPreference {
   id?: number;
   subjectName: string;
@@ -322,6 +327,7 @@ export type QueryParam = {
   genderId?: number;
   orderBy?: keyof typeof ORDER_BY_OPTIONS;
   yearLevel?: number;
+  statusId?: number;
 };
 
 export interface IIRProfileView {
@@ -343,4 +349,5 @@ export interface IIRProfileView {
     code: string;
   };
   yearLevel: number;
+  status: StudentStatus;
 }

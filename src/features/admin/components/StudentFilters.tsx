@@ -24,6 +24,10 @@ interface SearchFilterProps {
   yearLevels: any[];
   selectedYearLevelId: number;
   onYearLevelChange: (level: number) => void;
+  // Status props
+  statuses: any[];
+  selectedStatusId: number;
+  onStatusChange: (id: number) => void;
 }
 
 export default function StudentFilters({
@@ -38,6 +42,9 @@ export default function StudentFilters({
   yearLevels,
   selectedYearLevelId,
   onYearLevelChange,
+  statuses,
+  selectedStatusId,
+  onStatusChange,
 }: SearchFilterProps) {
   return (
     <div className="bg-glass-bg backdrop-blur-glass rounded-3xl border border-glass-border p-6 shadow-sm transition-all duration-500 hover:bg-glass-bg/30">
@@ -48,7 +55,7 @@ export default function StudentFilters({
           onSearchChange={onSearchChange}
           placeholder="Search by name, email, or student number..."
         />
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-2 w-full md:col-span-1 items-center justify-center">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 w-full md:col-span-1 items-center justify-center">
           <Dropdown
             label="Course"
             value={selectedCourseId}
@@ -66,6 +73,13 @@ export default function StudentFilters({
             value={selectedYearLevelId}
             onChange={onYearLevelChange}
             options={[{ id: 0, name: "All Year Levels" }, ...(yearLevels || [])]}
+          />
+          <Dropdown
+            label="Status"
+            value={selectedStatusId}
+            onChange={onStatusChange}
+            options={[{ id: 0, name: "All Statuses" }, ...(statuses || [])]}
+            labelKey="name"
           />
         </div>
       </div>

@@ -182,3 +182,17 @@ export function useActivityOptions() {
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
+
+/**
+ * Fetch student statuses lookup data
+ * @returns Query result with student statuses data
+ */
+export function useStudentStatuses() {
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.studentStatuses,
+    (config) => GetIIRLookup('studentStatuses', config),
+    'GetIIRLookup',
+    'Fetch Student Statuses',
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
+}

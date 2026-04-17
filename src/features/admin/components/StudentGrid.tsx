@@ -1,8 +1,8 @@
-import { Eye, Trash2 } from "lucide-react";
-import Duck from "@/assets/icons/Duck.svg";
+import { Eye } from "lucide-react";
 import { Spinner } from "@/components/shared";
 import { IIRProfileView } from "@/features/iir/types";
 import { ProfileFemale, ProfileMale } from "@/assets/icons";
+import { NothingFound } from "@/components/shared/NothingFound";
 
 interface StudentGridProps {
   students: IIRProfileView[];
@@ -29,16 +29,21 @@ export default function StudentGrid({
 
   if (students.length === 0) {
     return (
-      <div className="w-full h-full bg-transparent p-12 text-center items-center justify-center flex flex-col gap-4">
-        <img src={Duck} alt="Duck Icon" className="w-32 h-32  " />
-        <p className="text-card-foreground font-medium">No students found.</p>
-      </div>
+      <NothingFound message="No students found." />
     );
   }
 
   const genderColors: Record<number, string> = {
     1: "bg-blue-500",
     2: "bg-pink-500",
+  };
+
+  const statusColors: Record<number, string> = {
+    1: "bg-green-500/10 text-green-600 border-green-500/20",
+    2: "bg-blue-500/10 text-blue-600 border-blue-500/20",
+    3: "bg-orange-500/10 text-orange-600 border-orange-500/20",
+    4: "bg-gray-500/10 text-gray-600 border-gray-500/20",
+    5: "bg-red-500/10 text-red-600 border-red-500/20",
   };
 
   return (
@@ -48,6 +53,10 @@ export default function StudentGrid({
           key={student.email}
           className="group relative overflow-hidden rounded-[28px] border border-glass-border bg-glass-bg backdrop-blur-glass p-6 shadow-sm transition-all duration-500 hover:bg-glass-bg/40 hover:shadow-2xl hover:border-primary/30 hover:-translate-y-1.5 active:scale-[0.98]"
         >
+          {/* Status Badge */}
+          <div className={`absolute top-4 right-4 px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${statusColors[student.status?.id] || "bg-gray-200"}`}>
+            {student.status?.name || "Unknown"}
+          </div>
           {/* Subtle Gradient Accent */}
           <div className="absolute -right-10 -top-10 h-32 w-32 rounded-full bg-primary/5 blur-3xl group-hover:bg-primary/10 transition-colors duration-500" />
 

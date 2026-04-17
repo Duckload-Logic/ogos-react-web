@@ -56,7 +56,7 @@ export default function Calendar({
   legends,
   occupiedDayColor = "bg-primary",
   title = "Select Date",
-  allowPastDates = false,
+  allowPastDates = true,
   allowCurrentDate = true,
   allowWeekends = false,
   hasHeader = false,
@@ -355,23 +355,21 @@ function CalendarContent({
               selectedDate?.getDate() === day &&
               selectedDate.getMonth() === currentMonthIndex &&
               selectedDate.getFullYear() === currentYear;
-            const isDisabled = isDateDisabled(day);
-
+            const isWeekend = isDateDisabled(day);
             return (
               <div key={day} className="relative group p-1 flex justify-center">
                 <button
                   onClick={() => handleDateClick(day)}
-                  disabled={isDisabled}
                   className={`
                       size-12
                       rounded-lg font-semibold transition-colors text-sm
                       flex items-center justify-center
                       focus:outline-none focus:ring-1 focus:ring-primary/50
                       text-nowrap
-                      ${isDisabled ? "opacity-50 cursor-not-allowed" : "hover:ring-1 hover:ring-primary"}
+                      ${isWeekend ? "opacity-50 cursor-not-allowed" : "hover:ring-1 hover:ring-primary"}
                       ${isSelected
                       ? "bg-primary text-primary-foreground ring-1 ring-primary"
-                      : isDisabled
+                      : isWeekend
                         ? "bg-muted/50 text-muted-foreground"
                         : "bg-muted hover:bg-muted/80 text-foreground"
                     }
