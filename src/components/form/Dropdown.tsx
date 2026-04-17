@@ -59,7 +59,7 @@ export default function Dropdown({
   const getLabel = (option: any) => {
     if (!option) return `Select ${label}`;
     if (labelKey) return option[labelKey] || "";
-    return option.code || option.name || option.text || option || "";
+    return option.label || option.statusName || option.courseName || option.code || option.name || option.text || option || "";
   };
 
   const handleSelect = (optionValue: string) => {
