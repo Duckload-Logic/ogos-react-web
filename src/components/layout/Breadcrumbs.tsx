@@ -20,6 +20,7 @@ const PATH_LABELS: Record<string, string> = {
   form: "IIR Form",
   iir: "IIR Profile",
   profile: "Profile",
+  lifecycle: "Records Lifecycle",
 };
 
 export default function Breadcrumbs() {
