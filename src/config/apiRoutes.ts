@@ -126,6 +126,7 @@ export const API_ROUTES = Object.freeze({
       natureOfResidenceTypes: "/students/lookups/nature-of-residence-types",
       studentRelationshipTypes: "/students/lookups/student-relationship-types",
       activityOptions: "/students/lookups/activity-options",
+      studentStatuses: "/students/lookups/student-statuses",
     }),
     inventory: Object.freeze({
       all: "/students/inventory/records",
@@ -172,6 +173,7 @@ export const API_ROUTES = Object.freeze({
     }),
     submit: "/students/inventory/records/iir",
     checkOnboarding: (userId: string) => `/students/record/${userId}`,
+    bulkStatus: "/students/inventory/records/bulk-status",
   }),
   /**
    * Superadmin related endpoints

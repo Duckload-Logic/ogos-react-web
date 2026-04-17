@@ -26,8 +26,8 @@ import AppointmentLogs from "@/features/appointments/pages/admin/AppointmentLogs
 import ReviewSlips from "@/features/slips/pages/admin/ReviewSlips";
 import SlipDetails from "@/features/slips/pages/admin/SlipDetails";
 import SlipLogs from "@/features/slips/pages/admin/SlipLogs";
-import Reports from "@/features/analytics/pages/Reports";
 import Analytics from "@/features/analytics/pages/Analytics";
+import LifecycleManagement from "@/features/admin/pages/LifecycleManagement";
 import IIRProfile from "@/features/iir/pages/IIRProfile";
 import IIRForm from "@/features/iir/pages/IIRForm";
 import { CreateAppointment } from "@/features/appointments";
@@ -185,6 +185,10 @@ export const routes: RouteObject[] = [
         element: <IIRProfile />,
       },
       {
+        path: "lifecycle",
+        element: <LifecycleManagement />,
+      },
+      {
         path: "appointments",
         element: <AppointmentsManagement />,
       },
@@ -207,10 +211,6 @@ export const routes: RouteObject[] = [
       {
         path: "slips/logs",
         element: <SlipLogs />,
-      },
-      {
-        path: "reports",
-        element: <Reports />,
       },
       {
         path: "analytics",

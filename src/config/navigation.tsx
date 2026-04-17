@@ -4,14 +4,10 @@ import {
   Users,
   Calendar,
   FileText,
-  BarChart3,
   Timer,
   TrendingUp,
-  Key,
-  Shield,
-  Server,
-  ClipboardList,
   User,
+  GraduationCap,
 } from "lucide-react";
 
 export interface NavItem {
@@ -46,14 +42,14 @@ export const NAV_CONFIG: Record<string, NavItem[]>[] = [
         icon: <FileText size={ICON_SIZE} />,
       },
       {
-        label: "Reports",
-        href: "/admin/reports",
-        icon: <BarChart3 size={ICON_SIZE} />,
-      },
-      {
-        label: "Analytics",
+        label: "Reports & Analytics",
         href: "/admin/analytics",
         icon: <TrendingUp size={ICON_SIZE} />,
+      },
+      {
+        label: "Records Lifecycle",
+        href: "/admin/lifecycle",
+        icon: <GraduationCap size={ICON_SIZE} />,
       },
     ],
   },
