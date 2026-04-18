@@ -19,10 +19,12 @@ export interface AdminDashboardResponse {
  * @param filter Time filter (monthly, weekly, yearly)
  * @returns Admin dashboard analytics data
  */
-export async function GetAdminDashboard(filter: string = "monthly"): Promise<AdminDashboardResponse> {
+export async function GetAdminDashboard(
+  filter: string = "monthly",
+): Promise<AdminDashboardResponse> {
   try {
     const response = await apiClient.get(API_ROUTES.analytics.adminDashboard, {
-      params: { filter }
+      params: { filter },
     });
     return response.data;
   } catch (error: any) {

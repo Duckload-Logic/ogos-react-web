@@ -5,10 +5,7 @@ import {
   useAppointmentsStats,
   useUpdateAppointment,
 } from "@/features/appointments/hooks";
-import {
-  Calendar,
-  AppointmentList,
-} from "@/features/appointments/components";
+import { Calendar, AppointmentList } from "@/features/appointments/components";
 import { Appointment, AppointmentStatus } from "@/features/appointments/types";
 import { useStatuses } from "../../hooks/useLookups";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -34,6 +31,7 @@ import {
 } from "@/components/ui/chart";
 import { CalendarPlus, Archive } from "lucide-react";
 import { formatDate } from "@/utils";
+import { cn } from "@/lib/utils";
 
 const chartConfig = {
   pending: {
@@ -90,9 +88,7 @@ export default function AppointmentsManagement() {
   const [currentPage, setCurrentPage] = useState(1);
   const [startDate, setStartDate] = useState(() => {
     const now = new Date();
-    return toISODateString(
-      new Date(now.getFullYear(), now.getMonth(), 1),
-    );
+    return toISODateString(new Date(now.getFullYear(), now.getMonth(), 1));
   });
   const [searchTerm, setSearchTerm] = useState("");
   const debouncedSearch = useDebounce(searchTerm, 500);
@@ -100,15 +96,11 @@ export default function AppointmentsManagement() {
   const [endDate, setEndDate] = useState(() => {
     const now = new Date();
     // Day 0 of next month resolves to the last day of current month
-    return toISODateString(
-      new Date(now.getFullYear(), now.getMonth() + 1, 0),
-    );
+    return toISODateString(new Date(now.getFullYear(), now.getMonth() + 1, 0));
   });
 
   // No pre-selected date — show the full month overview by default
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(
-    undefined,
-  );
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
 
   const getLocalDateString = (date?: Date, fallback?: string) => {
     if (!date) return fallback || "";
@@ -155,7 +147,6 @@ export default function AppointmentsManagement() {
   };
 
   const chartData = (statusCounts || []).map((stat) => {
-
     let key: keyof typeof chartConfig = "noShow";
     const name = stat.name.toLowerCase();
 
@@ -178,17 +169,14 @@ export default function AppointmentsManagement() {
   // These must be stable references — usePageMetadata's useEffect uses
   // referential equality (===) to detect changes. Inline JSX creates a new
   // object on every render, causing an infinite setState → re-render loop.
-  const pageBadgeIcon = useMemo(
-    () => <CalendarPlus className="h-4 w-4" />,
-    [],
-  );
+  const pageBadgeIcon = useMemo(() => <CalendarPlus className="h-4 w-4" />, []);
 
   const pageHeaderActions = useMemo(
     () => (
       <Button
         variant="outline"
         onClick={() => navigate("/admin/appointments/logs")}
-        className="h-10 rounded-xl px-4 shadow-sm gap-2"
+        className="h-10 gap-2 rounded-xl px-4 shadow-sm"
       >
         <Archive className="h-4 w-4" />
         View All Logs
@@ -208,10 +196,9 @@ export default function AppointmentsManagement() {
 
   return (
     <>
-      <div className="py-2 space-y-4 animate-in fade-in slide-in-from-bottom-4 duration-300">
-
-        <div className="grid grid-cols-1 lg:grid-cols-6 gap-6 items-stretch">
-          <div className="lg:col-span-2 h-full">
+      <div className="animate-in fade-in slide-in-from-bottom-4 space-y-4 py-2 duration-300">
+        <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-6">
+          <div className="h-full lg:col-span-2">
             <Calendar
               title="Calendar"
               className="h-full"
@@ -254,9 +241,19 @@ export default function AppointmentsManagement() {
             />
           </div>
 
-          <Card className="lg:col-span-4 shadow-2xl overflow-hidden backdrop-blur-2xl transition-all duration-500 hover:bg-glass-bg/50">
-            <div className="border-b border-glass-border/40 bg-muted/20 px-8 py-4 flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-foreground/90 flex items-center gap-3">
+          <Card
+            className={cn(
+              "hover:bg-glass-bg/50 overflow-hidden shadow-2xl",
+              "backdrop-blur-2xl transition-all duration-500 lg:col-span-4",
+            )}
+          >
+            <div
+              className={cn(
+                "border-glass-border/40 flex items-center justify-between",
+                "border-b bg-muted/20 px-8 py-4",
+              )}
+            >
+              <h2 className="flex items-center gap-3 text-xl font-semibold text-foreground/90">
                 Overview
               </h2>
               {selectedDate && (
@@ -272,26 +269,33 @@ export default function AppointmentsManagement() {
                     setStartDate(toISODateString(start));
                     setEndDate(toISODateString(end));
                   }}
-                  className="text-xs h-8 px-3 rounded-lg hover:bg-primary/10 text-primary font-semibold"
+                  className="h-8 rounded-lg px-3 text-xs font-semibold text-primary hover:bg-primary/10"
                 >
                   View Monthly View
                 </Button>
               )}
             </div>
 
-            <CardContent className="p-8 flex flex-col min-h-[300px]">
-              <p className="text-sm text-muted-foreground mb-6 font-medium italic opacity-70">
-                Visual distribution for {selectedDate
+            <CardContent className="flex min-h-[300px] flex-col p-8">
+              <p className="mb-6 text-sm font-medium italic text-muted-foreground opacity-70">
+                Visual distribution for{" "}
+                {selectedDate
                   ? formatDate(startDate)
-                  : currentMonth.toLocaleString('default', {
-                    month: 'long',
-                    year: 'numeric'
-                  })}
+                  : currentMonth.toLocaleString("default", {
+                      month: "long",
+                      year: "numeric",
+                    })}
               </p>
 
-              <div className="rounded-3xl border border-glass-border/30 bg-glass-bg/20 px-4 py-8 sm:px-6 shadow-inner backdrop-blur-md">
-                <div className="h-[280px] relative">
-                  {chartData.length > 0 && chartData.some(d => d.count > 0) ? (
+              <div
+                className={cn(
+                  "border-glass-border/30 bg-glass-bg/20 rounded-3xl border",
+                  "px-4 py-8 shadow-inner backdrop-blur-md sm:px-6",
+                )}
+              >
+                <div className="relative h-[280px]">
+                  {chartData.length > 0 &&
+                  chartData.some((d) => d.count > 0) ? (
                     <ChartContainer
                       config={chartConfig}
                       className="h-[280px] w-full drop-shadow-sm"
@@ -314,7 +318,10 @@ export default function AppointmentsManagement() {
                           type="number"
                           tickLine={false}
                           axisLine={false}
-                          tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                          tick={{
+                            fontSize: 10,
+                            fill: "hsl(var(--muted-foreground))",
+                          }}
                           allowDecimals={false}
                         />
 
@@ -341,7 +348,10 @@ export default function AppointmentsManagement() {
                           maxBarSize={18}
                         >
                           {chartData.map((item) => (
-                            <Cell key={item.status} fill={item.fill} />
+                            <Cell
+                              key={item.status}
+                              fill={item.fill}
+                            />
                           ))}
 
                           <LabelList
@@ -355,14 +365,19 @@ export default function AppointmentsManagement() {
                       </BarChart>
                     </ChartContainer>
                   ) : (
-                    <div className="h-full flex flex-col items-center justify-center text-center animate-in fade-in zoom-in duration-700">
-                      <div className="rounded-full bg-primary/5 p-6 mb-4">
+                    <div
+                      className={cn(
+                        "animate-in fade-in zoom-in flex h-full flex-col items-center",
+                        "justify-center text-center duration-700",
+                      )}
+                    >
+                      <div className="mb-4 rounded-full bg-primary/5 p-6">
                         <Archive className="h-10 w-10 text-muted-foreground/40" />
                       </div>
                       <p className="text-sm font-medium text-muted-foreground/60">
                         No activity recorded for this period
                       </p>
-                      <p className="text-[10px] text-muted-foreground/40 mt-1 uppercase tracking-widest font-bold">
+                      <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
                         Appointments Stats
                       </p>
                     </div>
@@ -373,7 +388,10 @@ export default function AppointmentsManagement() {
                   {chartData.map((item) => (
                     <div
                       key={item.status}
-                      className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1"
+                      className={cn(
+                        "inline-flex items-center gap-2 rounded-full border",
+                        "border-border bg-background px-3 py-1",
+                      )}
                     >
                       <span
                         className="h-2.5 w-2.5 rounded-full"
@@ -394,8 +412,9 @@ export default function AppointmentsManagement() {
 
           <div className="lg:col-span-6">
             <AppointmentList
-              title={`Appointment List - ${selectedDate ? selectedDate.toDateString() : "All Dates"
-                }`}
+              title={`Appointment List - ${
+                selectedDate ? selectedDate.toDateString() : "All Dates"
+              }`}
               searchTerm={searchTerm}
               onSearchChange={(value: string) => {
                 setSearchTerm(value);

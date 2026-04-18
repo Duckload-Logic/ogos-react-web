@@ -120,8 +120,7 @@ All service functions follow the naming convention: **`[HTTP Method][Resource]`*
 Every service function accepts an optional `config` parameter for error logging.
 
 ```typescript
-export interface AxiosConfigWithMeta
-  extends Partial<InternalAxiosRequestConfig> {
+export interface AxiosConfigWithMeta extends Partial<InternalAxiosRequestConfig> {
   handlerName?: string; // Function name for logging
   stepName?: string; // Specific step that failed
   _retry?: boolean; // Internal retry flag

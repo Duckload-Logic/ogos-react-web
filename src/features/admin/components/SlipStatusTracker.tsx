@@ -16,7 +16,10 @@ interface SlipStatusTrackerProps {
   className?: string;
 }
 
-export function SlipStatusTracker({ stats, className }: SlipStatusTrackerProps) {
+export function SlipStatusTracker({
+  stats,
+  className,
+}: SlipStatusTrackerProps) {
   const items = [
     {
       label: "Pending Review",
@@ -47,7 +50,9 @@ export function SlipStatusTracker({ stats, className }: SlipStatusTrackerProps) 
   const navigate = useNavigate();
 
   return (
-    <Card className={cn("shadow-lg backdrop-blur-md overflow-hidden", className)}>
+    <Card
+      className={cn("overflow-hidden shadow-lg backdrop-blur-md", className)}
+    >
       <CardHeader className="pb-4">
         <CardTitle className="text-lg font-bold">Excuse Slip Tracker</CardTitle>
       </CardHeader>
@@ -58,13 +63,18 @@ export function SlipStatusTracker({ stats, className }: SlipStatusTrackerProps) 
             <div
               key={index}
               className={cn(
-                "flex items-center justify-between p-4 rounded-2xl border transition-all duration-300 hover:shadow-md",
+                "flex items-center justify-between rounded-2xl border p-4 transition-all duration-300 hover:shadow-md",
                 item.bgColor,
-                item.borderColor
+                item.borderColor,
               )}
             >
               <div className="flex items-center gap-4">
-                <div className={cn("p-2 rounded-xl bg-white shadow-sm", item.color)}>
+                <div
+                  className={cn(
+                    "rounded-xl bg-white p-2 shadow-sm",
+                    item.color,
+                  )}
+                >
                   <item.icon size={20} />
                 </div>
                 <span className="text-sm font-semibold text-slate-700 dark:text-slate-200">
@@ -79,9 +89,13 @@ export function SlipStatusTracker({ stats, className }: SlipStatusTrackerProps) 
           ))}
         </div>
 
-        <div className="mt-6 pt-4 border-t border-slate-200/50 dark:border-white/5">
+        <div className="mt-6 border-t border-slate-200/50 pt-4 dark:border-white/5">
           <button
-            className="w-full py-3 rounded-xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 text-sm font-bold transition-all hover:opacity-90 active:scale-95 shadow-lg"
+            className={cn(
+              "w-full rounded-xl bg-slate-900 py-3 text-sm font-bold",
+              "text-white shadow-lg transition-all hover:opacity-90",
+              "active:scale-95 dark:bg-white dark:text-slate-900",
+            )}
             onClick={() => navigate("/admin/slips")}
           >
             Manage All Slips

@@ -6,6 +6,7 @@
 import React from "react";
 import { AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface ErrorBoundaryProps {
   children: React.ReactNode;
@@ -38,13 +39,18 @@ export class ErrorBoundary extends React.Component<
     if (this.state.hasError) {
       return (
         this.props.fallback || (
-          <div className="flex flex-col items-center justify-center gap-4 p-8 rounded-lg border border-red-200 bg-red-50">
-            <AlertCircle className="w-8 h-8 text-red-600" />
+          <div
+            className={cn(
+              "flex flex-col items-center justify-center gap-4 rounded-lg",
+              "border border-red-200 bg-red-50 p-8",
+            )}
+          >
+            <AlertCircle className="h-8 w-8 text-red-600" />
             <div className="text-center">
               <h2 className="text-lg font-semibold text-red-900">
                 Something went wrong
               </h2>
-              <p className="text-sm text-red-700 mt-1">
+              <p className="mt-1 text-sm text-red-700">
                 {
                   // this.state.error?.message ||
                   "An unexpected error occurred"

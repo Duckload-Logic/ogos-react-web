@@ -7,8 +7,7 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
  * Extended Axios config with custom logging metadata
  * Allows partial config for use in hooks and services
  */
-export interface AxiosConfigWithMeta
-  extends Partial<InternalAxiosRequestConfig> {
+export interface AxiosConfigWithMeta extends Partial<InternalAxiosRequestConfig> {
   handlerName?: string;
   stepName?: string;
   _retry?: boolean;

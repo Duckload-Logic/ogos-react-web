@@ -19,6 +19,7 @@ import SubHeader from "./SubHeader";
 import { SpeechControl } from "../shared/SpeechControl";
 import { AnimationStyles } from "../ui/animations";
 import ScrollToTop from "@/utils/componentUtils";
+import { cn } from "@/lib/utils";
 
 interface LayoutProps {
   showHeader?: boolean;
@@ -200,24 +201,53 @@ export default function Layout({
     <ErrorBoundary>
       <ScrollToTop targetRef={scrollRef} />
       <div
-        className={`relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950 ${grayscale ? "grayscale" : ""
-          }`}
+        className={`relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950 ${
+          grayscale ? "grayscale" : ""
+        }`}
       >
         {/* Background Fallback / Graphics Quality Layers */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden">
           {performanceMode ? (
             // Lighter Fallback: Simple static gradients
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.03),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.02),transparent_25%)] dark:bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.05),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.03),transparent_25%)]" />
+            <div
+              className={cn(
+                "absolute inset-0",
+                "bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.03),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.02),transparent_25%)]",
+                "dark:bg-[radial-gradient(circle_at_top_left,rgba(220,38,38,0.05),transparent_25%),radial-gradient(circle_at_bottom_right,rgba(59,130,246,0.03),transparent_25%)]",
+              )}
+            />
           ) : (
             // High Quality: Animated Mesh pattern
             <div className="absolute inset-0 z-0">
-              <div className="absolute -left-[5%] -top-[5%] h-[30%] w-[30%] rounded-full bg-primary/5 blur-[100px] animate-pulse" />
-              <div className="absolute -right-[5%] -bottom-[5%] h-[30%] w-[30%] rounded-full bg-secondary/5 blur-[100px] animate-pulse [animation-delay:3s]" />
-              <div className="absolute left-1/2 top-1/2 h-[20%] w-[20%] -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary/3 blur-[90px]" />
+              <div
+                className={cn(
+                  "absolute -left-[5%] -top-[5%] h-[30%] w-[30%] animate-pulse",
+                  "rounded-full bg-primary/5 blur-[100px]",
+                )}
+              />
+              <div
+                className={cn(
+                  "absolute -bottom-[5%] -right-[5%] h-[30%] w-[30%]",
+                  "animate-pulse rounded-full bg-secondary/5 blur-[100px]",
+                  "[animation-delay:3s]",
+                )}
+              />
+              <div
+                className={cn(
+                  "bg-primary/3 absolute left-1/2 top-1/2 h-[20%] w-[20%]",
+                  "-translate-x-1/2 -translate-y-1/2 rounded-full blur-[90px]",
+                )}
+              />
             </div>
           )}
           {/* Global Light Overlay */}
-          <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.08))] dark:bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.01))]" />
+          <div
+            className={cn(
+              "absolute inset-0",
+              "bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.08))]",
+              "dark:bg-[linear-gradient(to_bottom,transparent,rgba(255,255,255,0.01))]",
+            )}
+          />
         </div>
 
         {mustAcceptTerms && (
@@ -230,10 +260,11 @@ export default function Layout({
 
         <div
           ref={contentRef}
-          className={`relative z-10 flex min-h-0 flex-1 flex-col transition-all duration-300 transform-gpu ${termsOpen
-            ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
-            : ""
-            }`}
+          className={`relative z-10 flex min-h-0 flex-1 transform-gpu flex-col transition-all duration-300 ${
+            termsOpen
+              ? "pointer-events-none select-none opacity-40 grayscale-[0.5]"
+              : ""
+          }`}
         >
           <Header
             title={title}
@@ -251,10 +282,13 @@ export default function Layout({
             setShowNotifications={setShowNotifications}
           />
 
-          <div className="flex flex-col-reverse md:flex-row min-h-0 w-full flex-1 bg-background">
+          <div className="flex min-h-0 w-full flex-1 flex-col-reverse bg-background md:flex-row">
             {/* <div
-              className="absolute inset-0 z-0 bg-[url('/src/assets/images/bg.gif')]
-               bg-cover bg-center bg-no-repeat opacity-[0.15] dark:opacity-10 transform-gpu"
+              className={cn(
+    "absolute inset-0 z-0 bg-[url('/src/assets/images/bg.gif')]",
+    "bg-cover bg-center bg-no-repeat opacity-[0.15]",
+    "dark:opacity-10 transform-gpu"
+  )}
             /> */}
             {isLoggedIn && (
               <Navigation
@@ -270,7 +304,7 @@ export default function Layout({
             <div className="relative min-w-0 flex-1 overflow-hidden">
               <div
                 ref={scrollRef}
-                className="relative z-10 flex h-full flex-col overflow-x-hidden overflow-y-auto"
+                className="relative z-10 flex h-full flex-col overflow-y-auto overflow-x-hidden"
               >
                 <main className="flex-1 p-4 md:p-6 lg:p-8">
                   {showHeader && showSubHeader && (
@@ -285,7 +319,7 @@ export default function Layout({
                     />
                   )}
                   {isLoading ? (
-                    <div className="flex h-full w-full items-center justify-center min-h-[400px]">
+                    <div className="flex h-full min-h-[400px] w-full items-center justify-center">
                       <Spinner size="lg" />
                     </div>
                   ) : null}
@@ -298,9 +332,10 @@ export default function Layout({
               {/* The Overlay: Handle both the dark tint and the blur here */}
               {sidebarHovered && !sidebarPinned && isLoggedIn && !termsOpen && (
                 <div
-                  className="pointer-events-none absolute inset-0 z-20
-                 bg-black/50 animate-in
-                 fade-in duration-200"
+                  className={cn(
+                    "animate-in fade-in pointer-events-none absolute inset-0 z-20",
+                    "bg-black/50 duration-200",
+                  )}
                 />
               )}
             </div>
@@ -311,7 +346,7 @@ export default function Layout({
         <SpeechControl />
         <AnimationStyles />
       </div>
-    </ErrorBoundary >
+    </ErrorBoundary>
   );
 }
 

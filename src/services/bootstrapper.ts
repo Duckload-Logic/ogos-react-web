@@ -52,23 +52,16 @@ export async function BootstrapApp(): Promise<BootstrapData> {
   bootstrapPromise = (async () => {
     try {
       // Import services here to avoid circular dependencies
-      const { userService } = await import(
-        "@/features/users/services/service"
-      );
-      const { slipService } = await import(
-        "@/features/slips/services"
-      );
-      const { appointmentService } = await import(
-        "@/features/appointments/services"
-      );
-      const { locationService } = await import(
-        "@/features/locations/services"
-      );
+      const { userService } = await import("@/features/users/services/service");
+      const { slipService } = await import("@/features/slips/services");
+      const { appointmentService } =
+        await import("@/features/appointments/services");
+      const { locationService } = await import("@/features/locations/services");
 
       // Create config for error logging
       const config: AxiosConfigWithMeta = {
-        handlerName: 'BootstrapApp',
-        stepName: 'Initialize',
+        handlerName: "BootstrapApp",
+        stepName: "Initialize",
       };
 
       // Fetch user data first (required for auth)
@@ -103,10 +96,8 @@ export async function BootstrapApp(): Promise<BootstrapData> {
       // Clear promise on error to allow retry
       bootstrapPromise = null;
 
-      const errorMsg = error.message || 'Unknown error';
-      console.error(
-        `[BootstrapApp] {Initialize}: ${errorMsg}`,
-      );
+      const errorMsg = error.message || "Unknown error";
+      console.error(`[BootstrapApp] {Initialize}: ${errorMsg}`);
 
       throw error;
     }
@@ -135,7 +126,6 @@ export function ResetBootstrap(): void {
  *
  * @returns Current bootstrap promise or null
  */
-export function GetBootstrapPromise(
-): Promise<BootstrapData> | null {
+export function GetBootstrapPromise(): Promise<BootstrapData> | null {
   return bootstrapPromise;
 }

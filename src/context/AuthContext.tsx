@@ -5,12 +5,7 @@
  * timeout safeguards to prevent infinite loading
  */
 
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useMe } from "@/features/users/hooks/useMe";
 import { useLogout as useLogoutMutation } from "@/features/auth/hooks";
 import { BootstrapApp } from "@/services/bootstrapper";
@@ -24,9 +19,9 @@ interface AuthContextType {
   refresh: () => Promise<void>;
 }
 
-export const AuthContext = createContext<
-  AuthContextType | undefined
->(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);
 
 /**
  * Timeout duration (ms) to prevent infinite loading
@@ -67,7 +62,7 @@ export const AuthProvider: React.FC<{
       const timeoutId = setTimeout(() => {
         console.warn(
           "[AuthProvider] {Timeout}: Auth check " +
-          "exceeded 5s, forcing loading state to false",
+            "exceeded 5s, forcing loading state to false",
         );
         setHasTimedOut(true);
       }, AUTH_TIMEOUT_MS);
@@ -85,10 +80,7 @@ export const AuthProvider: React.FC<{
   useEffect(() => {
     if (user && status === "success" && !isError) {
       BootstrapApp().catch((error: any) => {
-        console.error(
-          "[AuthProvider] {Bootstrap}: " +
-          `${error.message}`,
-        );
+        console.error("[AuthProvider] {Bootstrap}: " + `${error.message}`);
       });
     }
   }, [user, status, isError]);
@@ -111,8 +103,7 @@ export const AuthProvider: React.FC<{
    * - Error: status becomes "error"
    * - Timeout: hasTimedOut becomes true
    */
-  const isAuthLoading =
-    status === "pending" && !isError && !hasTimedOut;
+  const isAuthLoading = status === "pending" && !isError && !hasTimedOut;
 
   return (
     <AuthContext.Provider
@@ -130,4 +121,3 @@ export const AuthProvider: React.FC<{
     </AuthContext.Provider>
   );
 };
-

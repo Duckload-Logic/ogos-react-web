@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 type ConsentModalProps = {
   open: boolean;
@@ -26,12 +27,24 @@ export default function ConsentModal({
   const accentClass = role === "admin" ? "bg-[#8f1113]" : "bg-[#c62828]";
 
   return (
-    <Dialog open={open} onOpenChange={() => { }}>
-      <DialogContent className="w-[95vw] max-h-[70vh] overflow-y-auto sm:w-full max-w-[640px] rounded-3xl p-6 sm:p-8 outline-none border-glass-border bg-card" hasCloseButton={false}>
-
+    <Dialog
+      open={open}
+      onOpenChange={() => {}}
+    >
+      <DialogContent
+        className={cn(
+          "max-h-[70vh] w-[95vw] max-w-[640px] overflow-y-auto",
+          "rounded-3xl border-glass-border bg-card p-6 outline-none",
+          "sm:w-full sm:p-8",
+        )}
+        hasCloseButton={false}
+      >
         <div className={`mb-6 rounded-xl px-6 py-4 text-white ${accentClass}`}>
           <DialogTitle asChild>
-            <h2 id="terms-title" className="text-2xl font-bold">
+            <h2
+              id="terms-title"
+              className="text-2xl font-bold"
+            >
               Terms and Conditions
             </h2>
           </DialogTitle>
@@ -48,7 +61,10 @@ export default function ConsentModal({
           <p>
             Your information will be handled in accordance with our{" "}
             <a
-              className="font-bold text-primary hover:text-primary/70 transition-colors cursor-pointer duration-200"
+              className={cn(
+                "cursor-pointer font-bold text-primary transition-colors",
+                "duration-200 hover:text-primary/70",
+              )}
               target="_blank"
               href="https://www.pup.edu.ph/privacy"
             >
@@ -62,7 +78,14 @@ export default function ConsentModal({
           </p>
         </div>
 
-        <div className="mt-7 rounded-2xl border border-glass-border bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-primary-50 via-primary-100 to-primary-50 px-5 py-5">
+        <div
+          className={cn(
+            "from-primary-50 via-primary-100 to-primary-50 mt-7",
+            "rounded-2xl border border-glass-border",
+            "bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))]",
+            "px-5 py-5",
+          )}
+        >
           <label
             htmlFor="terms-agree"
             className="flex cursor-pointer items-start gap-4"
@@ -76,11 +99,11 @@ export default function ConsentModal({
             />
 
             <span
-              className="
-                mt-1 flex h-6 w-6 shrink-0 items-center justify-center rounded-md
-                border border-slate-400 bg-glass-bg transition
-                peer-checked:border-[#8f1113] peer-checked:bg-[#8f1113]
-              "
+              className={cn(
+                "mt-1 flex h-6 w-6 shrink-0 items-center justify-center",
+                "rounded-md border border-slate-400 bg-glass-bg transition",
+                "peer-checked:border-[#8f1113] peer-checked:bg-[#8f1113]",
+              )}
             >
               {agreed && (
                 <svg
@@ -103,7 +126,10 @@ export default function ConsentModal({
             <span className="text-base leading-7 text-foreground">
               I agree and acknowledge the{" "}
               <a
-                className="font-bold text-primary hover:text-primary/60 transition-colors cursor-pointer duration-200"
+                className={cn(
+                  "cursor-pointer font-bold text-primary transition-colors",
+                  "duration-200 hover:text-primary/60",
+                )}
                 target="_blank"
                 href="https://www.pup.edu.ph/terms"
               >

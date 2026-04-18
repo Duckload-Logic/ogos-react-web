@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Label } from "@radix-ui/react-label";
 import { ChevronDownIcon, X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface SearchFilterProps {
   searchTerm: string;
@@ -47,15 +48,26 @@ export default function StudentFilters({
   onStatusChange,
 }: SearchFilterProps) {
   return (
-    <div className="bg-glass-bg backdrop-blur-glass rounded-3xl border border-glass-border p-6 shadow-sm transition-all duration-500 hover:bg-glass-bg/30">
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+    <div
+      className={cn(
+        "hover:bg-glass-bg/30 rounded-3xl border border-glass-border",
+        "bg-glass-bg p-6 shadow-sm backdrop-blur-glass transition-all",
+        "duration-500",
+      )}
+    >
+      <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-3">
         <SearchInput
           className="md:col-span-2"
           searchTerm={searchTerm}
           onSearchChange={onSearchChange}
           placeholder="Search by name, email, or student number..."
         />
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-2 w-full md:col-span-1 items-center justify-center">
+        <div
+          className={cn(
+            "grid w-full grid-cols-1 items-center justify-center gap-2",
+            "md:col-span-1 md:grid-cols-4",
+          )}
+        >
           <Dropdown
             label="Course"
             value={selectedCourseId}
@@ -72,7 +84,10 @@ export default function StudentFilters({
             label="Year Level"
             value={selectedYearLevelId}
             onChange={onYearLevelChange}
-            options={[{ id: 0, name: "All Year Levels" }, ...(yearLevels || [])]}
+            options={[
+              { id: 0, name: "All Year Levels" },
+              ...(yearLevels || []),
+            ]}
           />
           <Dropdown
             label="Status"

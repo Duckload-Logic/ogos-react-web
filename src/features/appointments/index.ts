@@ -36,9 +36,4 @@ export * from "./services";
 export { default as CreateAppointment } from "./pages/student/CreateAppointment";
 
 // UI Components
-export {
-  Header,
-  Messages,
-  SlotSelector,
-  AppointmentForm,
-} from "./components";
+export { Header, Messages, SlotSelector, AppointmentForm } from "./components";

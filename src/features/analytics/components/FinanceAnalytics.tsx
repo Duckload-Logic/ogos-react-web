@@ -43,7 +43,7 @@ export default function FinanceAnalytics({
       incomeMap[income] = (incomeMap[income] || 0) + 1;
     });
 
-    // Common income brackets 
+    // Common income brackets
     const brackets: Record<string, number> = {
       "Below 10,000": 0,
       "10,000 - 25,000": 0,
@@ -123,24 +123,29 @@ export default function FinanceAnalytics({
 
   return (
     <div className="space-y-4">
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           Total Monthly Family Income
         </h2>
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="mb-4 text-sm text-muted-foreground">
           Students with recorded family income:{" "}
-          {students.filter(
-            (s) =>
-              s.family?.finance?.monthlyFamilyIncome ||
-              s.family?.monthlyFamilyIncome,
-          ).length}
+          {
+            students.filter(
+              (s) =>
+                s.family?.finance?.monthlyFamilyIncome ||
+                s.family?.monthlyFamilyIncome,
+            ).length
+          }
         </p>
 
         {incomeData.length > 0 ? (
           <>
             {/* Pie Chart */}
             <div className="mb-6">
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer
+                width="100%"
+                height={300}
+              >
                 <PieChart>
                   <Pie
                     data={incomeData}
@@ -170,15 +175,15 @@ export default function FinanceAnalytics({
             </div>
 
             {/* Stats */}
-            <div className="space-y-2 mb-6">
+            <div className="mb-6 space-y-2">
               {incomeData.map((item, index) => (
                 <div
                   key={item.name}
-                  className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                  className="flex items-center justify-between rounded-lg bg-muted p-3"
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-4 h-4 rounded"
+                      className="h-4 w-4 rounded"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
                     <span className="font-medium text-foreground">
@@ -199,14 +204,14 @@ export default function FinanceAnalytics({
 
             {/* Detailed Categories */}
             <div className="border-t border-border pt-4">
-              <h3 className="font-semibold text-card-foreground mb-3">
+              <h3 className="mb-3 font-semibold text-card-foreground">
                 Income Categories (Detailed)
               </h3>
               <div className="space-y-2">
                 {detailedIncomeData.slice(0, 10).map((item) => (
                   <div
                     key={item.income}
-                    className="flex justify-between items-center p-3 bg-muted rounded-lg text-sm"
+                    className="flex items-center justify-between rounded-lg bg-muted p-3 text-sm"
                   >
                     <span className="text-foreground">{item.income}</span>
                     <span className="font-bold text-green-600">
@@ -218,7 +223,7 @@ export default function FinanceAnalytics({
             </div>
           </>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             No income data available
           </div>
         )}

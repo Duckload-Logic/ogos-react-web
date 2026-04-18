@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useAppointment, useCancelAppointment } from "@/features/appointments/hooks";
+import {
+  useAppointment,
+  useCancelAppointment,
+} from "@/features/appointments/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -14,22 +17,23 @@ import {
   AlertCircle,
   MessageSquare,
   User,
-  ExternalLink
+  ExternalLink,
 } from "lucide-react";
 import { usePageMetadata } from "@/components/layout/Layout";
 import { AnimationStyles } from "@/components/ui/animations";
-import { 
-  Dialog, 
-  DialogContent, 
-  DialogDescription, 
-  DialogFooter, 
-  DialogHeader, 
-  DialogTitle 
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/context";
 import { format } from "date-fns";
+import { cn } from "@/lib/utils";
 
 export default function AppointmentDetails() {
   const { id } = useParams<{ id: string }>();
@@ -37,8 +41,9 @@ export default function AppointmentDetails() {
   const { triggerToast } = useToast();
 
   const { data: appointment, isLoading, isError } = useAppointment(id || "");
-  const { mutate: cancelAppointment, isPending: isCancelling } = useCancelAppointment();
-  
+  const { mutate: cancelAppointment, isPending: isCancelling } =
+    useCancelAppointment();
+
   const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState("");
 
@@ -46,31 +51,42 @@ export default function AppointmentDetails() {
     title: "Appointment Details",
     description: "View and manage your scheduled counseling appointment.",
     badgeText: appointment?.status?.name || "Loading",
-    badgeIcon: appointment?.status?.name === "Approved" ? <FileCheck className="h-4 w-4" /> : <Calendar className="h-4 w-4" />,
+    badgeIcon:
+      appointment?.status?.name === "Approved" ? (
+        <FileCheck className="h-4 w-4" />
+      ) : (
+        <Calendar className="h-4 w-4" />
+      ),
     isLoading: isLoading,
   });
 
   const handleCancel = () => {
     if (!id || !cancelReason.trim()) return;
-    
-    cancelAppointment({ id, reason: cancelReason }, {
-      onSuccess: () => {
-        triggerToast("Appointment cancelled successfully");
-        setIsCancelModalOpen(false);
-        navigate("/student/appointments");
+
+    cancelAppointment(
+      { id, reason: cancelReason },
+      {
+        onSuccess: () => {
+          triggerToast("Appointment cancelled successfully");
+          setIsCancelModalOpen(false);
+          navigate("/student/appointments");
+        },
+        onError: (error: any) => {
+          triggerToast(error.message || "Failed to cancel appointment");
+        },
       },
-      onError: (error: any) => {
-        triggerToast(error.message || "Failed to cancel appointment");
-      }
-    });
+    );
   };
 
   if (isError) {
     return (
       <div className="flex flex-col items-center justify-center py-20">
-        <AlertCircle className="h-12 w-12 text-red-500 mb-4" />
+        <AlertCircle className="mb-4 h-12 w-12 text-red-500" />
         <h2 className="text-xl font-semibold">Appointment not found</h2>
-        <Button variant="link" onClick={() => navigate("/student/appointments")}>
+        <Button
+          variant="link"
+          onClick={() => navigate("/student/appointments")}
+        >
           Back to list
         </Button>
       </div>
@@ -88,61 +104,86 @@ export default function AppointmentDetails() {
         <div className="max-w-full py-6">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             {/* Left Column: Primary Details */}
-            <div className="md:col-span-2 space-y-6">
-              <Card className="border-0 shadow-lg bg-card/60 backdrop-blur-md">
+            <div className="space-y-6 md:col-span-2">
+              <Card className="border-0 bg-card/60 shadow-lg backdrop-blur-md">
                 <CardHeader className="border-b border-border/60 pb-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2 bg-primary/10 rounded-lg">
+                      <div className="rounded-lg bg-primary/10 p-2">
                         <Calendar className="h-5 w-5 text-primary" />
                       </div>
-                      <CardTitle className="text-xl">Appointment Information</CardTitle>
+                      <CardTitle className="text-xl">
+                        Appointment Information
+                      </CardTitle>
                     </div>
                     <Badge
-                      className={`px-3 py-1 ${appointment?.status?.colorKey || "bg-muted text-muted-foreground"
-                        }`}
+                      className={`px-3 py-1 ${
+                        appointment?.status?.colorKey ||
+                        "bg-muted text-muted-foreground"
+                      }`}
                     >
                       {appointment?.status?.name}
                     </Badge>
                   </div>
                 </CardHeader>
-                <CardContent className="pt-6 space-y-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <CardContent className="space-y-6 pt-6">
+                  <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Date</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Date
+                      </p>
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-muted-foreground" />
                         <span className="font-medium">
-                          {appointment?.whenDate ? format(new Date(appointment.whenDate), "MMMM d, yyyy") : "---"}
+                          {appointment?.whenDate
+                            ? format(
+                                new Date(appointment.whenDate),
+                                "MMMM d, yyyy",
+                              )
+                            : "---"}
                         </span>
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Time</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Time
+                      </p>
                       <div className="flex items-center gap-2">
                         <Clock className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">{appointment?.timeSlot.time || "---"}</span>
+                        <span className="font-medium">
+                          {appointment?.timeSlot.time || "---"}
+                        </span>
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Category</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Category
+                      </p>
                       <div className="flex items-center gap-2">
-                        <Badge variant="outline">{appointment?.appointmentCategory.name}</Badge>
+                        <Badge variant="outline">
+                          {appointment?.appointmentCategory.name}
+                        </Badge>
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Location</p>
+                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                        Location
+                      </p>
                       <div className="flex items-center gap-2">
                         <MapPin className="h-4 w-4 text-muted-foreground" />
-                        <span className="font-medium">Guidance Office (Main Bldg)</span>
+                        <span className="font-medium">
+                          Guidance Office (Main Bldg)
+                        </span>
                       </div>
                     </div>
                   </div>
 
-                  <div className="pt-4 border-t border-border/40">
-                    <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">My Reason / Concern</p>
-                    <div className="p-4 rounded-lg bg-muted/50 border border-border/40">
-                      <p className="text-sm leading-relaxed whitespace-pre-wrap italic">
+                  <div className="border-t border-border/40 pt-4">
+                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      My Reason / Concern
+                    </p>
+                    <div className="rounded-lg border border-border/40 bg-muted/50 p-4">
+                      <p className="whitespace-pre-wrap text-sm italic leading-relaxed">
                         "{appointment?.reason}"
                       </p>
                     </div>
@@ -151,15 +192,17 @@ export default function AppointmentDetails() {
               </Card>
 
               {appointment?.adminNotes && (
-                <Card className="border-border/60 shadow-md bg-amber-50/10 dark:bg-amber-950/5">
+                <Card className="border-border/60 bg-amber-50/10 shadow-md dark:bg-amber-950/5">
                   <CardHeader className="py-4">
                     <div className="flex items-center gap-2">
                       <MessageSquare className="h-4 w-4 text-amber-500" />
-                      <CardTitle className="text-sm">Counselor Remarks</CardTitle>
+                      <CardTitle className="text-sm">
+                        Counselor Remarks
+                      </CardTitle>
                     </div>
                   </CardHeader>
                   <CardContent className="pb-5 pt-0">
-                    <p className="text-sm text-foreground/90 leading-relaxed italic">
+                    <p className="text-sm italic leading-relaxed text-foreground/90">
                       {appointment.adminNotes}
                     </p>
                   </CardContent>
@@ -169,15 +212,18 @@ export default function AppointmentDetails() {
 
             {/* Right Column: Actions & Metadata */}
             <div className="space-y-6">
-              <Card className="border-0 shadow-md bg-muted/30">
-                <CardHeader className="pb-3 border-b border-border/40">
-                  <CardTitle className="text-sm font-semibold uppercase">Management</CardTitle>
+              <Card className="border-0 bg-muted/30 shadow-md">
+                <CardHeader className="border-b border-border/40 pb-3">
+                  <CardTitle className="text-sm font-semibold uppercase">
+                    Management
+                  </CardTitle>
                 </CardHeader>
-                <CardContent className="pt-4 space-y-4">
+                <CardContent className="space-y-4 pt-4">
                   {isCancellable ? (
                     <div className="space-y-3">
                       <p className="text-xs text-muted-foreground">
-                        Changed your mind? You can cancel your appointment if it is still pending or scheduled.
+                        Changed your mind? You can cancel your appointment if it
+                        is still pending or scheduled.
                       </p>
                       <Button
                         variant="destructive"
@@ -189,16 +235,23 @@ export default function AppointmentDetails() {
                       </Button>
                     </div>
                   ) : (
-                    <div className="flex items-start gap-2 p-3 rounded-lg bg-blue-50/50 dark:bg-blue-950/10 border border-blue-100/50 dark:border-blue-900/30">
-                      <AlertCircle className="h-4 w-4 text-blue-500 shrink-0 mt-0.5" />
+                    <div
+                      className={cn(
+                        "flex items-start gap-2 rounded-lg border border-blue-100/50",
+                        "bg-blue-50/50 p-3 dark:border-blue-900/30 dark:bg-blue-950/10",
+                      )}
+                    >
+                      <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-blue-500" />
                       <p className="text-xs text-blue-700 dark:text-blue-300">
-                        This appointment is already {appointment?.status?.name?.toLowerCase()} and cannot be modified.
+                        This appointment is already{" "}
+                        {appointment?.status?.name?.toLowerCase()} and cannot be
+                        modified.
                       </p>
                     </div>
                   )}
 
                   <div className="pt-2">
-                    <p className="text-[10px] text-center text-muted-foreground">
+                    <p className="text-center text-[10px] text-muted-foreground">
                       ID: {appointment?.id}
                     </p>
                   </div>
@@ -209,12 +262,16 @@ export default function AppointmentDetails() {
         </div>
       </div>
 
-      <Dialog open={isCancelModalOpen} onOpenChange={setIsCancelModalOpen}>
+      <Dialog
+        open={isCancelModalOpen}
+        onOpenChange={setIsCancelModalOpen}
+      >
         <DialogContent className="sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Cancel Appointment</DialogTitle>
             <DialogDescription>
-              Please provide a reason for cancelling your appointment. This helps our counselors understand your situation.
+              Please provide a reason for cancelling your appointment. This
+              helps our counselors understand your situation.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -227,9 +284,9 @@ export default function AppointmentDetails() {
                 onChange={(e) => setCancelReason(e.target.value)}
                 className="min-h-[100px]"
               />
-              <p className="text-[10px] text-muted-foreground italic">
+              <p className="text-[10px] italic text-muted-foreground">
                 * This reason will be shared with the Guidance Office.
-</p>
+              </p>
             </div>
           </div>
           <DialogFooter className="gap-2 sm:gap-0">

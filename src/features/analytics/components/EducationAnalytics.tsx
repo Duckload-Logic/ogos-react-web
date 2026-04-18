@@ -78,7 +78,7 @@ export default function EducationAnalytics({
   // Analyze education levels
   const educationLevelData = useMemo(() => {
     const levelMap: Record<string, number> = {
-      "Elementary": 0,
+      Elementary: 0,
       "Junior High": 0,
       "Senior High": 0,
     };
@@ -89,7 +89,8 @@ export default function EducationAnalytics({
           const level = school.levelOfEducation?.toLowerCase() || "";
           if (level.includes("element")) levelMap["Elementary"]++;
           else if (level.includes("junior")) levelMap["Junior High"]++;
-          else if (level.includes("senior") || level.includes("senior high")) levelMap["Senior High"]++;
+          else if (level.includes("senior") || level.includes("senior high"))
+            levelMap["Senior High"]++;
         });
       }
     });
@@ -142,34 +143,35 @@ export default function EducationAnalytics({
   return (
     <div className="space-y-6">
       {/* HSGWA */}
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           High School GWA (HSGWA) Distribution
         </h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          Students with recorded HSGWA: {students.filter((s) => s.personalInfo?.highSchoolGWA).length}
+        <p className="mb-4 text-sm text-muted-foreground">
+          Students with recorded HSGWA:{" "}
+          {students.filter((s) => s.personalInfo?.highSchoolGWA).length}
         </p>
 
         {hsGwaData.data.length > 0 ? (
           <>
             {/* Stats Cards */}
-            <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">
+            <div className="mb-6 grid grid-cols-3 gap-4">
+              <div className="rounded-lg bg-muted p-4">
+                <p className="mb-1 text-xs text-muted-foreground">
                   Average GWA
                 </p>
                 <p className="text-2xl font-bold text-foreground">
                   {hsGwaData.avg}
                 </p>
               </div>
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Lowest</p>
+              <div className="rounded-lg bg-muted p-4">
+                <p className="mb-1 text-xs text-muted-foreground">Lowest</p>
                 <p className="text-2xl font-bold text-foreground">
                   {hsGwaData.min}
                 </p>
               </div>
-              <div className="bg-muted p-4 rounded-lg">
-                <p className="text-xs text-muted-foreground mb-1">Highest</p>
+              <div className="rounded-lg bg-muted p-4">
+                <p className="mb-1 text-xs text-muted-foreground">Highest</p>
                 <p className="text-2xl font-bold text-foreground">
                   {hsGwaData.max}
                 </p>
@@ -177,35 +179,44 @@ export default function EducationAnalytics({
             </div>
 
             {/* Bar Chart */}
-            <ChartContainer config={chartConfigGwa} className="h-80">
+            <ChartContainer
+              config={chartConfigGwa}
+              className="h-80"
+            >
               <BarChart data={hsGwaData.data}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="range" />
                 <YAxis />
                 <ChartTooltip content={<ChartTooltipContent />} />
-                <Bar dataKey="count" fill="hsl(var(--color-count))" />
+                <Bar
+                  dataKey="count"
+                  fill="hsl(var(--color-count))"
+                />
               </BarChart>
             </ChartContainer>
           </>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             No HSGWA data available
           </div>
         )}
       </div>
 
       {/* Education Levels */}
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           Education Levels
         </h2>
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="mb-4 text-sm text-muted-foreground">
           Distribution of schools by education level
         </p>
 
         {educationLevelData.length > 0 ? (
           <>
-            <ChartContainer config={chartConfigLevel} className="h-80 mb-6">
+            <ChartContainer
+              config={chartConfigLevel}
+              className="mb-6 h-80"
+            >
               <BarChart data={educationLevelData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="level" />
@@ -216,7 +227,10 @@ export default function EducationAnalytics({
                     border: "1px solid hsl(var(--border))",
                   }}
                 />
-                <Bar dataKey="count" fill="hsl(var(--color-count))" />
+                <Bar
+                  dataKey="count"
+                  fill="hsl(var(--color-count))"
+                />
               </BarChart>
             </ChartContainer>
 
@@ -224,7 +238,7 @@ export default function EducationAnalytics({
               {educationLevelData.map((item) => (
                 <div
                   key={item.level}
-                  className="flex justify-between items-center p-3 bg-muted rounded-lg"
+                  className="flex items-center justify-between rounded-lg bg-muted p-3"
                 >
                   <span className="font-medium text-foreground">
                     {item.level}
@@ -237,18 +251,18 @@ export default function EducationAnalytics({
             </div>
           </>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             No education level data available
           </div>
         )}
       </div>
 
       {/* School Type (Public vs Private) */}
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           Nature of Schooling
         </h2>
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="mb-4 text-sm text-muted-foreground">
           Public vs. Private school enrollment
         </p>
 
@@ -257,7 +271,7 @@ export default function EducationAnalytics({
             {schoolTypeData.map((item) => (
               <div
                 key={item.type}
-                className="flex justify-between items-center p-4 bg-muted rounded-lg"
+                className="flex items-center justify-between rounded-lg bg-muted p-4"
               >
                 <span className="font-medium text-foreground">{item.type}</span>
                 <div className="flex items-center gap-4">
@@ -277,7 +291,7 @@ export default function EducationAnalytics({
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             No school type data available
           </div>
         )}

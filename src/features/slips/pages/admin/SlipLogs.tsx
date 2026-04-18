@@ -113,12 +113,12 @@ export default function SlipLogs() {
     navigate(`/admin/slips/${slip.id}`);
   };
 
-
   const isPageLoading = isLoading || isStatsLoading;
 
   usePageMetadata({
     title: "Admission Slip Logs",
-    description: "Historical record of all processed admission slips with date and status filters",
+    description:
+      "Historical record of all processed admission slips with date and status filters",
     badgeText: "Audit Trail",
     badgeIcon: <Calendar className="h-4 w-4" />,
     isLoading: isPageLoading,
@@ -127,7 +127,6 @@ export default function SlipLogs() {
   return (
     <>
       <div className="space-y-6">
-
         {/* Filters Section */}
         <Card>
           <CardHeader>
@@ -137,7 +136,7 @@ export default function SlipLogs() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <Dropdown
                 label="Year"
                 options={yearsList}
@@ -168,11 +167,15 @@ export default function SlipLogs() {
           }}
           currentPage={currentPage}
           onPageChange={setCurrentPage}
-          totalPages={totalPages} statuses={[]}
+          totalPages={totalPages}
+          statuses={[]}
           // @ts-ignore
-          selectedStatus={undefined} statusCounts={[]} onStatusChange={function (status: SlipStatus): void {
+          selectedStatus={undefined}
+          statusCounts={[]}
+          onStatusChange={function (status: SlipStatus): void {
             throw new Error("Function not implemented.");
-          }} />
+          }}
+        />
       </div>
     </>
   );

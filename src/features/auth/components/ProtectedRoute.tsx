@@ -31,7 +31,7 @@ export const ProtectedRoute = ({
    */
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <Spinner />
       </div>
     );
@@ -43,7 +43,12 @@ export const ProtectedRoute = ({
    */
   if (!isAuthenticated || !user) {
     console.error("[ProtectedRoute] Unauthorized access attempt");
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
   }
 
   /**
@@ -53,7 +58,12 @@ export const ProtectedRoute = ({
     requiredRole &&
     user.role.name.toLowerCase() !== requiredRole.toLowerCase()
   ) {
-    return <Navigate to="/" replace />;
+    return (
+      <Navigate
+        to="/"
+        replace
+      />
+    );
   }
 
   return <>{children}</>;

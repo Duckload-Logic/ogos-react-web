@@ -194,23 +194,25 @@ export function transformFormToPayload(formData: IIRForm): any {
         ),
         natureOfResidence: formData.family.background.natureOfResidence,
       },
-      relatedPersons: formData.family.relatedPersons.map((person: RelatedPerson) => ({
-        id: person.id,
-        lastName: person.lastName,
-        firstName: person.firstName,
-        middleName: handleNullableString(person.middleName),
-        dateOfBirth: person.dateOfBirth
-          ? formatDateForBackend(person.dateOfBirth)
-          : undefined,
-        educationalLevel: person.educationalLevel,
-        occupation: handleNullableString(person.occupation),
-        employerName: handleNullableString(person.employerName),
-        employerAddress: handleNullableString(person.employerAddress),
-        relationship: person.relationship,
-        isParent: person.isParent,
-        isGuardian: person.isGuardian,
-        isLiving: person.isLiving,
-      })),
+      relatedPersons: formData.family.relatedPersons.map(
+        (person: RelatedPerson) => ({
+          id: person.id,
+          lastName: person.lastName,
+          firstName: person.firstName,
+          middleName: handleNullableString(person.middleName),
+          dateOfBirth: person.dateOfBirth
+            ? formatDateForBackend(person.dateOfBirth)
+            : undefined,
+          educationalLevel: person.educationalLevel,
+          occupation: handleNullableString(person.occupation),
+          employerName: handleNullableString(person.employerName),
+          employerAddress: handleNullableString(person.employerAddress),
+          relationship: person.relationship,
+          isParent: person.isParent,
+          isGuardian: person.isGuardian,
+          isLiving: person.isLiving,
+        }),
+      ),
       finance: {
         id: formData.family.finance.id,
         monthlyFamilyIncomeRange:
@@ -245,13 +247,15 @@ export function transformFormToPayload(formData: IIRForm): any {
           formData.health.healthRecord.generalHealthDetails,
         ),
       },
-      consultations: formData.health.consultations.map((consultation: ConsultationRecord) => ({
-        id: consultation.id,
-        professionalType: consultation.professionalType,
-        hasConsulted: consultation.hasConsulted,
-        whenDate: handleNullableString(consultation.whenDate),
-        forWhat: handleNullableString(consultation.forWhat),
-      })),
+      consultations: formData.health.consultations.map(
+        (consultation: ConsultationRecord) => ({
+          id: consultation.id,
+          professionalType: consultation.professionalType,
+          hasConsulted: consultation.hasConsulted,
+          whenDate: handleNullableString(consultation.whenDate),
+          forWhat: handleNullableString(consultation.forWhat),
+        }),
+      ),
     },
     interests: {
       activities: formData.interests.activities.map((activity: Activity) => ({
@@ -261,11 +265,13 @@ export function transformFormToPayload(formData: IIRForm): any {
         role: activity.role,
         roleSpecification: handleNullableString(activity.roleSpecification),
       })),
-      subjectPreferences: formData.interests.subjectPreferences.map((pref: SubjectPreference) => ({
-        id: pref.id,
-        subjectName: pref.subjectName,
-        isFavorite: pref.isFavorite,
-      })),
+      subjectPreferences: formData.interests.subjectPreferences.map(
+        (pref: SubjectPreference) => ({
+          id: pref.id,
+          subjectName: pref.subjectName,
+          isFavorite: pref.isFavorite,
+        }),
+      ),
       hobbies: formData.interests.hobbies.map((hobby: Hobby) => ({
         id: hobby.id,
         hobbyName: hobby.hobbyName,
@@ -288,7 +294,9 @@ function handleNullableString(value: string | null | undefined): string | null {
 /**
  * Safely parses a given entity into a continuous scalar skipping empty.
  */
-function parseNumberSafely(val: string | number | null | undefined): number | undefined {
+function parseNumberSafely(
+  val: string | number | null | undefined,
+): number | undefined {
   if (val === null || val === undefined || val === "") return undefined;
   const num = Number(val);
   return isNaN(num) ? undefined : num;

@@ -17,6 +17,7 @@ import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
 import { useUI } from "@/context";
 import { UISettingsModal } from "@/components/shared/UISettingsModal";
+import { cn } from "@/lib/utils";
 
 const HOME_HREF = "/";
 const SETTINGS_HREF = "/settings";
@@ -39,11 +40,16 @@ function NavItem({
       <Link
         to={item.href}
         onClick={onClick}
-        className={`flex flex-col items-center p-2 group ${
+        className={`group flex flex-col items-center p-2 ${
           active ? "text-primary" : "text-muted-foreground"
         }`}
       >
-        <div className="w-6 h-6 flex items-center justify-center transition-transform group-hover:scale-110">
+        <div
+          className={cn(
+            "flex h-6 w-6 items-center justify-center",
+            "transition-transform group-hover:scale-110",
+          )}
+        >
           {item.icon}
         </div>
       </Link>
@@ -55,13 +61,13 @@ function NavItem({
       <Link
         to={item.href}
         onClick={onClick}
-        className={`flex items-center gap-3 p-4 rounded-xl transition-colors ${
+        className={`flex items-center gap-3 rounded-xl p-4 transition-colors ${
           active
             ? "bg-primary text-primary-foreground"
             : "bg-muted/50 hover:bg-muted"
         }`}
       >
-        <div className="w-6 h-6 flex items-center justify-center">
+        <div className="flex h-6 w-6 items-center justify-center">
           {item.icon}
         </div>
         <span className="font-medium">{item.label}</span>
@@ -74,24 +80,20 @@ function NavItem({
     <Link
       to={item.href}
       onClick={onClick}
-      className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3
-      transition-all duration-200 hover:shadow-sm
-      ${
+      className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-200 hover:shadow-sm ${
         active
           ? "bg-primary text-primary-foreground shadow-sm"
           : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
       }`}
     >
       <div
-        className={`flex items-center justify-center w-6 shrink-0 transition-transform duration-200
-        ${isExpanded ? "scale-110" : ""}`}
+        className={`flex w-6 shrink-0 items-center justify-center transition-transform duration-200 ${isExpanded ? "scale-110" : ""}`}
       >
         {item.icon}
       </div>
 
       <span
-        className={`transition-all duration-200 whitespace-nowrap overflow-hidden
-        ${isExpanded ? "opacity-100 translate-x-0 w-auto" : "opacity-0 translate-x-[-3px] w-0"}`}
+        className={`overflow-hidden whitespace-nowrap transition-all duration-200 ${isExpanded ? "w-auto translate-x-0 opacity-100" : "w-0 translate-x-[-3px] opacity-0"}`}
       >
         {item.label}
       </span>
@@ -166,8 +168,8 @@ export default function Navigation({
 
     return (
       <>
-        <nav className="fixt bottom-0 w-full bg-background border-t shrink-0 z-50">
-          <div className="flex items-center justify-around h-16 px-2">
+        <nav className="fixt bottom-0 z-50 w-full shrink-0 border-t bg-background">
+          <div className="flex h-16 items-center justify-around px-2">
             {homeItem && (
               <NavItem
                 item={homeItem}
@@ -181,33 +183,36 @@ export default function Navigation({
                 setDrawerMode("menu");
                 setOpenDrawer(true);
               }}
-              className={`flex flex-col items-center p-2 group ${
+              className={`group flex flex-col items-center p-2 ${
                 isOverflowActive ? "text-primary" : "text-muted-foreground"
               }`}
             >
-              <MoreHorizontal className="w-6 h-6 group-aria-pressed:animate-spin transition-transform" />
+              <MoreHorizontal className="h-6 w-6 transition-transform group-aria-pressed:animate-spin" />
             </button>
             <button
               onClick={() => {
                 setDrawerMode("settings");
                 setOpenDrawer(true);
               }}
-              className={`flex flex-col items-center p-2 group ${
+              className={`group flex flex-col items-center p-2 ${
                 location.pathname.includes(SETTINGS_HREF)
                   ? "text-primary"
                   : "text-muted-foreground"
               }`}
             >
-              <Settings className="w-6 h-6 group-hover:rotate-45 transition-transform" />
+              <Settings className="h-6 w-6 transition-transform group-hover:rotate-45" />
             </button>
           </div>
         </nav>
 
-        <Drawer open={openDrawer} onOpenChange={setOpenDrawer}>
-          <DrawerContent className="p-4 pb-8 space-y-8">
+        <Drawer
+          open={openDrawer}
+          onOpenChange={setOpenDrawer}
+        >
+          <DrawerContent className="space-y-8 p-4 pb-8">
             {drawerMode === "menu" ? (
               <div className="space-y-3">
-                <p className="text-xs font-bold text-muted-foreground px-2">
+                <p className="px-2 text-xs font-bold text-muted-foreground">
                   NAVIGATION
                 </p>
                 {overflowItems.map((item) => {
@@ -246,14 +251,13 @@ export default function Navigation({
   }
 
   return (
-    <div className="h-full flex items-center justify-center">
+    <div className="flex h-full items-center justify-center">
       <aside
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={`relative flex flex-col bg-glass-bg border border-glass-border border-l-0 shadow-lg transition-all duration-300 z-30 h-[95%] rounded-3xl rounded-tl-none rounded-bl-none overflow-x-hidden
-        ${isExpanded ? "w-[16.25rem]" : "w-[4.5rem]"}`}
+        className={`relative z-30 flex h-[95%] flex-col overflow-x-hidden rounded-3xl rounded-bl-none rounded-tl-none border border-l-0 border-glass-border bg-glass-bg shadow-lg transition-all duration-300 ${isExpanded ? "w-[16.25rem]" : "w-[4.5rem]"}`}
       >
-        <nav className="flex flex-col gap-2 p-3 mt-2">
+        <nav className="mt-2 flex flex-col gap-2 p-3">
           {navigationItems.map((item) => {
             return (
               <NavItem
@@ -268,19 +272,17 @@ export default function Navigation({
         </nav>
 
         {/* Pin Toggle (Desktop Only) - Balanced spacing */}
-        <div className="mt-auto p-3 mb-2">
+        <div className="mb-2 mt-auto p-3">
           <button
             onClick={toggleSidebarPinned}
-            className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3 w-full
-            transition-all duration-200 hover:shadow-sm
-            ${
+            className={`sidebar-icon-tilt group flex w-full items-center gap-3 rounded-xl px-3 py-3 transition-all duration-200 hover:shadow-sm ${
               sidebarPinned
                 ? "bg-primary/10 text-primary shadow-sm"
                 : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
             }`}
             title={sidebarPinned ? "Unpin Sidebar" : "Pin Sidebar"}
           >
-            <div className="flex items-center justify-center w-6 shrink-0">
+            <div className="flex w-6 shrink-0 items-center justify-center">
               {sidebarPinned ? (
                 <PinOff size="1.25rem" />
               ) : (
@@ -288,7 +290,12 @@ export default function Navigation({
               )}
             </div>
             {isExpanded && (
-              <span className="font-medium whitespace-nowrap overflow-hidden w-auto animate-in fade-in slide-in-from-left-2 duration-200">
+              <span
+                className={cn(
+                  "animate-in fade-in slide-in-from-left-2 w-auto",
+                  "overflow-hidden whitespace-nowrap font-medium duration-200",
+                )}
+              >
                 {sidebarPinned ? "Unpin Sidebar" : "Pin Sidebar"}
               </span>
             )}
@@ -317,7 +324,10 @@ function MobileSettingsContent({
           navigate(`/${role}/profile`);
           closeDrawer();
         }}
-        className="flex items-center gap-4 p-2 cursor-pointer hover:bg-muted/50 rounded-xl transition"
+        className={cn(
+          "flex cursor-pointer items-center gap-4 rounded-xl p-2",
+          "transition hover:bg-muted/50",
+        )}
       >
         <Avatar className="h-12 w-12">
           <AvatarFallback className="bg-primary text-primary-foreground">
@@ -332,11 +342,14 @@ function MobileSettingsContent({
           <p className="text-xs text-muted-foreground">{roleLabel}</p>
         </div>
       </div>
-      <div className="border-t border-border my-2" />
+      <div className="my-2 border-t border-border" />
       <div className="flex flex-col gap-2">
         <button
           onClick={onOpenUISettings}
-          className="w-full flex items-center rounded-xl gap-3 px-4 py-3 text-sm hover:bg-muted transition"
+          className={cn(
+            "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm",
+            "transition hover:bg-muted",
+          )}
         >
           <Settings size={16} />
           <span>Settings</span>
@@ -344,7 +357,10 @@ function MobileSettingsContent({
         <a
           href="https://www.pup.edu.ph/terms/"
           target="_blank"
-          className="w-full flex items-center rounded-xl gap-3 px-4 py-3 text-sm hover:bg-muted transition"
+          className={cn(
+            "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm",
+            "transition hover:bg-muted",
+          )}
         >
           <Gavel size={16} />
           <span>Terms of Service</span>
@@ -352,7 +368,10 @@ function MobileSettingsContent({
         <a
           href="https://www.pup.edu.ph/privacy/"
           target="_blank"
-          className="w-full flex items-center rounded-xl gap-3 px-4 py-3 text-sm hover:bg-muted transition"
+          className={cn(
+            "flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm",
+            "transition hover:bg-muted",
+          )}
         >
           <ShieldCheck size={16} />
           <span>Privacy Policy</span>
@@ -362,8 +381,11 @@ function MobileSettingsContent({
       {/* Logout Action */}
       <button
         onClick={onLogout}
-        className="w-full flex items-center justify-center gap-3 p-4
-          text-red-500 bg-red-500/10 hover:bg-red-500/20 rounded-xl font-bold transition"
+        className={cn(
+          "flex w-full items-center justify-center gap-3 rounded-xl",
+          "bg-red-500/10 p-4 font-bold text-red-500 transition",
+          "hover:bg-red-500/20",
+        )}
       >
         <LogOut size={20} />
         Logout

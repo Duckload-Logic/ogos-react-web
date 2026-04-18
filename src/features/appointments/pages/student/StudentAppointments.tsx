@@ -33,6 +33,7 @@ import { useAppointmentsStats } from "../../hooks/useAppointments";
 import { Pagination } from "@/components/shared";
 import { format12HourTime } from "../../utils";
 import { usePageMetadata } from "@/components/layout/Layout";
+import { cn } from "@/lib/utils";
 
 const GLASS_CARD =
   "overflow-hidden rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]";
@@ -70,7 +71,10 @@ export default function StudentAppointments() {
     badgeIcon: <Calendar className="h-4 w-4" />,
     isLoading,
     headerActions: (
-      <Button asChild className="h-10 gap-2 rounded-xl shadow-lg shadow-primary/20">
+      <Button
+        asChild
+        className="h-10 gap-2 rounded-xl shadow-lg shadow-primary/20"
+      >
         <Link to="/student/appointments/schedule">
           <Plus className="h-4 w-4" />
           New Appointment
@@ -124,12 +128,19 @@ export default function StudentAppointments() {
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-7">
         {appointmentStatuses.map((stat: AppointmentStatus, index: number) => {
           const count =
-            statusCounts?.find((s) => String(s.id) === String(stat.id))?.count || 0;
+            statusCounts?.find((s) => String(s.id) === String(stat.id))
+              ?.count || 0;
 
           return (
             <Card
               key={stat.id}
-              className="group animate-fade-in-up overflow-hidden rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl transition-all duration-200 hover:-translate-y-0.5 dark:border-white/10 dark:bg-white/[0.04]"
+              className={cn(
+                "animate-fade-in-up group overflow-hidden rounded-[18px]",
+                "border border-white/20 bg-white/45",
+                "shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl",
+                "transition-all duration-200 hover:-translate-y-0.5",
+                "dark:border-white/10 dark:bg-white/[0.04]",
+              )}
               style={{
                 animationDelay: `${0.05 * (index + 1)}s`,
                 animationFillMode: "both",
@@ -143,12 +154,18 @@ export default function StudentAppointments() {
                     <p className="text-[11px] font-semibold uppercase tracking-[0.18em]">
                       {stat.name}
                     </p>
-                    <p className="text-2xl font-bold tracking-tight tabular-nums text-foreground">
+                    <p className="text-2xl font-bold tabular-nums tracking-tight text-foreground">
                       {count}
                     </p>
                   </div>
 
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-white/30 bg-white/50 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.06]">
+                  <div
+                    className={cn(
+                      "flex h-11 w-11 shrink-0 items-center justify-center",
+                      "rounded-xl border border-white/30 bg-white/50",
+                      "backdrop-blur-md dark:border-white/10 dark:bg-white/[0.06]",
+                    )}
+                  >
                     <ClipboardCheck className="h-5 w-5 text-foreground/80" />
                   </div>
                 </div>
@@ -162,12 +179,15 @@ export default function StudentAppointments() {
       <Card className={`${GLASS_CARD} animate-fade-in-up`}>
         {/* Filter Tabs */}
         <CardHeader className="border-b border-white/20 px-4 py-3 dark:border-white/10">
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide sm:pb-0">
+          <div className="scrollbar-hide flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
             {filterStatuses?.map((filter: AppointmentStatus) => {
               const isActive = selectedStatus.id === filter.id;
               const count =
                 filter.id === 0
-                  ? statusCounts.reduce((sum, item) => sum + (item.count || 0), 0)
+                  ? statusCounts.reduce(
+                      (sum, item) => sum + (item.count || 0),
+                      0,
+                    )
                   : statusCounts?.find((s) => s.id === filter.id)?.count || 0;
 
               return (
@@ -209,7 +229,10 @@ export default function StudentAppointments() {
                 {appointments.map((appointment: Appointment, index: number) => (
                   <div
                     key={appointment.id}
-                    className="animate-fade-in-up p-4 transition-colors duration-200 hover:bg-white/35 dark:hover:bg-white/[0.03] sm:p-5"
+                    className={cn(
+                      "animate-fade-in-up p-4 transition-colors duration-200",
+                      "hover:bg-white/35 dark:hover:bg-white/[0.03] sm:p-5",
+                    )}
                     style={{
                       animationDelay: `${0.04 * (index + 1)}s`,
                       animationFillMode: "both",
@@ -217,11 +240,22 @@ export default function StudentAppointments() {
                   >
                     <div className="flex items-start gap-4">
                       {/* Date Badge */}
-                      <div className="hidden h-20 w-20 shrink-0 flex-col items-center justify-center rounded-[18px] border border-white/20 bg-white/50 shadow-[0_8px_22px_rgba(15,23,42,0.05)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] sm:flex">
+                      <div
+                        className={cn(
+                          "hidden h-20 w-20 shrink-0 flex-col items-center",
+                          "justify-center rounded-[18px] border border-white/20",
+                          "bg-white/50 shadow-[0_8px_22px_rgba(15,23,42,0.05)]",
+                          "backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]",
+                          "sm:flex",
+                        )}
+                      >
                         <div className="mb-1 text-xs font-semibold uppercase text-primary">
-                          {new Date(appointment.whenDate).toLocaleDateString("en-US", {
-                            month: "short",
-                          })}
+                          {new Date(appointment.whenDate).toLocaleDateString(
+                            "en-US",
+                            {
+                              month: "short",
+                            },
+                          )}
                         </div>
                         <div className="text-2xl font-bold text-primary">
                           {new Date(appointment.whenDate).getDate()}
@@ -235,7 +269,10 @@ export default function StudentAppointments() {
                             <div className="flex flex-wrap items-center gap-2">
                               <Badge
                                 variant="outline"
-                                className="border-white/30 bg-white/60 text-xs font-medium backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
+                                className={cn(
+                                  "border-white/30 bg-white/60 text-xs font-medium",
+                                  "backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]",
+                                )}
                               >
                                 <Tag className="mr-1 h-3 w-3" />
                                 {appointment.appointmentCategory.name}
@@ -268,7 +305,10 @@ export default function StudentAppointments() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align="end"
-                              className="rounded-xl border-white/20 bg-white/85 backdrop-blur-xl dark:border-white/10 dark:bg-[#111]/80"
+                              className={cn(
+                                "rounded-xl border-white/20 bg-white/85 backdrop-blur-xl",
+                                "dark:border-white/10 dark:bg-[#111]/80",
+                              )}
                             >
                               <DropdownMenuItem>
                                 <Eye className="mr-2 h-4 w-4" />
@@ -292,15 +332,14 @@ export default function StudentAppointments() {
                               {formatDate(appointment.whenDate)}
                             </span>
                             <span className="hidden sm:inline">
-                              {new Date(appointment.whenDate).toLocaleDateString(
-                                "en-US",
-                                {
-                                  weekday: "long",
-                                  year: "numeric",
-                                  month: "long",
-                                  day: "numeric",
-                                },
-                              )}
+                              {new Date(
+                                appointment.whenDate,
+                              ).toLocaleDateString("en-US", {
+                                weekday: "long",
+                                year: "numeric",
+                                month: "long",
+                                day: "numeric",
+                              })}
                             </span>
                           </div>
                           <div className="flex items-center gap-1.5">
@@ -328,7 +367,13 @@ export default function StudentAppointments() {
               {/* Empty State */}
               <div className="px-4 py-10 sm:px-6 sm:py-12">
                 <div className="mx-auto flex max-w-md flex-col items-center text-center">
-                  <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border border-white/20 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
+                  <div
+                    className={cn(
+                      "mb-4 flex h-20 w-20 items-center justify-center rounded-full",
+                      "border border-white/20 bg-white/60 backdrop-blur-md",
+                      "dark:border-white/10 dark:bg-white/[0.05]",
+                    )}
+                  >
                     <CalendarX className="h-9 w-9 text-muted-foreground" />
                   </div>
 

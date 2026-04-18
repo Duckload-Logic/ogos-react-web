@@ -1,17 +1,7 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { User, Mail, ArrowRight } from "lucide-react";
@@ -44,14 +34,16 @@ export function StudentProfileCard({
         <CardTitle className="text-base">Student Profile</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
           {/* Personal Tab Label */}
           <div className="md:col-span-1">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Personal</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Personal
+            </h3>
             <div className="flex gap-4">
-              <User className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <User className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
                   Full Name
                 </p>
                 <p className="text-sm font-semibold text-foreground">
@@ -67,11 +59,13 @@ export function StudentProfileCard({
 
           {/* Contact Tab Label */}
           <div className="md:col-span-1">
-            <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Contact</h3>
+            <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+              Contact
+            </h3>
             <div className="flex gap-4">
-              <Mail className="h-4 w-4 text-muted-foreground flex-shrink-0 mt-0.5" />
+              <Mail className="mt-0.5 h-4 w-4 flex-shrink-0 text-muted-foreground" />
               <div className="flex-1">
-                <p className="text-xs text-muted-foreground uppercase tracking-wide mb-1">
+                <p className="mb-1 text-xs uppercase tracking-wide text-muted-foreground">
                   Email Address
                 </p>
                 <p className="text-sm font-semibold text-foreground">

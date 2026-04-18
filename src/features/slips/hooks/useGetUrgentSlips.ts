@@ -5,15 +5,9 @@ import { CACHE_TIMING } from "@/config/constants";
 
 export function useGetUrgentSlips(params?: any) {
   return useQuery({
-    queryKey: [
-      ...QUERY_KEYS.slips.stats,
-      "urgent",
-      params,
-    ],
+    queryKey: [...QUERY_KEYS.slips.stats, "urgent", params],
     queryFn: async () => {
-      const result = await slipService.GetUrgentSlips(
-        params,
-      );
+      const result = await slipService.GetUrgentSlips(params);
       return result;
     },
     staleTime: CACHE_TIMING.SHORT.staleTime,

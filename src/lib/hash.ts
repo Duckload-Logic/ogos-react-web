@@ -9,14 +9,14 @@ export const hashId = (id: string): string => {
 export const unhashId = (hash: string): string => {
   try {
     const decoded = atob(hash);
-    const parts = decoded.split(':');
+    const parts = decoded.split(":");
     if (parts.length !== 2 || parts[0] !== SECRET_KEY) {
-      console.error('Invalid hash format or wrong secret');
-      return '';
+      console.error("Invalid hash format or wrong secret");
+      return "";
     }
     return parts[1];
   } catch (error) {
-    console.error('Error decoding hash:', error);
-    return '';
+    console.error("Error decoding hash:", error);
+    return "";
   }
 };

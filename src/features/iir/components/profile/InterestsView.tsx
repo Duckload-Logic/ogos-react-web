@@ -27,18 +27,29 @@ export default function InterestsHobbiesView({
   );
 
   return (
-    <div className="flex flex-col gap-8 animate-in fade-in slide-in-from-left-4 duration-500">
+    <div
+      className={cn(
+        "animate-in fade-in slide-in-from-left-4 flex flex-col gap-8",
+        "duration-500",
+      )}
+    >
       <section>
         <SectionTitle title="Activities" />
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <ActivityCard title="Academic" list={academicInterests} />
-          <ActivityCard title="Other" list={otherActivities} />
+        <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <ActivityCard
+            title="Academic"
+            list={academicInterests}
+          />
+          <ActivityCard
+            title="Other"
+            list={otherActivities}
+          />
         </div>
       </section>
 
       <section>
         <SectionTitle title="Subject Preferences" />
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
           <CardBlock title="Favorite Subject/s">
             <TagList
               values={preferredSubjects
@@ -58,10 +69,13 @@ export default function InterestsHobbiesView({
 
       <section>
         <SectionTitle title="Hobbies (Priority Rank)" />
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
           {hobbies.length > 0 ? (
             hobbies.map((hobby: any) => (
-              <CardBlock key={hobby.id} title={`Rank ${hobby.priorityRank}`}>
+              <CardBlock
+                key={hobby.id}
+                title={`Rank ${hobby.priorityRank}`}
+              >
                 <div className="flex items-center gap-3">
                   <Trophy className="h-4 w-4 text-primary" />
                   <span className="text-sm font-semibold text-card-foreground">
@@ -87,12 +101,12 @@ function ActivityCard({ title, list }: { title: string; list: any[] }) {
           {list.map((activity: any) => (
             <div
               key={activity.id}
-              className="rounded-lg bg-glass-bg border border-glass-border p-3"
+              className="rounded-lg border border-glass-border bg-glass-bg p-3"
             >
               <p className="text-xs font-semibold text-card-foreground">
                 {asText(activity.activityOptions?.[0]?.name || "Activity")}
               </p>
-              <p className="text-[11px] text-muted-foreground mt-1">
+              <p className="mt-1 text-[11px] text-muted-foreground">
                 Role: {asText(activity.role)}
               </p>
             </div>

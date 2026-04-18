@@ -14,7 +14,12 @@ import { Alert, AlertDescription } from "@/components/ui/alert";
 import Layout, { usePageMetadata } from "@/components/layout/Layout";
 import { useToast } from "@/context";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { HeroSection } from "@/components/ui/hero-section";
 import { AnimationStyles } from "@/components/ui/animations";
 import {
@@ -61,6 +66,7 @@ import {
 } from "@/features/iir/components/form/FormErrorModal";
 import { SectionProgress } from "../components/form/SectionProgress";
 import ConsentDialog from "../components/form/ConsentDialog";
+import { cn } from "@/lib/utils";
 
 const FORM_SECTIONS = [
   { title: "I. Personal Information", id: 1, key: "personal" },
@@ -114,7 +120,9 @@ export default function IIRForm() {
 
   const handleInputChange = useCallback((fieldPath: string, value: any) => {
     const path = fieldPath.split(".");
-    setLocalFormData((prev: IIRFormType | null) => updateNestedField(prev, path, value));
+    setLocalFormData((prev: IIRFormType | null) =>
+      updateNestedField(prev, path, value),
+    );
     setLastChangeTimestamp(Date.now());
   }, []);
 
@@ -193,7 +201,6 @@ export default function IIRForm() {
       console.error("[AutoSave] Error saving draft:", err);
     }
   };
-
 
   const isLoading =
     isInitializing || isLoadingDraft || isSubmitting || isSaving;
@@ -365,7 +372,8 @@ export default function IIRForm() {
   const currentSectionDef = FORM_SECTIONS.find((s) => s.id === currentSection);
   usePageMetadata({
     title: "Individual Inventory Record",
-    description: "Fill out your student information with confidence. Your data is protected and used solely for academic and guidance purposes.",
+    description:
+      "Fill out your student information with confidence. Your data is protected and used solely for academic and guidance purposes.",
     badgeText: "Student Profile Portal",
     badgeIcon: <User className="h-4 w-4" />,
     isLoading,
@@ -377,38 +385,55 @@ export default function IIRForm() {
         <AnimationStyles />
 
         {/* Main Content Container */}
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10 relative z-10">
-          <div className="flex flex-col gap-10 w-full">
+        <div className="relative z-10 mx-auto max-w-6xl px-4 py-10 sm:px-6 lg:px-8">
+          <div className="flex w-full flex-col gap-10">
             {/* Draft Restore Prompt */}
             {showDraftPrompt && (
               <div className="animate-in slide-in-from-top-4 duration-500">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-5 bg-primary/5 backdrop-blur-md border border-primary/20 rounded-3xl dark:bg-primary/10 dark:border-primary/20">
+                <div
+                  className={cn(
+                    "rounded-3xl border border-primary/20 bg-primary/5 p-5",
+                    "backdrop-blur-md dark:border-primary/20",
+                    "dark:bg-primary/10 sm:flex-row",
+                  )}
+                >
                   <div className="flex items-center gap-3">
-                    <div className="h-10 w-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
+                    <div
+                      className={cn(
+                        "flex h-10 w-10 items-center justify-center rounded-2xl",
+                        "bg-primary/10 text-primary",
+                      )}
+                    >
                       <AlertCircle className="h-6 w-6" />
                     </div>
                     <div>
                       <h4 className="text-sm font-bold text-foreground">
                         Unsaved Progress Found
                       </h4>
-                      <p className="text-xs text-muted-foreground font-medium">
+                      <p className="text-xs font-medium text-muted-foreground">
                         Would you like to restore your previous work?
                       </p>
                     </div>
                   </div>
-                  <div className="flex gap-2 w-full sm:w-auto">
+                  <div className="flex w-full gap-2 sm:w-auto">
                     <Button
                       variant="ghost"
                       size="sm"
                       onClick={handleDiscardDraft}
-                      className="flex-1 sm:flex-none text-muted-foreground hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl font-bold"
+                      className={cn(
+                        "flex-1 rounded-xl font-bold text-muted-foreground",
+                        "hover:bg-neutral-100 dark:hover:bg-neutral-800 sm:flex-none",
+                      )}
                     >
                       Discard
                     </Button>
                     <Button
                       size="sm"
                       onClick={handleRestoreDraft}
-                      className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 text-white rounded-xl shadow-lg shadow-primary/20 font-bold px-6"
+                      className={cn(
+                        "flex-1 rounded-xl bg-primary px-6 font-bold text-white",
+                        "shadow-lg shadow-primary/20 hover:bg-primary/90 sm:flex-none",
+                      )}
                     >
                       Restore Draft
                     </Button>
@@ -438,10 +463,27 @@ export default function IIRForm() {
               {/* Form Content Wrapper */}
               <div className="">
                 {/* Floating Completion Pill */}
-                <div className="mb-3 animate-in fade-in slide-in-from-right-4 duration-700 delay-300">
-                  <div className="flex items-center gap-2.5 px-4 py-2 bg-white/60 backdrop-blur-md border border-white/20 rounded-full shadow-[0_4px_12px_rgba(0,0,0,0.03)] dark:bg-white/[0.04] dark:border-white/10">
-                    <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(var(--primary),0.6)]" />
-                    <span className="text-[11px] font-black uppercase tracking-wider text-neutral-900 dark:text-white">
+                <div className="animate-in fade-in slide-in-from-right-4 mb-3 delay-300 duration-700">
+                  <div
+                    className={cn(
+                      "flex items-center gap-2.5 rounded-full border",
+                      "border-white/20 bg-white/60 px-4 py-2",
+                      "shadow-[0_4px_12px_rgba(0,0,0,0.03)] backdrop-blur-md",
+                      "dark:border-white/10 dark:bg-white/[0.04]",
+                    )}
+                  >
+                    <div
+                      className={cn(
+                        "h-2.5 w-2.5 animate-pulse rounded-full bg-primary",
+                        "shadow-[0_0_10px_rgba(var(--primary),0.6)]",
+                      )}
+                    />
+                    <span
+                      className={cn(
+                        "text-[11px] font-black uppercase tracking-wider",
+                        "text-neutral-900 dark:text-white",
+                      )}
+                    >
                       {calculateSectionCompletion(
                         currentSection,
                         localFormData ?? null,
@@ -452,7 +494,12 @@ export default function IIRForm() {
                 </div>
 
                 {/* Individual Form Sections */}
-                <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 ease-out fill-mode-both">
+                <div
+                  className={cn(
+                    "animate-in fade-in slide-in-from-bottom-8",
+                    "fill-mode-both duration-700 ease-out",
+                  )}
+                >
                   {currentSection === 1 && localFormData?.student && (
                     <PersonalSection
                       ref={personalSectionRef}
@@ -502,11 +549,24 @@ export default function IIRForm() {
               </div>
 
               {/* Form Navigation Action Bar */}
-              <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-white/40 backdrop-blur-xl p-5 border border-white/20 shadow-[0_12px_40px_rgba(31,38,135,0.08)] dark:bg-white/[0.04] dark:border-white/10 rounded-[28px] mt-4 mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
+              <div
+                className={cn(
+                  "animate-in fade-in slide-in-from-bottom-4 mb-20 mt-4 flex",
+                  "flex-col items-center justify-between gap-4 rounded-[28px]",
+                  "border border-white/20 bg-white/40 p-5",
+                  "shadow-[0_12px_40px_rgba(31,38,135,0.08)] backdrop-blur-xl",
+                  "delay-500 duration-700 dark:border-white/10",
+                  "dark:bg-white/[0.04] md:flex-row",
+                )}
+              >
                 <Button
                   variant="ghost"
                   onClick={() => setShowResetConfirm(true)}
-                  className="text-neutral-400 hover:text-destructive hover:bg-destructive/10 font-bold rounded-xl px-4 sm:px-6 transition-all duration-300"
+                  className={cn(
+                    "rounded-xl px-4 font-bold text-neutral-400 transition-all",
+                    "duration-300 hover:bg-destructive/10 hover:text-destructive",
+                    "sm:px-6",
+                  )}
                 >
                   Reset
                 </Button>
@@ -516,7 +576,13 @@ export default function IIRForm() {
                     variant="outline"
                     onClick={handlePreviousSection}
                     disabled={currentSection === 1 || isSaving}
-                    className="flex items-center gap-2 border-neutral-200/50 bg-white/30 hover:bg-white/60 dark:border-white/10 dark:bg-white/5 dark:hover:bg-white/10 rounded-2xl px-5 sm:px-7 h-12 font-bold text-neutral-700 dark:text-neutral-200 transition-all duration-300 shadow-sm"
+                    className={cn(
+                      "flex h-12 items-center gap-2 rounded-2xl",
+                      "border-neutral-200/50 bg-white/30 px-5 font-bold",
+                      "text-neutral-700 shadow-sm transition-all duration-300",
+                      "hover:bg-white/60 dark:border-white/10 dark:bg-white/5",
+                      "dark:text-neutral-200 dark:hover:bg-white/10 sm:px-7",
+                    )}
                   >
                     <ChevronLeft className="h-5 w-5" />
                     <span className="hidden sm:inline">Back</span>
@@ -526,11 +592,21 @@ export default function IIRForm() {
                     <Button
                       onClick={handleNextSection}
                       disabled={isSaving}
-                      className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 rounded-2xl px-6 sm:px-10 h-12 font-black tracking-tight transition-all duration-300 active:scale-95"
+                      className={cn(
+                        "flex h-12 items-center gap-2 rounded-2xl bg-primary px-6",
+                        "font-black tracking-tight text-primary-foreground shadow-xl",
+                        "shadow-primary/20 transition-all duration-300",
+                        "hover:bg-primary/90 active:scale-95 sm:px-10",
+                      )}
                     >
                       {isSaving ? (
                         <div className="flex items-center gap-3">
-                          <div className="animate-spin h-5 w-5 border-3 border-primary-foreground border-t-transparent rounded-full" />
+                          <div
+                            className={cn(
+                              "border-3 h-5 w-5 animate-spin rounded-full",
+                              "border-primary-foreground border-t-transparent",
+                            )}
+                          />
                           <span>Saving...</span>
                         </div>
                       ) : (
@@ -544,11 +620,22 @@ export default function IIRForm() {
                     <Button
                       onClick={handleSubmit}
                       disabled={isSaving}
-                      className="flex items-center gap-2 bg-primary hover:bg-primary/90 text-primary-foreground shadow-xl shadow-primary/20 rounded-2xl px-6 sm:px-10 h-12 font-black tracking-tight transition-all duration-300 active:scale-95"
+                      className={cn(
+                        "flex h-12 items-center gap-2 rounded-2xl bg-primary",
+                        "px-6 font-black tracking-tight",
+                        "text-primary-foreground shadow-xl shadow-primary/20",
+                        "transition-all duration-300 hover:bg-primary/90",
+                        "active:scale-95 sm:px-10",
+                      )}
                     >
                       {isSubmitting ? (
                         <div className="flex items-center gap-3">
-                          <div className="animate-spin h-5 w-5 border-3 border-primary-foreground border-t-transparent rounded-full" />
+                          <div
+                            className={cn(
+                              "border-3 h-5 w-5 animate-spin rounded-full",
+                              "border-primary-foreground border-t-transparent",
+                            )}
+                          />
                           <span>Submitting...</span>
                         </div>
                       ) : (
@@ -582,28 +669,36 @@ export default function IIRForm() {
           open={showResetConfirm}
           onOpenChange={(open) => setShowResetConfirm(open)}
         >
-          <AlertDialogContent className="rounded-3xl border-none shadow-2xl backdrop-blur-3xl bg-white/90 dark:bg-neutral-900/90 max-w-sm">
+          <AlertDialogContent
+            className={cn(
+              "max-w-sm rounded-3xl border-none bg-white/90 shadow-2xl",
+              "backdrop-blur-3xl dark:bg-neutral-900/90",
+            )}
+          >
             <AlertDialogHeader>
               <AlertDialogTitle className="text-2xl font-black tracking-tight">
                 Erase everything?
               </AlertDialogTitle>
-              <AlertDialogDescription className="text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed">
+              <AlertDialogDescription className="font-medium leading-relaxed text-neutral-500 dark:text-neutral-400">
                 This will clear all your current answers. This action cannot be
                 undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter className="flex-row gap-2 mt-4">
+            <AlertDialogFooter className="mt-4 flex-row gap-2">
               <AlertDialogCancel asChild>
                 <Button
                   variant="ghost"
-                  className="flex-1 rounded-2xl font-bold border border-neutral-200 dark:border-neutral-800"
+                  className="flex-1 rounded-2xl border border-neutral-200 font-bold dark:border-neutral-800"
                 >
                   Cancel
                 </Button>
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={confirmReset}
-                className="flex-1 bg-destructive hover:bg-destructive/90 text-white rounded-2xl font-bold shadow-lg shadow-destructive/20"
+                className={cn(
+                  "flex-1 rounded-2xl bg-destructive font-bold text-white",
+                  "shadow-lg shadow-destructive/20 hover:bg-destructive/90",
+                )}
               >
                 Yes, Reset
               </AlertDialogAction>
@@ -618,7 +713,6 @@ export default function IIRForm() {
           totalErrors={totalErrors}
           onNavigateToSection={(id) => setCurrentSection(id)}
         />
-
       </div>
     </>
   );
@@ -637,26 +731,62 @@ function SuccessPopup({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-neutral-950/40 backdrop-blur-sm flex items-center justify-center z-[100] p-4 animate-in fade-in duration-500">
-      <div className="w-full max-w-md bg-white/90 backdrop-blur-2xl border border-white/20 rounded-[40px] shadow-[0_32px_120px_rgba(0,0,0,0.15)] dark:bg-neutral-900/90 dark:border-white/10 p-10 text-center animate-in zoom-in-95 duration-500">
-        <div className="flex justify-center mb-8">
+    <div
+      className={cn(
+        "animate-in fade-in fixed inset-0 z-[100] flex items-center",
+        "justify-center bg-neutral-950/40 p-4 backdrop-blur-sm",
+        "duration-500",
+      )}
+    >
+      <div
+        className={cn(
+          "animate-in zoom-in-95 w-full max-w-md rounded-[40px] border",
+          "border-white/20 bg-white/90 p-10 text-center",
+          "shadow-[0_32px_120px_rgba(0,0,0,0.15)] backdrop-blur-2xl",
+          "duration-500 dark:border-white/10 dark:bg-neutral-900/90",
+        )}
+      >
+        <div className="mb-8 flex justify-center">
           <div className="relative">
-            <div className="absolute inset-0 bg-green-500/20 blur-2xl rounded-full animate-pulse" />
-            <div className="relative w-20 h-20 rounded-[28px] bg-green-500 flex items-center justify-center shadow-xl shadow-green-500/30">
-              <Check className="w-10 h-10 text-white" strokeWidth={4} />
+            <div className="absolute inset-0 animate-pulse rounded-full bg-green-500/20 blur-2xl" />
+            <div
+              className={cn(
+                "relative flex h-20 w-20 items-center justify-center",
+                "rounded-[28px] bg-green-500 shadow-xl shadow-green-500/30",
+              )}
+            >
+              <Check
+                className="h-10 w-10 text-white"
+                strokeWidth={4}
+              />
             </div>
           </div>
         </div>
-        <h3 className="text-3xl font-[900] tracking-tight text-neutral-900 dark:text-white mb-3">
+        <h3
+          className={cn(
+            "mb-3 text-3xl font-[900] tracking-tight",
+            "text-neutral-900 dark:text-white",
+          )}
+        >
           All Done!
         </h3>
-        <p className="text-neutral-500 dark:text-neutral-400 font-medium mb-10 leading-relaxed px-4">
+        <p
+          className={cn(
+            "mb-10 px-4 font-medium leading-relaxed",
+            "text-neutral-500 dark:text-neutral-400",
+          )}
+        >
           Your Individual Inventory Record has been successfully submitted and
           saved to our secure database.
         </p>
         <Button
           onClick={onReturn}
-          className="w-full h-14 bg-neutral-900 hover:bg-neutral-800 dark:bg-white dark:hover:bg-neutral-200 text-white dark:text-neutral-950 rounded-2xl font-black tracking-tight text-lg shadow-xl transition-all duration-300 active:scale-95"
+          className={cn(
+            "h-14 w-full rounded-2xl bg-neutral-900 text-lg font-black",
+            "tracking-tight text-white shadow-xl transition-all",
+            "duration-300 hover:bg-neutral-800 active:scale-95",
+            "dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200",
+          )}
         >
           Back to Dashboard
         </Button>

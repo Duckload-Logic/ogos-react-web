@@ -40,7 +40,8 @@ import NotificationsPage from "@/features/notifications/pages/Notifications";
 const TermsContent = () => {
   usePageMetadata({
     title: "Terms and Conditions",
-    description: "Please read our terms and conditions carefully before using our services",
+    description:
+      "Please read our terms and conditions carefully before using our services",
     badgeText: "Legal",
     isLoading: false,
   });
@@ -50,7 +51,8 @@ const TermsContent = () => {
 const PrivacyContent = () => {
   usePageMetadata({
     title: "Privacy Policy",
-    description: "We value your privacy and are committed to protecting your personal data",
+    description:
+      "We value your privacy and are committed to protecting your personal data",
     badgeText: "Legal",
     isLoading: false,
   });
@@ -59,7 +61,15 @@ const PrivacyContent = () => {
 
 export const routes: RouteObject[] = [
   // Root route - redirect to login
-  { path: "/", element: <Navigate to="/login" replace /> },
+  {
+    path: "/",
+    element: (
+      <Navigate
+        to="/login"
+        replace
+      />
+    ),
+  },
 
   // Public routes
   {
@@ -85,7 +95,7 @@ export const routes: RouteObject[] = [
         element: (
           <IIRGate>
             <StudentDashboard />
-          </IIRGate >
+          </IIRGate>
         ),
       },
       {
@@ -93,7 +103,7 @@ export const routes: RouteObject[] = [
         element: (
           <IIRGate>
             <StudentAppointments />
-          </IIRGate >
+          </IIRGate>
         ),
       },
       {
@@ -109,7 +119,7 @@ export const routes: RouteObject[] = [
         element: (
           <IIRGate>
             <CreateAppointment />
-          </IIRGate >
+          </IIRGate>
         ),
       },
       {
@@ -117,7 +127,7 @@ export const routes: RouteObject[] = [
         element: (
           <IIRGate>
             <StudentSlips />
-          </IIRGate >
+          </IIRGate>
         ),
       },
       {
@@ -133,7 +143,7 @@ export const routes: RouteObject[] = [
         element: (
           <IIRGate>
             <SubmitSlip />
-          </IIRGate >
+          </IIRGate>
         ),
       },
       {

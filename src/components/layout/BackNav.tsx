@@ -42,11 +42,11 @@ export default function BackNav({
     <button
       type="button"
       onClick={handleBack}
-      className={`flex gap-2 group items-center justify-start text-sm text-foreground/70 font-medium hover:text-primary transition-colors w-fit h-5 p-0 ${className}`}
+      className={`group flex h-5 w-fit items-center justify-start gap-2 p-0 text-sm font-medium text-foreground/70 transition-colors hover:text-primary ${className}`}
     >
       <CircleChevronLeft
         size={14}
-        className="transform group-hover:-translate-x-1 transition-transform duration-300"
+        className="transform transition-transform duration-300 group-hover:-translate-x-1"
       />
       <span className="text-sm font-medium">Back</span>
     </button>

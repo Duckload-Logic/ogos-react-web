@@ -31,6 +31,7 @@ import {
 import { Slip, SlipStatus } from "@/features/slips/types";
 import { Pagination, Spinner } from "@/components/shared";
 import { usePageMetadata } from "@/components/layout/Layout";
+import { cn } from "@/lib/utils";
 
 interface StatusCount {
   id: string | number;
@@ -45,7 +46,10 @@ const GLASS_CARD =
 export default function StudentSlips() {
   const navigate = useNavigate();
   const { data: slipStatuses = [] } = useGetSlipStatuses();
-  const filterStatuses = [{ id: "0", name: "All", colorKey: "stale" }, ...slipStatuses];
+  const filterStatuses = [
+    { id: "0", name: "All", colorKey: "stale" },
+    ...slipStatuses,
+  ];
 
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedStatus, setSelectedStatus] = useState<SlipStatus | any>(
@@ -124,7 +128,7 @@ export default function StudentSlips() {
         className="gap-2 rounded-xl shadow-lg shadow-primary/20"
       >
         <Link to="/student/slips/submit">
-          <Plus className="w-4 h-4" />
+          <Plus className="h-4 w-4" />
           Submit Slip
         </Link>
       </Button>
@@ -140,12 +144,13 @@ export default function StudentSlips() {
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {slipStatuses.map((stat: SlipStatus, index: number) => {
             const count =
-              statusCounts?.find((s) => String(s.id) === String(stat.id))?.count || 0;
+              statusCounts?.find((s) => String(s.id) === String(stat.id))
+                ?.count || 0;
 
             return (
               <Card
                 key={stat.id}
-                className={`${GLASS_CARD} group animate-fade-in-up transition-all duration-200 hover:-translate-y-0.5`}
+                className={`${GLASS_CARD} animate-fade-in-up group transition-all duration-200 hover:-translate-y-0.5`}
                 style={{
                   animationDelay: `${0.08 * (index + 1)}s`,
                   animationFillMode: "both",
@@ -163,7 +168,7 @@ export default function StudentSlips() {
                         {stat.name}
                       </p>
                       <div className="space-y-1">
-                        <p className="text-4xl font-bold tracking-tight tabular-nums text-foreground">
+                        <p className="text-4xl font-bold tabular-nums tracking-tight text-foreground">
                           {count}
                         </p>
                       </div>
@@ -189,7 +194,7 @@ export default function StudentSlips() {
         <Card className={`${GLASS_CARD} animate-fade-in-up overflow-hidden`}>
           {/* Filter Tabs */}
           <CardHeader className="border-b border-white/20 px-4 py-3 dark:border-white/10">
-            <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-hide sm:pb-0">
+            <div className="scrollbar-hide flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
               {statsWithAll?.map((filter: any) => {
                 const isActive =
                   String(selectedStatus.id) === String(filter.id);
@@ -203,7 +208,7 @@ export default function StudentSlips() {
                     }}
                     variant={isActive ? "default" : "ghost"}
                     size="sm"
-                    className={`h-9 shrink-0 whitespace-nowrap rounded-xl px-3 text-xs font-medium transition-all duration-200 flex items-center gap-1.5 ${
+                    className={`flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-xs font-medium transition-all duration-200 ${
                       isActive
                         ? "shadow-md shadow-primary/20"
                         : "hover:bg-white/60 dark:hover:bg-white/[0.06]"
@@ -228,14 +233,20 @@ export default function StudentSlips() {
           <CardContent className="p-0">
             {isSlipsLoading ? (
               <div className="flex items-center justify-center py-16">
-                <Spinner size="md" message="Loading your slips..." />
+                <Spinner
+                  size="md"
+                  message="Loading your slips..."
+                />
               </div>
             ) : slips.length > 0 ? (
               <div className="divide-y divide-white/20 dark:divide-white/10">
                 {slips.map((slip: Slip, index: number) => (
                   <div
                     key={slip.id}
-                    className="animate-fade-in-up p-4 transition-colors duration-200 hover:bg-white/35 dark:hover:bg-white/[0.03] sm:p-5"
+                    className={cn(
+                      "animate-fade-in-up p-4 transition-colors duration-200",
+                      "hover:bg-white/35 dark:hover:bg-white/[0.03] sm:p-5",
+                    )}
                     style={{
                       animationDelay: `${0.05 * (index + 1)}s`,
                       animationFillMode: "both",
@@ -243,8 +254,22 @@ export default function StudentSlips() {
                   >
                     <div className="flex items-start gap-4">
                       {/* Category Icon Card */}
-                      <div className="hidden h-20 w-20 shrink-0 flex-col items-center justify-center rounded-[18px] border border-white/20 bg-white/50 shadow-[0_8px_22px_rgba(15,23,42,0.05)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04] sm:flex">
-                        <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-primary/20 bg-primary/10 text-primary backdrop-blur-md">
+                      <div
+                        className={cn(
+                          "hidden h-20 w-20 shrink-0 flex-col items-center",
+                          "justify-center rounded-[18px] border border-white/20",
+                          "bg-white/50 shadow-[0_8px_22px_rgba(15,23,42,0.05)]",
+                          "backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]",
+                          "sm:flex",
+                        )}
+                      >
+                        <div
+                          className={cn(
+                            "mb-2 flex h-10 w-10 items-center justify-center rounded-xl",
+                            "border border-primary/20 bg-primary/10 text-primary",
+                            "backdrop-blur-md",
+                          )}
+                        >
                           <FileUp className="h-5 w-5" />
                         </div>
                         <span className="line-clamp-2 px-2 text-center text-[10px] font-bold text-primary">
@@ -259,7 +284,10 @@ export default function StudentSlips() {
                             <div className="flex flex-wrap items-center gap-2">
                               <Badge
                                 variant="outline"
-                                className="border-white/30 bg-white/60 text-xs font-medium backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]"
+                                className={cn(
+                                  "border-white/30 bg-white/60 text-xs font-medium",
+                                  "backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]",
+                                )}
                               >
                                 <Tag className="mr-1 h-3 w-3" />
                                 {slip.category?.name}
@@ -291,16 +319,23 @@ export default function StudentSlips() {
                             </DropdownMenuTrigger>
                             <DropdownMenuContent
                               align="end"
-                              className="rounded-xl border-white/20 bg-white/85 backdrop-blur-xl dark:border-white/10 dark:bg-[#111]/80"
+                              className={cn(
+                                "rounded-xl border-white/20 bg-white/85 backdrop-blur-xl",
+                                "dark:border-white/10 dark:bg-[#111]/80",
+                              )}
                             >
                               <DropdownMenuItem
-                                onClick={() => navigate(`/student/slips/${slip.id}`)}
+                                onClick={() =>
+                                  navigate(`/student/slips/${slip.id}`)
+                                }
                               >
                                 <Eye className="mr-2 h-4 w-4" />
                                 View Details
                               </DropdownMenuItem>
                               <DropdownMenuItem
-                                onClick={() => navigate(`/student/slips/${slip.id}`)}
+                                onClick={() =>
+                                  navigate(`/student/slips/${slip.id}`)
+                                }
                               >
                                 <Download className="mr-2 h-4 w-4" />
                                 Download Attachments
@@ -318,7 +353,9 @@ export default function StudentSlips() {
                           <span className="text-muted-foreground/40">•</span>
                           <div className="flex items-center gap-1.5">
                             <Calendar className="h-3.5 w-3.5" />
-                            <span>Needed by: {formatDate(slip.dateNeeded)}</span>
+                            <span>
+                              Needed by: {formatDate(slip.dateNeeded)}
+                            </span>
                           </div>
                         </div>
                       </div>
@@ -327,35 +364,41 @@ export default function StudentSlips() {
                 ))}
               </div>
             ) : (
-            <div className="px-4 py-10 sm:px-6 sm:py-12">
-              <div className="mx-auto flex max-w-md flex-col items-center text-center">
-                <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border border-white/20 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-                  <FileX className="h-9 w-9 text-muted-foreground" />
-                </div>
-
-                <h3 className="mb-2 text-xl font-semibold text-foreground">
-                  No slips found
-                </h3>
-
-                <p className="mb-6 text-sm text-muted-foreground">
-                  {String(selectedStatus?.id) === "0"
-                    ? "You haven't submitted any admission slips yet. Submit your first slip now."
-                    : `No ${selectedStatus.name.toLowerCase()} slips found.`}
-                </p>
-
-                {String(selectedStatus?.id) === "0" && (
-                  <Button
-                    asChild
-                    className="rounded-xl shadow-lg shadow-primary/20"
+              <div className="px-4 py-10 sm:px-6 sm:py-12">
+                <div className="mx-auto flex max-w-md flex-col items-center text-center">
+                  <div
+                    className={cn(
+                      "mb-4 flex h-20 w-20 items-center justify-center rounded-full",
+                      "border border-white/20 bg-white/60 backdrop-blur-md",
+                      "dark:border-white/10 dark:bg-white/[0.05]",
+                    )}
                   >
-                    <Link to="/student/slips/submit">
-                      <Plus className="mr-2 h-4 w-4" />
-                      Submit Admission Slip
-                    </Link>
-                  </Button>
-                )}
+                    <FileX className="h-9 w-9 text-muted-foreground" />
+                  </div>
+
+                  <h3 className="mb-2 text-xl font-semibold text-foreground">
+                    No slips found
+                  </h3>
+
+                  <p className="mb-6 text-sm text-muted-foreground">
+                    {String(selectedStatus?.id) === "0"
+                      ? "You haven't submitted any admission slips yet. Submit your first slip now."
+                      : `No ${selectedStatus.name.toLowerCase()} slips found.`}
+                  </p>
+
+                  {String(selectedStatus?.id) === "0" && (
+                    <Button
+                      asChild
+                      className="rounded-xl shadow-lg shadow-primary/20"
+                    >
+                      <Link to="/student/slips/submit">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Submit Admission Slip
+                      </Link>
+                    </Button>
+                  )}
+                </div>
               </div>
-            </div>
             )}
 
             <Separator className="bg-white/20 dark:bg-white/10" />

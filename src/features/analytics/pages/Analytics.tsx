@@ -1,9 +1,24 @@
 import React, { useState, useMemo } from "react";
 import { useAnalyticsDashboard } from "../hooks/useAnalyticsDashboard";
 import Layout, { usePageMetadata } from "@/components/layout/Layout";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from "@/components/ui/card";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { AlertCircle, TrendingUp, Users, MapPin, GraduationCap, Home, DollarSign, Network } from "lucide-react";
+import {
+  AlertCircle,
+  TrendingUp,
+  Users,
+  MapPin,
+  GraduationCap,
+  Home,
+  DollarSign,
+  Network,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   BarChart,
@@ -26,6 +41,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dropdown } from "@/components/form";
 import { useCourses, useStudentStatuses } from "@/features/iir/hooks";
+import { cn } from "@/lib/utils";
 
 // --- THEME COLORS ---
 const COLORS = [
@@ -92,7 +108,8 @@ export default function AnalyticsPage() {
 
   usePageMetadata({
     title: "Student Analytics",
-    description: "Holistic analysis of student demographics, academic background, and social profiles",
+    description:
+      "Holistic analysis of student demographics, academic background, and social profiles",
     badgeText: "Real-time Metrics",
     badgeIcon: <TrendingUp className="h-4 w-4" />,
     isLoading: loading,
@@ -105,7 +122,10 @@ export default function AnalyticsPage() {
           identifier="value"
           value={selectedYear}
           onChange={handleYearChange}
-          options={Array.from({ length: 5 }, (_, i) => new Date().getFullYear() - i).map(year => ({
+          options={Array.from(
+            { length: 5 },
+            (_, i) => new Date().getFullYear() - i,
+          ).map((year) => ({
             value: year.toString(),
             label: year.toString(),
           }))}
@@ -128,8 +148,11 @@ export default function AnalyticsPage() {
 
   if (error) {
     return (
-      <div className="p-8 max-w-2xl mx-auto">
-        <Alert variant="destructive" className="bg-destructive/10 border-destructive/20 text-destructive">
+      <div className="mx-auto max-w-2xl p-8">
+        <Alert
+          variant="destructive"
+          className="border-destructive/20 bg-destructive/10 text-destructive"
+        >
           <AlertCircle className="h-5 w-5" />
           <AlertDescription className="ml-2 font-medium">
             Could not retrieve analytics data: {error}
@@ -137,7 +160,13 @@ export default function AnalyticsPage() {
         </Alert>
         <Button
           variant="outline"
-          onClick={() => refresh(parseInt(selectedYear), parseInt(selectedCourse), parseInt(selectedStatus))}
+          onClick={() =>
+            refresh(
+              parseInt(selectedYear),
+              parseInt(selectedCourse),
+              parseInt(selectedStatus),
+            )
+          }
           className="mt-4 border-primary/20 hover:bg-primary/5"
         >
           Try Again
@@ -153,20 +182,58 @@ export default function AnalyticsPage() {
   if (!data) return null;
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700">
-      <Tabs defaultValue="overview" className="space-y-8 ">
+    <div className="animate-in fade-in space-y-8 duration-700">
+      <Tabs
+        defaultValue="overview"
+        className="space-y-8"
+      >
         <div className="flex items-center justify-between border-b pb-4">
           <TabsList className="bg-background/50 backdrop-blur-sm">
-            <TabsTrigger value="overview" className="text-xs font-bold uppercase tracking-widest px-6 data-[state=active]:bg-primary/50">Overview</TabsTrigger>
-            <TabsTrigger value="demographics" className="text-xs font-bold uppercase tracking-widest px-6 data-[state=active]:bg-primary/50">Demographics</TabsTrigger>
-            <TabsTrigger value="academic" className="text-xs font-bold uppercase tracking-widest px-6 data-[state=active]:bg-primary/50">Academic</TabsTrigger>
-            <TabsTrigger value="family" className="text-xs font-bold uppercase tracking-widest px-6 data-[state=active]:bg-primary/50">Family & Social</TabsTrigger>
+            <TabsTrigger
+              value="overview"
+              className={cn(
+                "px-6 text-xs font-bold uppercase tracking-widest",
+                "data-[state=active]:bg-primary/50",
+              )}
+            >
+              Overview
+            </TabsTrigger>
+            <TabsTrigger
+              value="demographics"
+              className={cn(
+                "px-6 text-xs font-bold uppercase tracking-widest",
+                "data-[state=active]:bg-primary/50",
+              )}
+            >
+              Demographics
+            </TabsTrigger>
+            <TabsTrigger
+              value="academic"
+              className={cn(
+                "px-6 text-xs font-bold uppercase tracking-widest",
+                "data-[state=active]:bg-primary/50",
+              )}
+            >
+              Academic
+            </TabsTrigger>
+            <TabsTrigger
+              value="family"
+              className={cn(
+                "px-6 text-xs font-bold uppercase tracking-widest",
+                "data-[state=active]:bg-primary/50",
+              )}
+            >
+              Family & Social
+            </TabsTrigger>
           </TabsList>
         </div>
 
-        <TabsContent value="overview" className="space-y-8 focus-visible:outline-none focus-visible:ring-0">
+        <TabsContent
+          value="overview"
+          className="space-y-8 focus-visible:outline-none focus-visible:ring-0"
+        >
           {/* --- KPI SECTION --- */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
             <KPICard
               title="Total Population"
               value={data?.totalStudents?.toLocaleString() ?? "0"}
@@ -176,7 +243,11 @@ export default function AnalyticsPage() {
             />
             <KPICard
               title="Gender Balance"
-              value={data?.genderDistribution?.[0] ? `${data.genderDistribution[0].totalPct}%` : "0%"}
+              value={
+                data?.genderDistribution?.[0]
+                  ? `${data.genderDistribution[0].totalPct}%`
+                  : "0%"
+              }
               subtitle={`${data?.genderDistribution?.[0]?.category || "N/A"} Majority`}
               icon={<Network className="h-5 w-5 text-indigo-500" />}
               gradient="from-indigo-500/10 via-background to-background"
@@ -197,11 +268,20 @@ export default function AnalyticsPage() {
             />
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <ChartCard title="Gender Distribution" description="Total student body split">
-              <ChartContainer config={genderDistributionConfig} className="mx-auto aspect-square max-h-[300px]">
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <ChartCard
+              title="Gender Distribution"
+              description="Total student body split"
+            >
+              <ChartContainer
+                config={genderDistributionConfig}
+                className="mx-auto aspect-square max-h-[300px]"
+              >
                 <PieChart>
-                  <ChartTooltip cursor={false} content={<ChartTooltipContent hideLabel />} />
+                  <ChartTooltip
+                    cursor={false}
+                    content={<ChartTooltipContent hideLabel />}
+                  />
                   <Pie
                     data={data?.genderDistribution ?? []}
                     cx="50%"
@@ -214,34 +294,102 @@ export default function AnalyticsPage() {
                     isAnimationActive={false}
                   >
                     {(data?.genderDistribution ?? []).map((gender) => (
-                      <Cell key={gender.category} fill={gender.category === "Male" ? "var(--color-Male)" : "var(--color-Female)"} />
+                      <Cell
+                        key={gender.category}
+                        fill={
+                          gender.category === "Male"
+                            ? "var(--color-Male)"
+                            : "var(--color-Female)"
+                        }
+                      />
                     ))}
                   </Pie>
-                  <Legend verticalAlign="bottom" height={36} iconType="circle" />
+                  <Legend
+                    verticalAlign="bottom"
+                    height={36}
+                    iconType="circle"
+                  />
                 </PieChart>
               </ChartContainer>
             </ChartCard>
-            <StatSummaryCard title="Top Global Rankings" data={data} className="lg:col-span-2" />
+            <StatSummaryCard
+              title="Top Global Rankings"
+              data={data}
+              className="lg:col-span-2"
+            />
           </div>
         </TabsContent>
 
-        <TabsContent value="demographics" className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <TabsContent
+          value="demographics"
+          className="space-y-6 focus-visible:outline-none focus-visible:ring-0"
+        >
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <ChartCard
               title="Age Distribution"
               description="Grouped by Gender vs Total per age group"
               className="lg:col-span-2"
             >
-              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[300px] w-full">
-                <BarChart data={data?.ageDistribution ?? []} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: "hsl(var(--muted-foreground))" }} />
+              <ChartContainer
+                config={genderSplitConfig}
+                className="aspect-auto h-[300px] w-full"
+              >
+                <BarChart
+                  data={data?.ageDistribution ?? []}
+                  margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    dataKey="category"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fontSize: 12,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fontSize: 12,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
+                  />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Legend verticalAlign="top" height={36} />
-                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[4, 4, 0, 0]} barSize={20} />
-                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[4, 4, 0, 0]} barSize={20} />
-                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[4, 4, 0, 0]} barSize={20} opacity={0.3} />
+                  <Legend
+                    verticalAlign="top"
+                    height={36}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Male"
+                    dataKey="maleCount"
+                    fill="var(--color-maleCount)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={20}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Female"
+                    dataKey="femaleCount"
+                    fill="var(--color-femaleCount)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={20}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Total"
+                    dataKey="total"
+                    fill="var(--color-total)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={20}
+                    opacity={0.3}
+                  />
                 </BarChart>
               </ChartContainer>
             </ChartCard>
@@ -251,62 +399,200 @@ export default function AnalyticsPage() {
               description="Spiritual background distribution with gender split"
               className="lg:col-span-1"
             >
-              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[300px] w-full">
-                <BarChart layout="vertical" data={(data?.religions ?? []).slice(0, 5)} margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
-                  <XAxis type="number" hide />
+              <ChartContainer
+                config={genderSplitConfig}
+                className="aspect-auto h-[300px] w-full"
+              >
+                <BarChart
+                  layout="vertical"
+                  data={(data?.religions ?? []).slice(0, 5)}
+                  margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    horizontal={false}
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    type="number"
+                    hide
+                  />
                   <YAxis
                     type="category"
                     dataKey="category"
                     axisLine={false}
                     tickLine={false}
                     width={100}
-                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{
+                      fontSize: 10,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={8} />
-                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={8} />
-                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={8} opacity={0.3} />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Male"
+                    dataKey="maleCount"
+                    fill="var(--color-maleCount)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Female"
+                    dataKey="femaleCount"
+                    fill="var(--color-femaleCount)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Total"
+                    dataKey="total"
+                    fill="var(--color-total)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                    opacity={0.3}
+                  />
                 </BarChart>
               </ChartContainer>
             </ChartCard>
           </div>
         </TabsContent>
 
-        <TabsContent value="academic" className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <ChartCard title="High School GWA" description="Academic performance with gender split" className="lg:col-span-2">
-              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[300px] w-full">
-                <BarChart data={data?.highSchoolGWA ?? []} margin={{ top: 20, right: 30, left: 0, bottom: 0 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
-                  <XAxis dataKey="category" axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+        <TabsContent
+          value="academic"
+          className="space-y-6 focus-visible:outline-none focus-visible:ring-0"
+        >
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+            <ChartCard
+              title="High School GWA"
+              description="Academic performance with gender split"
+              className="lg:col-span-2"
+            >
+              <ChartContainer
+                config={genderSplitConfig}
+                className="aspect-auto h-[300px] w-full"
+              >
+                <BarChart
+                  data={data?.highSchoolGWA ?? []}
+                  margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    dataKey="category"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fontSize: 10,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fontSize: 10,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
+                  />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Legend verticalAlign="top" height={36} />
-                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[4, 4, 0, 0]} barSize={20} />
-                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[4, 4, 0, 0]} barSize={20} />
-                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[4, 4, 0, 0]} barSize={20} opacity={0.3} />
+                  <Legend
+                    verticalAlign="top"
+                    height={36}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Male"
+                    dataKey="maleCount"
+                    fill="var(--color-maleCount)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={20}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Female"
+                    dataKey="femaleCount"
+                    fill="var(--color-femaleCount)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={20}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Total"
+                    dataKey="total"
+                    fill="var(--color-total)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={20}
+                    opacity={0.3}
+                  />
                 </BarChart>
               </ChartContainer>
             </ChartCard>
 
-            <ChartCard title="Performance Brackets" description="Secondary GWA with gender breakdown">
-              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[300px] w-full">
-                <BarChart layout="vertical" data={data?.highSchoolGWA ?? []} margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
-                  <XAxis type="number" hide />
+            <ChartCard
+              title="Performance Brackets"
+              description="Secondary GWA with gender breakdown"
+            >
+              <ChartContainer
+                config={genderSplitConfig}
+                className="aspect-auto h-[300px] w-full"
+              >
+                <BarChart
+                  layout="vertical"
+                  data={data?.highSchoolGWA ?? []}
+                  margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    horizontal={false}
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    type="number"
+                    hide
+                  />
                   <YAxis
                     type="category"
                     dataKey="category"
                     axisLine={false}
                     tickLine={false}
                     width={80}
-                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{
+                      fontSize: 10,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={8} />
-                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={8} />
-                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={8} opacity={0.3} />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Male"
+                    dataKey="maleCount"
+                    fill="var(--color-maleCount)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Female"
+                    dataKey="femaleCount"
+                    fill="var(--color-femaleCount)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Total"
+                    dataKey="total"
+                    fill="var(--color-total)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                    opacity={0.3}
+                  />
                 </BarChart>
               </ChartContainer>
             </ChartCard>
@@ -315,72 +601,204 @@ export default function AnalyticsPage() {
           </div>
         </TabsContent>
 
-        <TabsContent value="family" className="space-y-6 focus-visible:outline-none focus-visible:ring-0">
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <TabsContent
+          value="family"
+          className="space-y-6 focus-visible:outline-none focus-visible:ring-0"
+        >
+          <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
             <ChartCard
               title="Monthly Family Income"
               description="Grouped by gender and income bracket"
               className="lg:col-span-2"
             >
-              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[300px] w-full">
-                <BarChart layout="vertical" data={data?.monthlyIncome ?? []} margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
-                  <XAxis type="number" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+              <ChartContainer
+                config={genderSplitConfig}
+                className="aspect-auto h-[300px] w-full"
+              >
+                <BarChart
+                  layout="vertical"
+                  data={data?.monthlyIncome ?? []}
+                  margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    horizontal={false}
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    type="number"
+                    tick={{
+                      fontSize: 10,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
+                  />
                   <YAxis
                     type="category"
                     dataKey="category"
                     axisLine={false}
                     tickLine={false}
                     width={100}
-                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{
+                      fontSize: 10,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Legend verticalAlign="top" height={36} />
-                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={10} />
-                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={10} />
-                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={10} opacity={0.3} />
+                  <Legend
+                    verticalAlign="top"
+                    height={36}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Male"
+                    dataKey="maleCount"
+                    fill="var(--color-maleCount)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={10}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Female"
+                    dataKey="femaleCount"
+                    fill="var(--color-femaleCount)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={10}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Total"
+                    dataKey="total"
+                    fill="var(--color-total)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={10}
+                    opacity={0.3}
+                  />
                 </BarChart>
               </ChartContainer>
             </ChartCard>
 
-            <ChartCard title="Parent Marital Status" description="Family structure indicators by gender">
-              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[250px] w-full">
-                <BarChart layout="vertical" data={data?.parentsMaritalStatus ?? []} margin={{ top: 5, right: 30, left: 100, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
-                  <XAxis type="number" hide />
+            <ChartCard
+              title="Parent Marital Status"
+              description="Family structure indicators by gender"
+            >
+              <ChartContainer
+                config={genderSplitConfig}
+                className="aspect-auto h-[250px] w-full"
+              >
+                <BarChart
+                  layout="vertical"
+                  data={data?.parentsMaritalStatus ?? []}
+                  margin={{ top: 5, right: 30, left: 100, bottom: 5 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    horizontal={false}
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    type="number"
+                    hide
+                  />
                   <YAxis
                     type="category"
                     dataKey="category"
                     axisLine={false}
                     tickLine={false}
                     width={100}
-                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{
+                      fontSize: 10,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={8} />
-                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={8} />
-                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={8} opacity={0.3} />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Male"
+                    dataKey="maleCount"
+                    fill="var(--color-maleCount)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Female"
+                    dataKey="femaleCount"
+                    fill="var(--color-femaleCount)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Total"
+                    dataKey="total"
+                    fill="var(--color-total)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                    opacity={0.3}
+                  />
                 </BarChart>
               </ChartContainer>
             </ChartCard>
 
-            <ChartCard title="Study Environment" description="Quiet place to study (Yes/No) by gender">
-              <ChartContainer config={genderSplitConfig} className="aspect-auto h-[200px] w-full">
-                <BarChart layout="vertical" data={data?.quietStudyPlace ?? []} margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
-                  <XAxis type="number" hide />
+            <ChartCard
+              title="Study Environment"
+              description="Quiet place to study (Yes/No) by gender"
+            >
+              <ChartContainer
+                config={genderSplitConfig}
+                className="aspect-auto h-[200px] w-full"
+              >
+                <BarChart
+                  layout="vertical"
+                  data={data?.quietStudyPlace ?? []}
+                  margin={{ top: 5, right: 30, left: 80, bottom: 5 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    horizontal={false}
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    type="number"
+                    hide
+                  />
                   <YAxis
                     type="category"
                     dataKey="category"
                     axisLine={false}
                     tickLine={false}
                     width={80}
-                    tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+                    tick={{
+                      fontSize: 10,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
                   />
                   <ChartTooltip content={<ChartTooltipContent />} />
-                  <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={8} />
-                  <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={8} />
-                  <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={8} opacity={0.3} />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Male"
+                    dataKey="maleCount"
+                    fill="var(--color-maleCount)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Female"
+                    dataKey="femaleCount"
+                    fill="var(--color-femaleCount)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Total"
+                    dataKey="total"
+                    fill="var(--color-total)"
+                    radius={[0, 4, 4, 0]}
+                    barSize={8}
+                    opacity={0.3}
+                  />
                 </BarChart>
               </ChartContainer>
             </ChartCard>
@@ -393,38 +811,46 @@ export default function AnalyticsPage() {
 
 // --- HELPER COMPONENTS ---
 
-const KPICard = React.memo(({ title, value, subtitle, icon, gradient }: any) => {
-  return (
-    <Card className={`overflow-hidden border-none shadow-premium bg-gradient-to-br ${gradient}`}>
-      <CardHeader className="flex flex-row items-center justify-between pb-2">
-        <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
-          {title}
-        </CardTitle>
-        <div className="p-2 bg-background/80 rounded-xl shadow-sm">
-          {icon}
-        </div>
-      </CardHeader>
-      <CardContent>
-        <div className="text-3xl font-black">{value}</div>
-        <p className="text-[10px] text-muted-foreground mt-1 font-medium">{subtitle}</p>
-      </CardContent>
-    </Card>
-  );
-});
+const KPICard = React.memo(
+  ({ title, value, subtitle, icon, gradient }: any) => {
+    return (
+      <Card
+        className={`shadow-premium overflow-hidden border-none bg-gradient-to-br ${gradient}`}
+      >
+        <CardHeader className="flex flex-row items-center justify-between pb-2">
+          <CardTitle className="text-xs font-bold uppercase tracking-widest text-muted-foreground">
+            {title}
+          </CardTitle>
+          <div className="rounded-xl bg-background/80 p-2 shadow-sm">
+            {icon}
+          </div>
+        </CardHeader>
+        <CardContent>
+          <div className="text-3xl font-black">{value}</div>
+          <p className="mt-1 text-[10px] font-medium text-muted-foreground">
+            {subtitle}
+          </p>
+        </CardContent>
+      </Card>
+    );
+  },
+);
 
-const ChartCard = React.memo(({ title, description, children, className }: any) => {
-  return (
-    <Card className={`border-primary/5 shadow-premium bg-card/40 backdrop-blur-sm overflow-hidden ${className}`}>
-      <CardHeader className="pb-2 border-b border-primary/5 bg-muted/5">
-        <CardTitle className="text-base font-bold">{title}</CardTitle>
-        <CardDescription className="text-xs">{description}</CardDescription>
-      </CardHeader>
-      <CardContent className="pt-6">
-        {children}
-      </CardContent>
-    </Card>
-  );
-});
+const ChartCard = React.memo(
+  ({ title, description, children, className }: any) => {
+    return (
+      <Card
+        className={`shadow-premium overflow-hidden border-primary/5 bg-card/40 backdrop-blur-sm ${className}`}
+      >
+        <CardHeader className="border-b border-primary/5 bg-muted/5 pb-2">
+          <CardTitle className="text-base font-bold">{title}</CardTitle>
+          <CardDescription className="text-xs">{description}</CardDescription>
+        </CardHeader>
+        <CardContent className="pt-6">{children}</CardContent>
+      </Card>
+    );
+  },
+);
 
 const CityDistributionCard = React.memo(({ data }: { data: any[] }) => {
   const [cityPage, setCityPage] = useState(0);
@@ -437,14 +863,27 @@ const CityDistributionCard = React.memo(({ data }: { data: any[] }) => {
       className="lg:col-span-3"
     >
       <div className="space-y-6">
-        <ChartContainer config={genderSplitConfig} className="aspect-auto h-[400px] w-full">
+        <ChartContainer
+          config={genderSplitConfig}
+          className="aspect-auto h-[400px] w-full"
+        >
           <BarChart
             layout="vertical"
-            data={data.slice(cityPage * CITY_PAGE_SIZE, (cityPage + 1) * CITY_PAGE_SIZE)}
+            data={data.slice(
+              cityPage * CITY_PAGE_SIZE,
+              (cityPage + 1) * CITY_PAGE_SIZE,
+            )}
             margin={{ top: 5, right: 30, left: 120, bottom: 5 }}
           >
-            <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="hsl(var(--border))" />
-            <XAxis type="number" tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }} />
+            <CartesianGrid
+              strokeDasharray="3 3"
+              horizontal={false}
+              stroke="hsl(var(--border))"
+            />
+            <XAxis
+              type="number"
+              tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
+            />
             <YAxis
               type="category"
               dataKey="category"
@@ -454,32 +893,59 @@ const CityDistributionCard = React.memo(({ data }: { data: any[] }) => {
               tick={{ fontSize: 10, fill: "hsl(var(--muted-foreground))" }}
             />
             <ChartTooltip content={<ChartTooltipContent />} />
-            <Legend verticalAlign="top" height={36} />
-            <Bar isAnimationActive={false} name="Male" dataKey="maleCount" fill="var(--color-maleCount)" radius={[0, 4, 4, 0]} barSize={15} />
-            <Bar isAnimationActive={false} name="Female" dataKey="femaleCount" fill="var(--color-femaleCount)" radius={[0, 4, 4, 0]} barSize={15} />
-            <Bar isAnimationActive={false} name="Total" dataKey="total" fill="var(--color-total)" radius={[0, 4, 4, 0]} barSize={15} opacity={0.3} />
+            <Legend
+              verticalAlign="top"
+              height={36}
+            />
+            <Bar
+              isAnimationActive={false}
+              name="Male"
+              dataKey="maleCount"
+              fill="var(--color-maleCount)"
+              radius={[0, 4, 4, 0]}
+              barSize={15}
+            />
+            <Bar
+              isAnimationActive={false}
+              name="Female"
+              dataKey="femaleCount"
+              fill="var(--color-femaleCount)"
+              radius={[0, 4, 4, 0]}
+              barSize={15}
+            />
+            <Bar
+              isAnimationActive={false}
+              name="Total"
+              dataKey="total"
+              fill="var(--color-total)"
+              radius={[0, 4, 4, 0]}
+              barSize={15}
+              opacity={0.3}
+            />
           </BarChart>
         </ChartContainer>
 
-        <div className="flex justify-center items-center gap-4">
+        <div className="flex items-center justify-center gap-4">
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setCityPage(p => Math.max(0, p - 1))}
+            onClick={() => setCityPage((p) => Math.max(0, p - 1))}
             disabled={cityPage === 0}
-            className="h-8 text-[10px] uppercase font-bold tracking-wider"
+            className="h-8 text-[10px] font-bold uppercase tracking-wider"
           >
             Previous
           </Button>
-          <div className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest">
-            Showing {cityPage * CITY_PAGE_SIZE + 1} - {Math.min((cityPage + 1) * CITY_PAGE_SIZE, data?.length || 0)} of {data?.length || 0}
+          <div className="text-[10px] font-medium uppercase tracking-widest text-muted-foreground">
+            Showing {cityPage * CITY_PAGE_SIZE + 1} -{" "}
+            {Math.min((cityPage + 1) * CITY_PAGE_SIZE, data?.length || 0)} of{" "}
+            {data?.length || 0}
           </div>
           <Button
             variant="outline"
             size="sm"
-            onClick={() => setCityPage(p => p + 1)}
+            onClick={() => setCityPage((p) => p + 1)}
             disabled={(cityPage + 1) * CITY_PAGE_SIZE >= (data?.length || 0)}
-            className="h-8 text-[10px] uppercase font-bold tracking-wider"
+            className="h-8 text-[10px] font-bold uppercase tracking-wider"
           >
             Next
           </Button>
@@ -495,11 +961,27 @@ function StatSummaryCard({ title, data, className }: any) {
   const topOrdinal = data.ordinalPosition[0]?.category || "N/A";
 
   return (
-    <StatCard title={title} description="Key insights and dominant categories" className={className}>
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <InsightItem label="Primary Location" value={topAddress} icon={<MapPin className="h-4 w-4" />} />
-        <InsightItem label="Enrollment Nature" value={topNature} icon={<Home className="h-4 w-4" />} />
-        <InsightItem label="Family Position" value={`${topOrdinal} Child`} icon={<Network className="h-4 w-4" />} />
+    <StatCard
+      title={title}
+      description="Key insights and dominant categories"
+      className={className}
+    >
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+        <InsightItem
+          label="Primary Location"
+          value={topAddress}
+          icon={<MapPin className="h-4 w-4" />}
+        />
+        <InsightItem
+          label="Enrollment Nature"
+          value={topNature}
+          icon={<Home className="h-4 w-4" />}
+        />
+        <InsightItem
+          label="Family Position"
+          value={`${topOrdinal} Child`}
+          icon={<Network className="h-4 w-4" />}
+        />
       </div>
     </StatCard>
   );
@@ -507,25 +989,27 @@ function StatSummaryCard({ title, data, className }: any) {
 
 function StatCard({ title, description, children, className }: any) {
   return (
-    <Card className={`border-primary/5 shadow-premium bg-card/40 backdrop-blur-sm overflow-hidden ${className}`}>
-      <CardHeader className="pb-2 border-b border-primary/5 bg-muted/5">
+    <Card
+      className={`shadow-premium overflow-hidden border-primary/5 bg-card/40 backdrop-blur-sm ${className}`}
+    >
+      <CardHeader className="border-b border-primary/5 bg-muted/5 pb-2">
         <CardTitle className="text-base font-bold">{title}</CardTitle>
         <CardDescription className="text-xs">{description}</CardDescription>
       </CardHeader>
-      <CardContent className="pt-6">
-        {children}
-      </CardContent>
+      <CardContent className="pt-6">{children}</CardContent>
     </Card>
   );
 }
 
 function InsightItem({ label, value, icon }: any) {
   return (
-    <div className="p-4 bg-background rounded-2xl border border-primary/10 flex items-start gap-3">
-      <div className="p-2 bg-primary/10 rounded-lg text-primary">{icon}</div>
+    <div className="flex items-start gap-3 rounded-2xl border border-primary/10 bg-background p-4">
+      <div className="rounded-lg bg-primary/10 p-2 text-primary">{icon}</div>
       <div>
-        <p className="text-[10px] font-bold uppercase text-muted-foreground tracking-wider">{label}</p>
-        <p className="text-sm font-bold text-foreground mt-0.5">{value}</p>
+        <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+          {label}
+        </p>
+        <p className="mt-0.5 text-sm font-bold text-foreground">{value}</p>
       </div>
     </div>
   );
@@ -535,7 +1019,12 @@ function AnalyticsSkeleton() {
   return (
     <div className="space-y-8 p-6">
       <div className="grid grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map(i => <Skeleton key={i} className="h-32 w-full rounded-2xl" />)}
+        {[1, 2, 3, 4].map((i) => (
+          <Skeleton
+            key={i}
+            className="h-32 w-full rounded-2xl"
+          />
+        ))}
       </div>
       <div className="grid grid-cols-3 gap-6">
         <Skeleton className="col-span-2 h-[400px] rounded-2xl" />

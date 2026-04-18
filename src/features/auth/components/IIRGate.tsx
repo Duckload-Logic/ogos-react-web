@@ -7,6 +7,7 @@ import { useIIRForm } from "@/features/iir/hooks";
 import { useIIRStatus } from "@/features/iir/hooks";
 import { AnimationStyles } from "@/components/ui/animations";
 import { Spinner } from "@/components/shared";
+import { cn } from "@/lib/utils";
 
 interface IIRGateProps {
   children: React.ReactNode;
@@ -26,7 +27,12 @@ export const IIRGate = ({
   const { data: isSubmitted, isLoading: isIIRLoading } = useIIRStatus();
 
   if (isIIRLoading) {
-    return <Spinner size="lg" message="Checking your profile..." />;
+    return (
+      <Spinner
+        size="lg"
+        message="Checking your profile..."
+      />
+    );
   }
 
   // If PDS is not completed and this is not the form page
@@ -39,22 +45,41 @@ export const IIRGate = ({
         </div>
 
         {/* Modal overlay */}
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-background/60 backdrop-blur-sm animate-fade-in">
+        <div
+          className={cn(
+            "animate-fade-in fixed inset-0 z-50 flex items-center",
+            "justify-center bg-background/60 p-4 backdrop-blur-sm",
+          )}
+        >
           <AnimationStyles />
-          <div className="bg-card text-card-foreground rounded-xl shadow-xl max-w-md w-full p-8 border border-border animate-fade-in-scale">
-            <div className="flex items-center justify-center w-12 h-12 bg-yellow-100 dark:bg-yellow-900/40 rounded-full mx-auto mb-4">
-              <AlertTriangle className="w-6 h-6 text-yellow-600 dark:text-yellow-400" />
+          <div
+            className={cn(
+              "animate-fade-in-scale w-full max-w-md rounded-xl border",
+              "border-border bg-card p-8 text-card-foreground shadow-xl",
+            )}
+          >
+            <div
+              className={cn(
+                "mx-auto mb-4 flex h-12 w-12 items-center justify-center",
+                "rounded-full bg-yellow-100 dark:bg-yellow-900/40",
+              )}
+            >
+              <AlertTriangle className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
             </div>
-            <h2 className="text-2xl font-bold text-center text-foreground mb-2">
+            <h2 className="mb-2 text-center text-2xl font-bold text-foreground">
               Access Restricted
             </h2>
-            <p className="text-muted-foreground text-center mb-6">
+            <p className="mb-6 text-center text-muted-foreground">
               You must complete your student Individual Inventory Record (IIR)
               form first to access this service.
             </p>
             <a
               href="/student/iir/form"
-              className="w-full block text-center bg-primary text-primary-foreground py-3 rounded-lg font-semibold hover:bg-primary/90 transition-colors"
+              className={cn(
+                "block w-full rounded-lg bg-primary py-3 text-center",
+                "font-semibold text-primary-foreground transition-colors",
+                "hover:bg-primary/90",
+              )}
             >
               Go to IIR Form
             </a>

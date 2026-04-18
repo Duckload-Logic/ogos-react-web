@@ -4,7 +4,13 @@
  */
 
 import React from "react";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 interface FormCardProps {
   title: string;
@@ -24,13 +30,9 @@ export const FormCard: React.FC<FormCardProps> = ({
       <CardTitle>{title}</CardTitle>
       {description && <CardDescription>{description}</CardDescription>}
     </CardHeader>
-    <CardContent className="space-y-4">
-      {children}
-    </CardContent>
+    <CardContent className="space-y-4">{children}</CardContent>
     {footer && (
-      <div className="px-6 py-4 border-t border-border bg-muted">
-        {footer}
-      </div>
+      <div className="border-t border-border bg-muted px-6 py-4">{footer}</div>
     )}
   </Card>
 );

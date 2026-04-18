@@ -60,9 +60,8 @@ export async function GetCities(
 ) {
   try {
     const response = await apiClient.get(
-      (provinceCode
-        ? API_ROUTES.locations.citiesByProvince(provinceCode)
-        : API_ROUTES.locations.citiesByRegion(regionCode || "")) as string, // Type assertion to string since API_ROUTES returns string | function
+        : API_ROUTES.locations.citiesByRegion(regionCode || "")
+      ) as string, // Type assertion for API_ROUTES return type
       config,
     );
     return response.data;

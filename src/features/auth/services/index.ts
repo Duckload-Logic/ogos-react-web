@@ -67,9 +67,7 @@ export const PostIDPTokenExchange = async (
     );
     return data;
   } catch (error) {
-    console.error(
-      `[PostIDPTokenExchange] {Token Exchange}: ${error}`,
-    );
+    console.error(`[PostIDPTokenExchange] {Token Exchange}: ${error}`);
     throw error;
   }
 };
@@ -148,9 +146,11 @@ export const GetCurrentUser = async (
  * @returns The absolute URL for logout
  */
 export const GetLogoutURL = (): string => {
-
   const redirectUri = window.location.origin;
-  return `${import.meta.env.VITE_API_BASE_URL}${API_ROUTES.auth.logout(redirectUri)}`;
+  const baseUrl = import.meta.env.VITE_API_BASE_URL;
+  const logoutPath = API_ROUTES.auth.logout(redirectUri);
+
+  return `${baseUrl}${logoutPath}`;
 };
 
 /**

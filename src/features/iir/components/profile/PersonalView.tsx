@@ -49,7 +49,12 @@ export default function PersonalView({
     <div className="space-y-8">
       <section>
         <SectionTitle title="Student Identity & Personal Details" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-y-6 gap-x-10 mt-6">
+        <div
+          className={cn(
+            "mt-6 grid grid-cols-1 gap-x-10 gap-y-6",
+            "md:grid-cols-2 lg:grid-cols-3",
+          )}
+        >
           {personalInfoFields.map((field) => (
             <InfoItem
               key={field.label}
@@ -62,14 +67,17 @@ export default function PersonalView({
 
       <section>
         <SectionTitle title="Residency Details" />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
           {addresses?.length > 0 ? (
             addresses?.map((entry: StudentAddress) => (
               <div
                 key={entry?.id}
                 className="rounded-xl border border-border p-4 shadow-sm"
               >
-                <CardBlock icon={Home} title={asText(entry.addressType)}>
+                <CardBlock
+                  icon={Home}
+                  title={asText(entry.addressType)}
+                >
                   <p className="text-xs text-card-foreground">
                     {renderAddress(entry?.address)}
                   </p>

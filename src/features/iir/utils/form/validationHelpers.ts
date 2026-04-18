@@ -31,7 +31,7 @@ export function validateAllSections(
   sectionRefs: Record<number, any>,
   formSections: Array<{ title: string; id: number; key: string }>,
   calculateSectionCompletion: (sectionIndex: number) => number,
-  currentSection: number
+  currentSection: number,
 ): ValidationSummary {
   const result: ValidationSummary = {
     hasErrors: false,
@@ -62,7 +62,7 @@ export function validateAllSections(
     if (completion < 100) {
       result.incompleteCompletionSections.push(i);
       result.incompleteCompletionMessages.push(
-        `${formSections[i - 1].title} — ${completion}% complete (required 100%)`
+        `${formSections[i - 1].title} — ${completion}% complete (required 100%)`,
       );
 
       if (!result.hasErrors) {

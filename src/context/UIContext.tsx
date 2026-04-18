@@ -1,5 +1,11 @@
 import { AuthContext } from "@/context/AuthContext";
-import React, { createContext, useContext, useState, useCallback, useEffect } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useEffect,
+} from "react";
 
 export interface PageMetadata {
   title: string;
@@ -105,88 +111,123 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
         return localStorage.getItem(key) || def;
       };
 
-      setSidebarPinnedInternal(getPref(STORAGE_KEYS.SIDEBAR_EXPANDED, "false") === "true");
+      setSidebarPinnedInternal(
+        getPref(STORAGE_KEYS.SIDEBAR_EXPANDED, "false") === "true",
+      );
       setDarkModeInternal(getPref(STORAGE_KEYS.DARK_MODE, "light") === "dark");
       setGrayscaleInternal(getPref(STORAGE_KEYS.GRAYSCALE, "false") === "true");
-      setDyslexiaModeInternal(getPref(STORAGE_KEYS.DYSLEXIA, "false") === "true");
-      setFontScaleInternal(parseInt(getPref(STORAGE_KEYS.FONT_SCALE, "100"), 10));
-      setPerformanceModeInternal(getPref(STORAGE_KEYS.PERFORMANCE, "false") === "true");
+      setDyslexiaModeInternal(
+        getPref(STORAGE_KEYS.DYSLEXIA, "false") === "true",
+      );
+      setFontScaleInternal(
+        parseInt(getPref(STORAGE_KEYS.FONT_SCALE, "100"), 10),
+      );
+      setPerformanceModeInternal(
+        getPref(STORAGE_KEYS.PERFORMANCE, "false") === "true",
+      );
       setSpeechRateState(parseFloat(getPref(STORAGE_KEYS.SPEECH_RATE, "1")));
       setSpeechVoiceState(getPref(STORAGE_KEYS.SPEECH_VOICE, ""));
     }
   }, [isLoading, userId]);
 
-  const setSidebarPinned = useCallback((value: boolean | ((prev: boolean) => boolean)) => {
-    setSidebarPinnedInternal((prev) => {
-      const next = typeof value === "function" ? value(prev) : value;
+  const setSidebarPinned = useCallback(
+    (value: boolean | ((prev: boolean) => boolean)) => {
+      setSidebarPinnedInternal((prev) => {
+        const next = typeof value === "function" ? value(prev) : value;
+        if (userId) {
+          localStorage.setItem(
+            `${STORAGE_KEYS.SIDEBAR_EXPANDED}-${userId}`,
+            String(next),
+          );
+        }
+        return next;
+      });
+    },
+    [userId],
+  );
+
+  const setDarkMode = useCallback(
+    (value: boolean) => {
+      setDarkModeInternal(value);
+      const val = value ? "dark" : "light";
+      localStorage.setItem(STORAGE_KEYS.DARK_MODE, val);
       if (userId) {
-        localStorage.setItem(`${STORAGE_KEYS.SIDEBAR_EXPANDED}-${userId}`, String(next));
+        localStorage.setItem(`${STORAGE_KEYS.DARK_MODE}-${userId}`, val);
       }
-      return next;
-    });
-  }, [userId]);
+    },
+    [userId],
+  );
 
-  const setDarkMode = useCallback((value: boolean) => {
-    setDarkModeInternal(value);
-    const val = value ? "dark" : "light";
-    localStorage.setItem(STORAGE_KEYS.DARK_MODE, val);
-    if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.DARK_MODE}-${userId}`, val);
-    }
-  }, [userId]);
+  const setGrayscale = useCallback(
+    (value: boolean) => {
+      setGrayscaleInternal(value);
+      const val = String(value);
+      localStorage.setItem(STORAGE_KEYS.GRAYSCALE, val);
+      if (userId) {
+        localStorage.setItem(`${STORAGE_KEYS.GRAYSCALE}-${userId}`, val);
+      }
+    },
+    [userId],
+  );
 
-  const setGrayscale = useCallback((value: boolean) => {
-    setGrayscaleInternal(value);
-    const val = String(value);
-    localStorage.setItem(STORAGE_KEYS.GRAYSCALE, val);
-    if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.GRAYSCALE}-${userId}`, val);
-    }
-  }, [userId]);
+  const setDyslexiaMode = useCallback(
+    (value: boolean) => {
+      setDyslexiaModeInternal(value);
+      const val = String(value);
+      localStorage.setItem(STORAGE_KEYS.DYSLEXIA, val);
+      if (userId) {
+        localStorage.setItem(`${STORAGE_KEYS.DYSLEXIA}-${userId}`, val);
+      }
+    },
+    [userId],
+  );
 
-  const setDyslexiaMode = useCallback((value: boolean) => {
-    setDyslexiaModeInternal(value);
-    const val = String(value);
-    localStorage.setItem(STORAGE_KEYS.DYSLEXIA, val);
-    if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.DYSLEXIA}-${userId}`, val);
-    }
-  }, [userId]);
+  const setFontScale = useCallback(
+    (value: number) => {
+      setFontScaleInternal(value);
+      const val = String(value);
+      localStorage.setItem(STORAGE_KEYS.FONT_SCALE, val);
+      if (userId) {
+        localStorage.setItem(`${STORAGE_KEYS.FONT_SCALE}-${userId}`, val);
+      }
+    },
+    [userId],
+  );
 
-  const setFontScale = useCallback((value: number) => {
-    setFontScaleInternal(value);
-    const val = String(value);
-    localStorage.setItem(STORAGE_KEYS.FONT_SCALE, val);
-    if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.FONT_SCALE}-${userId}`, val);
-    }
-  }, [userId]);
+  const setPerformanceMode = useCallback(
+    (value: boolean) => {
+      setPerformanceModeInternal(value);
+      const val = String(value);
+      localStorage.setItem(STORAGE_KEYS.PERFORMANCE, val);
+      if (userId) {
+        localStorage.setItem(`${STORAGE_KEYS.PERFORMANCE}-${userId}`, val);
+      }
+    },
+    [userId],
+  );
 
-  const setPerformanceMode = useCallback((value: boolean) => {
-    setPerformanceModeInternal(value);
-    const val = String(value);
-    localStorage.setItem(STORAGE_KEYS.PERFORMANCE, val);
-    if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.PERFORMANCE}-${userId}`, val);
-    }
-  }, [userId]);
+  const setSpeechRate = useCallback(
+    (rate: number) => {
+      setSpeechRateState(rate);
+      const val = String(rate);
+      localStorage.setItem(STORAGE_KEYS.SPEECH_RATE, val);
+      if (userId) {
+        localStorage.setItem(`${STORAGE_KEYS.SPEECH_RATE}-${userId}`, val);
+      }
+    },
+    [userId],
+  );
 
-  const setSpeechRate = useCallback((rate: number) => {
-    setSpeechRateState(rate);
-    const val = String(rate);
-    localStorage.setItem(STORAGE_KEYS.SPEECH_RATE, val);
-    if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.SPEECH_RATE}-${userId}`, val);
-    }
-  }, [userId]);
-
-  const setSpeechVoice = useCallback((voice: string) => {
-    setSpeechVoiceState(voice);
-    localStorage.setItem(STORAGE_KEYS.SPEECH_VOICE, voice);
-    if (userId) {
-      localStorage.setItem(`${STORAGE_KEYS.SPEECH_VOICE}-${userId}`, voice);
-    }
-  }, [userId]);
+  const setSpeechVoice = useCallback(
+    (voice: string) => {
+      setSpeechVoiceState(voice);
+      localStorage.setItem(STORAGE_KEYS.SPEECH_VOICE, voice);
+      if (userId) {
+        localStorage.setItem(`${STORAGE_KEYS.SPEECH_VOICE}-${userId}`, voice);
+      }
+    },
+    [userId],
+  );
 
   const toggleSidebarPinned = useCallback(() => {
     setSidebarPinned((prev) => !prev);

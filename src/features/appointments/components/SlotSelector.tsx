@@ -3,6 +3,7 @@ import { AvailableTimeSlotView, TimeSlot } from "../types";
 import { Sun, Moon } from "lucide-react";
 import { format12HourTime } from "../utils";
 import { Spinner } from "@/components/shared";
+import { cn } from "@/lib/utils";
 
 interface TimeSlotselectorProps {
   selectedDate: Date | undefined;
@@ -31,12 +32,12 @@ export default function SlotSelector({
       key={slot.id}
       onClick={() => onTimeSelect(slot)}
       disabled={!slot.isAvailable}
-      className={`py-2 px-2 rounded-lg font-medium transition-colors text-xs sm:text-sm ${
+      className={`rounded-lg px-2 py-2 text-xs font-medium transition-colors sm:text-sm ${
         selectedTime?.id === slot.id
           ? "bg-primary text-primary-foreground ring-2 ring-primary"
           : slot.isAvailable
-            ? "bg-muted hover:bg-muted/80 text-foreground hover:ring-2 hover:ring-primary/50"
-            : "bg-muted/50 text-muted-foreground cursor-not-allowed"
+            ? "bg-muted text-foreground hover:bg-muted/80 hover:ring-2 hover:ring-primary/50"
+            : "cursor-not-allowed bg-muted/50 text-muted-foreground"
       }`}
       aria-label={`Select ${slot.time}`}
       aria-pressed={selectedTime?.id === slot.id}
@@ -47,37 +48,45 @@ export default function SlotSelector({
 
   return (
     <div className="w-full">
-      <Card className="border border-border shadow-sm h-full bg-card">
-        <CardHeader className="bg-gradient-to-r from-muted/50 to-muted border-b border-border rounded-t-md">
+      <Card className="h-full border border-border bg-card shadow-sm">
+        <CardHeader className="rounded-t-md border-b border-border bg-gradient-to-r from-muted/50 to-muted">
           <CardTitle className="text-lg text-foreground">Select Time</CardTitle>
         </CardHeader>
         <CardContent className="pt-4">
           {selectedDate ? (
             <>
-              <p className="text-sm font-semibold text-muted-foreground mb-4">
+              <p className="mb-4 text-sm font-semibold text-muted-foreground">
                 {selectedDate.toDateString()}
               </p>
               {loading ? (
-                <p className="text-muted-foreground text-center py-8 text-sm">
-                  <Spinner size="sm" message="Loading available slots" />
+                <p className="py-8 text-center text-sm text-muted-foreground">
+                  <Spinner
+                    size="sm"
+                    message="Loading available slots"
+                  />
                 </p>
               ) : availableSlots.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                   {/* AM Column */}
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-amber-600 dark:text-amber-400">
-                      <Sun className="w-4 h-4" />
+                    <div
+                      className={cn(
+                        "flex items-center gap-2 text-sm font-semibold text-amber-600",
+                        "dark:text-amber-400",
+                      )}
+                    >
+                      <Sun className="h-4 w-4" />
                       <span>Morning</span>
                       <span className="text-xs font-normal text-muted-foreground">
                         ({amSlots.length} slots)
                       </span>
                     </div>
                     {amSlots.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto p-2">
+                      <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto p-2">
                         {amSlots.map(renderSlotButton)}
                       </div>
                     ) : (
-                      <p className="text-muted-foreground text-center py-4 text-sm bg-muted/30 rounded-lg">
+                      <p className="rounded-lg bg-muted/30 py-4 text-center text-sm text-muted-foreground">
                         No morning slots
                       </p>
                     )}
@@ -85,32 +94,37 @@ export default function SlotSelector({
 
                   {/* PM Column */}
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2 text-sm font-semibold text-indigo-600 dark:text-indigo-400">
-                      <Moon className="w-4 h-4" />
+                    <div
+                      className={cn(
+                        "flex items-center gap-2 text-sm font-semibold",
+                        "text-indigo-600 dark:text-indigo-400",
+                      )}
+                    >
+                      <Moon className="h-4 w-4" />
                       <span>Afternoon</span>
                       <span className="text-xs font-normal text-muted-foreground">
                         ({pmSlots.length} slots)
                       </span>
                     </div>
                     {pmSlots.length > 0 ? (
-                      <div className="grid grid-cols-2 gap-2 max-h-64 overflow-y-auto p-2">
+                      <div className="grid max-h-64 grid-cols-2 gap-2 overflow-y-auto p-2">
                         {pmSlots.map(renderSlotButton)}
                       </div>
                     ) : (
-                      <p className="text-muted-foreground text-center py-4 text-sm bg-muted/30 rounded-lg">
+                      <p className="rounded-lg bg-muted/30 py-4 text-center text-sm text-muted-foreground">
                         No afternoon slots
                       </p>
                     )}
                   </div>
                 </div>
               ) : (
-                <p className="text-muted-foreground text-center py-8 text-sm">
+                <p className="py-8 text-center text-sm text-muted-foreground">
                   No available slots for this date
                 </p>
               )}
             </>
           ) : (
-            <p className="text-muted-foreground text-center py-8 text-sm">
+            <p className="py-8 text-center text-sm text-muted-foreground">
               Select a date to see available times
             </p>
           )}

@@ -3,6 +3,7 @@ import { Settings, LogOut, Gavel, ShieldCheck } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { UISettingsModal } from "@/components/shared/UISettingsModal";
+import { cn } from "@/lib/utils";
 
 interface ProfileMenuProps {
   firstName?: string;
@@ -47,10 +48,16 @@ export default function ProfileMenu({
 
   return (
     <>
-      <div className="relative z-[9999]" ref={menuRef}>
+      <div
+        className="relative z-[9999]"
+        ref={menuRef}
+      >
         <button
           onClick={() => setOpen(!open)}
-          className="flex items-center gap-2 p-2 rounded hover:bg-muted/30 transition text-foreground"
+          className={cn(
+            "flex items-center gap-2 rounded p-2 text-foreground",
+            "transition hover:bg-muted/30",
+          )}
         >
           <Avatar className="h-7 w-7">
             <AvatarFallback className="text-xs font-semibold text-foreground">
@@ -58,7 +65,7 @@ export default function ProfileMenu({
               {lastName?.charAt(0)}
             </AvatarFallback>
           </Avatar>
-          <span className="text-sm hidden md:block text-foreground">
+          <span className="hidden text-sm text-foreground md:block">
             {roleLabel}
           </span>
         </button>
@@ -66,14 +73,18 @@ export default function ProfileMenu({
         {open && (
           <div
             onClick={(e) => e.stopPropagation()}
-            className="absolute right-0 mt-2 w-72 bg-card text-card-foreground border border-border rounded-xl shadow-xl z-[9999] overflow-hidden animate-in fade-in zoom-in-95 isolate"
+            className={cn(
+              "animate-in fade-in zoom-in-95 absolute right-0 isolate",
+              "z-[9999] mt-2 w-72 overflow-hidden rounded-xl border",
+              "border-border bg-card text-card-foreground shadow-xl",
+            )}
           >
             <button
               onClick={() => {
                 navigate(profilePath);
                 setOpen(false);
               }}
-              className="w-full text-left p-4 border-b border-border hover:bg-muted transition"
+              className="w-full border-b border-border p-4 text-left transition hover:bg-muted"
             >
               <div className="flex items-center gap-3">
                 <Avatar className="h-9 w-9">
@@ -104,7 +115,10 @@ export default function ProfileMenu({
                 setOpen(false);
                 setSettingsOpen(true);
               }}
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-muted transition text-left"
+              className={cn(
+                "flex w-full items-center gap-3 px-4 py-3 text-left text-sm",
+                "transition hover:bg-muted",
+              )}
             >
               <Settings size={16} />
               <span>Settings</span>
@@ -114,7 +128,7 @@ export default function ProfileMenu({
               href="https://www.pup.edu.ph/terms/"
               target="_blank"
               rel="noreferrer"
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-muted transition"
+              className="flex w-full items-center gap-3 px-4 py-3 text-sm transition hover:bg-muted"
             >
               <Gavel size={16} />
               <span>Terms of Service</span>
@@ -124,7 +138,7 @@ export default function ProfileMenu({
               href="https://www.pup.edu.ph/privacy/"
               target="_blank"
               rel="noreferrer"
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm hover:bg-muted transition"
+              className="flex w-full items-center gap-3 px-4 py-3 text-sm transition hover:bg-muted"
             >
               <ShieldCheck size={16} />
               <span>Privacy Policy</span>
@@ -132,7 +146,10 @@ export default function ProfileMenu({
 
             <button
               onClick={onLogout}
-              className="w-full flex items-center gap-3 px-4 py-3 text-sm text-red-500 hover:bg-red-500/10 transition border-t border-border"
+              className={cn(
+                "flex w-full items-center gap-3 border-t border-border px-4",
+                "py-3 text-sm text-red-500 transition hover:bg-red-500/10",
+              )}
             >
               <LogOut size={16} />
               Logout

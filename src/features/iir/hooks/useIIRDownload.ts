@@ -29,11 +29,11 @@ export function useIIRDownload() {
       link.setAttribute("download", fileName);
       document.body.appendChild(link);
       link.click();
-      
+
       // Cleanup
       link.parentNode?.removeChild(link);
       window.URL.revokeObjectURL(url);
-      
+
       triggerToast("IIR PDF downloaded successfully");
     } catch (error) {
       console.error("Failed to download IIR PDF:", error);

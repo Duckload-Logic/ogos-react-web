@@ -23,6 +23,7 @@ import {
   StudentSupportType,
 } from "../../types";
 import { NOT_SPECIFIED } from "../../constants";
+import { cn } from "@/lib/utils";
 
 export default function FamilyView({
   data,
@@ -30,10 +31,10 @@ export default function FamilyView({
   data: FamilySection | undefined;
 }) {
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="animate-in fade-in space-y-8 duration-500">
       <section>
         <SectionTitle title="Family Background" />
-        <div className="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           <StatCard
             label="Parental Status"
             value={asText(data?.background?.parentalStatus?.name)}
@@ -81,7 +82,7 @@ export default function FamilyView({
           />
         </div>
 
-        <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
           <CardBlock title="Room Sharing Details">
             <p className="text-xs text-card-foreground">
               {asText(data?.background?.roomSharingDetails)}
@@ -101,7 +102,7 @@ export default function FamilyView({
 
       <section>
         <SectionTitle title="Related Persons" />
-        <div className="mt-6 grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
           {(data?.relatedPersons?.length ?? 0) > 0 ? (
             data!.relatedPersons.map((person: RelatedPerson) => (
               <CardBlock
@@ -109,18 +110,29 @@ export default function FamilyView({
                 title={asText(person?.relationship?.name)}
                 icon={User}
               >
-                <div className="flex flex-col md:flex-row items-start justify-between gap-4">
+                <div
+                  className={cn(
+                    "flex flex-col items-start justify-between gap-4",
+                    "md:flex-row",
+                  )}
+                >
                   <div>
                     <p className="text-sm font-bold text-card-foreground">
-                      {`${asText(person?.lastName)}, ${asText(person?.firstName)} ${
-                        person?.middleName ? `${person?.middleName[0]}.` : ""
-                      }`}
+                      {asText(person?.lastName)}, {asText(person?.firstName)}
+                      {person?.middleName
+                        ? ` ${person?.middleName[0]}.`
+                        : ""}
                     </p>
-                    <p className="text-[10px] uppercase text-muted-foreground tracking-wide mt-1">
+                    <p
+                      className={cn(
+                        "mt-1 text-[10px] uppercase tracking-wide",
+                        "text-muted-foreground",
+                      )}
+                    >
                       {asText(person?.relationship?.name)}
                     </p>
                   </div>
-                  <div className="flex gap-1 flex-wrap justify-start md:justify-end">
+                  <div className="flex flex-wrap justify-start gap-1 md:justify-end">
                     {person.isParent && <RoleBadge label="Parent" />}
                     {person.isGuardian && <RoleBadge label="Guardian" />}
                     <RoleBadge
@@ -128,7 +140,7 @@ export default function FamilyView({
                     />
                   </div>
                 </div>
-                <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                   <InfoItem
                     label="Educational Level"
                     value={asText(person?.educationalLevel)}
@@ -160,22 +172,27 @@ export default function FamilyView({
 
       <section>
         <SectionTitle title="Financial Profile" />
-        <div className="mt-6 w-full p-6 rounded-2xl bg-primary text-primary-foreground shadow-lg shadow-primary/20">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div
+          className={cn(
+            "mt-6 w-full rounded-2xl bg-primary p-6",
+            "text-primary-foreground shadow-lg shadow-primary/20",
+          )}
+        >
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
             <div>
-              <p className="text-[10px] uppercase opacity-70 mb-1">
+              <p className="mb-1 text-[10px] uppercase opacity-70">
                 Monthly Family Income
               </p>
               <p className="text-2xl font-bold">
                 {asText(data?.finance?.monthlyFamilyIncomeRange?.text)}
               </p>
-              <p className="text-xs mt-2 opacity-90">
+              <p className="mt-2 text-xs opacity-90">
                 Other Income: {asText(data?.finance?.otherIncomeDetails)}
               </p>
             </div>
 
             <div className="md:border-l md:border-primary-foreground/20 md:pl-8">
-              <p className="text-[10px] uppercase opacity-70 mb-1">
+              <p className="mb-1 text-[10px] uppercase opacity-70">
                 Weekly Allowance
               </p>
               <p className="text-2xl font-bold">
@@ -184,7 +201,7 @@ export default function FamilyView({
             </div>
 
             <div className="md:border-l md:border-primary-foreground/20 md:pl-8">
-              <p className="text-[10px] uppercase opacity-70 mb-2">
+              <p className="mb-2 text-[10px] uppercase opacity-70">
                 Financial Sources
               </p>
               {(data?.finance?.financialSupportTypes?.length ?? 0) > 0 && (
@@ -205,7 +222,12 @@ export default function FamilyView({
 
 function RoleBadge({ label }: { label: string }) {
   return (
-    <span className="text-[10px] px-2 py-1 rounded-full border-2 border-border bg-muted text-muted-foreground">
+    <span
+      className={cn(
+        "rounded-full border-2 border-border bg-muted px-2 py-1",
+        "text-[10px] text-muted-foreground",
+      )}
+    >
       {label}
     </span>
   );

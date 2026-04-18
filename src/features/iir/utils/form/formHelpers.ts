@@ -15,7 +15,7 @@ import { IIRForm } from "../../types";
 export function updateNestedField(
   formData: IIRForm | null,
   path: string[],
-  value: any
+  value: any,
 ): IIRForm | null {
   if (!formData) return formData;
 
@@ -47,11 +47,11 @@ export function updateNestedField(
  * @returns True if field is filled
  */
 export function countFilledField(val: any): boolean {
-  if (val === null || val === undefined || val === '') return false;
-  if (typeof val === 'object') {
+  if (val === null || val === undefined || val === "") return false;
+  if (typeof val === "object") {
     if (Array.isArray(val)) return val.length > 0;
     // For objects, check if they have an id (indicating it's been selected)
-    return val?.id !== undefined && val?.id !== null && val?.id !== '';
+    return val?.id !== undefined && val?.id !== null && val?.id !== "";
   }
   return true;
 }
@@ -66,7 +66,7 @@ export function countFilledField(val: any): boolean {
 export function getOverallCompletion(
   formData: IIRForm | null,
   sectionCount: number,
-  calculateSectionCompletion: (sectionIndex: number) => number
+  calculateSectionCompletion: (sectionIndex: number) => number,
 ): number {
   let totalPercentage = 0;
   for (let i = 1; i <= sectionCount; i++) {
@@ -83,12 +83,12 @@ export function getOverallCompletion(
  */
 export function getSectionStatus(
   sectionIndex: number,
-  calculateSectionCompletion: (sectionIndex: number) => number
-): 'complete' | 'partial' | 'empty' {
+  calculateSectionCompletion: (sectionIndex: number) => number,
+): "complete" | "partial" | "empty" {
   const percentage = calculateSectionCompletion(sectionIndex);
-  if (percentage === 100) return 'complete';
-  if (percentage > 0) return 'partial';
-  return 'empty';
+  if (percentage === 100) return "complete";
+  if (percentage > 0) return "partial";
+  return "empty";
 }
 
 /**
@@ -103,13 +103,13 @@ export function createResetFormData(emptyForm: IIRForm, me: any): IIRForm {
     student: {
       ...emptyForm.student,
       basicInfo: {
-        firstName: me?.firstName || '',
+        firstName: me?.firstName || "",
         middleName:
-          me?.middleName && typeof me?.middleName === 'string'
+          me?.middleName && typeof me?.middleName === "string"
             ? me?.middleName
-            : '',
-        lastName: me?.lastName || '',
-        email: me?.email || '',
+            : "",
+        lastName: me?.lastName || "",
+        email: me?.email || "",
       },
     },
   };
@@ -125,7 +125,7 @@ export function createResetFormData(emptyForm: IIRForm, me: any): IIRForm {
 export function initializeFormData(
   draft: IIRForm | null,
   emptyForm: IIRForm,
-  me: any
+  me: any,
 ): IIRForm {
   const baseData = draft || emptyForm;
 
@@ -135,13 +135,13 @@ export function initializeFormData(
       ...baseData.student,
       basicInfo: {
         ...baseData.student?.basicInfo,
-        firstName: me?.firstName || '',
+        firstName: me?.firstName || "",
         middleName:
-          me?.middleName && typeof me?.middleName === 'string'
+          me?.middleName && typeof me?.middleName === "string"
             ? me?.middleName
-            : '',
-        lastName: me?.lastName || '',
-        email: me?.email || '',
+            : "",
+        lastName: me?.lastName || "",
+        email: me?.email || "",
       },
       personalInfo: {
         ...baseData.student?.personalInfo,

@@ -16,7 +16,7 @@ export default function TagList({
       {values.map((value, index) => (
         <span
           key={`${value}-${index}`}
-          className={`px-2 py-1 rounded-full text-xs ${
+          className={`rounded-full px-2 py-1 text-xs ${
             dark
               ? "bg-primary-foreground/10 text-primary-foreground"
               : "bg-primary/10 text-primary"
