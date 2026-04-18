@@ -1,4 +1,5 @@
 import { Bell, CircleCheck } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Props {
   toasts: string[];
@@ -9,7 +10,12 @@ const ICON_SIZE = 20;
 
 export default function Toast({
   toasts,
-  icon = <Bell size={ICON_SIZE} className="text-primary" />,
+  icon = (
+    <Bell
+      size={ICON_SIZE}
+      className="text-primary"
+    />
+  ),
 }: Props) {
   const visibleToasts = toasts.slice(-5);
 
@@ -23,9 +29,13 @@ export default function Toast({
           <div
             key={index}
             style={{ opacity }}
-            className="bg-card border-glass-border shadow-xl rounded-xl px-5 py-3 text-sm flex items-center gap-3 animate-toast-slide-in-right transition-opacity duration-300"
+            className={cn(
+              "flex animate-toast-slide-in-right items-center gap-3",
+              "rounded-xl border-glass-border bg-card px-5 py-3 text-sm",
+              "shadow-xl transition-opacity duration-300",
+            )}
           >
-            <div className="flex-shrink-0 animate-ring origin-top">{icon}</div>
+            <div className="flex-shrink-0 origin-top animate-ring">{icon}</div>
             {toast}
           </div>
         );

@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface StatsCardProps {
   to: string;
@@ -26,11 +27,15 @@ export function StatsCard({
   return (
     <Link to={to}>
       <Card
-        className={`animate-fade-in-up hover:shadow-md transition-shadow cursor-pointer border-l-4 ${borderColor}`}
+        className={cn(
+          "animate-fade-in-up cursor-pointer border-l-4 transition-shadow",
+          "hover:shadow-md",
+          borderColor,
+        )}
         style={{ animationDelay, animationFillMode: "both" }}
       >
-        <CardContent className="py-4 px-4 flex items-center gap-3">
-          <div className={`p-2 rounded-lg ${bgColor}`}>
+        <CardContent className="flex items-center gap-3 px-4 py-4">
+          <div className={`rounded-lg p-2 ${bgColor}`}>
             <Icon className={`h-5 w-5 ${iconColor}`} />
           </div>
           <div>

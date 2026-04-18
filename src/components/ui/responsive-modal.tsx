@@ -36,14 +36,20 @@ export function ResponsiveModal({
 
   if (isMobile) {
     return (
-      <Drawer open={open} onOpenChange={onOpenChange}>
+      <Drawer
+        open={open}
+        onOpenChange={onOpenChange}
+      >
         {children}
       </Drawer>
     );
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog
+      open={open}
+      onOpenChange={onOpenChange}
+    >
       {children}
     </Dialog>
   );
@@ -116,10 +122,14 @@ export function ResponsiveModalDescription({
   const isMobile = useIsMobile();
 
   if (isMobile) {
-    return <DrawerDescription className={className}>{children}</DrawerDescription>;
+    return (
+      <DrawerDescription className={className}>{children}</DrawerDescription>
+    );
   }
 
-  return <DialogDescription className={className}>{children}</DialogDescription>;
+  return (
+    <DialogDescription className={className}>{children}</DialogDescription>
+  );
 }
 
 export function ResponsiveModalFooter({
@@ -134,4 +144,3 @@ export function ResponsiveModalFooter({
 
   return <DialogFooter className={className}>{children}</DialogFooter>;
 }
-

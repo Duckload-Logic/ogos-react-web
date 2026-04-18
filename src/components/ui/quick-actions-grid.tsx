@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { LucideIcon, ChevronRight } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export interface QuickAction {
   title: string;
@@ -26,30 +27,46 @@ export function QuickActions({
       className="animate-fade-in-up mb-6"
       style={{ animationDelay, animationFillMode: "both" }}
     >
-      <h2 className="text-base font-semibold text-foreground mb-3">{title}</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+      <h2 className="mb-3 text-base font-semibold text-foreground">{title}</h2>
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
         {actions.map((action, index) => (
-          <Link key={index} to={action.to}>
+          <Link
+            key={index}
+            to={action.to}
+          >
             <Card
-              className="animate-fade-in-scale group hover:shadow-md transition-all duration-300 cursor-pointer"
+              className={cn(
+                "animate-fade-in-scale group cursor-pointer transition-all",
+                "duration-300 hover:shadow-md",
+              )}
               style={{
                 animationDelay: `${0.2 + index * 0.05}s`,
                 animationFillMode: "both",
               }}
             >
-              <CardContent className="py-4 px-4 flex items-center gap-3">
-                <div className={`p-2.5 rounded-lg ${action.color}`}>
+              <CardContent className="flex items-center gap-3 px-4 py-4">
+                <div className={`rounded-lg p-2.5 ${action.color}`}>
                   <action.icon className="h-5 w-5" />
                 </div>
-                <div className="flex-1 min-w-0">
-                  <h3 className="font-semibold text-sm text-foreground group-hover:text-primary transition-colors">
+                <div className="min-w-0 flex-1">
+                  <h3
+                    className={cn(
+                      "text-sm font-semibold text-foreground transition-colors",
+                      "group-hover:text-primary",
+                    )}
+                  >
                     {action.title}
                   </h3>
                   <p className="text-xs text-muted-foreground">
                     {action.description}
                   </p>
                 </div>
-                <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                <ChevronRight
+                  className={cn(
+                    "h-4 w-4 text-muted-foreground transition-all",
+                    "group-hover:translate-x-1 group-hover:text-primary",
+                  )}
+                />
               </CardContent>
             </Card>
           </Link>
