@@ -1,4 +1,5 @@
 import { Trophy } from "lucide-react";
+import { cn } from "@/lib/utils";
 import CardBlock from "./CardBlock";
 import EmptyState from "./EmptyState";
 import SectionTitle from "./SectionTitle";

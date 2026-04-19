@@ -7,6 +7,7 @@ import SectionTitle from "./SectionTitle";
 import CardBlock from "./CardBlock";
 import InfoItem from "./InfoItem";
 import { NOT_SPECIFIED } from "../../constants";
+import { cn } from "@/lib/utils";
 
 export default function PersonalView({
   data,
