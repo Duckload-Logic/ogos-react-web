@@ -18,8 +18,8 @@ import {
   CheckCircle,
   AlertTriangle,
 } from "lucide-react";
-import {
 import { cn } from "@/lib/utils";
+import {
   useGetNotifications,
   useMarkNotificationRead,
 } from "../hooks/useNotifications";
@@ -98,8 +98,6 @@ export default function NotificationsPage() {
           </div>
           {unreadCount > 0 && (
             <Button
-              variant="outline"
-              size="sm"
               onClick={handleMarkAllRead}
               disabled={markRead.isPending}
             >
@@ -121,10 +119,12 @@ export default function NotificationsPage() {
           >
             Unread
             {unreadCount > 0 && filter === "all" && (
-              <span className={cn(
-    "flex h-5 min-w-[20px] items-center justify-center",
-    "rounded-full bg-red-500 px-1 text-[10px] text-white"
-  )}>
+              <span
+                className={cn(
+                  "flex h-5 min-w-[20px] items-center justify-center",
+                  "rounded-full bg-red-500 px-1 text-[10px] text-white",
+                )}
+              >
                 {unreadCount}
               </span>
             )}
@@ -174,10 +174,12 @@ export default function NotificationsPage() {
                       >
                         {notif.title}
                       </p>
-                      <p className={cn(
-    "mt-1 line-clamp-2 text-sm leading-relaxed",
-    "text-muted-foreground sm:line-clamp-none"
-  )}>
+                      <p
+                        className={cn(
+                          "mt-1 line-clamp-2 text-sm leading-relaxed",
+                          "text-muted-foreground sm:line-clamp-none",
+                        )}
+                      >
                         {notif.message}
                       </p>
                       <p className="mt-2 text-xs font-medium text-muted-foreground">
