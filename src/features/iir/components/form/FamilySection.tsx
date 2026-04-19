@@ -16,14 +16,13 @@ import {
   Calendar,
   GraduationCap,
 } from "lucide-react";
-import {
-  FormInput,
-  Checkbox,
-  Radio,
-  Dropdown,
-} from "@/components/form";
+import { FormInput, Checkbox, Radio, Dropdown } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
-import { validateObject, isFieldRequired, validateField } from "@/services/validationSchema";
+import {
+  validateObject,
+  isFieldRequired,
+  validateField,
+} from "@/services/validationSchema";
 import { familyValidationSchema } from "@/features/iir/config/familyValidationSchema";
 import {
   useIncomeRanges,
@@ -33,6 +32,7 @@ import {
   useStudentSupportTypes,
 } from "../../hooks";
 import { ParentalStatus } from "../../types";
+import { cn } from "@/lib/utils";
 
 interface FormErrors {
   [key: string]: string;
@@ -131,27 +131,41 @@ export const FamilySection = forwardRef<
   return (
     <SectionContainer
       title="Family Background"
-      description="Details about your family structure, parental status, and living arrangements"
+      description={cn(
+        "Details about your family structure,",
+        "parental status, and living arrangements",
+      )}
       icon={Users}
     >
       <div className="space-y-12">
         {/* I. Parental Status */}
-        <div className="bg-glass-bg/60 backdrop-blur-glass rounded-[24px] p-5 sm:p-8 border border-glass-border/40 shadow-sm transition-all duration-300 hover:shadow-md">
-          <div className="flex items-center gap-3 mb-6 sm:mb-8">
-            <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary shadow-sm">
-              <Heart className="w-5 h-5" />
+        <div
+          className={cn(
+            "bg-glass-bg/60 border-glass-border/40 rounded-[24px] border",
+            "p-5 shadow-sm backdrop-blur-glass transition-all duration-300",
+            "hover:shadow-md sm:p-8",
+          )}
+        >
+          <div className="mb-6 flex items-center gap-3 sm:mb-8">
+            <div
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-xl",
+                "bg-primary/10 text-primary shadow-sm",
+              )}
+            >
+              <Heart className="h-5 w-5" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-foreground">
                 Parental Status
               </h3>
-              <p className="text-xs text-muted-foreground font-medium">
+              <p className="text-xs font-medium text-muted-foreground">
                 Please indicate the current marital/legal status of your parents
               </p>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 sm:gap-4">
+          <div className="grid grid-cols-1 gap-3 sm:gap-4 md:grid-cols-2">
             {parentalStatusOptions?.map((option: any) => {
               const isOther =
                 option.name?.toLowerCase() === "other" ||
@@ -162,7 +176,10 @@ export const FamilySection = forwardRef<
                 ) === String(option.id);
 
               return (
-                <div key={option.id} className="relative group">
+                <div
+                  key={option.id}
+                  className="group relative"
+                >
                   <button
                     type="button"
                     onClick={() =>
@@ -170,28 +187,44 @@ export const FamilySection = forwardRef<
                         id: Number(option.id),
                       })
                     }
-                    className={`w-full flex items-center justify-between p-4 rounded-xl border transition-all duration-300 ${isSelected
-                      ? "bg-primary/5 border-primary shadow-sm"
-                      : "bg-glass-bg/40 border-glass-border/20 hover:bg-glass-bg/60 hover:border-primary/20"
-                      }`}
+                    className={cn(
+                      "flex w-full items-center justify-between",
+                      "rounded-xl border p-4 transition-all duration-300",
+                      isSelected
+                        ? "border-primary bg-primary/5 shadow-sm"
+                        : "border-glass-border/20 bg-glass-bg/40",
+                      !isSelected &&
+                        "hover:border-primary/20 hover:bg-glass-bg/60",
+                    )}
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className={`w-2.5 h-2.5 rounded-full transition-all duration-300 ${isSelected ? "bg-primary scale-110 shadow-[0_0_8px_rgba(239,68,68,0.5)]" : "bg-muted"}`}
-                      />
+                      className={cn(
+                        "h-2.5 w-2.5 rounded-full transition-all duration-300",
+                        isSelected
+                          ? "scale-110 bg-primary shadow-[0_0_8px_rgba(239,68,68,0.5)]"
+                          : "bg-muted",
+                      )}
+                    />
                       <span
-                        className={`text-sm font-bold transition-colors duration-300 text-left ${isSelected ? "text-primary" : "text-foreground/70 group-hover:text-foreground"}`}
+                        className={cn(
+                          "text-left text-sm font-bold transition-colors",
+                          "duration-300",
+                          isSelected
+                            ? "text-primary"
+                            : "text-foreground/70 group-hover:text-foreground",
+                        )}
                       >
                         {option.name || option.text || option.code}
                       </span>
                     </div>
                     {isSelected && (
-                      <CheckCircle2 className="w-5 h-5 text-primary stroke-[2.5]" />
+                      <CheckCircle2 className="h-5 w-5 stroke-[2.5] text-primary" />
                     )}
                   </button>
 
                   {isOther && isSelected && (
-                    <div className="mt-4 px-1 animate-fade-in">
+                    <div className="animate-fade-in mt-4 px-1">
                       <FormInput
                         name="family.background.parentalStatusOther"
                         label="Please Specify"
@@ -214,34 +247,61 @@ export const FamilySection = forwardRef<
           </div>
 
           {errors["family.background.parentalStatus"] && (
-            <p className="text-xs font-bold text-destructive mt-4 ml-1 flex items-center gap-1.5 animate-bounce">
-              <AlertCircle className="w-3.5 h-3.5" />
+            <p
+              className={cn(
+                "ml-1 mt-4 flex animate-bounce items-center gap-1.5 text-xs",
+                "font-bold text-destructive",
+              )}
+            >
+              <AlertCircle className="h-3.5 w-3.5" />
               {errors["family.background.parentalStatus"]}
             </p>
           )}
         </div>
 
         {/* II. Living Situation */}
-        <div className="bg-glass-bg/60 backdrop-blur-glass rounded-[24px] p-5 sm:p-8 border border-glass-border/40 shadow-sm transition-all duration-300 hover:shadow-md">
-          <div className="flex items-center gap-3 mb-6 sm:mb-8">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center text-indigo-500 shadow-sm">
-              <Home className="w-5 h-5" />
+        <div
+          className={cn(
+            "bg-glass-bg/60 border-glass-border/40 rounded-[24px] border",
+            "p-5 shadow-sm backdrop-blur-glass transition-all duration-300",
+            "hover:shadow-md sm:p-8",
+          )}
+        >
+          <div className="mb-6 flex items-center gap-3 sm:mb-8">
+            <div
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-xl",
+                "bg-indigo-500/10 text-indigo-500 shadow-sm",
+              )}
+            >
+              <Home className="h-5 w-5" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-foreground">
                 Living Situation
               </h3>
-              <p className="text-xs text-muted-foreground font-medium">
+              <p className="text-xs font-medium text-muted-foreground">
                 Environment and nature of your current residence
               </p>
             </div>
           </div>
 
-          <div className="space-y-6 sm:y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-              <div className="bg-glass-bg/40 backdrop-blur-sm rounded-[20px] p-5 sm:p-6 border border-glass-border/20 transition-all duration-300 hover:bg-glass-bg/60">
-                <p className="text-sm font-bold text-foreground/80 mb-4 block flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+          <div className="sm:y-8 space-y-6">
+            <div className="grid grid-cols-1 gap-4 sm:gap-6 md:grid-cols-2">
+              <div
+                className={cn(
+                  "bg-glass-bg/40 border-glass-border/20 hover:bg-glass-bg/60",
+                  "rounded-[20px] border p-5 backdrop-blur-sm transition-all",
+                  "duration-300 sm:p-6",
+                )}
+              >
+                <p
+                  className={cn(
+                    "mb-4 block flex items-center gap-2",
+                    "text-sm font-bold text-foreground/80",
+                  )}
+                >
+                  <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
                   Do you have a quiet place to study?
                 </p>
                 <div className="grid grid-cols-2 gap-3">
@@ -259,10 +319,13 @@ export const FamilySection = forwardRef<
                             val === "yes",
                           )
                         }
-                        className={`py-2.5 px-4 rounded-xl border text-sm font-bold transition-all duration-300 ${isSelected
-                          ? "bg-indigo-500/10 border-indigo-500 text-indigo-600 shadow-sm"
-                          : "bg-white/20 border-glass-border/20 text-muted-foreground hover:bg-white/40"
-                          }`}
+                        className={cn(
+                          "rounded-xl border px-4 py-2.5 text-sm font-bold",
+                          "transition-all duration-300",
+                          isSelected
+                            ? "border-indigo-500 bg-indigo-500/10 text-indigo-600 shadow-sm"
+                            : "border-glass-border/20 bg-white/20 text-muted-foreground hover:bg-white/40",
+                        )}
                       >
                         {val.charAt(0).toUpperCase() + val.slice(1)}
                       </button>
@@ -270,15 +333,21 @@ export const FamilySection = forwardRef<
                   })}
                 </div>
                 {errors["family.background.haveQuietPlaceToStudy"] && (
-                  <p className="text-[10px] font-bold text-destructive mt-2 ml-1">
+                  <p className="ml-1 mt-2 text-[10px] font-bold text-destructive">
                     {errors["family.background.haveQuietPlaceToStudy"]}
                   </p>
                 )}
               </div>
 
-              <div className="bg-glass-bg/40 backdrop-blur-sm rounded-[20px] p-5 sm:p-6 border border-glass-border/20 transition-all duration-300 hover:bg-glass-bg/60">
-                <p className="text-sm font-bold text-foreground/80 mb-4 block flex items-center gap-2">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+              <div
+                className={cn(
+                  "bg-glass-bg/40 border-glass-border/20 hover:bg-glass-bg/60",
+                  "rounded-[20px] border p-5 backdrop-blur-sm transition-all",
+                  "duration-300 sm:p-6",
+                )}
+              >
+                <p className="mb-4 block flex items-center gap-2 text-sm font-bold text-foreground/80">
+                  <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
                   Do you share your room with anyone?
                 </p>
                 <div className="grid grid-cols-2 gap-3">
@@ -295,10 +364,13 @@ export const FamilySection = forwardRef<
                             val === "yes",
                           )
                         }
-                        className={`py-2.5 px-4 rounded-xl border text-sm font-bold transition-all duration-300 ${isSelected
-                          ? "bg-indigo-500/10 border-indigo-500 text-indigo-600 shadow-sm"
-                          : "bg-white/20 border-glass-border/20 text-muted-foreground hover:bg-white/40"
-                          }`}
+                        className={cn(
+                          "rounded-xl border px-4 py-2.5 text-sm font-bold",
+                          "transition-all duration-300",
+                          isSelected
+                            ? "border-indigo-500 bg-indigo-500/10 text-indigo-600 shadow-sm"
+                            : "border-glass-border/20 bg-white/20 text-muted-foreground hover:bg-white/40",
+                        )}
                       >
                         {val.charAt(0).toUpperCase() + val.slice(1)}
                       </button>
@@ -306,13 +378,13 @@ export const FamilySection = forwardRef<
                   })}
                 </div>
                 {errors["family.background.isSharingRoom"] && (
-                  <p className="text-[10px] font-bold text-destructive mt-2 ml-1">
+                  <p className="ml-1 mt-2 text-[10px] font-bold text-destructive">
                     {errors["family.background.isSharingRoom"]}
                   </p>
                 )}
 
                 {family?.background?.isSharingRoom === true && (
-                  <div className="mt-4 animate-fade-in">
+                  <div className="animate-fade-in mt-4">
                     <FormInput
                       name="family.background.roomSharingDetails"
                       label="Share room with whom?"
@@ -337,12 +409,18 @@ export const FamilySection = forwardRef<
               </div>
             </div>
 
-            <div className="bg-glass-bg/40 backdrop-blur-sm rounded-[24px] p-5 sm:p-6 border border-glass-border/20 transition-all duration-300 hover:bg-glass-bg/60">
-              <label className="text-sm font-bold text-foreground/80 mb-6 block flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+            <div
+              className={cn(
+                "bg-glass-bg/40 border-glass-border/20 hover:bg-glass-bg/60",
+                "rounded-[24px] border p-5 backdrop-blur-sm transition-all",
+                "duration-300 sm:p-6",
+              )}
+            >
+              <label className="mb-6 block flex items-center gap-2 text-sm font-bold text-foreground/80">
+                <span className="h-1.5 w-1.5 rounded-full bg-indigo-500" />
                 Nature of Residence
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
                 {natureOfResidenceOptions?.map((option: any) => {
                   const isSelected =
                     String(
@@ -358,16 +436,19 @@ export const FamilySection = forwardRef<
                           { id: Number(option.id) },
                         )
                       }
-                      className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 ${isSelected
-                        ? "bg-indigo-500/10 border-indigo-500 shadow-sm"
-                        : "bg-white/20 border-glass-border/20 hover:bg-white/40"
-                        }`}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl border p-3.5",
+                        "transition-all duration-300",
+                        isSelected
+                          ? "border-indigo-500 bg-indigo-500/10 shadow-sm"
+                          : "border-glass-border/20 bg-white/20 hover:bg-white/40",
+                      )}
                     >
                       <div
-                        className={`w-2 h-2 rounded-full transition-all duration-300 ${isSelected ? "bg-indigo-500 scale-110" : "bg-muted"}`}
+                        className={`h-2 w-2 rounded-full transition-all duration-300 ${isSelected ? "scale-110 bg-indigo-500" : "bg-muted"}`}
                       />
                       <span
-                        className={`text-xs font-bold text-left ${isSelected ? "text-indigo-600" : "text-foreground/70"}`}
+                        className={`text-left text-xs font-bold ${isSelected ? "text-indigo-600" : "text-foreground/70"}`}
                       >
                         {option.name || option.text || option.code}
                       </span>
@@ -376,7 +457,7 @@ export const FamilySection = forwardRef<
                 })}
               </div>
               {errors["family.background.natureOfResidence"] && (
-                <p className="text-[10px] font-bold text-destructive mt-4 ml-1">
+                <p className="ml-1 mt-4 text-[10px] font-bold text-destructive">
                   {errors["family.background.natureOfResidence"]}
                 </p>
               )}
@@ -385,30 +466,53 @@ export const FamilySection = forwardRef<
         </div>
 
         {/* Divider */}
-        <div className="border-t border-border my-8"></div>
+        <div className="my-8 border-t border-border"></div>
 
         {/* III. Family Members Information */}
         <div className="space-y-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-2xl bg-rose-500/10 flex items-center justify-center text-rose-500 shadow-[0_0_15px_rgba(244,63,94,0.1)]">
-              <Users className="w-5 h-5" />
+          <div className="mb-2 flex items-center gap-3">
+            <div
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-2xl",
+                "bg-rose-500/10 text-rose-500",
+                "shadow-[0_0_15px_rgba(244,63,94,0.1)]",
+              )}
+            >
+              <Users className="h-5 w-5" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-foreground">
                 Family Members Information
               </h3>
-              <p className="text-xs text-muted-foreground font-medium">
+              <p className="text-xs font-medium text-muted-foreground">
                 Detailed information about your parents and guardian
               </p>
             </div>
           </div>
 
           {/* Father Card */}
-          <div className="group bg-glass-bg/60 backdrop-blur-glass rounded-[24px] border border-glass-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-            <div className="px-5 sm:px-8 py-4 sm:py-5 bg-glass-bg/40 border-b border-glass-border/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div
+            className={cn(
+              "bg-glass-bg/60 border-glass-border/40 group overflow-hidden",
+              "rounded-[24px] border shadow-sm backdrop-blur-glass",
+              "transition-all duration-300 hover:shadow-md",
+            )}
+          >
+            <div
+              className={cn(
+                "bg-glass-bg/40 border-glass-border/20 flex flex-col",
+                "items-start justify-between gap-4 border-b px-5 py-4",
+                "sm:flex-row sm:items-center sm:px-8 sm:py-5",
+              )}
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-sm text-primary">
-                  <User className="w-5 h-5" />
+                <div
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-xl",
+                    "bg-primary/10 text-primary shadow-sm",
+                  )}
+                >
+                  <User className="h-5 w-5" />
                 </div>
                 <h4 className="text-base font-bold text-foreground">
                   Father's Information
@@ -417,8 +521,10 @@ export const FamilySection = forwardRef<
               <div className="flex items-center gap-3 self-end sm:self-auto">
                 {["Living", "Deceased"].map((status) => {
                   const isLiving = status === "Living";
-                  const currentPerson = family?.relatedPersons?.[FATHER_IDX] || {};
-                  const isSelected = (currentPerson.isLiving ?? true) === isLiving;
+                  const currentPerson =
+                    family?.relatedPersons?.[FATHER_IDX] || {};
+                  const isSelected =
+                    (currentPerson.isLiving ?? true) === isLiving;
                   return (
                     <button
                       key={status}
@@ -429,12 +535,16 @@ export const FamilySection = forwardRef<
                           isLiving,
                         )
                       }
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border ${isSelected
-                        ? isLiving
-                          ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-600"
-                          : "bg-rose-500/10 border-rose-500/50 text-rose-600"
-                        : "bg-glass-bg/40 border-glass-border/20 text-muted-foreground"
-                        }`}
+                      className={cn(
+                        "rounded-lg border px-3 py-1.5 text-[10px]",
+                        "font-bold uppercase tracking-wider transition-all",
+                        "duration-300",
+                        isSelected
+                          ? isLiving
+                            ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600"
+                            : "border-rose-500/50 bg-rose-500/10 text-rose-600"
+                          : "border-glass-border/20 bg-glass-bg/40 text-muted-foreground",
+                      )}
                     >
                       {status}
                     </button>
@@ -444,7 +554,7 @@ export const FamilySection = forwardRef<
             </div>
 
             <div className="p-5 sm:p-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-8 mb-6 sm:mb-8">
+              <div className="mb-6 grid grid-cols-1 gap-5 sm:mb-8 sm:gap-8 md:grid-cols-3">
                 <FormInput
                   name={`family.relatedPersons.${FATHER_IDX}.firstName`}
                   label="First Name"
@@ -510,13 +620,15 @@ export const FamilySection = forwardRef<
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                 <FormInput
                   name={`family.relatedPersons.${FATHER_IDX}.dateOfBirth`}
                   label="Date of Birth"
                   type="date"
                   required
-                  value={family?.relatedPersons?.[FATHER_IDX]?.dateOfBirth || ""}
+                  value={
+                    family?.relatedPersons?.[FATHER_IDX]?.dateOfBirth || ""
+                  }
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${FATHER_IDX}.dateOfBirth`,
@@ -604,7 +716,8 @@ export const FamilySection = forwardRef<
                     name={`family.relatedPersons.${FATHER_IDX}.employerAddress`}
                     label="Address of Employer"
                     value={
-                      family?.relatedPersons?.[FATHER_IDX]?.employerAddress || ""
+                      family?.relatedPersons?.[FATHER_IDX]?.employerAddress ||
+                      ""
                     }
                     onChange={(val) =>
                       handleInputChange(
@@ -629,11 +742,28 @@ export const FamilySection = forwardRef<
           </div>
 
           {/* Mother Card */}
-          <div className="group bg-glass-bg/60 backdrop-blur-glass rounded-[24px] border border-glass-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-            <div className="px-5 sm:px-8 py-4 sm:py-5 bg-glass-bg/40 border-b border-glass-border/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div
+            className={cn(
+              "bg-glass-bg/60 border-glass-border/40 group overflow-hidden",
+              "rounded-[24px] border shadow-sm backdrop-blur-glass",
+              "transition-all duration-300 hover:shadow-md",
+            )}
+          >
+            <div
+              className={cn(
+                "bg-glass-bg/40 border-glass-border/20 flex flex-col",
+                "items-start justify-between gap-4 border-b px-5 py-4",
+                "sm:flex-row sm:items-center sm:px-8 sm:py-5",
+              )}
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-sm text-primary">
-                  <User className="w-5 h-5" />
+                <div
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-xl",
+                    "bg-primary/10 text-primary shadow-sm",
+                  )}
+                >
+                  <User className="h-5 w-5" />
                 </div>
                 <h4 className="text-base font-bold text-foreground">
                   Mother's Information
@@ -642,8 +772,10 @@ export const FamilySection = forwardRef<
               <div className="flex items-center gap-3 self-end sm:self-auto">
                 {["Living", "Deceased"].map((status) => {
                   const isLiving = status === "Living";
-                  const currentPerson = family?.relatedPersons?.[MOTHER_IDX] || {};
-                  const isSelected = (currentPerson.isLiving ?? true) === isLiving;
+                  const currentPerson =
+                    family?.relatedPersons?.[MOTHER_IDX] || {};
+                  const isSelected =
+                    (currentPerson.isLiving ?? true) === isLiving;
                   return (
                     <button
                       key={status}
@@ -654,12 +786,16 @@ export const FamilySection = forwardRef<
                           isLiving,
                         )
                       }
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border ${isSelected
-                        ? isLiving
-                          ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-600"
-                          : "bg-rose-500/10 border-rose-500/50 text-rose-600"
-                        : "bg-glass-bg/40 border-glass-border/20 text-muted-foreground"
-                        }`}
+                      className={cn(
+                        "rounded-lg border px-3 py-1.5 text-[10px]",
+                        "font-bold uppercase tracking-wider transition-all",
+                        "duration-300",
+                        isSelected
+                          ? isLiving
+                            ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600"
+                            : "border-rose-500/50 bg-rose-500/10 text-rose-600"
+                          : "border-glass-border/20 bg-glass-bg/40 text-muted-foreground",
+                      )}
                     >
                       {status}
                     </button>
@@ -669,7 +805,7 @@ export const FamilySection = forwardRef<
             </div>
 
             <div className="p-5 sm:p-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-8 mb-6 sm:mb-8">
+              <div className="mb-6 grid grid-cols-1 gap-5 sm:mb-8 sm:gap-8 md:grid-cols-3">
                 <FormInput
                   name={`family.relatedPersons.${MOTHER_IDX}.firstName`}
                   label="First Name"
@@ -735,13 +871,15 @@ export const FamilySection = forwardRef<
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                 <FormInput
                   name={`family.relatedPersons.${MOTHER_IDX}.dateOfBirth`}
                   label="Date of Birth"
                   type="date"
                   required
-                  value={family?.relatedPersons?.[MOTHER_IDX]?.dateOfBirth || ""}
+                  value={
+                    family?.relatedPersons?.[MOTHER_IDX]?.dateOfBirth || ""
+                  }
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${MOTHER_IDX}.dateOfBirth`,
@@ -832,7 +970,8 @@ export const FamilySection = forwardRef<
                     name={`family.relatedPersons.${MOTHER_IDX}.employerAddress`}
                     label="Address of Employer"
                     value={
-                      family?.relatedPersons?.[MOTHER_IDX]?.employerAddress || ""
+                      family?.relatedPersons?.[MOTHER_IDX]?.employerAddress ||
+                      ""
                     }
                     onChange={(val) =>
                       handleInputChange(
@@ -855,14 +994,31 @@ export const FamilySection = forwardRef<
             </div>
           </div>
 
-          <div className="border-t border-border my-6"></div>
+          <div className="my-6 border-t border-border"></div>
 
           {/* Guardian Card */}
-          <div className="group bg-glass-bg/60 backdrop-blur-glass rounded-[24px] border border-glass-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden">
-            <div className="px-5 sm:px-8 py-4 sm:py-5 bg-glass-bg/40 border-b border-glass-border/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div
+            className={cn(
+              "bg-glass-bg/60 border-glass-border/40 group overflow-hidden",
+              "rounded-[24px] border shadow-sm backdrop-blur-glass",
+              "transition-all duration-300 hover:shadow-md",
+            )}
+          >
+            <div
+              className={cn(
+                "bg-glass-bg/40 border-glass-border/20 flex flex-col",
+                "items-start justify-between gap-4 border-b px-5 py-4",
+                "sm:flex-row sm:items-center sm:px-8 sm:py-5",
+              )}
+            >
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-sm text-primary">
-                  <User className="w-5 h-5" />
+                <div
+                  className={cn(
+                    "flex h-10 w-10 items-center justify-center rounded-xl",
+                    "bg-primary/10 text-primary shadow-sm",
+                  )}
+                >
+                  <User className="h-5 w-5" />
                 </div>
                 <h4 className="text-base font-bold text-foreground">
                   Guardian's Information
@@ -884,12 +1040,13 @@ export const FamilySection = forwardRef<
                           isLiving,
                         )
                       }
-                      className={`px-3 py-1.5 rounded-lg text-[10px] font-bold uppercase tracking-wider transition-all duration-300 border ${isSelected
-                        ? isLiving
-                          ? "bg-emerald-500/10 border-emerald-500/50 text-emerald-600"
-                          : "bg-rose-500/10 border-rose-500/50 text-rose-600"
-                        : "bg-glass-bg/40 border-glass-border/20 text-muted-foreground"
-                        }`}
+                      className={`rounded-lg border px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider transition-all duration-300 ${
+                        isSelected
+                          ? isLiving
+                            ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600"
+                            : "border-rose-500/50 bg-rose-500/10 text-rose-600"
+                          : "bg-glass-bg/40 border-glass-border/20 text-muted-foreground"
+                      }`}
                     >
                       {status}
                     </button>
@@ -899,12 +1056,14 @@ export const FamilySection = forwardRef<
             </div>
 
             <div className="p-5 sm:p-8">
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-5 sm:gap-8 mb-6 sm:mb-8">
+              <div className="mb-6 grid grid-cols-1 gap-5 sm:mb-8 sm:gap-8 md:grid-cols-3">
                 <FormInput
                   name={`family.relatedPersons.${GUARDIAN_IDX}.firstName`}
                   label="First Name"
                   required
-                  value={family?.relatedPersons?.[GUARDIAN_IDX]?.firstName || ""}
+                  value={
+                    family?.relatedPersons?.[GUARDIAN_IDX]?.firstName || ""
+                  }
                   onChange={(val) =>
                     handleInputChange(
                       `family.relatedPersons.${GUARDIAN_IDX}.firstName`,
@@ -966,7 +1125,7 @@ export const FamilySection = forwardRef<
                 />
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
                 <FormInput
                   name={`family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`}
                   label="Date of Birth"
@@ -1089,20 +1248,31 @@ export const FamilySection = forwardRef<
             </div>
           </div>
 
-          <div className="border-t border-border my-6"></div>
+          <div className="my-6 border-t border-border"></div>
 
           {/* Sibling Information Card */}
-          <div className="group bg-glass-bg/60 backdrop-blur-glass rounded-[24px] border border-glass-border/40 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden p-5 sm:p-8">
-            <div className="flex items-center gap-3 mb-6 sm:mb-8">
-              <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center shadow-sm text-primary">
-                <Users className="w-5 h-5" />
+          <div
+            className={cn(
+              "bg-glass-bg/60 border-glass-border/40 group overflow-hidden",
+              "rounded-[24px] border p-5 shadow-sm backdrop-blur-glass",
+              "transition-all duration-300 hover:shadow-md sm:p-8",
+            )}
+          >
+            <div className="mb-6 flex items-center gap-3 sm:mb-8">
+              <div
+                className={cn(
+                  "flex h-10 w-10 items-center justify-center rounded-xl",
+                  "bg-primary/10 text-primary shadow-sm",
+                )}
+              >
+                <Users className="h-5 w-5" />
               </div>
               <h4 className="text-base font-bold text-foreground">
                 Sibling Information
               </h4>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
+            <div className="mb-8 grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
               <FormInput
                 name="family.background.brothers"
                 label="Brothers"
@@ -1147,7 +1317,9 @@ export const FamilySection = forwardRef<
                     val === "" ? "" : Number(val),
                   )
                 }
-                onBlur={() => handleFieldBlur("family.background.employedSiblings")}
+                onBlur={() =>
+                  handleFieldBlur("family.background.employedSiblings")
+                }
                 placeholder="0"
                 error={getFieldError("family.background.employedSiblings")}
               />
@@ -1163,24 +1335,26 @@ export const FamilySection = forwardRef<
                     val === "" ? "" : Number(val),
                   )
                 }
-                onBlur={() => handleFieldBlur("family.background.ordinalPosition")}
+                onBlur={() =>
+                  handleFieldBlur("family.background.ordinalPosition")
+                }
                 placeholder="e.g. 1"
                 error={getFieldError("family.background.ordinalPosition")}
               />
             </div>
 
             <div className="space-y-4">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2">
-
-                Is your brother/sister who is gainfully employed providing support
-                to your:
+              <label className="flex items-center gap-2 text-sm font-bold text-foreground">
+                Is your brother/sister who is gainfully employed providing
+                support to your:
                 <span className="text-rose-500">*</span>
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {siblingSupportTypesOptions?.map((option: any) => {
-                  const isChecked = family?.background?.siblingSupportTypes?.some(
-                    (item: any) => String(item.id) === String(option.id),
-                  );
+                  const isChecked =
+                    family?.background?.siblingSupportTypes?.some(
+                      (item: any) => String(item.id) === String(option.id),
+                    );
                   return (
                     <div
                       key={option.id}
@@ -1189,10 +1363,14 @@ export const FamilySection = forwardRef<
                           family?.background?.siblingSupportTypes || [];
                         let newTypes;
                         if (!isChecked) {
-                          newTypes = [...currentTypes, { id: Number(option.id) }];
+                          newTypes = [
+                            ...currentTypes,
+                            { id: Number(option.id) },
+                          ];
                         } else {
                           newTypes = currentTypes.filter(
-                            (item: any) => String(item.id) !== String(option.id),
+                            (item: any) =>
+                              String(item.id) !== String(option.id),
                           );
                         }
                         handleInputChange(
@@ -1200,26 +1378,28 @@ export const FamilySection = forwardRef<
                           newTypes,
                         );
                       }}
-                      className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 cursor-pointer group/opt ${isChecked
-                        ? "bg-primary/5 border-primary shadow-sm"
-                        : "bg-glass-bg/20 border-glass-border/20 hover:border-primary/20"
-                        }`}
+                      className={`group/opt flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-all duration-300 ${
+                        isChecked
+                          ? "border-primary bg-primary/5 shadow-sm"
+                          : "bg-glass-bg/20 border-glass-border/20 hover:border-primary/20"
+                      }`}
                     >
                       <div
-                        className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${isChecked
-                          ? "bg-primary border-primary"
-                          : "bg-white border-muted-foreground/30"
-                          }`}
+                        className={`flex h-5 w-5 items-center justify-center rounded-lg border-2 transition-all duration-300 ${
+                          isChecked
+                            ? "border-primary bg-primary"
+                            : "border-muted-foreground/30 bg-white"
+                        }`}
                       >
                         {isChecked && (
                           <Check
-                            className="w-3.5 h-3.5 text-white"
+                            className="h-3.5 w-3.5 text-white"
                             strokeWidth={3}
                           />
                         )}
                       </div>
                       <span
-                        className={`text-sm font-medium transition-colors ${isChecked ? "text-primary italic" : "text-muted-foreground"}`}
+                        className={`text-sm font-medium transition-colors ${isChecked ? "italic text-primary" : "text-muted-foreground"}`}
                       >
                         {option.name || option.text || option.code}
                       </span>
@@ -1228,23 +1408,24 @@ export const FamilySection = forwardRef<
                 })}
               </div>
               {errors["family.background.siblingSupportTypes"] && (
-                <p className="text-xs font-bold text-rose-500 mt-2 flex items-center gap-1">
-                  <span className="w-1 h-1 rounded-full bg-rose-500" />
+                <p className="mt-2 flex items-center gap-1 text-xs font-bold text-rose-500">
+                  <span className="h-1 w-1 rounded-full bg-rose-500" />
                   {errors["family.background.siblingSupportTypes"]}
                 </p>
               )}
             </div>
 
-            <div className="mt-8 pt-8 border-t border-white/40">
-              <label className="text-sm font-bold text-foreground flex items-center gap-2 mb-4">
+            <div className="mt-8 border-t border-white/40 pt-8">
+              <label className="mb-4 flex items-center gap-2 text-sm font-bold text-foreground">
                 Who finances your schooling?
                 <span className="text-rose-500">*</span>
               </label>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {studentSupportTypesOptions?.map((option: any) => {
-                  const isChecked = family?.finance?.financialSupportTypes?.some(
-                    (item: any) => String(item.id) === String(option.id),
-                  );
+                  const isChecked =
+                    family?.finance?.financialSupportTypes?.some(
+                      (item: any) => String(item.id) === String(option.id),
+                    );
                   return (
                     <div
                       key={option.id}
@@ -1253,10 +1434,14 @@ export const FamilySection = forwardRef<
                           family?.finance?.financialSupportTypes || [];
                         let newTypes;
                         if (!isChecked) {
-                          newTypes = [...currentTypes, { id: Number(option.id) }];
+                          newTypes = [
+                            ...currentTypes,
+                            { id: Number(option.id) },
+                          ];
                         } else {
                           newTypes = currentTypes.filter(
-                            (item: any) => String(item.id) !== String(option.id),
+                            (item: any) =>
+                              String(item.id) !== String(option.id),
                           );
                         }
                         handleInputChange(
@@ -1264,26 +1449,28 @@ export const FamilySection = forwardRef<
                           newTypes,
                         );
                       }}
-                      className={`flex items-center gap-3 p-3.5 rounded-xl border transition-all duration-300 cursor-pointer group/opt ${isChecked
-                        ? "bg-primary/5 border-primary shadow-sm"
-                        : "bg-glass-bg/20 border-glass-border/20 hover:border-primary/20"
-                        }`}
+                      className={`group/opt flex cursor-pointer items-center gap-3 rounded-xl border p-3.5 transition-all duration-300 ${
+                        isChecked
+                          ? "border-primary bg-primary/5 shadow-sm"
+                          : "bg-glass-bg/20 border-glass-border/20 hover:border-primary/20"
+                      }`}
                     >
                       <div
-                        className={`w-5 h-5 rounded-lg border-2 flex items-center justify-center transition-all duration-300 ${isChecked
-                          ? "bg-primary border-primary"
-                          : "bg-white border-muted-foreground/30"
-                          }`}
+                        className={`flex h-5 w-5 items-center justify-center rounded-lg border-2 transition-all duration-300 ${
+                          isChecked
+                            ? "border-primary bg-primary"
+                            : "border-muted-foreground/30 bg-white"
+                        }`}
                       >
                         {isChecked && (
                           <Check
-                            className="w-3.5 h-3.5 text-white"
+                            className="h-3.5 w-3.5 text-white"
                             strokeWidth={3}
                           />
                         )}
                       </div>
                       <span
-                        className={`text-sm font-medium transition-colors ${isChecked ? "text-primary italic" : "text-muted-foreground"}`}
+                        className={`text-sm font-medium transition-colors ${isChecked ? "italic text-primary" : "text-muted-foreground"}`}
                       >
                         {option.name || option.text || option.code}
                       </span>
@@ -1292,8 +1479,8 @@ export const FamilySection = forwardRef<
                 })}
               </div>
               {errors["family.finance.financialSupportTypes"] && (
-                <p className="text-xs font-bold text-rose-500 mt-2 flex items-center gap-1">
-                  <span className="w-1 h-1 rounded-full bg-rose-500" />
+                <p className="mt-2 flex items-center gap-1 text-xs font-bold text-rose-500">
+                  <span className="h-1 w-1 rounded-full bg-rose-500" />
                   {errors["family.finance.financialSupportTypes"]}
                 </p>
               )}
@@ -1301,35 +1488,50 @@ export const FamilySection = forwardRef<
           </div>
         </div>
 
-        <div className="border-t border-border my-8"></div>
+        <div className="my-8 border-t border-border"></div>
 
         {/* IV. Financial Information */}
         <div className="space-y-8">
-          <div className="flex items-center gap-3 mb-2">
-            <div className="w-10 h-10 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 shadow-[0_0_15px_rgba(245,158,11,0.1)]">
-              <CircleDollarSign className="w-5 h-5" />
+          <div className="mb-2 flex items-center gap-3">
+            <div
+              className={cn(
+                "flex h-10 w-10 items-center justify-center rounded-2xl",
+                "bg-amber-500/10 text-amber-500",
+                "shadow-[0_0_15px_rgba(245,158,11,0.1)]",
+              )}
+            >
+              <CircleDollarSign className="h-5 w-5" />
             </div>
             <div>
               <h3 className="text-lg font-bold text-foreground">
                 Financial Information
               </h3>
-              <p className="text-xs text-muted-foreground font-medium">
+              <p className="text-xs font-medium text-muted-foreground">
                 Monthly household income and allowance
               </p>
             </div>
           </div>
 
-          <div className="group bg-glass-bg/20 backdrop-blur-sm rounded-3xl border border-glass-border/20 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden p-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <div
+            className={cn(
+              "bg-glass-bg/20 border-glass-border/20 group overflow-hidden",
+              "rounded-3xl border p-8 shadow-sm backdrop-blur-sm",
+              "transition-all duration-300 hover:shadow-md",
+            )}
+          >
+            <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
               <div className="space-y-4">
                 <Dropdown
                   label="Parents' Combined Monthly Income"
                   name="family.finance.monthlyFamilyIncomeRange"
                   value={family?.finance?.monthlyFamilyIncomeRange?.id || ""}
                   onChange={(val) => {
-                    handleInputChange("family.finance.monthlyFamilyIncomeRange", {
-                      id: val,
-                    });
+                    handleInputChange(
+                      "family.finance.monthlyFamilyIncomeRange",
+                      {
+                        id: val,
+                      },
+                    );
                     if (val !== "others") {
                       handleInputChange(
                         "family.finance.monthlyFamilyIncomeRange.otherSpecification",
@@ -1345,7 +1547,7 @@ export const FamilySection = forwardRef<
                 />
 
                 {family?.finance?.monthlyFamilyIncomeRange?.id === "others" && (
-                  <div className="pt-2 animate-in fade-in slide-in-from-top-2 duration-300">
+                  <div className="animate-in fade-in slide-in-from-top-2 pt-2 duration-300">
                     <FormInput
                       ref={otherInputRef}
                       name="family.finance.monthlyFamilyIncomeRange.otherSpecification"
@@ -1365,12 +1567,12 @@ export const FamilySection = forwardRef<
                       placeholder="Enter income range..."
                       error={
                         otherTouched &&
-                          !family?.finance?.monthlyFamilyIncomeRange
-                            ?.otherSpecification
+                        !family?.finance?.monthlyFamilyIncomeRange
+                          ?.otherSpecification
                           ? "Please specify"
                           : errors[
-                          "family.finance.monthlyFamilyIncomeRange.otherSpecification"
-                          ]
+                              "family.finance.monthlyFamilyIncomeRange.otherSpecification"
+                            ]
                       }
                     />
                   </div>

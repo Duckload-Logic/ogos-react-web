@@ -27,6 +27,7 @@ import { ConcernCategory } from "../../types";
 import { useSubmitAppointment } from "../../hooks/useAppointments";
 import { toISODateString } from "../../utils";
 import Layout, { usePageMetadata } from "@/components/layout/Layout";
+import { cn } from "@/lib/utils";
 
 const EMPTY_APPOINTMENT_FORM: Appointment = {
   reason: "",
@@ -79,14 +80,24 @@ export default function CreateAppointment() {
     <>
       <div className="min-h-full bg-background">
         {/* Header */}
-        <div className="flex flex-col items-center text-center space-y-4 py-10 border-b border-border/40 bg-background/50 backdrop-blur-sm">
+        <div
+          className={cn(
+            "flex flex-col items-center space-y-4 border-b",
+            "border-border/40 bg-background/50 py-10 text-center",
+            "backdrop-blur-sm",
+          )}
+        >
           <Link
             to="/student/appointments"
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full text-xs font-semibold text-muted-foreground hover:text-primary hover:bg-primary/10 transition-all group"
+            className={cn(
+              "group inline-flex items-center gap-2 rounded-full px-3",
+              "py-1.5 text-xs font-semibold text-muted-foreground",
+              "transition-all hover:bg-primary/10 hover:text-primary",
+            )}
           >
             <CircleChevronLeft
               size={16}
-              className="group-hover:-translate-x-0.5 transition-transform"
+              className="transition-transform group-hover:-translate-x-0.5"
             />
             <span>Return to My Appointments</span>
           </Link>
@@ -95,7 +106,7 @@ export default function CreateAppointment() {
             <h1 className="text-3xl font-bold tracking-tight text-foreground">
               Schedule an Appointment
             </h1>
-            <p className="text-sm text-muted-foreground max-w-prose">
+            <p className="max-w-prose text-sm text-muted-foreground">
               Select your preferred date and time. Please be descriptive about
               your concern to help our counselor prepare.
             </p>
@@ -103,7 +114,7 @@ export default function CreateAppointment() {
         </div>
 
         {/* Main Content */}
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 lg:py-12">
+        <div className="mx-auto max-w-4xl px-4 py-8 sm:px-6 lg:py-12">
           {/* Compact Progress Bar */}
           <div className="mb-8">
             <div className="flex items-center justify-center gap-0">
@@ -113,42 +124,35 @@ export default function CreateAppointment() {
                 const isCurrent = currentStep === step.id;
 
                 return (
-                  <div key={step.id} className="flex items-center">
+                  <div
+                    key={step.id}
+                    className="flex items-center"
+                  >
                     <div className="flex flex-col items-center">
                       <div
-                        className={`
-                          flex items-center justify-center w-10 h-10 rounded-full
-                          transition-all duration-300
-                          ${
-                            isCompleted
-                              ? "bg-primary text-primary-foreground"
-                              : isCurrent
-                                ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
-                                : "bg-muted text-muted-foreground"
-                          }
-                        `}
+                        className={`flex h-10 w-10 items-center justify-center rounded-full transition-all duration-300 ${
+                          isCompleted
+                            ? "bg-primary text-primary-foreground"
+                            : isCurrent
+                              ? "bg-primary text-primary-foreground ring-4 ring-primary/20"
+                              : "bg-muted text-muted-foreground"
+                        } `}
                       >
                         {isCompleted ? (
-                          <CheckCircle2 className="w-5 h-5" />
+                          <CheckCircle2 className="h-5 w-5" />
                         ) : (
-                          <StepIcon className="w-5 h-5" />
+                          <StepIcon className="h-5 w-5" />
                         )}
                       </div>
                       <span
-                        className={`
-                          text-xs font-medium mt-1.5 transition-colors
-                          ${isCurrent || isCompleted ? "text-foreground" : "text-muted-foreground"}
-                        `}
+                        className={`mt-1.5 text-xs font-medium transition-colors ${isCurrent || isCompleted ? "text-foreground" : "text-muted-foreground"} `}
                       >
                         {step.label}
                       </span>
                     </div>
                     {index < steps.length - 1 && (
                       <div
-                        className={`
-                          w-16 sm:w-24 h-0.5 mx-3 rounded-full transition-colors duration-300
-                          ${currentStep > step.id ? "bg-primary" : "bg-border"}
-                        `}
+                        className={`mx-3 h-0.5 w-16 rounded-full transition-colors duration-300 sm:w-24 ${currentStep > step.id ? "bg-primary" : "bg-border"} `}
                       />
                     )}
                   </div>
@@ -160,32 +164,40 @@ export default function CreateAppointment() {
           {/* Selected Items Summary Bar */}
           {(selectedDate || selectedTime) && (
             <Card className="mb-6 border-primary/20 bg-primary/5">
-              <CardContent className="py-3 px-4">
-                <div className="flex items-center gap-2 flex-wrap">
+              <CardContent className="px-4 py-3">
+                <div className="flex flex-wrap items-center gap-2">
                   {selectedDate && (
                     <button
                       onClick={() => {
                         setSelectedDate(undefined);
                         setSelectedTime(undefined);
                       }}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-background border border-border rounded-full text-sm font-medium hover:bg-muted transition-colors group"
+                      className={cn(
+                        "group inline-flex items-center gap-2 rounded-full border",
+                        "border-border bg-background px-3 py-1.5 text-sm font-medium",
+                        "transition-colors hover:bg-muted",
+                      )}
                     >
-                      <CalendarDays className="w-4 h-4 text-primary" />
+                      <CalendarDays className="h-4 w-4 text-primary" />
                       {formatSelectedDate(selectedDate)}
-                      <Edit2 className="w-3 h-3 text-muted-foreground group-hover:text-foreground" />
+                      <Edit2 className="h-3 w-3 text-muted-foreground group-hover:text-foreground" />
                     </button>
                   )}
                   {selectedDate && selectedTime && (
-                    <ChevronRight className="w-4 h-4 text-muted-foreground" />
+                    <ChevronRight className="h-4 w-4 text-muted-foreground" />
                   )}
                   {selectedTime && (
                     <button
                       onClick={() => setSelectedTime(undefined)}
-                      className="inline-flex items-center gap-2 px-3 py-1.5 bg-background border border-border rounded-full text-sm font-medium hover:bg-muted transition-colors group"
+                      className={cn(
+                        "group inline-flex items-center gap-2 rounded-full border",
+                        "border-border bg-background px-3 py-1.5 text-sm font-medium",
+                        "transition-colors hover:bg-muted",
+                      )}
                     >
-                      <Clock className="w-4 h-4 text-primary" />
+                      <Clock className="h-4 w-4 text-primary" />
                       {selectedTime.time}
-                      <Edit2 className="w-3 h-3 text-muted-foreground group-hover:text-foreground" />
+                      <Edit2 className="h-3 w-3 text-muted-foreground group-hover:text-foreground" />
                     </button>
                   )}
                 </div>
@@ -214,7 +226,7 @@ export default function CreateAppointment() {
                   occupiedDayColor="bg-primary/80"
                   legends={[]}
                   hasHeader
-                  className="max-w-md mx-auto"
+                  className="mx-auto max-w-md"
                   allowCurrentDate={false}
                 />
               </div>
@@ -244,16 +256,16 @@ export default function CreateAppointment() {
               <div className="animate-in fade-in slide-in-from-bottom-4 duration-300">
                 {/* Appointment Summary Card */}
                 <Card className="mb-6 border-green-200 bg-green-50/50 dark:border-green-900 dark:bg-green-950/20">
-                  <CardContent className="py-4 px-5">
+                  <CardContent className="px-5 py-4">
                     <div className="flex items-start gap-4">
-                      <div className="p-2 bg-green-100 dark:bg-green-900/30 rounded-lg">
-                        <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
+                      <div className="rounded-lg bg-green-100 p-2 dark:bg-green-900/30">
+                        <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
                       </div>
                       <div className="flex-1">
                         <p className="text-sm font-medium text-green-800 dark:text-green-200">
                           Appointment Selected
                         </p>
-                        <p className="text-sm text-green-700 dark:text-green-300 mt-0.5">
+                        <p className="mt-0.5 text-sm text-green-700 dark:text-green-300">
                           {new Date(
                             appointmentFormData.whenDate,
                           ).toLocaleDateString("en-US", {
@@ -272,7 +284,10 @@ export default function CreateAppointment() {
                           setSelectedDate(undefined);
                           setSelectedTime(undefined);
                         }}
-                        className="text-green-700 hover:text-green-800 hover:bg-green-100 dark:text-green-300 dark:hover:bg-green-900/30"
+                        className={cn(
+                          "text-green-700 hover:bg-green-100 hover:text-green-800",
+                          "dark:text-green-300 dark:hover:bg-green-900/30",
+                        )}
                       >
                         Change
                       </Button>
@@ -291,30 +306,22 @@ export default function CreateAppointment() {
                   onSubmit={async () => {
                     const payload: CreateAppointmentRequest = {
                       reason: appointmentFormData.reason,
-                      whenDate:
-                        appointmentFormData.whenDate,
+                      whenDate: appointmentFormData.whenDate,
                       timeSlot: {
                         id: appointmentFormData.timeSlot.id,
                       },
                       appointmentCategory: {
-                        id: appointmentFormData
-                          .appointmentCategory.id,
+                        id: appointmentFormData.appointmentCategory.id,
                       },
                     };
 
                     submit(payload, {
                       onSuccess: () => {
-                        navigate(
-                          "/student/appointments",
-                        );
+                        navigate("/student/appointments");
                       },
                       onError: (error: any) => {
-                        if (
-                          error.message?.includes(
-                            'IIR profile',
-                          )
-                        ) {
-                          navigate('/iir-form');
+                        if (error.message?.includes("IIR profile")) {
+                          navigate("/iir-form");
                         }
                       },
                     });

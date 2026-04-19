@@ -17,7 +17,7 @@ export default function StatementPage({
   const isLoading = isLatestStatementLoading || isStatementContentLoading;
 
   return (
-    <div className="flex flex-col w-full gap-4">
+    <div className="flex w-full flex-col gap-4">
       <BackNav />
       <StatementLayout isLoading={isLoading}>
         {latestStatement && (

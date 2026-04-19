@@ -1,4 +1,5 @@
 import { Eye } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface Appointment {
   id: string;
@@ -33,28 +34,34 @@ export default function UpcomingAppointments({
   };
 
   return (
-    <div className="rounded-lg shadow border border-border p-4">
-      <h3 className="font-semibold text-foreground mb-4">
+    <div className="rounded-lg border border-border p-4 shadow">
+      <h3 className="mb-4 font-semibold text-foreground">
         Upcoming Appointments
       </h3>
       <div className="space-y-3">
         {appointments.slice(0, 5).map((appointment) => (
           <div
             key={appointment.id}
-            className="flex items-center justify-between p-3 border border-border rounded hover:bg-muted/50 dark:hover:bg-muted/30 transition-colors"
+            className={cn(
+              "flex items-center justify-between rounded border",
+              "border-border p-3 transition-colors hover:bg-muted/50",
+              "dark:hover:bg-muted/30",
+            )}
           >
             <div className="flex-1">
-              <p className="font-medium text-foreground text-sm">
+              <p className="text-sm font-medium text-foreground">
                 {appointment.studentName}
               </p>
               <p className="text-xs text-muted-foreground">
                 {appointment.date} at {appointment.time}
               </p>
-              <p className="text-xs text-muted-foreground">{appointment.reason}</p>
+              <p className="text-xs text-muted-foreground">
+                {appointment.reason}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               <span
-                className={`text-xs px-2 py-1 rounded font-medium ${getStatusColor(
+                className={`rounded px-2 py-1 text-xs font-medium ${getStatusColor(
                   appointment.status,
                 )}`}
               >
@@ -62,9 +69,12 @@ export default function UpcomingAppointments({
               </span>
               <button
                 onClick={() => onViewClick(appointment)}
-                className="p-1 hover:bg-muted rounded transition-colors"
+                className="rounded p-1 transition-colors hover:bg-muted"
               >
-                <Eye size={14} className="text-foreground" />
+                <Eye
+                  size={14}
+                  className="text-foreground"
+                />
               </button>
             </div>
           </div>

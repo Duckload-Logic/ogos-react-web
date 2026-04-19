@@ -8,13 +8,11 @@ export function useGetStatementContent(
   statementId?: number,
 ) {
   return useQuery({
-    queryKey: QUERY_KEYS.consents.latestContent(
-      statementType,
-    ),
+    queryKey: QUERY_KEYS.consents.latestContent(statementType),
     queryFn: (): Promise<string> =>
       GetStatementContent(statementType, {
-        handlerName: 'useGetStatementContent',
-        stepName: 'Fetch Content',
+        handlerName: "useGetStatementContent",
+        stepName: "Fetch Content",
       }),
     staleTime: CACHE_TIMING.LONG.staleTime,
     gcTime: CACHE_TIMING.LONG.gcTime,

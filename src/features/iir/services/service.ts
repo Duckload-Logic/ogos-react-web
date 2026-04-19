@@ -19,30 +19,30 @@ const toNumber = (value: unknown): number => {
 const normalizeIIRPayload = (iir: IIRForm) => {
   const activities = Array.isArray(iir.interests?.activities)
     ? iir.interests.activities.map((activity) => ({
-      id: activity.id,
-      activityOption: activity.activityOption,
-      otherSpecification: activity.otherSpecification,
-      role: activity.role,
-      roleSpecification: activity.roleSpecification,
-    }))
+        id: activity.id,
+        activityOption: activity.activityOption,
+        otherSpecification: activity.otherSpecification,
+        role: activity.role,
+        roleSpecification: activity.roleSpecification,
+      }))
     : [];
 
   const schools = Array.isArray(iir.education?.schools)
     ? iir.education.schools.map((school) => ({
-      ...school,
-      yearStarted: toNumber(school.yearStarted),
-      yearCompleted: toNumber(school.yearCompleted),
-    }))
+        ...school,
+        yearStarted: toNumber(school.yearStarted),
+        yearCompleted: toNumber(school.yearCompleted),
+      }))
     : [];
 
   const addresses = Array.isArray(iir.student?.addresses)
     ? iir.student.addresses.map((addr) => ({
-      ...addr,
-      addressType:
-        addr.addressType?.toLowerCase() === "residential"
-          ? "residential"
-          : addr.addressType,
-    }))
+        ...addr,
+        addressType:
+          addr.addressType?.toLowerCase() === "residential"
+            ? "residential"
+            : addr.addressType,
+      }))
     : [];
 
   return {
@@ -85,9 +85,9 @@ const normalizeIIRPayload = (iir: IIRForm) => {
         : [],
       hobbies: Array.isArray(iir.interests?.hobbies)
         ? iir.interests.hobbies.map((hobby) => ({
-          ...hobby,
-          priorityRank: toNumber(hobby.priorityRank),
-        }))
+            ...hobby,
+            priorityRank: toNumber(hobby.priorityRank),
+          }))
         : [],
     },
     // testResults: Array.isArray(iir.testResults) ? iir.testResults : []
@@ -160,8 +160,7 @@ const INVENTORY_GET_ROUTES = {
   testResults: (iirID: string) => API_ROUTES.iir.inventory.testResults(iirID),
   significantNotes: (iirID: string) =>
     API_ROUTES.iir.inventory.significantNotes(iirID),
-  download: (iirID: string) =>
-    API_ROUTES.iir.inventory.download(iirID),
+  download: (iirID: string) => API_ROUTES.iir.inventory.download(iirID),
 };
 
 const DRAFT_ROUTES = {
@@ -249,9 +248,7 @@ export const GetIIRByUserId = async (
  * @param config - Optional axios config with metadata
  * @returns Promise resolving to IIR record
  */
-export const GetIIRByMe = async (
-  config?: AxiosConfigWithMeta,
-) => {
+export const GetIIRByMe = async (config?: AxiosConfigWithMeta) => {
   try {
     const { data } = await apiClient.get(
       INVENTORY_GET_ROUTES.profileByMe,
@@ -390,20 +387,19 @@ export const DownloadIIRPDF = async (
   config?: AxiosConfigWithMeta,
 ): Promise<{ blob: Blob; fileName: string }> => {
   try {
-    const response = await apiClient.get(
-      INVENTORY_GET_ROUTES.download(iirID),
-      {
-        ...config,
-        responseType: "blob",
-      },
-    );
+    const response = await apiClient.get(INVENTORY_GET_ROUTES.download(iirID), {
+      ...config,
+      responseType: "blob",
+    });
 
     // Extract filename from Content-Disposition header if available
     let fileName = `IIR-Record-${iirID}.pdf`;
     const contentDisposition = response.headers["content-disposition"];
     if (contentDisposition) {
       // Handles filename="name.pdf" or filename=name.pdf
-      const fileNameMatch = contentDisposition.match(/filename=["']?([^"']+)["']?/);
+      const fileNameMatch = contentDisposition.match(
+        /filename=["']?([^"']+)["']?/,
+      );
       if (fileNameMatch?.[1]) {
         fileName = fileNameMatch[1].trim();
       }

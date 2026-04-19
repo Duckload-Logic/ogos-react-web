@@ -1,4 +1,8 @@
-import { FieldValidationSchema, commonRules, ValidationRule } from "@/services/validationSchema";
+import {
+  FieldValidationSchema,
+  commonRules,
+  ValidationRule,
+} from "@/services/validationSchema";
 export const requireAtLeastOne = (message: string): ValidationRule => ({
   type: "requireAtLeastOne",
   validate: (value: any) => {
@@ -12,10 +16,12 @@ export const familyValidationSchema: FieldValidationSchema = {
     {
       type: "required",
       validate: (value: any) => {
-        return value?.id !== undefined && value?.id !== null && value?.id !== "";
+        return (
+          value?.id !== undefined && value?.id !== null && value?.id !== ""
+        );
       },
       message: "Parental status is required",
-    }
+    },
   ],
 
   "family.background.roomSharingDetails": [
@@ -38,51 +44,71 @@ export const familyValidationSchema: FieldValidationSchema = {
     {
       type: "required",
       validate: (value: any) => {
-        return value?.id !== undefined && value?.id !== null && value?.id !== "";
+        return (
+          value?.id !== undefined && value?.id !== null && value?.id !== ""
+        );
       },
       message: "Monthly family income range is required",
-    }
+    },
   ],
   "family.finance.monthlyFamilyIncomeRange.otherSpecification": [
     {
       type: "required",
       validate: (value: any, rootData: any) => {
-        if (rootData?.family?.finance?.monthlyFamilyIncomeRange?.id === "others") {
+        if (
+          rootData?.family?.finance?.monthlyFamilyIncomeRange?.id === "others"
+        ) {
           return value && String(value).trim().length > 0;
         }
         return true;
       },
       message: "Please specify the income range",
     },
-    commonRules.noSpecialChars("Income range")
+    commonRules.noSpecialChars("Income range"),
   ],
   "family.finance.weeklyAllowance": [
     commonRules.required("Weekly allowance"),
     commonRules.positiveNumber(),
     commonRules.maxValue(50000),
   ],
-  "family.background.brothers": [commonRules.required("Number of brothers"), commonRules.minValue(0)],
-  "family.background.sisters": [commonRules.required("Number of sisters"), commonRules.minValue(0)],
+  "family.background.brothers": [
+    commonRules.required("Number of brothers"),
+    commonRules.minValue(0),
+  ],
+  "family.background.sisters": [
+    commonRules.required("Number of sisters"),
+    commonRules.minValue(0),
+  ],
   "family.background.employedSiblings": [
     commonRules.required("Number of gainfully employed"),
     commonRules.minValue(0),
-    commonRules.siblingCount("family.background.brothers", "family.background.sisters")
+    commonRules.siblingCount(
+      "family.background.brothers",
+      "family.background.sisters",
+    ),
   ],
   "family.background.ordinalPosition": [
     commonRules.required("Ordinal position"),
     commonRules.minValue(1),
-    commonRules.ordinalPosition("family.background.brothers", "family.background.sisters")
+    commonRules.ordinalPosition(
+      "family.background.brothers",
+      "family.background.sisters",
+    ),
   ],
-  "family.background.haveQuietPlaceToStudy": [commonRules.required("Quiet place to study")],
+  "family.background.haveQuietPlaceToStudy": [
+    commonRules.required("Quiet place to study"),
+  ],
   "family.background.isSharingRoom": [commonRules.required("Shares room")],
   "family.background.natureOfResidence": [
     {
       type: "required",
       validate: (value: any) => {
-        return value?.id !== undefined && value?.id !== null && value?.id !== "";
+        return (
+          value?.id !== undefined && value?.id !== null && value?.id !== ""
+        );
       },
       message: "Nature of residence is required",
-    }
+    },
   ],
   "family.finance.financialSupportTypes": [
     {
@@ -91,7 +117,7 @@ export const familyValidationSchema: FieldValidationSchema = {
         return Array.isArray(value) && value.length > 0;
       },
       message: "Please select at least one financing source",
-    }
+    },
   ],
   "family.background.siblingSupportTypes": [
     {
@@ -103,7 +129,7 @@ export const familyValidationSchema: FieldValidationSchema = {
         return true;
       },
       message: "Please indicate how employed siblings are providing support",
-    }
+    },
   ],
 };
 
@@ -118,31 +144,70 @@ RELATIONS.forEach(({ prefix, label }) => {
   const isRequired = label !== "Guardian";
 
   if (isRequired) {
-    familyValidationSchema[`${prefix}.firstName`] = [commonRules.required(`${label} first name`), commonRules.minLength(2), commonRules.nameFormat(), commonRules.noSpecialChars(`${label} first name`)];
-    familyValidationSchema[`${prefix}.lastName`] = [commonRules.required(`${label} last name`), commonRules.minLength(2), commonRules.nameFormat(), commonRules.noSpecialChars(`${label} last name`)];
-    familyValidationSchema[`${prefix}.dateOfBirth`] = [commonRules.required(`${label} date of birth`)];
-    familyValidationSchema[`${prefix}.educationalLevel`] = [commonRules.required(`${label} educational attainment`), commonRules.noSpecialChars(`${label} educational attainment`)];
-    familyValidationSchema[`${prefix}.occupation`] = [commonRules.required(`${label} occupation`), commonRules.noSpecialChars(`${label} occupation`)];
-    familyValidationSchema[`${prefix}.employerName`] = [commonRules.required(`${label} employer name`), commonRules.noSpecialChars(`${label} employer name`)];
-    familyValidationSchema[`${prefix}.employerAddress`] = [commonRules.noSpecialChars(`${label} employer address`)];
-    familyValidationSchema[`${prefix}.isLiving`] = [commonRules.required(`${label} status (Living/Deceased)`)];
+    familyValidationSchema[`${prefix}.firstName`] = [
+      commonRules.required(`${label} first name`),
+      commonRules.minLength(2),
+      commonRules.nameFormat(),
+      commonRules.noSpecialChars(`${label} first name`),
+    ];
+    familyValidationSchema[`${prefix}.lastName`] = [
+      commonRules.required(`${label} last name`),
+      commonRules.minLength(2),
+      commonRules.nameFormat(),
+      commonRules.noSpecialChars(`${label} last name`),
+    ];
+    familyValidationSchema[`${prefix}.dateOfBirth`] = [
+      commonRules.required(`${label} date of birth`),
+    ];
+    familyValidationSchema[`${prefix}.educationalLevel`] = [
+      commonRules.required(`${label} educational attainment`),
+      commonRules.noSpecialChars(`${label} educational attainment`),
+    ];
+    familyValidationSchema[`${prefix}.occupation`] = [
+      commonRules.required(`${label} occupation`),
+      commonRules.noSpecialChars(`${label} occupation`),
+    ];
+    familyValidationSchema[`${prefix}.employerName`] = [
+      commonRules.required(`${label} employer name`),
+      commonRules.noSpecialChars(`${label} employer name`),
+    ];
+    familyValidationSchema[`${prefix}.employerAddress`] = [
+      commonRules.noSpecialChars(`${label} employer address`),
+    ];
+    familyValidationSchema[`${prefix}.isLiving`] = [
+      commonRules.required(`${label} status (Living/Deceased)`),
+    ];
   } else {
-    const guardianFields = ["firstName", "lastName", "occupation", "educationalLevel", "employerName", "employerAddress"];
-    guardianFields.forEach(field => {
+    const guardianFields = [
+      "firstName",
+      "lastName",
+      "occupation",
+      "educationalLevel",
+      "employerName",
+      "employerAddress",
+    ];
+    guardianFields.forEach((field) => {
       familyValidationSchema[`${prefix}.${field}`] = [
         {
           type: "required",
           validate: (value: any, rootData: any) => {
             const guardian = rootData?.family?.relatedPersons?.[2];
-            const isAnyFilled = guardian && (guardian.firstName || guardian.lastName || guardian.occupation);
-            if (isAnyFilled && (field === "firstName" || field === "lastName" || field === "occupation")) {
+            const isAnyFilled =
+              guardian &&
+              (guardian.firstName || guardian.lastName || guardian.occupation);
+            if (
+              isAnyFilled &&
+              (field === "firstName" ||
+                field === "lastName" ||
+                field === "occupation")
+            ) {
               return !!value && String(value).trim().length > 0;
             }
             return true;
           },
           message: `${label} ${field} is required if guardian info is being provided`,
         },
-        commonRules.noSpecialChars(`${label} ${field}`)
+        commonRules.noSpecialChars(`${label} ${field}`),
       ];
     });
   }

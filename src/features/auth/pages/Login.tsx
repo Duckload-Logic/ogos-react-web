@@ -10,7 +10,6 @@ import {
   isValidPassword,
   isValidUsername,
 } from "@/utils/validation";
-import { ROLE_ROUTES } from "@/config/constants";
 import { useLogin } from "../hooks";
 import { useMe } from "@/features/users/hooks/useMe";
 import Layout from "@/components/layout/Layout";
@@ -66,22 +65,26 @@ export default function Login() {
   };
 
   return (
-    <Layout showHeader={false} isLoggedIn={false} isLoading={isLoggingIn}>
+    <Layout
+      showHeader={false}
+      isLoggedIn={false}
+      isLoading={isLoggingIn}
+    >
       <section
         className={
           "mx-auto flex h-full w-full max-w-[1180px] " +
-          "items-center justify-center " +
+          "items-center justify-center" +
           "py-3 sm:py-5 lg:py-6"
         }
       >
         <div
           className={
             "relative grid w-full overflow-hidden " +
-            "rounded-[30px] " +
-            "border border-[hsl(var(--border)/0.65)] " +
-            "bg-[hsl(var(--card)/0.82)] " +
-            "shadow-[0_30px_90px_-40px_rgba(0,0,0,0.55)] " +
-            "backdrop-blur-2xl " +
+            "rounded-[30px]" +
+            "border border-[hsl(var(--border)/0.65)]" +
+            "bg-[hsl(var(--card)/0.82)]" +
+            "shadow-[0_30px_90px_-40px_rgba(0,0,0,0.55)]" +
+            "backdrop-blur-2xl" +
             "lg:grid-cols-[0.92fr_1.08fr]"
           }
         >
@@ -122,10 +125,10 @@ export default function Login() {
                 <span
                   className={
                     "inline-flex rounded-full " +
-                    "border border-[hsl(var(--border)/0.7)] " +
-                    "bg-[hsl(var(--background)/0.72)] " +
-                    "px-3 py-1 text-[11px] font-semibold " +
-                    "uppercase tracking-[0.22em] " +
+                    "border border-[hsl(var(--border)/0.7)]" +
+                    "bg-[hsl(var(--background)/0.72)]" +
+                    "px-3 py-1 text-[11px] font-semibold" +
+                    "uppercase tracking-[0.22em]" +
                     "text-muted-foreground backdrop-blur"
                   }
                 >

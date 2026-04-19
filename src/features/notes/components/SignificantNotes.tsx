@@ -18,14 +18,13 @@ import SectionTitle from "@/features/iir/components/profile/SectionTitle";
 import { NOT_SPECIFIED } from "@/features/iir/constants";
 import { Spinner } from "@/components/shared";
 import { useToast } from "@/context";
+import { cn } from "@/lib/utils";
 
 interface SignificantNotesProps {
   iirId: string;
 }
 
-export default function SignificantNotes({
-  iirId,
-}: SignificantNotesProps) {
+export default function SignificantNotes({ iirId }: SignificantNotesProps) {
   const { triggerToast } = useToast();
   const [searchParams, setSearchParams] = useSearchParams();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -67,7 +66,7 @@ export default function SignificantNotes({
 
   if (isLoading) {
     return (
-      <div className="flex justify-center items-center min-h-[200px]">
+      <div className="flex min-h-[200px] items-center justify-center">
         <Spinner />
       </div>
     );
@@ -82,7 +81,7 @@ export default function SignificantNotes({
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500">
+    <div className="animate-in fade-in space-y-6 duration-500">
       <div className="flex items-center justify-between">
         <SectionTitle title="Significant Notes / Incidents" />
         <Button
@@ -99,7 +98,7 @@ export default function SignificantNotes({
         {(notes?.length ?? 0) > 0 ? (
           notes!.map((note) => (
             <CardBlock key={note.id}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-3">
+              <div className="mb-3 grid grid-cols-1 gap-4 md:grid-cols-2">
                 <InfoItem
                   label="Created"
                   value={
@@ -127,7 +126,10 @@ export default function SignificantNotes({
                     <Button
                       variant="link"
                       size="sm"
-                      className="h-auto p-0 flex items-center gap-1.5 text-xs text-primary/80 hover:text-primary transition-colors"
+                      className={cn(
+                        "flex h-auto items-center gap-1.5 p-0 text-xs text-primary/80",
+                        "transition-colors hover:text-primary",
+                      )}
                       asChild
                     >
                       <Link to={`/admin/appointments/${note.appointmentId}`}>

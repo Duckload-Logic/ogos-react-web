@@ -28,7 +28,10 @@ export default function LoginForm({
 
   return (
     <>
-      <form onSubmit={onSubmit} className="space-y-5">
+      <form
+        onSubmit={onSubmit}
+        className="space-y-5"
+      >
         <FormField
           id="username"
           label="Email or Username"
@@ -40,12 +43,12 @@ export default function LoginForm({
           disabled={isLoading}
           className={
             "h-12 rounded-2xl " +
-            "border-[hsl(var(--border)/0.9)] " +
-            "bg-[hsl(var(--background)/0.78)] px-4 " +
-            "text-foreground " +
-            "shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] " +
-            "backdrop-blur " +
-            "placeholder:text-muted-foreground " +
+            "border-[hsl(var(--border)/0.9)]" +
+            "bg-[hsl(var(--background)/0.78)] px-4" +
+            "text-foreground" +
+            "shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]" +
+            "backdrop-blur" +
+            "placeholder:text-muted-foreground" +
             "focus-visible:ring-2"
           }
         />
@@ -61,12 +64,12 @@ export default function LoginForm({
           disabled={isLoading}
           className={
             "h-12 rounded-2xl " +
-            "border-[hsl(var(--border)/0.9)] " +
-            "bg-[hsl(var(--background)/0.78)] px-4 " +
-            "text-foreground " +
-            "shadow-[inset_0_1px_0_rgba(255,255,255,0.08)] " +
-            "backdrop-blur " +
-            "placeholder:text-muted-foreground " +
+            "border-[hsl(var(--border)/0.9)]" +
+            "bg-[hsl(var(--background)/0.78)] px-4" +
+            "text-foreground" +
+            "shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]" +
+            "backdrop-blur" +
+            "placeholder:text-muted-foreground" +
             "focus-visible:ring-2"
           }
         />
@@ -82,9 +85,7 @@ export default function LoginForm({
             id="remember"
             name="remember"
             checked={rememberMe}
-            onCheckedChange={(checked) =>
-              setRememberMe(checked === true)
-            }
+            onCheckedChange={(checked) => setRememberMe(checked === true)}
           />
 
           <Link
@@ -104,10 +105,10 @@ export default function LoginForm({
             disabled={isLoading}
             className={
               "h-12 w-full rounded-2xl bg-primary " +
-              "text-sm font-semibold " +
-              "text-primary-foreground " +
+              "text-sm font-semibold" +
+              "text-primary-foreground" +
               "shadow-[0_14px_30px_-16px_" +
-              "rgba(220,38,38,0.55)] " +
+              "rgba(220,38,38,0.55)]" +
               "transition hover:bg-primary/90 sm:text-base"
             }
           >
@@ -115,7 +116,7 @@ export default function LoginForm({
               <div
                 className={
                   "h-4 w-4 rounded-full border-2 " +
-                  "border-t-0 border-primary-foreground " +
+                  "border-t-0 border-primary-foreground" +
                   "animate-spin"
                 }
               />
@@ -125,15 +126,10 @@ export default function LoginForm({
           </Button>
 
           <div className="relative">
-            <div
-              className={
-                "absolute inset-0 flex items-center"
-              }
-            >
+            <div className={"absolute inset-0 flex items-center"}>
               <span
                 className={
-                  "w-full border-t " +
-                  "border-[hsl(var(--border)/0.5)]"
+                  "w-full border-t " + "border-[hsl(var(--border)/0.5)]"
                 }
               />
             </div>
@@ -141,7 +137,7 @@ export default function LoginForm({
               <span
                 className={
                   "bg-[hsl(var(--card)/0.82)] px-2 " +
-                  "text-muted-foreground uppercase " +
+                  "uppercase text-muted-foreground" +
                   "tracking-wider"
                 }
               >
@@ -155,28 +151,23 @@ export default function LoginForm({
             disabled={isLoading}
             className={
               "h-12 w-full rounded-2xl " +
-              "border-[hsl(var(--border)/0.9)] " +
-              "bg-[hsl(var(--background)/0.8)] " +
-              "!text-foreground backdrop-blur " +
-              "hover:bg-[hsl(var(--muted)/0.9)] " +
-              "sm:text-base font-semibold " +
+              "border-[hsl(var(--border)/0.9)]" +
+              "bg-[hsl(var(--background)/0.8)]" +
+              "!text-foreground backdrop-blur" +
+              "hover:bg-[hsl(var(--muted)/0.9)]" +
+              "font-semibold sm:text-base" +
               "transition-colors"
             }
           />
         </div>
       </form>
 
-      <p
-        className={
-          "mt-6 text-center text-sm text-muted-foreground"
-        }
-      >
+      <p className={"mt-6 text-center text-sm text-muted-foreground"}>
         Don&apos;t have an account?{" "}
         <Link
           to="/register"
           className={
-            "font-semibold text-primary " +
-            "transition-colors hover:opacity-80"
+            "font-semibold text-primary " + "transition-colors hover:opacity-80"
           }
         >
           Register here

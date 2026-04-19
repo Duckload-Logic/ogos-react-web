@@ -35,24 +35,26 @@ import { SlipStatusTracker } from "@/features/admin/components/SlipStatusTracker
 import { useGetSlipStats } from "@/features/slips/hooks/useSlips";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState, useMemo, useEffect } from "react";
-
+import { cn } from "@/lib/utils";
 
 export default function Dashboard() {
   const navigate = useNavigate();
   const todayStr = toISODateString(new Date());
 
-  const { data: appointmentData, isLoading: isAppointmentsLoading } = useAppointments({
-    params: {
-      startDate: todayStr,
-      endDate: todayStr,
-    },
-  });
+  const { data: appointmentData, isLoading: isAppointmentsLoading } =
+    useAppointments({
+      params: {
+        startDate: todayStr,
+        endDate: todayStr,
+      },
+    });
 
   const appointments = appointmentData?.appointments || [];
   const [showDailyTip, setShowDailyTip] = useState(false);
 
   const { data: slipStats, isLoading: isSlipsLoading } = useGetSlipStats();
-  const { data: adminAnalytics, isLoading: isAnalyticsLoading } = useAdminDashboard();
+  const { data: adminAnalytics, isLoading: isAnalyticsLoading } =
+    useAdminDashboard();
 
   const tipQuotes = useMemo(
     () => [
@@ -112,10 +114,13 @@ export default function Dashboard() {
     },
   ];
 
-  const visitorData = adminAnalytics?.monthlyVisitors.map((v: { month: string; count: number }) => ({
-    name: v.month,
-    visitors: v.count
-  })) || [];
+  const visitorData =
+    adminAnalytics?.monthlyVisitors.map(
+      (v: { month: string; count: number }) => ({
+        name: v.month,
+        visitors: v.count,
+      }),
+    ) || [];
 
   const visitorConfig = {
     visitors: {
@@ -126,7 +131,8 @@ export default function Dashboard() {
 
   usePageMetadata({
     title: "Guidance Dashboard",
-    description: "PUP-T Online Guidance Office Services — Supporting student success",
+    description:
+      "PUP-T Online Guidance Office Services — Supporting student success",
     badgeText: "Admin Overview",
     badgeIcon: <Sparkles className="h-3.5 w-3.5" />,
     showDate: true,
@@ -141,49 +147,71 @@ export default function Dashboard() {
     <div className="space-y-8 pb-10">
       {/* Daily Tip Alert */}
       {showDailyTip && (
-        <div className="relative group overflow-hidden p-6 rounded-3xl bg-gradient-to-r from-teal-500/10 to-emerald-500/10 border border-teal-500/20 backdrop-blur-md animate-in fade-in slide-in-from-top-4 duration-700">
+        <div
+          className={cn(
+            "animate-in fade-in slide-in-from-top-4 group relative",
+            "overflow-hidden rounded-3xl border border-teal-500/20",
+            "bg-gradient-to-r from-teal-500/10 to-emerald-500/10 p-6",
+            "backdrop-blur-md duration-700",
+          )}
+        >
           <div className="flex items-start gap-5">
-            <div className="p-3 rounded-2xl bg-teal-500 text-white shadow-lg shadow-teal-500/20">
+            <div className="rounded-2xl bg-teal-500 p-3 text-white shadow-lg shadow-teal-500/20">
               <Sparkles size={24} />
             </div>
             <div className="flex-1 pr-10">
-              <h4 className="text-sm font-bold text-teal-900 dark:text-teal-100 mb-1 flex items-center gap-2">
+              <h4 className="mb-1 flex items-center gap-2 text-sm font-bold text-teal-900 dark:text-teal-100">
                 Daily Counseling Insight
               </h4>
-              <p className="text-sm text-teal-800/80 dark:text-teal-200/80 font-medium leading-relaxed">
+              <p className="text-sm font-medium leading-relaxed text-teal-800/80 dark:text-teal-200/80">
                 "{dailyTip}"
               </p>
             </div>
             <button
               onClick={() => setShowDailyTip(false)}
-              className="absolute top-4 right-4 p-2 rounded-xl text-teal-900/40 dark:text-teal-100/40 hover:bg-teal-500/10 hover:text-teal-900 dark:hover:text-teal-100 transition-all opacity-0 group-hover:opacity-100"
+              className={cn(
+                "absolute right-4 top-4 rounded-xl p-2 text-teal-900/40",
+                "opacity-0 transition-all hover:bg-teal-500/10",
+                "hover:text-teal-900 group-hover:opacity-100",
+                "dark:text-teal-100/40 dark:hover:text-teal-100",
+              )}
             >
               <MoreHorizontal size={20} />
             </button>
           </div>
           {/* Subtle background decoration */}
-          <div className="absolute -bottom-6 -right-6 w-24 h-24 bg-teal-500/5 rounded-full blur-2xl" />
+          <div className="absolute -bottom-6 -right-6 h-24 w-24 rounded-full bg-teal-500/5 blur-2xl" />
         </div>
       )}
 
       {/* Metrics Row */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
         <DashboardMetrics metrics={metrics} />
         {/* Monthly Visitors Analytics */}
-        <Card className="shadow-lg backdrop-blur-md overflow-hidden">
+        <Card className="overflow-hidden shadow-lg backdrop-blur-md">
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-base font-bold">Monthly Visitors</CardTitle>
+            <CardTitle className="text-base font-bold">
+              Monthly Visitors
+            </CardTitle>
           </CardHeader>
-          <CardContent className="pt-4 pb-4">
+          <CardContent className="pb-4 pt-4">
             <div className="h-48 w-full">
               <ChartContainer config={visitorConfig}>
                 <LineChart data={visitorData}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" opacity={0.5} />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="hsl(var(--border))"
+                    opacity={0.5}
+                  />
                   <XAxis
                     dataKey="name"
                     axisLine={false}
                     tickLine={false}
-                    tick={{ fontSize: 10, fill: 'hsl(var(--muted-foreground))' }}
+                    tick={{
+                      fontSize: 10,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
                     dy={10}
                   />
                   <YAxis hide={true} />
@@ -193,7 +221,12 @@ export default function Dashboard() {
                     dataKey="visitors"
                     stroke="var(--color-visitors)"
                     strokeWidth={3}
-                    dot={{ fill: 'var(--color-visitors)', strokeWidth: 2, r: 4, stroke: 'hsl(var(--background))' }}
+                    dot={{
+                      fill: "var(--color-visitors)",
+                      strokeWidth: 2,
+                      r: 4,
+                      stroke: "hsl(var(--background))",
+                    }}
                     activeDot={{ r: 6, strokeWidth: 0 }}
                   />
                 </LineChart>
@@ -203,12 +236,14 @@ export default function Dashboard() {
         </Card>
       </div>
 
-      <div className="flex flex-col xl:flex-row gap-8">
+      <div className="flex flex-col gap-8 xl:flex-row">
         {/* Main Content: Upcoming Appointments */}
         <div className="flex-1 space-y-8">
-          <Card className="shadow-lg backdrop-blur-md overflow-hidden">
+          <Card className="overflow-hidden shadow-lg backdrop-blur-md">
             <CardHeader className="flex flex-row items-center justify-between">
-              <CardTitle className="text-lg font-bold">Upcoming Appointments</CardTitle>
+              <CardTitle className="text-lg font-bold">
+                Upcoming Appointments
+              </CardTitle>
               <button className="text-slate-400 hover:text-slate-600">
                 <MoreHorizontal size={20} />
               </button>
@@ -216,46 +251,54 @@ export default function Dashboard() {
             <CardContent className="p-0">
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
-                  <thead className="bg-slate-50/50 dark:bg-black/20 text-slate-400 text-[10px] uppercase font-bold tracking-widest">
+                  <thead
+                    className={cn(
+                      "bg-slate-50/50 text-[10px] font-bold uppercase",
+                      "tracking-widest text-slate-400 dark:bg-black/20",
+                    )}
+                  >
                     <tr>
-                      <th className="py-4 px-6">Name</th>
-                      <th className="py-4 px-6">Category</th>
-                      <th className="py-4 px-6">Date</th>
-                      <th className="py-4 px-6">Time</th>
+                      <th className="px-6 py-4">Name</th>
+                      <th className="px-6 py-4">Category</th>
+                      <th className="px-6 py-4">Date</th>
+                      <th className="px-6 py-4">Time</th>
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-slate-100 dark:divide-white/5">
                     {appointments.slice(0, 5).map((apt) => (
                       <tr
                         key={apt.id}
-                        className="group bg-glass-bg transition-colors cursor-pointer"
-                        onClick={() => navigate(`/admin/appointments/${apt.id}`)}
+                        className="group cursor-pointer bg-glass-bg transition-colors"
+                        onClick={() =>
+                          navigate(`/admin/appointments/${apt.id}`)
+                        }
                       >
-                        <td className="py-4 px-6">
+                        <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
                             <Avatar className="size-8 rounded-lg">
                               <AvatarImage src={apt.user?.profilePicture} />
-                              <AvatarFallback className="bg-primary/10 text-primary text-[10px] font-bold rounded-lg uppercase">
-                                {apt.user?.firstName?.[0]}{apt.user?.lastName?.[0]}
+                              <AvatarFallback className="rounded-lg bg-primary/10 text-[10px] font-bold uppercase text-primary">
+                                {apt.user?.firstName?.[0]}
+                                {apt.user?.lastName?.[0]}
                               </AvatarFallback>
                             </Avatar>
                             <div>
                               <p className="text-sm font-bold text-slate-800 dark:text-slate-200">
                                 {apt.user?.firstName} {apt.user?.lastName}
                               </p>
-                              <p className="text-[10px] text-slate-400 font-medium whitespace-nowrap">
+                              <p className="whitespace-nowrap text-[10px] font-medium text-slate-400">
                                 {apt.user?.studentNumber}
                               </p>
                             </div>
                           </div>
                         </td>
-                        <td className="py-4 px-6 text-sm text-slate-500 font-medium">
+                        <td className="px-6 py-4 text-sm font-medium text-slate-500">
                           {apt.appointmentCategory.name}
                         </td>
-                        <td className="py-4 px-6 text-sm text-slate-500 font-medium whitespace-nowrap">
+                        <td className="whitespace-nowrap px-6 py-4 text-sm font-medium text-slate-500">
                           {new Date(apt.whenDate).toLocaleDateString()}
                         </td>
-                        <td className="py-4 px-6 text-sm text-slate-700 dark:text-slate-300 font-bold">
+                        <td className="px-6 py-4 text-sm font-bold text-slate-700 dark:text-slate-300">
                           {format12HourTime(apt.timeSlot.time)}
                         </td>
                       </tr>
@@ -263,7 +306,7 @@ export default function Dashboard() {
                   </tbody>
                 </table>
                 {appointments.length === 0 && (
-                  <div className="py-10 text-center text-slate-400 text-sm italic">
+                  <div className="py-10 text-center text-sm italic text-slate-400">
                     No upcoming appointments for today
                   </div>
                 )}
@@ -273,14 +316,14 @@ export default function Dashboard() {
         </div>
 
         {/* Sidebar: Slips & Analytics */}
-        <div className="w-full xl:w-96 space-y-8">
+        <div className="w-full space-y-8 xl:w-96">
           {/* Slip Status Tracker */}
           <SlipStatusTracker
             stats={{
               pending: slipStats?.pending || 12,
               approvedToday: slipStats?.approvedToday || 5,
               rejectedToday: slipStats?.rejectedToday || 1,
-              urgentRequests: 3
+              urgentRequests: 3,
             }}
           />
         </div>

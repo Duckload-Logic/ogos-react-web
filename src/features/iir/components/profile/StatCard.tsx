@@ -10,7 +10,10 @@ export default function StatCard({
   icon: any;
 }) {
   return (
-    <CardBlock icon={Icon} title={label}>
+    <CardBlock
+      icon={Icon}
+      title={label}
+    >
       <p className="text-sm font-semibold text-card-foreground">{value}</p>
     </CardBlock>
   );

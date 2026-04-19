@@ -20,22 +20,15 @@ const FetchStudentPage = async (
   config?: AxiosConfigWithMeta,
 ) => {
   try {
-    const { data } = await apiClient.get(
-      API_ROUTES.iir.inventory.all,
-      {
-        ...config,
-        params: { page, page_size: pageSize },
-      },
-    );
+    const { data } = await apiClient.get(API_ROUTES.iir.inventory.all, {
+      ...config,
+      params: { page, page_size: pageSize },
+    });
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'FetchStudentPage';
-    const stepName = config?.stepName ||
-      `Fetch Page ${page}`;
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "FetchStudentPage";
+    const stepName = config?.stepName || `Fetch Page ${page}`;
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -56,14 +49,10 @@ export const GetStudentsAnalytics = async (
     const allStudents: StudentAnalytics[] = [];
 
     for (let page = 1; page <= maxPages; page++) {
-      const response = await FetchStudentPage(
-        page,
-        pageSize,
-        {
-          ...config,
-          stepName: `Fetch Page ${page}`,
-        },
-      );
+      const response = await FetchStudentPage(page, pageSize, {
+        ...config,
+        stepName: `Fetch Page ${page}`,
+      });
 
       if (response?.students) {
         allStudents.push(...response.students);
@@ -77,13 +66,9 @@ export const GetStudentsAnalytics = async (
 
     return allStudents;
   } catch (error) {
-    const handlerName = config?.handlerName ||
-      'GetStudentsAnalytics';
-    const stepName = config?.stepName ||
-      'Aggregate Analytics';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error}`,
-    );
+    const handlerName = config?.handlerName || "GetStudentsAnalytics";
+    const stepName = config?.stepName || "Aggregate Analytics";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -92,7 +77,6 @@ export const GetStudentsAnalytics = async (
  * Legacy function for backward compatibility
  * @deprecated Use GetStudentsAnalytics instead
  */
-export const fetchStudentsAnalytics =
-  async (): Promise<StudentAnalytics[]> => {
-    return GetStudentsAnalytics();
-  };
+export const fetchStudentsAnalytics = async (): Promise<StudentAnalytics[]> => {
+  return GetStudentsAnalytics();
+};

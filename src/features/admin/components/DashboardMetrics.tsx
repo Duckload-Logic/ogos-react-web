@@ -23,15 +23,25 @@ export function MetricCard({
   className,
 }: MetricCardProps) {
   return (
-    <Card className={cn("overflow-hidden shadow-lg transition-all duration-300 hover:shadow-xl hover:-translate-y-1  backdrop-blur-md", className)}>
+    <Card
+      className={cn(
+        "overflow-hidden shadow-lg backdrop-blur-md transition-all duration-300 hover:-translate-y-1 hover:shadow-xl",
+        className,
+      )}
+    >
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div className="space-y-4">
             <div className="flex items-center gap-3">
-              <div className={cn("p-2 rounded-xl bg-white/50 dark:bg-black/30 shadow-inner", iconColor)}>
+              <div
+                className={cn(
+                  "rounded-xl bg-white/50 p-2 shadow-inner dark:bg-black/30",
+                  iconColor,
+                )}
+              >
                 <Icon size={20} />
               </div>
-              <span className="text-sm font-medium text-slate-500 dark:text-slate-400 capitalize">
+              <span className="text-sm font-medium capitalize text-slate-500 dark:text-slate-400">
                 {title}
               </span>
             </div>
@@ -42,7 +52,7 @@ export function MetricCard({
               </h3>
               <div className="flex items-center gap-2">
                 {trend && (
-                  <span className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-1.5 py-0.5 rounded">
+                  <span className="rounded bg-emerald-500/10 px-1.5 py-0.5 text-xs font-bold text-emerald-500">
                     {trend}
                   </span>
                 )}
@@ -60,9 +70,12 @@ export function MetricCard({
 
 export function DashboardMetrics({ metrics }: { metrics: MetricCardProps[] }) {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 gap-6">
+    <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-2">
       {metrics.map((metric, index) => (
-        <MetricCard key={index} {...metric} />
+        <MetricCard
+          key={index}
+          {...metric}
+        />
       ))}
     </div>
   );

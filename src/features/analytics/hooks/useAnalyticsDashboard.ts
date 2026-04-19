@@ -8,29 +8,36 @@ export function useAnalyticsDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchDashboard = useCallback(async (year?: number, courseId?: number, statusId?: number) => {
-    try {
-      setLoading(true);
-      const params = new URLSearchParams();
-      if (year) params.append("year", year.toString());
-      if (courseId) params.append("course_id", courseId.toString());
-      if (statusId) params.append("status_id", statusId.toString());
+  const fetchDashboard = useCallback(
+    async (year?: number, courseId?: number, statusId?: number) => {
+      try {
+        setLoading(true);
+        const params = new URLSearchParams();
+        if (year) params.append("year", year.toString());
+        if (courseId) params.append("course_id", courseId.toString());
+        if (statusId) params.append("status_id", statusId.toString());
 
-      const response = await apiClient.get(`/analytics/dashboard?${params.toString()}`);
-      
-      // The apiClient interceptor in api.ts already unwraps JSend responses
-      // and validates the "success" status. response.data is now the dashboard object.
-      if (response.data) {
-        setData(response.data);
-      } else {
-        setError("Failed to fetch dashboard data");
+        const response = await apiClient.get(
+          `/analytics/dashboard?${params.toString()}`,
+        );
+
+        // The apiClient interceptor in api.ts already unwraps JSend responses
+        // and validates the "success" status. response.data is now the dashboard object.
+        if (response.data) {
+          setData(response.data);
+        } else {
+          setError("Failed to fetch dashboard data");
+        }
+      } catch (err: any) {
+        setError(
+          err.response?.data?.message || err.message || "An error occurred",
+        );
+      } finally {
+        setLoading(false);
       }
-    } catch (err: any) {
-      setError(err.response?.data?.message || err.message || "An error occurred");
-    } finally {
-      setLoading(false);
-    }
-  }, []);
+    },
+    [],
+  );
 
   const fetchCourses = useCallback(async () => {
     try {

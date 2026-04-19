@@ -212,7 +212,8 @@ export async function PostSlip(
   config?: AxiosConfigWithMeta,
 ): Promise<Slip> {
   try {
-    const { ["Content-Type"]: _contentType, ...headers } = config?.headers || {};
+    const { ["Content-Type"]: _contentType, ...headers } =
+      config?.headers || {};
 
     const response = await apiClient.post(API_ROUTES.slips.all, data, {
       ...config,

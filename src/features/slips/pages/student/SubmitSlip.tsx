@@ -22,13 +22,19 @@ import {
   Folder,
   Plus,
 } from "lucide-react";
-import { useGetSlipCategories, useSubmitSlip, useUpdateSlip, useGetSlipById } from "@/features/slips/hooks";
+import {
+  useGetSlipCategories,
+  useSubmitSlip,
+  useUpdateSlip,
+  useGetSlipById,
+} from "@/features/slips/hooks";
 import { StepProgress } from "@/features/slips/components";
 import { AnimationStyles } from "@/components/ui/animations";
 import { CreateSlipRequest } from "@/features/slips/types";
 import { usePageMetadata } from "@/components/layout/Layout";
 import FormInput from "@/components/form/FormInput";
 import { useToast } from "@/context";
+import { cn } from "@/lib/utils";
 
 interface SubmitSlipFormState {
   dateOfAbsence: string;
@@ -57,7 +63,8 @@ const EMPTY_FORM_DATA: SubmitSlipFormState = {
 };
 
 export default function SubmitSlip() {
-  const [formData, setFormData] = useState<SubmitSlipFormState>(EMPTY_FORM_DATA);
+  const [formData, setFormData] =
+    useState<SubmitSlipFormState>(EMPTY_FORM_DATA);
   const [currentStep, setCurrentStep] = useState(1);
   const navigate = useNavigate();
   const { id } = useParams<{ id: string }>();
@@ -66,15 +73,21 @@ export default function SubmitSlip() {
 
   const { data: categories = [], isLoading: isCategoriesLoading } =
     useGetSlipCategories();
-  const { data: existingSlip, isLoading: isSlipLoading } = useGetSlipById(id || "");
+  const { data: existingSlip, isLoading: isSlipLoading } = useGetSlipById(
+    id || "",
+  );
   const { mutate: submitSlip, isPending: isSubmitting } = useSubmitSlip();
   const { mutate: updateSlip, isPending: isUpdating } = useUpdateSlip();
 
   useEffect(() => {
     if (isEditMode && existingSlip) {
       setFormData({
-        dateOfAbsence: existingSlip.dateOfAbsence ? new Date(existingSlip.dateOfAbsence).toISOString().split("T")[0] : "",
-        dateNeeded: existingSlip.dateNeeded ? new Date(existingSlip.dateNeeded).toISOString().split("T")[0] : "",
+        dateOfAbsence: existingSlip.dateOfAbsence
+          ? new Date(existingSlip.dateOfAbsence).toISOString().split("T")[0]
+          : "",
+        dateNeeded: existingSlip.dateNeeded
+          ? new Date(existingSlip.dateNeeded).toISOString().split("T")[0]
+          : "",
         reason: existingSlip.reason,
         categoryId: existingSlip.categoryId,
         files: {
@@ -131,7 +144,10 @@ export default function SubmitSlip() {
     documentsProvided,
   ];
 
-  const handleDateChange = (field: "dateOfAbsence" | "dateNeeded", value: string) => {
+  const handleDateChange = (
+    field: "dateOfAbsence" | "dateNeeded",
+    value: string,
+  ) => {
     setFormData((prev) => ({
       ...prev,
       [field]: value,
@@ -197,7 +213,9 @@ export default function SubmitSlip() {
 
     const payload: CreateSlipRequest = {
       reason: formData.reason,
-      dateOfAbsence: new Date(formData.dateOfAbsence).toISOString().split("T")[0],
+      dateOfAbsence: new Date(formData.dateOfAbsence)
+        .toISOString()
+        .split("T")[0],
       dateNeeded: new Date(formData.dateNeeded).toISOString().split("T")[0],
       categoryId: formData.categoryId,
       files: {
@@ -219,7 +237,7 @@ export default function SubmitSlip() {
           onError: (error: any) => {
             triggerToast(error.message || "Failed to update slip");
           },
-        }
+        },
       );
     } else {
       submitSlip(payload, {
@@ -248,12 +266,20 @@ export default function SubmitSlip() {
 
   usePageMetadata({
     title: isEditMode ? "Update Admission Slip" : "Submit Admission Slip",
-    description: isEditMode 
+    description: isEditMode
       ? "Update your information or re-upload your document links as requested by the guidance counselor."
       : "Provide the required information and supporting documents for your absence.",
     badgeText: isEditMode ? "Revision" : "New Request",
-    badgeIcon: isEditMode ? <Edit2 className="h-4 w-4" /> : <Plus className="h-4 w-4" />,
-    isLoading: isCategoriesLoading || (isEditMode && isSlipLoading) || isSubmitting || isUpdating,
+    badgeIcon: isEditMode ? (
+      <Edit2 className="h-4 w-4" />
+    ) : (
+      <Plus className="h-4 w-4" />
+    ),
+    isLoading:
+      isCategoriesLoading ||
+      (isEditMode && isSlipLoading) ||
+      isSubmitting ||
+      isUpdating,
   });
 
   return (
@@ -279,7 +305,11 @@ export default function SubmitSlip() {
                         <button
                           type="button"
                           onClick={() => setCurrentStep(1)}
-                          className="group inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                          className={cn(
+                            "group inline-flex items-center gap-2 rounded-full border",
+                            "border-border bg-background px-3 py-1.5 text-sm font-medium",
+                            "transition-colors hover:bg-muted",
+                          )}
                         >
                           <Calendar className="h-4 w-4 text-primary" />
                           {formatDate(formData.dateOfAbsence)} to{" "}
@@ -294,9 +324,16 @@ export default function SubmitSlip() {
                         <button
                           type="button"
                           onClick={() => setCurrentStep(2)}
-                          className="group inline-flex items-center gap-2 rounded-full border border-border bg-background px-3 py-1.5 text-sm font-medium transition-colors hover:bg-muted"
+                          className={cn(
+                            "group inline-flex items-center gap-2 rounded-full border",
+                            "border-border bg-background px-3 py-1.5 text-sm font-medium",
+                            "transition-colors hover:bg-muted",
+                          )}
                         >
-                          <Badge variant="outline" className="text-xs">
+                          <Badge
+                            variant="outline"
+                            className="text-xs"
+                          >
                             {getSelectedCategory()?.name}
                           </Badge>
                           <Edit2 className="h-3 w-3 text-muted-foreground group-hover:text-foreground" />
@@ -313,17 +350,21 @@ export default function SubmitSlip() {
                     <CardHeader className="border-b border-border/60 bg-muted/30 py-3">
                       <div className="flex items-center gap-2">
                         <Calendar className="h-4 w-4 text-red-500" />
-                        <CardTitle className="text-base">Absence Dates</CardTitle>
+                        <CardTitle className="text-base">
+                          Absence Dates
+                        </CardTitle>
                       </div>
                       <p className="mt-2 text-xs text-muted-foreground">
-                        Tell us when you were absent and when you need approval by
+                        Tell us when you were absent and when you need approval
+                        by
                       </p>
                     </CardHeader>
                     <CardContent className="space-y-4 pt-5">
                       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                         <div className="space-y-1.5">
                           <label className="text-xs font-semibold text-foreground">
-                            Date of Absence <span className="text-red-500">*</span>
+                            Date of Absence{" "}
+                            <span className="text-red-500">*</span>
                           </label>
                           <input
                             type="date"
@@ -331,7 +372,12 @@ export default function SubmitSlip() {
                             onChange={(e) =>
                               handleDateChange("dateOfAbsence", e.target.value)
                             }
-                            className="w-full rounded-md border border-border bg-background p-2.5 text-sm text-foreground transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                            className={cn(
+                              "w-full rounded-md border border-border bg-background p-2.5",
+                              "text-sm text-foreground transition-colors",
+                              "focus:border-transparent focus:outline-none focus:ring-2",
+                              "focus:ring-primary",
+                            )}
                           />
                         </div>
                         <div className="space-y-1.5">
@@ -344,7 +390,12 @@ export default function SubmitSlip() {
                             onChange={(e) =>
                               handleDateChange("dateNeeded", e.target.value)
                             }
-                            className="w-full rounded-md border border-border bg-background p-2.5 text-sm text-foreground transition-colors focus:border-transparent focus:outline-none focus:ring-2 focus:ring-primary"
+                            className={cn(
+                              "w-full rounded-md border border-border bg-background p-2.5",
+                              "text-sm text-foreground transition-colors",
+                              "focus:border-transparent focus:outline-none focus:ring-2",
+                              "focus:ring-primary",
+                            )}
                           />
                           <p className="mt-1 text-xs text-muted-foreground">
                             When do you need this approval?
@@ -389,7 +440,9 @@ export default function SubmitSlip() {
                     <CardHeader className="border-b border-border/60 bg-muted/30 py-3">
                       <div className="flex items-center gap-2">
                         <Layers className="h-4 w-4 text-red-500" />
-                        <CardTitle className="text-base">Select Category</CardTitle>
+                        <CardTitle className="text-base">
+                          Select Category
+                        </CardTitle>
                       </div>
                       <p className="mt-2 text-xs text-muted-foreground">
                         Choose the category that best describes your absence
@@ -452,7 +505,9 @@ export default function SubmitSlip() {
                     <CardHeader className="border-b border-border/60 bg-muted/30 py-3">
                       <div className="flex items-center gap-2">
                         <FileUp className="h-4 w-4 text-red-500" />
-                        <CardTitle className="text-base">Upload Documents</CardTitle>
+                        <CardTitle className="text-base">
+                          Upload Documents
+                        </CardTitle>
                       </div>
                       <p className="mt-2 text-xs text-muted-foreground">
                         Upload all required documents to complete your admission
@@ -461,7 +516,12 @@ export default function SubmitSlip() {
                     </CardHeader>
                   </Card>
 
-                  <Card className="border-amber-200/60 bg-amber-50/50 dark:border-amber-900/30 dark:bg-amber-950/10">
+                  <Card
+                    className={cn(
+                      "border-amber-200/60 bg-amber-50/50 dark:border-amber-900/30",
+                      "dark:bg-amber-950/10",
+                    )}
+                  >
                     <CardContent className="px-4 py-3">
                       <div className="flex items-start gap-2.5">
                         <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
@@ -474,11 +534,23 @@ export default function SubmitSlip() {
 
                   <Card className="border-0 shadow-sm">
                     <CardContent className="p-0">
-                      <Accordion type="single" collapsible className="w-full">
-                        <AccordionItem value="cor" className="border-b last:border-b-0">
+                      <Accordion
+                        type="single"
+                        collapsible
+                        className="w-full"
+                      >
+                        <AccordionItem
+                          value="cor"
+                          className="border-b last:border-b-0"
+                        >
                           <AccordionTrigger className="px-4 py-3 hover:bg-muted/30 hover:no-underline">
                             <div className="flex flex-1 items-center gap-3">
-                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
+                              <div
+                                className={cn(
+                                  "flex h-6 w-6 items-center justify-center rounded-full",
+                                  "bg-muted text-xs font-semibold text-foreground",
+                                )}
+                              >
                                 1
                               </div>
                               <div className="text-left">
@@ -486,12 +558,16 @@ export default function SubmitSlip() {
                                   <h3 className="text-sm font-medium text-foreground">
                                     Certificate of Registration (COR)
                                   </h3>
-                                  <Badge variant="destructive" className="text-xs">
+                                  <Badge
+                                    variant="destructive"
+                                    className="text-xs"
+                                  >
                                     Required
                                   </Badge>
                                 </div>
                                 <p className="mt-0.5 text-xs text-muted-foreground">
-                                  Upload your current COR as a separate requirement
+                                  Upload your current COR as a separate
+                                  requirement
                                 </p>
                               </div>
                             </div>
@@ -502,11 +578,19 @@ export default function SubmitSlip() {
                           <AccordionContent className="border-t border-border/40 bg-muted/20 px-4 py-3">
                             <div className="space-y-3">
                               {formData.files.cor.length === 0 ? (
-                                <div className="relative cursor-pointer rounded-lg border-2 border-dashed border-border/60 p-6 transition-colors hover:border-primary/50 hover:bg-muted/20">
+                                <div
+                                  className={cn(
+                                    "relative cursor-pointer rounded-lg border-2 border-dashed",
+                                    "border-border/60 p-6 transition-colors",
+                                    "hover:border-primary/50 hover:bg-muted/20",
+                                  )}
+                                >
                                   <input
                                     type="file"
                                     multiple
-                                    onChange={(e) => handleFileAdd("cor", e.target.files)}
+                                    onChange={(e) =>
+                                      handleFileAdd("cor", e.target.files)
+                                    }
                                     className="absolute inset-0 cursor-pointer opacity-0"
                                     accept=".pdf,.jpg,.jpeg,.png"
                                   />
@@ -525,7 +609,11 @@ export default function SubmitSlip() {
                                   {formData.files.cor.map((file, index) => (
                                     <div
                                       key={`cor-${index}`}
-                                      className="flex items-center justify-between rounded-md border border-green-200/50 bg-green-50/50 p-3 dark:border-green-900/40 dark:bg-green-950/20"
+                                      className={cn(
+                                        "flex items-center justify-between rounded-md border",
+                                        "border-green-200/50 bg-green-50/50 p-3",
+                                        "dark:border-green-900/40 dark:bg-green-950/20",
+                                      )}
                                     >
                                       <div className="flex min-w-0 items-center gap-2">
                                         <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />
@@ -537,8 +625,13 @@ export default function SubmitSlip() {
                                       </div>
                                       <button
                                         type="button"
-                                        onClick={() => handleFileRemove("cor", index)}
-                                        className="shrink-0 rounded p-0.5 transition-colors hover:bg-red-100/50 dark:hover:bg-red-950/30"
+                                        onClick={() =>
+                                          handleFileRemove("cor", index)
+                                        }
+                                        className={cn(
+                                          "shrink-0 rounded p-0.5 transition-colors hover:bg-red-100/50",
+                                          "dark:hover:bg-red-950/30",
+                                        )}
                                         aria-label="Remove file"
                                       >
                                         <X className="h-3.5 w-3.5 text-red-500" />
@@ -551,10 +644,18 @@ export default function SubmitSlip() {
                           </AccordionContent>
                         </AccordionItem>
 
-                        <AccordionItem value="excuse-letter" className="border-b last:border-b-0">
+                        <AccordionItem
+                          value="excuse-letter"
+                          className="border-b last:border-b-0"
+                        >
                           <AccordionTrigger className="px-4 py-3 hover:bg-muted/30 hover:no-underline">
                             <div className="flex flex-1 items-center gap-3">
-                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
+                              <div
+                                className={cn(
+                                  "flex h-6 w-6 items-center justify-center rounded-full",
+                                  "bg-muted text-xs font-semibold text-foreground",
+                                )}
+                              >
                                 2
                               </div>
                               <div className="text-left">
@@ -562,12 +663,16 @@ export default function SubmitSlip() {
                                   <h3 className="text-sm font-medium text-foreground">
                                     Excuse Letter
                                   </h3>
-                                  <Badge variant="destructive" className="text-xs">
+                                  <Badge
+                                    variant="destructive"
+                                    className="text-xs"
+                                  >
                                     Required
                                   </Badge>
                                 </div>
                                 <p className="mt-0.5 text-xs text-muted-foreground">
-                                  Upload an excuse letter explaining your absence
+                                  Upload an excuse letter explaining your
+                                  absence
                                 </p>
                               </div>
                             </div>
@@ -578,12 +683,21 @@ export default function SubmitSlip() {
                           <AccordionContent className="border-t border-border/40 bg-muted/20 px-4 py-3">
                             <div className="space-y-3">
                               {formData.files.excuseLetter.length === 0 ? (
-                                <div className="relative cursor-pointer rounded-lg border-2 border-dashed border-border/60 p-6 transition-colors hover:border-primary/50 hover:bg-muted/20">
+                                <div
+                                  className={cn(
+                                    "relative cursor-pointer rounded-lg border-2 border-dashed",
+                                    "border-border/60 p-6 transition-colors",
+                                    "hover:border-primary/50 hover:bg-muted/20",
+                                  )}
+                                >
                                   <input
                                     type="file"
                                     multiple
                                     onChange={(e) =>
-                                      handleFileAdd("excuseLetter", e.target.files)
+                                      handleFileAdd(
+                                        "excuseLetter",
+                                        e.target.files,
+                                      )
                                     }
                                     className="absolute inset-0 cursor-pointer opacity-0"
                                     accept=".pdf,.jpg,.jpeg,.png"
@@ -600,41 +714,61 @@ export default function SubmitSlip() {
                                 </div>
                               ) : (
                                 <div className="space-y-2">
-                                  {formData.files.excuseLetter.map((file, index) => (
-                                    <div
-                                      key={`excuse-${index}`}
-                                      className="flex items-center justify-between rounded-md border border-green-200/50 bg-green-50/50 p-3 dark:border-green-900/40 dark:bg-green-950/20"
-                                    >
-                                      <div className="flex min-w-0 items-center gap-2">
-                                        <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />
-                                        <div className="min-w-0">
-                                          <p className="truncate text-xs font-medium text-foreground">
-                                            {file.name}
-                                          </p>
-                                        </div>
-                                      </div>
-                                      <button
-                                        type="button"
-                                        onClick={() =>
-                                          handleFileRemove("excuseLetter", index)
-                                        }
-                                        className="shrink-0 rounded p-0.5 transition-colors hover:bg-red-100/50 dark:hover:bg-red-950/30"
-                                        aria-label="Remove file"
+                                  {formData.files.excuseLetter.map(
+                                    (file, index) => (
+                                      <div
+                                        key={`excuse-${index}`}
+                                        className={cn(
+                                          "flex items-center justify-between rounded-md border",
+                                          "border-green-200/50 bg-green-50/50 p-3",
+                                          "dark:border-green-900/40 dark:bg-green-950/20",
+                                        )}
                                       >
-                                        <X className="h-3.5 w-3.5 text-red-500" />
-                                      </button>
-                                    </div>
-                                  ))}
+                                        <div className="flex min-w-0 items-center gap-2">
+                                          <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />
+                                          <div className="min-w-0">
+                                            <p className="truncate text-xs font-medium text-foreground">
+                                              {file.name}
+                                            </p>
+                                          </div>
+                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            handleFileRemove(
+                                              "excuseLetter",
+                                              index,
+                                            )
+                                          }
+                                          className={cn(
+                                            "shrink-0 rounded p-0.5 transition-colors hover:bg-red-100/50",
+                                            "dark:hover:bg-red-950/30",
+                                          )}
+                                          aria-label="Remove file"
+                                        >
+                                          <X className="h-3.5 w-3.5 text-red-500" />
+                                        </button>
+                                      </div>
+                                    ),
+                                  )}
                                 </div>
                               )}
                             </div>
                           </AccordionContent>
                         </AccordionItem>
 
-                        <AccordionItem value="parent-id" className="border-b last:border-b-0">
+                        <AccordionItem
+                          value="parent-id"
+                          className="border-b last:border-b-0"
+                        >
                           <AccordionTrigger className="px-4 py-3 hover:bg-muted/30 hover:no-underline">
                             <div className="flex flex-1 items-center gap-3">
-                              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
+                              <div
+                                className={cn(
+                                  "flex h-6 w-6 items-center justify-center rounded-full",
+                                  "bg-muted text-xs font-semibold text-foreground",
+                                )}
+                              >
                                 3
                               </div>
                               <div className="text-left">
@@ -642,13 +776,16 @@ export default function SubmitSlip() {
                                   <h3 className="text-sm font-medium text-foreground">
                                     Valid Parent&apos;s ID
                                   </h3>
-                                  <Badge variant="destructive" className="text-xs">
+                                  <Badge
+                                    variant="destructive"
+                                    className="text-xs"
+                                  >
                                     Required
                                   </Badge>
                                 </div>
                                 <p className="mt-0.5 text-xs text-muted-foreground">
-                                  Upload a copy of your parent&apos;s or guardian&apos;s
-                                  valid ID
+                                  Upload a copy of your parent&apos;s or
+                                  guardian&apos;s valid ID
                                 </p>
                               </div>
                             </div>
@@ -659,7 +796,13 @@ export default function SubmitSlip() {
                           <AccordionContent className="border-t border-border/40 bg-muted/20 px-4 py-3">
                             <div className="space-y-3">
                               {formData.files.parentId.length === 0 ? (
-                                <div className="relative cursor-pointer rounded-lg border-2 border-dashed border-border/60 p-6 transition-colors hover:border-primary/50 hover:bg-muted/20">
+                                <div
+                                  className={cn(
+                                    "relative cursor-pointer rounded-lg border-2 border-dashed",
+                                    "border-border/60 p-6 transition-colors",
+                                    "hover:border-primary/50 hover:bg-muted/20",
+                                  )}
+                                >
                                   <input
                                     type="file"
                                     multiple
@@ -681,29 +824,40 @@ export default function SubmitSlip() {
                                 </div>
                               ) : (
                                 <div className="space-y-2">
-                                  {formData.files.parentId.map((file, index) => (
-                                    <div
-                                      key={`parent-${index}`}
-                                      className="flex items-center justify-between rounded-md border border-green-200/50 bg-green-50/50 p-3 dark:border-green-900/40 dark:bg-green-950/20"
-                                    >
-                                      <div className="flex min-w-0 items-center gap-2">
-                                        <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />
-                                        <div className="min-w-0">
-                                          <p className="truncate text-xs font-medium text-foreground">
-                                            {file.name}
-                                          </p>
-                                        </div>
-                                      </div>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleFileRemove("parentId", index)}
-                                        className="shrink-0 rounded p-0.5 transition-colors hover:bg-red-100/50 dark:hover:bg-red-950/30"
-                                        aria-label="Remove file"
+                                  {formData.files.parentId.map(
+                                    (file, index) => (
+                                      <div
+                                        key={`parent-${index}`}
+                                        className={cn(
+                                          "flex items-center justify-between rounded-md border",
+                                          "border-green-200/50 bg-green-50/50 p-3",
+                                          "dark:border-green-900/40 dark:bg-green-950/20",
+                                        )}
                                       >
-                                        <X className="h-3.5 w-3.5 text-red-500" />
-                                      </button>
-                                    </div>
-                                  ))}
+                                        <div className="flex min-w-0 items-center gap-2">
+                                          <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />
+                                          <div className="min-w-0">
+                                            <p className="truncate text-xs font-medium text-foreground">
+                                              {file.name}
+                                            </p>
+                                          </div>
+                                        </div>
+                                        <button
+                                          type="button"
+                                          onClick={() =>
+                                            handleFileRemove("parentId", index)
+                                          }
+                                          className={cn(
+                                            "shrink-0 rounded p-0.5 transition-colors hover:bg-red-100/50",
+                                            "dark:hover:bg-red-950/30",
+                                          )}
+                                          aria-label="Remove file"
+                                        >
+                                          <X className="h-3.5 w-3.5 text-red-500" />
+                                        </button>
+                                      </div>
+                                    ),
+                                  )}
                                 </div>
                               )}
                             </div>
@@ -711,10 +865,18 @@ export default function SubmitSlip() {
                         </AccordionItem>
 
                         {isMedicalCategory() && (
-                          <AccordionItem value="medical-cert" className="border-b last:border-b-0">
+                          <AccordionItem
+                            value="medical-cert"
+                            className="border-b last:border-b-0"
+                          >
                             <AccordionTrigger className="px-4 py-3 hover:bg-muted/30 hover:no-underline">
                               <div className="flex flex-1 items-center gap-3">
-                                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted text-xs font-semibold text-foreground">
+                                <div
+                                  className={cn(
+                                    "flex h-6 w-6 items-center justify-center rounded-full",
+                                    "bg-muted text-xs font-semibold text-foreground",
+                                  )}
+                                >
                                   4
                                 </div>
                                 <div className="text-left">
@@ -722,7 +884,10 @@ export default function SubmitSlip() {
                                     <h3 className="text-sm font-medium text-foreground">
                                       Medical Certificate
                                     </h3>
-                                    <Badge variant="destructive" className="text-xs">
+                                    <Badge
+                                      variant="destructive"
+                                      className="text-xs"
+                                    >
                                       Required
                                     </Badge>
                                   </div>
@@ -731,19 +896,29 @@ export default function SubmitSlip() {
                                   </p>
                                 </div>
                               </div>
-                              {medicalCertProvided && formData.files.medicalCert.length > 0 && (
-                                <CheckCircle2 className="mr-2 h-4 w-4 shrink-0 text-green-500" />
-                              )}
+                              {medicalCertProvided &&
+                                formData.files.medicalCert.length > 0 && (
+                                  <CheckCircle2 className="mr-2 h-4 w-4 shrink-0 text-green-500" />
+                                )}
                             </AccordionTrigger>
                             <AccordionContent className="border-t border-border/40 bg-muted/20 px-4 py-3">
                               <div className="space-y-3">
                                 {formData.files.medicalCert.length === 0 ? (
-                                  <div className="relative cursor-pointer rounded-lg border-2 border-dashed border-border/60 p-6 transition-colors hover:border-primary/50 hover:bg-muted/20">
+                                  <div
+                                    className={cn(
+                                      "relative cursor-pointer rounded-lg border-2 border-dashed",
+                                      "border-border/60 p-6 transition-colors",
+                                      "hover:border-primary/50 hover:bg-muted/20",
+                                    )}
+                                  >
                                     <input
                                       type="file"
                                       multiple
                                       onChange={(e) =>
-                                        handleFileAdd("medicalCert", e.target.files)
+                                        handleFileAdd(
+                                          "medicalCert",
+                                          e.target.files,
+                                        )
                                       }
                                       className="absolute inset-0 cursor-pointer opacity-0"
                                       accept=".pdf,.jpg,.jpeg,.png"
@@ -760,31 +935,43 @@ export default function SubmitSlip() {
                                   </div>
                                 ) : (
                                   <div className="space-y-2">
-                                    {formData.files.medicalCert.map((file, index) => (
-                                      <div
-                                        key={`cert-${index}`}
-                                        className="flex items-center justify-between rounded-md border border-green-200/50 bg-green-50/50 p-3 dark:border-green-900/40 dark:bg-green-950/20"
-                                      >
-                                        <div className="flex min-w-0 items-center gap-2">
-                                          <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />
-                                          <div className="min-w-0">
-                                            <p className="truncate text-xs font-medium text-foreground">
-                                              {file.name}
-                                            </p>
-                                          </div>
-                                        </div>
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            handleFileRemove("medicalCert", index)
-                                          }
-                                          className="shrink-0 rounded p-0.5 transition-colors hover:bg-red-100/50 dark:hover:bg-red-950/30"
-                                          aria-label="Remove file"
+                                    {formData.files.medicalCert.map(
+                                      (file, index) => (
+                                        <div
+                                          key={`cert-${index}`}
+                                          className={cn(
+                                            "flex items-center justify-between rounded-md border",
+                                            "border-green-200/50 bg-green-50/50 p-3",
+                                            "dark:border-green-900/40 dark:bg-green-950/20",
+                                          )}
                                         >
-                                          <X className="h-3.5 w-3.5 text-red-500" />
-                                        </button>
-                                      </div>
-                                    ))}
+                                          <div className="flex min-w-0 items-center gap-2">
+                                            <CheckCircle2 className="h-4 w-4 shrink-0 text-green-500" />
+                                            <div className="min-w-0">
+                                              <p className="truncate text-xs font-medium text-foreground">
+                                                {file.name}
+                                              </p>
+                                            </div>
+                                          </div>
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              handleFileRemove(
+                                                "medicalCert",
+                                                index,
+                                              )
+                                            }
+                                            className={cn(
+                                              "shrink-0 rounded p-0.5 transition-colors hover:bg-red-100/50",
+                                              "dark:hover:bg-red-950/30",
+                                            )}
+                                            aria-label="Remove file"
+                                          >
+                                            <X className="h-3.5 w-3.5 text-red-500" />
+                                          </button>
+                                        </div>
+                                      ),
+                                    )}
                                   </div>
                                 )}
                               </div>
@@ -811,8 +998,8 @@ export default function SubmitSlip() {
                       {isSubmitting || isUpdating
                         ? "Saving..."
                         : isEditMode
-                        ? "Update & Resubmit"
-                        : "Submit Admission Slip"}
+                          ? "Update & Resubmit"
+                          : "Submit Admission Slip"}
                     </Button>
                   </div>
                 </div>
@@ -823,10 +1010,14 @@ export default function SubmitSlip() {
                   <CardTitle className="text-sm">NEED HELP?</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-2 pt-3 text-sm">
-                  <p className="font-medium text-foreground">Visit the Guidance Office</p>
+                  <p className="font-medium text-foreground">
+                    Visit the Guidance Office
+                  </p>
                   <div className="space-y-1 text-xs">
                     <p className="text-muted-foreground">
-                      <span className="font-medium text-foreground">Hours:</span>{" "}
+                      <span className="font-medium text-foreground">
+                        Hours:
+                      </span>{" "}
                       Mon-Fri, 7:30 AM - 4:00 PM
                     </p>
                   </div>
@@ -845,8 +1036,8 @@ export default function SubmitSlip() {
                 <CardContent className="space-y-3 text-sm">
                   <div>
                     <p className="font-medium text-foreground">
-                      <span className="text-primary">Date of Absence</span> is when
-                      you were actually absent.
+                      <span className="text-primary">Date of Absence</span> is
+                      when you were actually absent.
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       <span className="font-medium">Date Needed</span> is your
@@ -855,8 +1046,9 @@ export default function SubmitSlip() {
                   </div>
                   <div>
                     <p className="font-medium text-foreground">
-                      Be <span className="text-primary">specific and honest</span> in
-                      your reason.
+                      Be{" "}
+                      <span className="text-primary">specific and honest</span>{" "}
+                      in your reason.
                     </p>
                     <p className="mt-1 text-xs text-muted-foreground">
                       Vague reasons may cause delays in approval.
@@ -868,7 +1060,8 @@ export default function SubmitSlip() {
               <Card className="border-0 shadow-sm">
                 <CardHeader className="pb-3">
                   <CardTitle className="flex items-center gap-2 text-sm">
-                    <ClipboardList className="h-4 w-4 text-primary" /> REQUIREMENTS
+                    <ClipboardList className="h-4 w-4 text-primary" />{" "}
+                    REQUIREMENTS
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
@@ -880,14 +1073,17 @@ export default function SubmitSlip() {
                           Certificate of Registration (COR)
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          required as a separate field for admission slip requests
+                          required as a separate field for admission slip
+                          requests
                         </p>
                       </div>
                     </li>
                     <li className="flex gap-3">
                       <span className="shrink-0 font-bold text-primary">2</span>
                       <div>
-                        <p className="font-medium text-foreground">Medical Certificate</p>
+                        <p className="font-medium text-foreground">
+                          Medical Certificate
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           required for illness-related absences
                         </p>
@@ -896,7 +1092,9 @@ export default function SubmitSlip() {
                     <li className="flex gap-3">
                       <span className="shrink-0 font-bold text-primary">3</span>
                       <div>
-                        <p className="font-medium text-foreground">Supporting Document</p>
+                        <p className="font-medium text-foreground">
+                          Supporting Document
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           any proof related to your reason
                         </p>
@@ -905,7 +1103,9 @@ export default function SubmitSlip() {
                     <li className="flex gap-3">
                       <span className="shrink-0 font-bold text-primary">4</span>
                       <div>
-                        <p className="font-medium text-foreground">File formats</p>
+                        <p className="font-medium text-foreground">
+                          File formats
+                        </p>
                         <p className="text-xs text-muted-foreground">
                           PDF, JPG, PNG — max 5MB per file
                         </p>

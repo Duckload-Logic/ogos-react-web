@@ -56,7 +56,11 @@ export function useCreateNote(
       // Invalidate related appointment if applicable
       if (variables.appointmentId) {
         queryClient.invalidateQueries({
-          queryKey: [...QUERY_KEYS.appointments.all, "byId", variables.appointmentId],
+          queryKey: [
+            ...QUERY_KEYS.appointments.all,
+            "byId",
+            variables.appointmentId,
+          ],
         });
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.appointments.all,

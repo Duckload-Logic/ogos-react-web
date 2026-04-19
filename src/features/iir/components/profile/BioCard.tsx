@@ -4,6 +4,7 @@ import { asText, renderAddress } from "@/features/iir/utils";
 import { StudentSection } from "../../types";
 import { NOT_SPECIFIED } from "../../constants";
 import QuickInfo from "./QuickInfo";
+import { cn } from "@/lib/utils";
 
 export default function BioCard({
   data,
@@ -14,13 +15,23 @@ export default function BioCard({
     data?.personalInfo?.gender?.id === 1 ? ProfileMale : ProfileFemale;
 
   return (
-    <div className="relative mt-10 sm:mt-12 flex flex-col items-center">
+    <div className="relative mt-10 flex flex-col items-center sm:mt-12">
       <div className="absolute -top-12 z-10">
-        <DefaultProfileIcon className="h-24 w-24 rounded-full bg-background p-1 border-4 border-card shadow-xl text-muted-foreground" />
+        <DefaultProfileIcon
+          className={cn(
+            "h-24 w-24 rounded-full border-4 border-card bg-background",
+            "p-1 text-muted-foreground shadow-xl",
+          )}
+        />
       </div>
 
-      <div className="w-full rounded-2xl border border-glass-border bg-glass-bg px-6 pt-16 pb-6 shadow-xl">
-        <div className="text-center mb-6">
+      <div
+        className={cn(
+          "w-full rounded-2xl border border-glass-border bg-glass-bg",
+          "px-6 pb-6 pt-16 shadow-xl",
+        )}
+      >
+        <div className="mb-6 text-center">
           <h2 className="text-xl font-black tracking-tight text-card-foreground">
             {data?.basicInfo?.firstName}{" "}
             {data?.basicInfo?.middleName
@@ -28,13 +39,18 @@ export default function BioCard({
               : ""}{" "}
             {data?.basicInfo?.lastName}
           </h2>
-          <span className="inline-block mt-1 px-3 py-2 rounded-lg bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-widest">
+          <span
+            className={cn(
+              "mt-1 inline-block rounded-lg bg-primary/10 px-3 py-2",
+              "text-[10px] font-bold uppercase tracking-widest text-primary",
+            )}
+          >
             {data?.personalInfo?.course?.code || NOT_SPECIFIED}-
             {data?.personalInfo?.yearLevel || NOT_SPECIFIED}
           </span>
         </div>
 
-        <div className="w-full grid grid-cols-1 gap-4 pt-6 border-t border-border/50">
+        <div className="grid w-full grid-cols-1 gap-4 border-t border-border/50 pt-6">
           <QuickInfo
             icon={IdCard}
             label="Student Number"
@@ -54,15 +70,33 @@ export default function BioCard({
           <QuickInfo
             icon={School}
             label="Year & Section"
-            value={`${asText(data?.personalInfo?.yearLevel)}-${asText(data?.personalInfo?.section)}`}
+            value={cn(
+              asText(data?.personalInfo?.yearLevel),
+              "-",
+              asText(data?.personalInfo?.section),
+            )}
           />
         </div>
       </div>
-      <div className="relative w-full overflow-hidden rounded-2xl border-2 border-glass-border bg-gradient-to-b from-glass-bg via-glass-bg/30 to-muted/50 px-6 py-5 mt-2">
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-gradient-to-b from-primary to-secondary" />
+      <div
+        className={cn(
+          "via-glass-bg/30 relative mt-2 w-full overflow-hidden",
+          "rounded-2xl border-2 border-glass-border bg-gradient-to-b",
+          "from-glass-bg to-muted/50 px-6 py-5",
+        )}
+      >
+        <div className="absolute bottom-0 left-0 top-0 w-1 bg-gradient-to-b from-primary to-secondary" />
         <div className="mb-3 flex items-center gap-2">
-          <AlertCircle size={20} className="text-primary" />
-          <p className="text-[12px] font-black uppercase tracking-[0.15em] text-muted-foreground">
+          <AlertCircle
+            size={20}
+            className="text-primary"
+          />
+          <p
+            className={cn(
+              "text-[12px] font-black uppercase tracking-[0.15em]",
+              "text-muted-foreground",
+            )}
+          >
             Emergency Contact
           </p>
         </div>
@@ -70,14 +104,19 @@ export default function BioCard({
         <div className="grid grid-cols-1 gap-4 border-l border-glass-border pl-4 sm:grid-cols-2 sm:pl-6">
           <div className="space-y-2">
             <div>
-              <p className="text-sm font-bold text-card-foreground leading-tight">
+              <p className="text-sm font-bold leading-tight text-card-foreground">
                 {asText(data?.personalInfo?.emergencyContact?.firstName)}{" "}
                 {data?.personalInfo?.emergencyContact?.middleName
                   ? `${data.personalInfo.emergencyContact.middleName[0]}.`
                   : ""}{" "}
                 {asText(data?.personalInfo?.emergencyContact?.lastName)}
               </p>
-              <p className="text-[11px] font-semibold text-primary/80 italic uppercase">
+              <p
+                className={cn(
+                  "text-[11px] font-semibold uppercase italic",
+                  "text-primary/80",
+                )}
+              >
                 {asText(
                   data?.personalInfo?.emergencyContact?.relationship?.name,
                 )}
@@ -85,7 +124,12 @@ export default function BioCard({
             </div>
 
             <div className="flex flex-col">
-              <span className="text-[9px] uppercase font-bold text-muted-foreground/70">
+              <span
+                className={cn(
+                  "text-[9px] font-bold uppercase",
+                  "text-muted-foreground/70",
+                )}
+              >
                 Contact Number
               </span>
               <span className="text-xs font-semibold text-card-foreground">
@@ -95,7 +139,12 @@ export default function BioCard({
           </div>
 
           <div className="flex flex-col">
-            <span className="text-[9px] uppercase font-bold text-muted-foreground/70">
+            <span
+              className={cn(
+                "text-[9px] font-bold uppercase",
+                "text-muted-foreground/70",
+              )}
+            >
               Address
             </span>
             <span className="text-xs text-card-foreground/90">

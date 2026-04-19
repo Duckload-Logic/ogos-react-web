@@ -6,7 +6,10 @@
 /**
  * Validate form fields
  */
-export function validateFormField(field: string, value: unknown): string | null {
+export function validateFormField(
+  field: string,
+  value: unknown,
+): string | null {
   switch (field) {
     case "email": {
       const email = String(value);
@@ -51,7 +54,7 @@ export function validateFormField(field: string, value: unknown): string | null 
  */
 export function calculateFormCompletion(
   formData: Record<string, unknown>,
-  requiredFields: string[]
+  requiredFields: string[],
 ): number {
   const completed = requiredFields.filter((field) => {
     const value = formData[field];
@@ -64,7 +67,9 @@ export function calculateFormCompletion(
 /**
  * Format form data for submission
  */
-export function formatFormData(data: Record<string, unknown>): Record<string, unknown> {
+export function formatFormData(
+  data: Record<string, unknown>,
+): Record<string, unknown> {
   return {
     ...data,
     submittedAt: new Date().toISOString(),

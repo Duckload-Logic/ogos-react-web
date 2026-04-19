@@ -8,7 +8,7 @@
  * @returns Formatted date string (e.g., "January 5, 2026")
  */
 export const formatDate = (date: string | Date): string => {
-  const dateObj = typeof date === 'string' ? new Date(date) : date;
+  const dateObj = typeof date === "string" ? new Date(date) : date;
   return dateObj.toLocaleDateString("en-US", {
     year: "numeric",
     month: "long",

@@ -9,16 +9,13 @@ export {
   useGetSlipById,
 } from "./useSlips";
 
-export {
-  useGetSlipStatuses,
-  useGetSlipCategories,
-} from "./useLookups";
+export { useGetSlipStatuses, useGetSlipCategories } from "./useLookups";
 
 // Mutation hooks
-export { 
-  useSubmitSlip, 
-  useUpdateSlipStatus, 
-  useUpdateSlip 
+export {
+  useSubmitSlip,
+  useUpdateSlipStatus,
+  useUpdateSlip,
 } from "./useSlipMutations";
 
 // Attachment hooks

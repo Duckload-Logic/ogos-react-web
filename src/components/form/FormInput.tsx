@@ -4,6 +4,7 @@ import { useSpeechToText } from "@/hooks/useSpeechToText";
 import { SPECIAL_CHARS_REGEX } from "@/utils/validation";
 
 import { forwardRef } from "react";
+import { cn } from "@/lib/utils";
 
 const FormInput = forwardRef<
   HTMLInputElement | HTMLTextAreaElement,
@@ -23,14 +24,14 @@ const FormInput = forwardRef<
     required?: boolean;
     isTextarea?: boolean;
     inputMode?:
-    | "search"
-    | "none"
-    | "text"
-    | "tel"
-    | "url"
-    | "email"
-    | "numeric"
-    | "decimal";
+      | "search"
+      | "none"
+      | "text"
+      | "tel"
+      | "url"
+      | "email"
+      | "numeric"
+      | "decimal";
     disabled?: boolean;
     info?: string;
     prefix?: string;
@@ -66,22 +67,22 @@ const FormInput = forwardRef<
       transcript,
       startListening,
       stopListening,
-      browserSupportsSpeechRecognition
+      browserSupportsSpeechRecognition,
     } = useSpeechToText();
 
-    const previousTranscriptRef = useRef('');
+    const previousTranscriptRef = useRef("");
 
     useEffect(() => {
       if (transcript && transcript !== previousTranscriptRef.current) {
         const newPart = transcript.slice(previousTranscriptRef.current.length);
-        const newValue = (value || '') + newPart;
+        const newValue = (value || "") + newPart;
 
         // Support both string-based and event-based onChange (React Hook Form)
-        if (typeof onChange === 'function') {
+        if (typeof onChange === "function") {
           // Create a synthetic event for React Hook Form if needed
           const event = {
             target: { value: newValue, name },
-            currentTarget: { value: newValue, name }
+            currentTarget: { value: newValue, name },
           } as any;
 
           try {
@@ -114,7 +115,9 @@ const FormInput = forwardRef<
       }
     };
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const handleChange = (
+      e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
+    ) => {
       const newValue = e.target.value;
       validateContent(newValue);
 
@@ -129,13 +132,14 @@ const FormInput = forwardRef<
     const inputClasses = `
       w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200
       text-sm font-medium tracking-tight text-foreground placeholder:text-muted-foreground/70
-      ${disabled
-        ? "bg-muted/80 border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-60"
-        : value !== undefined && value !== null && value !== ""
-          ? "bg-muted/20 border-primary/30 focus:bg-glass-bg dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm"
-          : required
-            ? "bg-muted/60 dark:bg-muted/20 border-border hover:border-destructive/40 focus:border-destructive/50 focus:ring-2 focus:ring-destructive/5"
-            : "bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
+      ${
+        disabled
+          ? "bg-muted/80 border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-60"
+          : value !== undefined && value !== null && value !== ""
+            ? "bg-muted/20 border-primary/30 focus:bg-glass-bg dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm"
+            : required
+              ? "bg-muted/60 dark:bg-muted/20 border-border hover:border-destructive/40 focus:border-destructive/50 focus:ring-2 focus:ring-destructive/5"
+              : "bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
       }
       ${isTextarea ? "min-h-[100px] py-3 resize-none" : "h-11"}
       ${isListening ? "border-primary ring-2 ring-primary/10" : ""}
@@ -143,15 +147,20 @@ const FormInput = forwardRef<
 
     return (
       <div className={`space-y-2 ${className}`}>
-        <div className="text-sm font-medium text-card-foreground flex max-h-10 items-start gap-1">
+        <div className="flex max-h-10 items-start gap-1 text-sm font-medium text-card-foreground">
           {info && <CustomTooltip content={info} />}
           <span>{label}</span>
           {required && <span className="text-red-500">*</span>}
         </div>
         <div className="flex gap-2">
           {prefix && (
-            <div className="flex items-center w-fit rounded-md bg-muted-foreground/50 px-3 py-2 text-muted-foreground rounded-r-none">
-              <span className="text-sm font-medium text-card-foreground text-nowrap">
+            <div
+              className={cn(
+                "flex w-fit items-center rounded-md rounded-r-none",
+                "bg-muted-foreground/50 px-3 py-2 text-muted-foreground",
+              )}
+            >
+              <span className="text-nowrap text-sm font-medium text-card-foreground">
                 {prefix}
               </span>
             </div>
@@ -188,20 +197,19 @@ const FormInput = forwardRef<
               />
             )}
 
-            <div className="block right-2 bottom-4 flex items-center gap-2 z-10">
+            <div className="bottom-4 right-2 z-10 block flex items-center gap-2">
               {isTextarea && browserSupportsSpeechRecognition && !disabled && (
                 <button
                   type="button"
                   onClick={handleMicToggle}
                   title={isListening ? "Stop Dictation" : "Start Dictation"}
-                  className={`flex h-10 w-10 items-center justify-center rounded-lg
-                    transition-all shadow-sm p-0 ${isListening
-                      ? "bg-primary text-white animate-pulse ring-4 ring-primary/20"
+                  className={`flex h-10 w-10 items-center justify-center rounded-lg p-0 shadow-sm transition-all ${
+                    isListening
+                      ? "animate-pulse bg-primary text-white ring-4 ring-primary/20"
                       : "bg-transparent text-muted-foreground hover:bg-primary/10 " +
-                      "hover:text-primary border border-border/50"
-                    }`}
+                        "border border-border/50 hover:text-primary"
+                  }`}
                 >
-
                   {isListening ? <MicOff size={15} /> : <Mic size={15} />}
                 </button>
               )}
@@ -209,7 +217,12 @@ const FormInput = forwardRef<
           </div>
         </div>
         {(error || internalError) && (
-          <p className="text-[11px] font-medium text-destructive mt-1.5 ml-1 animate-in fade-in slide-in-from-top-1 duration-200">
+          <p
+            className={cn(
+              "animate-in fade-in slide-in-from-top-1 ml-1 mt-1.5",
+              "text-[11px] font-medium text-destructive duration-200",
+            )}
+          >
             {error || internalError}
           </p>
         )}
@@ -251,13 +264,18 @@ export function CustomTooltip({
         onMouseLeave={() => setIsVisible(false)}
       >
         {children || (
-          <Info className="h-4 w-4 text-muted-foreground hover:text-primary transition-colors duration-200" />
+          <Info className="h-4 w-4 text-muted-foreground transition-colors duration-200 hover:text-primary" />
         )}
       </div>
 
       {isVisible && (
         <div
-          className="fixed px-3 py-2 bg-card border-2 border-primary rounded-md shadow-lg text-sm text-card-foreground z-50 animate-in fade-in slide-in-from-bottom-2 duration-200 max-w-xs whitespace-normal"
+          className={cn(
+            "animate-in fade-in slide-in-from-bottom-2 fixed z-50",
+            "max-w-xs whitespace-normal rounded-md border-2 border-primary",
+            "bg-card px-3 py-2 text-sm text-card-foreground shadow-lg",
+            "duration-200",
+          )}
           style={{
             top: `${position.top}px`,
             left: `${position.left}px`,
@@ -266,7 +284,11 @@ export function CustomTooltip({
           }}
         >
           {content}
-          {/* <div className="absolute top-full left-1/2 -translate-x-1/2 w-0 h-0 border-l-4 border-r-4 border-t-4 border-l-transparent border-r-transparent border-t-primary" /> */}
+          {/* <div className={cn(
+    "absolute top-full left-1/2 -translate-x-1/2 w-0 h-0",
+    "border-l-4 border-r-4 border-t-4 border-l-transparent",
+    "border-r-transparent border-t-primary"
+  )} /> */}
         </div>
       )}
     </div>

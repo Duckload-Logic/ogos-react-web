@@ -48,8 +48,11 @@ export default function ActionConfirmModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent className="sm:max-w-md animate-in fade-in zoom-in-95 duration-200">
+    <Dialog
+      open={isOpen}
+      onOpenChange={handleClose}
+    >
+      <DialogContent className="animate-in fade-in zoom-in-95 duration-200 sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Confirm {action}</DialogTitle>
           <DialogDescription className="text-sm leading-relaxed">
@@ -76,7 +79,8 @@ export default function ActionConfirmModal({
         )}
 
         <DialogFooter>
-          <Button variant="outline"
+          <Button
+            variant="outline"
             onClick={handleClose}
             className="transition-all duration-200 hover:scale-105"
           >

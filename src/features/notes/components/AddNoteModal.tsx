@@ -2,9 +2,9 @@
  * Modal for adding a new significant note
  */
 
-import { useEffect } from 'react';
-import { Controller, useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
+import { useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import {
   ResponsiveModal,
   ResponsiveModalContent,
@@ -12,10 +12,13 @@ import {
   ResponsiveModalFooter,
   ResponsiveModalHeader,
   ResponsiveModalTitle,
-} from '@/components/ui/responsive-modal';
-import { Button } from '@/components/ui/button';
-import { significantNoteSchema, SignificantNoteFormData } from '../validation/noteSchema';
-import { FormInput } from '@/components/form';
+} from "@/components/ui/responsive-modal";
+import { Button } from "@/components/ui/button";
+import {
+  significantNoteSchema,
+  SignificantNoteFormData,
+} from "../validation/noteSchema";
+import { FormInput } from "@/components/form";
 
 interface AddNoteModalProps {
   open: boolean;
@@ -40,10 +43,10 @@ export default function AddNoteModal({
   } = useForm<SignificantNoteFormData>({
     resolver: zodResolver(significantNoteSchema),
     defaultValues: {
-      appointmentId: appointmentId || '',
-      note: '',
-      remarks: ''
-    }
+      appointmentId: appointmentId || "",
+      note: "",
+      remarks: "",
+    },
   });
 
   // Update appointmentId if prop changes
@@ -51,8 +54,8 @@ export default function AddNoteModal({
     if (open && appointmentId) {
       reset({
         appointmentId,
-        note: '',
-        remarks: ''
+        note: "",
+        remarks: "",
       });
     }
   }, [open, appointmentId, reset]);
@@ -68,16 +71,23 @@ export default function AddNoteModal({
   };
 
   return (
-    <ResponsiveModal open={open} onOpenChange={handleClose}>
+    <ResponsiveModal
+      open={open}
+      onOpenChange={handleClose}
+    >
       <ResponsiveModalContent className="sm:max-w-[600px]">
         <ResponsiveModalHeader>
           <ResponsiveModalTitle>Add Significant Note</ResponsiveModalTitle>
           <ResponsiveModalDescription>
-            Record a significant incident or note about the student. All fields are required.
+            Record a significant incident or note about the student. All fields
+            are required.
           </ResponsiveModalDescription>
         </ResponsiveModalHeader>
 
-        <form onSubmit={handleSubmit(handleFormSubmit)} className="space-y-4">
+        <form
+          onSubmit={handleSubmit(handleFormSubmit)}
+          className="space-y-4"
+        >
           <Controller
             name="note"
             control={control}
@@ -117,8 +127,11 @@ export default function AddNoteModal({
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isSubmitting}>
-              {isSubmitting ? 'Saving...' : 'Save Note'}
+            <Button
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Saving..." : "Save Note"}
             </Button>
           </ResponsiveModalFooter>
         </form>

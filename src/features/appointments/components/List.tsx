@@ -55,35 +55,47 @@ export default function AppointmentList({
   }, [statusCounts]);
 
   const dropdownOptions = useMemo(() => {
-    return statuses.map(s => ({
+    return statuses.map((s) => ({
       ...s,
-      displayName: s.id === 0 ? "All Statuses" : `${s.name} (${statMap[s.id]?.count || 0})`
+      displayName:
+        s.id === 0
+          ? "All Statuses"
+          : `${s.name} (${statMap[s.id]?.count || 0})`,
     }));
   }, [statuses, statMap]);
 
   return (
     <Card
-      className={`border-glass-border bg-glass-bg/40 shadow-2xl backdrop-blur-2xl lg:col-span-3 flex flex-col overflow-hidden transition-all duration-500 hover:bg-glass-bg/50 ${className || ""}`}
+      className={`bg-glass-bg/40 hover:bg-glass-bg/50 flex flex-col overflow-hidden border-glass-border shadow-2xl backdrop-blur-2xl transition-all duration-500 lg:col-span-3 ${className || ""}`}
     >
-      <CardHeader className="border-b border-glass-border/30 px-8 py-7 space-y-6 bg-muted/10">
+      <CardHeader className="border-glass-border/30 space-y-6 border-b bg-muted/10 px-8 py-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-1.5 text-left">
-            <h2 className="text-xl font-bold tracking-tight text-foreground/90">{title}</h2>
+            <h2 className="text-xl font-bold tracking-tight text-foreground/90">
+              {title}
+            </h2>
           </div>
 
           {!isLoading && appointments.length > 0 && (
-            <div className="rounded-full border border-primary/20 bg-primary/10 px-4 py-1.5 text-[10px] font-bold tracking-wide text-primary self-start shadow-sm">
-              {appointments.length} Total Record{appointments.length !== 1 ? "s" : ""}
+            <div
+              className={cn(
+                "self-start rounded-full border border-primary/20",
+                "bg-primary/10 px-4 py-1.5 text-[10px] font-bold tracking-wide",
+                "text-primary shadow-sm",
+              )}
+            >
+              {appointments.length} Total Record
+              {appointments.length !== 1 ? "s" : ""}
             </div>
           )}
         </div>
 
-        <div className="flex flex-col sm:flex-row gap-4 w-full items-center">
+        <div className="flex w-full flex-col items-center gap-4 sm:flex-row">
           <SearchInput
             searchTerm={searchTerm}
             onSearchChange={onSearchChange}
             placeholder="Search student identity..."
-            className="w-full border-glass-border/40 focus:bg-glass-bg/60 rounded-2xl"
+            className="border-glass-border/40 focus:bg-glass-bg/60 w-full rounded-2xl"
             hasHeader={false}
           />
 
@@ -92,7 +104,7 @@ export default function AppointmentList({
               options={dropdownOptions}
               value={selectedStatus?.id}
               onChange={(val) => {
-                const status = statuses.find(s => s.id === val);
+                const status = statuses.find((s) => s.id === val);
                 if (status) onStatusChange(status);
               }}
               labelKey="displayName"
@@ -103,21 +115,34 @@ export default function AppointmentList({
         </div>
       </CardHeader>
 
-      <CardContent className="p-0 flex-1">
+      <CardContent className="flex-1 p-0">
         {isLoading ? (
           <div className="flex min-h-[350px] items-center justify-center px-6 text-center">
-            <Spinner size="sm" message="Synchronizing sessions" />
+            <Spinner
+              size="sm"
+              message="Synchronizing sessions"
+            />
           </div>
         ) : appointments.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-24 px-6 text-center space-y-6">
-            <div className="p-6 bg-muted/20 rounded-full border border-glass-border/40 border-dashed animate-pulse">
-              <CalendarX className="w-10 h-10 text-muted-foreground/50" />
+          <div className="flex flex-col items-center justify-center space-y-6 px-6 py-24 text-center">
+            <div
+              className={cn(
+                "border-glass-border/40 animate-pulse rounded-full border",
+                "border-dashed bg-muted/20 p-6",
+              )}
+            >
+              <CalendarX className="h-10 w-10 text-muted-foreground/50" />
             </div>
             <div className="space-y-2">
               <h3 className="text-xl font-black tracking-tight text-foreground/80">
                 Inbox Empty
               </h3>
-              <p className="text-xs font-semibold text-muted-foreground tracking-wide opacity-70 leading-relaxed">
+              <p
+                className={cn(
+                  "text-xs font-semibold leading-relaxed tracking-wide",
+                  "text-muted-foreground opacity-70",
+                )}
+              >
                 No active records match the current telemetry filters.
               </p>
             </div>
@@ -125,15 +150,15 @@ export default function AppointmentList({
         ) : (
           <>
             {/* Desktop Table View */}
-            <div className="hidden md:block overflow-x-auto px-6 pb-6 pt-4">
-              <table className="w-full text-sm border-separate border-spacing-y-3">
-                <thead className="text-muted-foreground text-[10px] font-bold tracking-wide opacity-60">
+            <div className="hidden overflow-x-auto px-6 pb-6 pt-4 md:block">
+              <table className="w-full border-separate border-spacing-y-3 text-sm">
+                <thead className="text-[10px] font-bold tracking-wide text-muted-foreground opacity-60">
                   <tr>
                     <th className="px-6 py-4 text-left">Student Name</th>
                     <th className="px-6 py-4 text-left">Session Time</th>
                     <th className="px-6 py-4 text-left">Category</th>
                     <th className="px-6 py-4 text-left">Status</th>
-                    <th className="px-6 py-4 text-right pr-10">Actions</th>
+                    <th className="px-6 py-4 pr-10 text-right">Actions</th>
                   </tr>
                 </thead>
 
@@ -141,9 +166,14 @@ export default function AppointmentList({
                   {appointments.map((apt) => (
                     <tr
                       key={apt.id}
-                      className="group rounded-[20px] bg-glass-bg/20 backdrop-blur-sm border border-glass-border/20 shadow-sm transition-all duration-300 hover:bg-glass-bg/60 hover:shadow-xl hover:scale-[1.005] hover:border-primary/20"
+                      className={cn(
+                        "bg-glass-bg/20 border-glass-border/20 hover:bg-glass-bg/60",
+                        "group rounded-[20px] border shadow-sm backdrop-blur-sm",
+                        "transition-all duration-300 hover:scale-[1.005]",
+                        "hover:border-primary/20 hover:shadow-xl",
+                      )}
                     >
-                      <td className="px-6 py-6 text-foreground font-bold text-sm rounded-l-[20px] tracking-tight">
+                      <td className="rounded-l-[20px] px-6 py-6 text-sm font-bold tracking-tight text-foreground">
                         {apt.user?.firstName}{" "}
                         {apt.user?.middleName?.[0]
                           ? `${apt.user?.middleName?.[0]}. `
@@ -151,14 +181,19 @@ export default function AppointmentList({
                         {apt.user?.lastName}
                       </td>
 
-                      <td className="px-6 py-6 text-foreground/80 font-bold whitespace-nowrap text-xs tracking-wide">
+                      <td className="whitespace-nowrap px-6 py-6 text-xs font-bold tracking-wide text-foreground/80">
                         {format12HourTime(apt.timeSlot?.time || "")}
                       </td>
 
                       <td className="px-4 py-4 text-foreground">
-                        <div className="flex items-center gap-2 border border-border rounded-full px-2.5 py-1 w-fit bg-muted/20">
-                          <Tag className="w-3 h-3 text-muted-foreground" />
-                          <span className="text-nowrap max-w-[140px]">
+                        <div
+                          className={cn(
+                            "flex w-fit items-center gap-2 rounded-full border",
+                            "border-border bg-muted/20 px-2.5 py-1",
+                          )}
+                        >
+                          <Tag className="h-3 w-3 text-muted-foreground" />
+                          <span className="max-w-[140px] text-nowrap">
                             {apt.appointmentCategory?.name}
                           </span>
                         </div>
@@ -166,21 +201,22 @@ export default function AppointmentList({
 
                       <td className="px-4 py-4">
                         <span
-                          className={`inline-block px-2.5 py-1 rounded-full text-xs font-medium border ${STATUS_COLORS[apt.status?.colorKey || "info"]
-                            }`}
+                          className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${
+                            STATUS_COLORS[apt.status?.colorKey || "info"]
+                          }`}
                         >
                           {apt.status?.name}
                         </span>
                       </td>
 
-                      <td className="px-4 py-4 rounded-r-xl">
+                      <td className="rounded-r-xl px-4 py-4">
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={() => onViewClick(apt)}
                           className="gap-1 rounded-full px-3"
                         >
-                          <Eye className="w-4 h-4" />
+                          <Eye className="h-4 w-4" />
                           View
                         </Button>
                       </td>
@@ -191,16 +227,20 @@ export default function AppointmentList({
             </div>
 
             {/* Mobile Card View */}
-            <div className="block md:hidden space-y-4 px-4 pb-6">
+            <div className="block space-y-4 px-4 pb-6 md:hidden">
               {appointments.map((apt) => (
                 <div
                   key={apt.id}
-                  className="p-6 space-y-4 bg-glass-bg/20 backdrop-blur-md rounded-3xl border border-glass-border/20 shadow-sm transition-all duration-300 active:scale-[0.98]"
+                  className={cn(
+                    "bg-glass-bg/20 border-glass-border/20 space-y-4 rounded-3xl",
+                    "border p-6 shadow-sm backdrop-blur-md transition-all",
+                    "duration-300 active:scale-[0.98]",
+                  )}
                 >
                   <div className="flex items-start justify-between gap-3">
-                    <div className="flex items-center gap-3 text-foreground font-bold text-sm">
-                      <div className="p-2 bg-primary/10 rounded-xl border border-primary/20">
-                        <User className="w-4 h-4 text-primary" />
+                    <div className="flex items-center gap-3 text-sm font-bold text-foreground">
+                      <div className="rounded-xl border border-primary/20 bg-primary/10 p-2">
+                        <User className="h-4 w-4 text-primary" />
                       </div>
                       <span className="tracking-tight">
                         {apt.user?.firstName} {apt.user?.lastName}
@@ -208,26 +248,44 @@ export default function AppointmentList({
                     </div>
 
                     <Badge
-                      className={cn("px-3 py-1 text-[9px] font-bold tracking-wide rounded-full border shadow-sm", STATUS_COLORS[apt.status?.colorKey || "info"])}
+                      className={cn(
+                        "rounded-full border px-3 py-1 text-[9px] font-bold tracking-wide shadow-sm",
+                        STATUS_COLORS[apt.status?.colorKey || "info"],
+                      )}
                     >
                       {apt.status?.name}
                     </Badge>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 text-[10px] font-bold">
-                    <div className="flex items-center gap-2 text-muted-foreground/80 bg-muted/20 px-3 py-2 rounded-xl border border-glass-border/10">
-                      <CalendarDays className="w-3.5 h-3.5 text-primary/60" />
+                    <div
+                      className={cn(
+                        "border-glass-border/10 flex items-center gap-2 rounded-xl",
+                        "border bg-muted/20 px-3 py-2 text-muted-foreground/80",
+                      )}
+                    >
+                      <CalendarDays className="h-3.5 w-3.5 text-primary/60" />
                       <span>{formatDate(apt.whenDate || "")}</span>
                     </div>
 
-                    <div className="flex items-center gap-2 text-muted-foreground/80 bg-muted/20 px-3 py-2 rounded-xl border border-glass-border/10">
-                      <Clock className="w-3.5 h-3.5 text-primary/60" />
+                    <div
+                      className={cn(
+                        "border-glass-border/10 flex items-center gap-2 rounded-xl",
+                        "border bg-muted/20 px-3 py-2 text-muted-foreground/80",
+                      )}
+                    >
+                      <Clock className="h-3.5 w-3.5 text-primary/60" />
                       <span>{format12HourTime(apt.timeSlot?.time || "")}</span>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-3 bg-muted/20 px-4 py-3 rounded-2xl border border-glass-border/10">
-                    <Tag className="w-4 h-4 text-primary/60" />
+                  <div
+                    className={cn(
+                      "border-glass-border/10 flex items-center gap-3 rounded-2xl",
+                      "border bg-muted/20 px-4 py-3",
+                    )}
+                  >
+                    <Tag className="h-4 w-4 text-primary/60" />
                     <span className="text-[10px] font-bold tracking-wide text-foreground/70">
                       {apt.appointmentCategory?.name}
                     </span>
@@ -238,9 +296,12 @@ export default function AppointmentList({
                       variant="outline"
                       size="sm"
                       onClick={() => onViewClick(apt)}
-                      className="w-full gap-2 rounded-2xl border-primary/20 bg-primary/5 text-primary font-bold tracking-wide text-[10px] h-11"
+                      className={cn(
+                        "h-11 w-full gap-2 rounded-2xl border-primary/20 bg-primary/5",
+                        "text-[10px] font-bold tracking-wide text-primary",
+                      )}
                     >
-                      <Eye className="w-3.5 h-3.5" />
+                      <Eye className="h-3.5 w-3.5" />
                       Access Interface
                     </Button>
                   </div>

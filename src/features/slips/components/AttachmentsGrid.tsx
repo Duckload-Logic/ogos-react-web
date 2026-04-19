@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { SlipAttachment } from "../types";
 import { useDownloadAttachment, useGetAttachmentPreview } from "../hooks";
+import { cn } from "@/lib/utils";
 
 interface AttachmentsGridProps {
   slipId: string;
@@ -47,7 +48,10 @@ function PreviewModal({
   const { previewUrl, isLoading } = useGetAttachmentPreview(slipId, file.id);
 
   return (
-    <Dialog open={isOpen} onOpenChange={onOpenChange}>
+    <Dialog
+      open={isOpen}
+      onOpenChange={onOpenChange}
+    >
       <DialogContent className="max-w-xl">
         <DialogHeader>
           <DialogTitle>File Preview</DialogTitle>
@@ -57,38 +61,43 @@ function PreviewModal({
         </DialogHeader>
 
         {error && (
-          <div className="bg-destructive/10 border border-destructive text-destructive p-3 rounded-md text-sm">
+          <div
+            className={cn(
+              "rounded-md border border-destructive bg-destructive/10 p-3",
+              "text-sm text-destructive",
+            )}
+          >
             {error}
           </div>
         )}
 
         <div className="flex flex-col items-center gap-4">
           {isLoading ? (
-            <div className="w-full h-96 bg-muted rounded-lg flex items-center justify-center">
-              <LoaderCircle className="w-8 h-8 animate-spin text-muted-foreground" />
+            <div className="flex h-96 w-full items-center justify-center rounded-lg bg-muted">
+              <LoaderCircle className="h-8 w-8 animate-spin text-muted-foreground" />
             </div>
           ) : isImageFile(file.fileName) && previewUrl ? (
             <img
               src={previewUrl}
               alt="Preview"
-              className="max-w-full max-h-96 rounded-lg"
+              className="max-h-96 max-w-full rounded-lg"
             />
           ) : isPdfFile(file.fileName) ? (
-            <div className="w-full h-96 bg-muted rounded-lg flex items-center justify-center">
+            <div className="flex h-96 w-full items-center justify-center rounded-lg bg-muted">
               <div className="text-center">
-                <FileText className="w-12 h-12 text-red-500 mx-auto mb-2" />
+                <FileText className="mx-auto mb-2 h-12 w-12 text-red-500" />
                 <p className="text-muted-foreground">
                   PDF Preview not available in browser
                 </p>
-                <span className="text-muted-foreground/85 text-xs">
+                <span className="text-xs text-muted-foreground/85">
                   Please download the file to view its contents.
                 </span>
               </div>
             </div>
           ) : (
-            <div className="w-full h-96 bg-muted rounded-lg flex items-center justify-center">
+            <div className="flex h-96 w-full items-center justify-center rounded-lg bg-muted">
               <div className="text-center">
-                <FileText className="w-12 h-12 text-blue-500 mx-auto mb-2" />
+                <FileText className="mx-auto mb-2 h-12 w-12 text-blue-500" />
                 <p className="text-muted-foreground">
                   Preview not available for this file type
                 </p>
@@ -99,10 +108,10 @@ function PreviewModal({
                 >
                   {isDownloading ? (
                     <span className="animate-spin">
-                      <LoaderCircle className="w-4 h-4" />
+                      <LoaderCircle className="h-4 w-4" />
                     </span>
                   ) : (
-                    <Download className="w-4 h-4" />
+                    <Download className="h-4 w-4" />
                   )}
                   {isDownloading ? "Downloading..." : "Download File"}
                 </Button>
@@ -115,7 +124,7 @@ function PreviewModal({
             className="w-full gap-2"
             disabled={isDownloading}
           >
-            <Download className="w-4 h-4" />
+            <Download className="h-4 w-4" />
             {isDownloading ? "Downloading..." : "Download File"}
           </Button>
         </div>
@@ -147,38 +156,44 @@ function AttachmentItem({
   return (
     <div
       key={index}
-      className="relative group rounded-lg border border-border bg-card hover:bg-accent transition-colors overflow-hidden"
+      className={cn(
+        "group relative overflow-hidden rounded-lg border",
+        "border-border bg-card transition-colors hover:bg-accent",
+      )}
     >
       <div
-        className="aspect-square flex items-center justify-center bg-muted p-2 hover:cursor-pointer hover:brightness-50"
+        className={cn(
+          "flex aspect-square items-center justify-center bg-muted p-2",
+          "hover:cursor-pointer hover:brightness-50",
+        )}
         onClick={() => onPreview(file)}
       >
         {isLoading ? (
-          <div className="flex items-center justify-center w-full h-full">
-            <LoaderCircle className="w-6 h-6 animate-spin text-muted-foreground" />
+          <div className="flex h-full w-full items-center justify-center">
+            <LoaderCircle className="h-6 w-6 animate-spin text-muted-foreground" />
           </div>
         ) : isImageFile(file.fileName) && previewUrl ? (
           <img
             src={previewUrl}
             alt={`Attachment ${index + 1}`}
-            className="w-full h-full object-cover"
+            className="h-full w-full object-cover"
           />
         ) : isImageFile(file.fileName) ? (
-          <div className="flex flex-col items-center justify-center gap-2 w-full h-full">
-            <ImageIcon className="w-10 h-10 text-muted-foreground" />
-            <span className="text-xs text-center font-medium">
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2">
+            <ImageIcon className="h-10 w-10 text-muted-foreground" />
+            <span className="text-center text-xs font-medium">
               Failed to load image
             </span>
           </div>
         ) : file.fileName.toLowerCase().endsWith(".pdf") ? (
-          <div className="flex flex-col items-center justify-center gap-2 w-full h-full">
-            <FileText className="w-10 h-10 text-red-500" />
-            <span className="text-xs text-center font-medium">PDF</span>
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2">
+            <FileText className="h-10 w-10 text-red-500" />
+            <span className="text-center text-xs font-medium">PDF</span>
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center gap-2 w-full h-full">
-            <FileText className="w-10 h-10 text-blue-500" />
-            <span className="text-xs text-center font-medium">
+          <div className="flex h-full w-full flex-col items-center justify-center gap-2">
+            <FileText className="h-10 w-10 text-blue-500" />
+            <span className="text-center text-xs font-medium">
               {getFileExtension(file.fileName).toUpperCase()}
             </span>
           </div>
@@ -186,8 +201,13 @@ function AttachmentItem({
       </div>
 
       {/* File name tooltip */}
-      <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 to-transparent p-2 hidden group-hover:block">
-        <p className="text-xs text-white truncate">
+      <div
+        className={cn(
+          "absolute bottom-0 left-0 right-0 hidden bg-gradient-to-t",
+          "from-black/80 to-transparent p-2 group-hover:block",
+        )}
+      >
+        <p className="truncate text-xs text-white">
           {getFileName(file.fileName)}
         </p>
       </div>
@@ -195,10 +215,7 @@ function AttachmentItem({
   );
 }
 
-export function AttachmentsGrid({
-  slipId,
-  files,
-}: AttachmentsGridProps) {
+export function AttachmentsGrid({ slipId, files }: AttachmentsGridProps) {
   const [selectedFile, setSelectedFile] = useState<SlipAttachment | null>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const { downloadAttachment, isDownloading, error } = useDownloadAttachment();
@@ -240,7 +257,7 @@ export function AttachmentsGrid({
 
   return (
     <>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
         {files.map((file, index) => (
           <AttachmentItem
             key={index}

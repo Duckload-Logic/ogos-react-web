@@ -28,7 +28,11 @@ interface StudentAnalytics {
   [key: string]: any;
 }
 
-export default function AgeAnalytics({ students }: { students: StudentAnalytics[] }) {
+export default function AgeAnalytics({
+  students,
+}: {
+  students: StudentAnalytics[];
+}) {
   const ageData = useMemo(() => {
     const ages = students
       .filter((s) => s.dateOfBirth)
@@ -88,38 +92,45 @@ export default function AgeAnalytics({ students }: { students: StudentAnalytics[
 
   return (
     <div className="space-y-4">
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           Age Distribution
         </h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          Students with recorded birth dates: {students.filter((s) => s.dateOfBirth).length}
+        <p className="mb-4 text-sm text-muted-foreground">
+          Students with recorded birth dates:{" "}
+          {students.filter((s) => s.dateOfBirth).length}
         </p>
 
         {/* Stats Cards */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
-          <div className="bg-muted p-4 rounded-lg">
-            <p className="text-xs text-muted-foreground mb-1">Average Age</p>
+        <div className="mb-6 grid grid-cols-3 gap-4">
+          <div className="rounded-lg bg-muted p-4">
+            <p className="mb-1 text-xs text-muted-foreground">Average Age</p>
             <p className="text-2xl font-bold text-foreground">{ageStats.avg}</p>
           </div>
-          <div className="bg-muted p-4 rounded-lg">
-            <p className="text-xs text-muted-foreground mb-1">Youngest</p>
+          <div className="rounded-lg bg-muted p-4">
+            <p className="mb-1 text-xs text-muted-foreground">Youngest</p>
             <p className="text-2xl font-bold text-foreground">{ageStats.min}</p>
           </div>
-          <div className="bg-muted p-4 rounded-lg">
-            <p className="text-xs text-muted-foreground mb-1">Oldest</p>
+          <div className="rounded-lg bg-muted p-4">
+            <p className="mb-1 text-xs text-muted-foreground">Oldest</p>
             <p className="text-2xl font-bold text-foreground">{ageStats.max}</p>
           </div>
         </div>
 
         {/* Bar Chart */}
-        <ChartContainer config={chartConfig} className="h-80">
+        <ChartContainer
+          config={chartConfig}
+          className="h-80"
+        >
           <BarChart data={ageData}>
             <CartesianGrid strokeDasharray="3 3" />
             <XAxis dataKey="range" />
             <YAxis />
             <ChartTooltip content={<ChartTooltipContent />} />
-            <Bar dataKey="count" fill="hsl(var(--color-count))" />
+            <Bar
+              dataKey="count"
+              fill="hsl(var(--color-count))"
+            />
           </BarChart>
         </ChartContainer>
       </div>

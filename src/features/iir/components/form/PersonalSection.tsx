@@ -1,4 +1,10 @@
-import { forwardRef, useImperativeHandle, useState, useCallback, useMemo } from "react";
+import {
+  forwardRef,
+  useImperativeHandle,
+  useState,
+  useCallback,
+  useMemo,
+} from "react";
 import { Dropdown, FormInput, Checkbox } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
 import {
@@ -14,7 +20,7 @@ import {
   Layers,
   Hash,
   Activity,
-  UserCheck
+  UserCheck,
 } from "lucide-react";
 import {
   useCourses,
@@ -37,8 +43,17 @@ import {
   Region,
   StudentSection,
 } from "@/features/iir/types";
-import { validateObject, commonRules, isFieldRequired, FieldValidationSchema, validateField } from "@/services/validationSchema";
-import { personalInformationValidationSchema } from "@/features/iir/config/personalInfoValidationSchema";
+import {
+  validateObject,
+  commonRules,
+  isFieldRequired,
+  FieldValidationSchema,
+  validateField,
+} from "@/services/validationSchema";
+import {
+  personalInformationValidationSchema
+} from "@/features/iir/config/personalInfoValidationSchema";
+import { cn } from "@/lib/utils";
 
 interface FormErrors {
   [key: string]: string;
@@ -57,7 +72,12 @@ export const PersonalSection = forwardRef<
     shouldShowError?: (fieldPath: string) => boolean;
   }
 >(function PersonalSection(
-  { studentInfo, onChange, onFieldBlur, shouldShowError }: {
+  {
+    studentInfo,
+    onChange,
+    onFieldBlur,
+    shouldShowError,
+  }: {
     studentInfo: StudentSection;
     onChange: (path: string, value: any) => void;
     onFieldBlur?: (fieldPath: string) => void;
@@ -250,10 +270,16 @@ export const PersonalSection = forwardRef<
   } = useGetBarangays(addressCity.residential?.code || "");
 
   const getRuntimeSchema = (): FieldValidationSchema => {
-    const schema: FieldValidationSchema = { ...personalInformationValidationSchema };
+    const schema: FieldValidationSchema = {
+      ...personalInformationValidationSchema,
+    };
     if ((studentInfo as any)?.personalInfo?.isEmployed) {
-      schema["student.personalInfo.employerName"] = [commonRules.required("Employer name")];
-      schema["student.personalInfo.employerAddress"] = [commonRules.required("Employer address")];
+      schema["student.personalInfo.employerName"] = [
+        commonRules.required("Employer name"),
+      ];
+      schema["student.personalInfo.employerAddress"] = [
+        commonRules.required("Employer address"),
+      ];
     }
     return schema;
   };
@@ -335,15 +361,20 @@ export const PersonalSection = forwardRef<
         description="Official academic identity and name"
         icon={User}
       >
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-6">
           <div className="md:col-span-2">
             <FormInput
               label="First Name"
               value={studentInfo?.basicInfo?.firstName || ""}
-              onChange={(val: any) => handleInputChange("student.basicInfo.firstName", val)}
+              onChange={(val: any) =>
+                handleInputChange("student.basicInfo.firstName", val)
+              }
               error={errors["student.basicInfo.firstName"]}
               placeholder="First name"
-              required={isFieldRequired(runtimeSchema, "student.basicInfo.firstName")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.basicInfo.firstName",
+              )}
               disabled
             />
           </div>
@@ -352,11 +383,13 @@ export const PersonalSection = forwardRef<
               label="Middle Name"
               value={
                 studentInfo?.basicInfo?.middleName == null ||
-                  typeof studentInfo.basicInfo.middleName === "object"
+                typeof studentInfo.basicInfo.middleName === "object"
                   ? ""
                   : studentInfo.basicInfo.middleName
               }
-              onChange={(val: any) => handleInputChange("student.basicInfo.middleName", val)}
+              onChange={(val: any) =>
+                handleInputChange("student.basicInfo.middleName", val)
+              }
               placeholder="Middle name"
               disabled
             />
@@ -365,10 +398,15 @@ export const PersonalSection = forwardRef<
             <FormInput
               label="Last Name"
               value={studentInfo?.basicInfo?.lastName || ""}
-              onChange={(val: any) => handleInputChange("student.basicInfo.lastName", val)}
+              onChange={(val: any) =>
+                handleInputChange("student.basicInfo.lastName", val)
+              }
               error={errors["student.basicInfo.lastName"]}
               placeholder="Last name"
-              required={isFieldRequired(runtimeSchema, "student.basicInfo.lastName")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.basicInfo.lastName",
+              )}
               disabled
             />
           </div>
@@ -377,7 +415,9 @@ export const PersonalSection = forwardRef<
             <FormInput
               label="Suffix"
               value={studentInfo?.personalInfo?.suffix || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.suffix", val)}
+              onChange={(val: any) =>
+                handleInputChange("student.personalInfo.suffix", val)
+              }
               placeholder="Jr/Sr/III"
               noSpecialCharacters={true}
               error={getFieldError("student.personalInfo.suffix")}
@@ -387,11 +427,18 @@ export const PersonalSection = forwardRef<
             <FormInput
               label="Student Number"
               value={studentInfo?.personalInfo?.studentNumber || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.studentNumber", val)}
-              onBlur={() => handleFieldBlur("student.personalInfo.studentNumber")}
+              onChange={(val: any) =>
+                handleInputChange("student.personalInfo.studentNumber", val)
+              }
+              onBlur={() =>
+                handleFieldBlur("student.personalInfo.studentNumber")
+              }
               error={getFieldError("student.personalInfo.studentNumber")}
               placeholder="20XX-XXXXX"
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.studentNumber")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.studentNumber",
+              )}
             />
           </div>
           <div className="md:col-span-3">
@@ -400,9 +447,14 @@ export const PersonalSection = forwardRef<
               label="Course"
               options={courses}
               value={studentInfo?.personalInfo?.course?.id || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.course", { id: val })}
+              onChange={(val: any) =>
+                handleInputChange("student.personalInfo.course", { id: val })
+              }
               error={errors["student.personalInfo.course"]}
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.course")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.course",
+              )}
             />
           </div>
 
@@ -414,16 +466,25 @@ export const PersonalSection = forwardRef<
               value={studentInfo?.personalInfo?.yearLevel || ""}
               onChange={(val: any) => {
                 const parsed = parseInt(val, 10);
-                handleInputChange("student.personalInfo.yearLevel", isNaN(parsed) ? "" : parsed);
+                handleInputChange(
+                  "student.personalInfo.yearLevel",
+                  isNaN(parsed) ? "" : parsed,
+                );
               }}
               onBlur={() => {
                 const val = studentInfo?.personalInfo?.yearLevel;
-                handleInputChange("student.personalInfo.yearLevel", val == null ? null : Number(val));
+                handleInputChange(
+                  "student.personalInfo.yearLevel",
+                  val == null ? null : Number(val),
+                );
                 handleFieldBlur("student.personalInfo.yearLevel");
               }}
               error={getFieldError("student.personalInfo.yearLevel")}
               placeholder="1, 2, 3..."
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.yearLevel")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.yearLevel",
+              )}
             />
           </div>
           <div className="md:col-span-3">
@@ -434,16 +495,25 @@ export const PersonalSection = forwardRef<
               value={studentInfo?.personalInfo?.section || ""}
               onChange={(val: any) => {
                 const parsed = parseInt(val, 10);
-                handleInputChange("student.personalInfo.section", isNaN(parsed) ? "" : parsed);
+                handleInputChange(
+                  "student.personalInfo.section",
+                  isNaN(parsed) ? "" : parsed,
+                );
               }}
               onBlur={() => {
                 const val = studentInfo?.personalInfo?.section;
-                handleInputChange("student.personalInfo.section", val == null ? null : Number(val));
+                handleInputChange(
+                  "student.personalInfo.section",
+                  val == null ? null : Number(val),
+                );
                 handleFieldBlur("student.personalInfo.section");
               }}
               error={getFieldError("student.personalInfo.section")}
               placeholder="Section number"
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.section")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.section",
+              )}
             />
           </div>
         </div>
@@ -455,16 +525,21 @@ export const PersonalSection = forwardRef<
         description="Detailed personal characteristics"
         icon={Activity}
       >
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-6">
           <div className="md:col-span-2">
             <Dropdown
               formStyle
               label="Gender"
               options={genders}
               value={studentInfo?.personalInfo?.gender?.id || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.gender", { id: val })}
+              onChange={(val: any) =>
+                handleInputChange("student.personalInfo.gender", { id: val })
+              }
               error={errors["student.personalInfo.gender"]}
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.gender")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.gender",
+              )}
             />
           </div>
           <div className="md:col-span-2">
@@ -473,9 +548,16 @@ export const PersonalSection = forwardRef<
               label="Civil Status"
               options={civilStatuses}
               value={studentInfo?.personalInfo?.civilStatus?.id || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.civilStatus", { id: val })}
+              onChange={(val: any) =>
+                handleInputChange("student.personalInfo.civilStatus", {
+                  id: val,
+                })
+              }
               error={errors["student.personalInfo.civilStatus"]}
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.civilStatus")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.civilStatus",
+              )}
             />
           </div>
           <div className="md:col-span-2">
@@ -484,9 +566,14 @@ export const PersonalSection = forwardRef<
               label="Religion"
               options={religions}
               value={studentInfo?.personalInfo?.religion?.id || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.religion", { id: val })}
+              onChange={(val: any) =>
+                handleInputChange("student.personalInfo.religion", { id: val })
+              }
               error={errors["student.personalInfo.religion"]}
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.religion")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.religion",
+              )}
             />
           </div>
 
@@ -495,20 +582,30 @@ export const PersonalSection = forwardRef<
               label="Date of Birth"
               type="date"
               value={studentInfo?.personalInfo?.dateOfBirth || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.dateOfBirth", val)}
+              onChange={(val: any) =>
+                handleInputChange("student.personalInfo.dateOfBirth", val)
+              }
               error={errors["student.personalInfo.dateOfBirth"]}
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.dateOfBirth")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.dateOfBirth",
+              )}
             />
           </div>
           <div className="md:col-span-3">
             <FormInput
               label="Place of Birth"
               value={studentInfo?.personalInfo?.placeOfBirth || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.placeOfBirth", val)}
+              onChange={(val: any) =>
+                handleInputChange("student.personalInfo.placeOfBirth", val)
+              }
               error={errors["student.personalInfo.placeOfBirth"]}
               placeholder="City/Municipality, Province"
               noSpecialCharacters={true}
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.placeOfBirth")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.placeOfBirth",
+              )}
             />
           </div>
 
@@ -518,15 +615,26 @@ export const PersonalSection = forwardRef<
               type="text"
               inputMode="decimal"
               value={studentInfo?.personalInfo?.highSchoolGWA || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.highSchoolGWA", String(val).replace(/[^0-9.]/g, ""))}
+              onChange={(val: any) =>
+                handleInputChange(
+                  "student.personalInfo.highSchoolGWA",
+                  String(val).replace(/[^0-9.]/g, ""),
+                )
+              }
               onBlur={() => {
                 const val = studentInfo?.personalInfo?.highSchoolGWA;
-                handleInputChange("student.personalInfo.highSchoolGWA", val === "" || val == null ? null : Number(val));
+                handleInputChange(
+                  "student.personalInfo.highSchoolGWA",
+                  val === "" || val == null ? null : Number(val),
+                );
                 handleFieldBlur("student.personalInfo.highSchoolGWA");
               }}
               error={errors["student.personalInfo.highSchoolGWA"]}
               placeholder="90.5"
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.highSchoolGWA")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.highSchoolGWA",
+              )}
             />
           </div>
           <div className="md:col-span-2">
@@ -537,16 +645,25 @@ export const PersonalSection = forwardRef<
               value={studentInfo?.personalInfo?.heightFt || ""}
               onChange={(val: any) => {
                 // TODO: some validation for height
-                handleInputChange("student.personalInfo.heightFt", String(val).replace(/[^0-9.]/g, ""))
+                handleInputChange(
+                  "student.personalInfo.heightFt",
+                  String(val).replace(/[^0-9.]/g, ""),
+                );
               }}
               onBlur={() => {
                 const val = studentInfo?.personalInfo?.heightFt;
-                handleInputChange("student.personalInfo.heightFt", val === "" ? null : Number(val));
+                handleInputChange(
+                  "student.personalInfo.heightFt",
+                  val === "" ? null : Number(val),
+                );
                 handleFieldBlur("student.personalInfo.heightFt");
               }}
               error={errors["student.personalInfo.heightFt"]}
               placeholder="5'7"
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.heightFt")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.heightFt",
+              )}
             />
           </div>
           <div className="md:col-span-2">
@@ -557,16 +674,25 @@ export const PersonalSection = forwardRef<
               value={studentInfo?.personalInfo?.weightKg || ""}
               onChange={(val: any) => {
                 // TODO: some validation for weight
-                handleInputChange("student.personalInfo.weightKg", String(val).replace(/[^0-9.]/g, ""))
+                handleInputChange(
+                  "student.personalInfo.weightKg",
+                  String(val).replace(/[^0-9.]/g, ""),
+                );
               }}
               onBlur={() => {
                 const val = studentInfo?.personalInfo?.weightKg;
-                handleInputChange("student.personalInfo.weightKg", val === "" ? null : Number(val));
+                handleInputChange(
+                  "student.personalInfo.weightKg",
+                  val === "" ? null : Number(val),
+                );
                 handleFieldBlur("student.personalInfo.weightKg");
               }}
               error={errors["student.personalInfo.weightKg"]}
               placeholder="65"
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.weightKg")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.weightKg",
+              )}
             />
           </div>
 
@@ -574,12 +700,17 @@ export const PersonalSection = forwardRef<
             <FormInput
               label="Complexion"
               value={studentInfo?.personalInfo?.complexion || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.complexion", val)}
+              onChange={(val: any) =>
+                handleInputChange("student.personalInfo.complexion", val)
+              }
               onBlur={() => handleFieldBlur("student.personalInfo.complexion")}
               error={getFieldError("student.personalInfo.complexion")}
               placeholder="e.g. Fair, Tan"
               noSpecialCharacters={true}
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.complexion")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.complexion",
+              )}
             />
           </div>
         </div>
@@ -591,16 +722,21 @@ export const PersonalSection = forwardRef<
         description="Channels for communication"
         icon={Mail}
       >
-        <div className="grid grid-cols-1 md:grid-cols-6 gap-6">
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-6">
           <div className="md:col-span-6">
             <FormInput
               label="Email Address"
               type="email"
               value={studentInfo?.basicInfo?.email || ""}
-              onChange={(val: any) => handleInputChange("student.basicInfo.email", val)}
+              onChange={(val: any) =>
+                handleInputChange("student.basicInfo.email", val)
+              }
               error={errors["student.basicInfo.email"]}
               placeholder="student@example.com"
-              required={isFieldRequired(runtimeSchema, "student.basicInfo.email")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.basicInfo.email",
+              )}
               disabled
             />
           </div>
@@ -611,11 +747,17 @@ export const PersonalSection = forwardRef<
               value={studentInfo?.personalInfo?.mobileNumber || ""}
               onChange={(val: any) => {
                 const cleaned = val.replace(/[^0-9]/g, "");
-                handleInputChange("student.personalInfo.mobileNumber", cleaned.slice(0, 11));
+                handleInputChange(
+                  "student.personalInfo.mobileNumber",
+                  cleaned.slice(0, 11),
+                );
               }}
               error={errors["student.personalInfo.mobileNumber"]}
               placeholder="09XXXXXXXXX"
-              required={isFieldRequired(runtimeSchema, "student.personalInfo.mobileNumber")}
+              required={isFieldRequired(
+                runtimeSchema,
+                "student.personalInfo.mobileNumber",
+              )}
             />
           </div>
           <div className="md:col-span-3">
@@ -625,7 +767,10 @@ export const PersonalSection = forwardRef<
               value={studentInfo?.personalInfo?.telephoneNumber || ""}
               onChange={(val: any) => {
                 const cleaned = val.replace(/[^0-9]/g, "");
-                handleInputChange("student.personalInfo.telephoneNumber", cleaned.slice(0, 10));
+                handleInputChange(
+                  "student.personalInfo.telephoneNumber",
+                  cleaned.slice(0, 10),
+                );
               }}
               error={errors["student.personalInfo.telephoneNumber"]}
               placeholder="Optional"
@@ -650,28 +795,44 @@ export const PersonalSection = forwardRef<
               const isChecked = checked === true;
               handleInputChange("student.personalInfo.isEmployed", isChecked);
             }}
-            info="Mark this if you're currently working. Additional fields will appear below."
+            info={cn(
+              "Mark this if you're currently working.",
+              "Additional fields will appear below.",
+            )}
           />
 
           {studentInfo?.personalInfo?.isEmployed && (
             <div
-              className="grid grid-cols-1 md:grid-cols-2 gap-6 pt-6 border-t border-border/10 animate-fade-in"
+              className={cn(
+                "animate-fade-in grid grid-cols-1 gap-6 border-t",
+                "border-border/10 pt-6 md:grid-cols-2",
+              )}
             >
               <FormInput
                 label="Employer Name"
                 value={studentInfo?.personalInfo?.employerName || ""}
-                onChange={(val: any) => handleInputChange("student.personalInfo.employerName", val)}
+                onChange={(val: any) =>
+                  handleInputChange("student.personalInfo.employerName", val)
+                }
                 placeholder="Company name"
                 error={errors["student.personalInfo.employerName"]}
-                required={isFieldRequired(runtimeSchema, "student.personalInfo.employerName")}
+                required={isFieldRequired(
+                  runtimeSchema,
+                  "student.personalInfo.employerName",
+                )}
               />
               <FormInput
                 label="Employer Address"
                 value={studentInfo?.personalInfo?.employerAddress || ""}
-                onChange={(val: any) => handleInputChange("student.personalInfo.employerAddress", val)}
+                onChange={(val: any) =>
+                  handleInputChange("student.personalInfo.employerAddress", val)
+                }
                 placeholder="Company address"
                 error={errors["student.personalInfo.employerAddress"]}
-                required={isFieldRequired(runtimeSchema, "student.personalInfo.employerAddress")}
+                required={isFieldRequired(
+                  runtimeSchema,
+                  "student.personalInfo.employerAddress",
+                )}
               />
             </div>
           )}
@@ -687,11 +848,11 @@ export const PersonalSection = forwardRef<
         <div className="flex flex-col gap-10">
           {/* Provincial Address */}
           <div>
-            <h4 className="text-sm font-bold text-foreground/80 mb-6 flex items-center gap-2">
-              <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+            <h4 className="mb-6 flex items-center gap-2 text-sm font-bold text-foreground/80">
+              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
               Provincial Address
             </h4>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <Dropdown
                 formStyle
                 labelKey="name"
@@ -699,19 +860,36 @@ export const PersonalSection = forwardRef<
                 options={regions}
                 get="code"
                 identifier="code"
-                value={addressRegion.provincial?.code || ({ code: "" } as Region)}
+                value={
+                  addressRegion.provincial?.code || ({ code: "" } as Region)
+                }
                 onChange={(val: any) => {
-                  onChange(`student.addresses.${PROVINCIAL_IDX}.address.region`, { code: val });
-                  onChange(`student.addresses.${PROVINCIAL_IDX}.address.province`, { code: "" } as Province);
-                  onChange(`student.addresses.${PROVINCIAL_IDX}.address.city`, { code: "" } as City);
-                  onChange(`student.addresses.${PROVINCIAL_IDX}.address.barangay`, { code: "" } as Barangay);
+                  onChange(
+                    `student.addresses.${PROVINCIAL_IDX}.address.region`,
+                    { code: val },
+                  );
+                  onChange(
+                    `student.addresses.${PROVINCIAL_IDX}.address.province`,
+                    { code: "" } as Province,
+                  );
+                  onChange(`student.addresses.${PROVINCIAL_IDX}.address.city`, {
+                    code: "",
+                  } as City);
+                  onChange(
+                    `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
+                    { code: "" } as Barangay,
+                  );
                   setErrors((prev: FormErrors) => {
                     const u = { ...prev };
-                    delete u[`student.addresses.${PROVINCIAL_IDX}.address.region`];
+                    delete u[
+                      `student.addresses.${PROVINCIAL_IDX}.address.region`
+                    ];
                     return u;
                   });
                 }}
-                error={errors[`student.addresses.${PROVINCIAL_IDX}.address.region`]}
+                error={
+                  errors[`student.addresses.${PROVINCIAL_IDX}.address.region`]
+                }
                 required
               />
               {!isProvincialNCR && (
@@ -723,18 +901,36 @@ export const PersonalSection = forwardRef<
                   get="code"
                   identifier="code"
                   enabled={!!addressRegion.provincial?.code}
-                  value={addressProvince.provincial?.code || ({ code: "" } as Province)}
+                  value={
+                    addressProvince.provincial?.code ||
+                    ({ code: "" } as Province)
+                  }
                   onChange={(val: any) => {
-                    onChange(`student.addresses.${PROVINCIAL_IDX}.address.province`, { code: val });
-                    onChange(`student.addresses.${PROVINCIAL_IDX}.address.city`, { code: "" } as City);
-                    onChange(`student.addresses.${PROVINCIAL_IDX}.address.barangay`, { code: "" } as Barangay);
+                    onChange(
+                      `student.addresses.${PROVINCIAL_IDX}.address.province`,
+                      { code: val },
+                    );
+                    onChange(
+                      `student.addresses.${PROVINCIAL_IDX}.address.city`,
+                      { code: "" } as City,
+                    );
+                    onChange(
+                      `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
+                      { code: "" } as Barangay,
+                    );
                     setErrors((prev: FormErrors) => {
                       const u = { ...prev };
-                      delete u[`student.addresses.${PROVINCIAL_IDX}.address.province`];
+                      delete u[
+                        `student.addresses.${PROVINCIAL_IDX}.address.province`
+                      ];
                       return u;
                     });
                   }}
-                  error={errors[`student.addresses.${PROVINCIAL_IDX}.address.province`]}
+                  error={
+                    errors[
+                      `student.addresses.${PROVINCIAL_IDX}.address.province`
+                    ]
+                  }
                   required
                 />
               )}
@@ -745,19 +941,36 @@ export const PersonalSection = forwardRef<
                 options={provincialCities}
                 get="code"
                 identifier="code"
-                enabled={isProvincialNCR ? !!addressRegion.provincial?.code && !isProvincialCitiesLoading : !!addressProvince.provincial?.code && !isProvincialCitiesLoading}
+                enabled={
+                  isProvincialNCR
+                    ? !!addressRegion.provincial?.code &&
+                      !isProvincialCitiesLoading
+                    : !!addressProvince.provincial?.code &&
+                      !isProvincialCitiesLoading
+                }
                 value={addressCity.provincial?.code || ({ code: "" } as City)}
                 onChange={(val: any) => {
-                  onChange(`student.addresses.${PROVINCIAL_IDX}.address.city`, { code: val });
-                  onChange(`student.addresses.${PROVINCIAL_IDX}.address.barangay`, { code: "" } as Barangay);
+                  onChange(`student.addresses.${PROVINCIAL_IDX}.address.city`, {
+                    code: val,
+                  });
+                  onChange(
+                    `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
+                    { code: "" } as Barangay,
+                  );
                   setErrors((prev: FormErrors) => {
                     const u = { ...prev };
-                    delete u[`student.addresses.${PROVINCIAL_IDX}.address.city`];
+                    delete u[
+                      `student.addresses.${PROVINCIAL_IDX}.address.city`
+                    ];
                     return u;
                   });
                 }}
-                lockedReason={!addressRegion.provincial?.code ? "Select a Region first" : ""}
-                error={errors[`student.addresses.${PROVINCIAL_IDX}.address.city`]}
+                lockedReason={
+                  !addressRegion.provincial?.code ? "Select a Region first" : ""
+                }
+                error={
+                  errors[`student.addresses.${PROVINCIAL_IDX}.address.city`]
+                }
                 required
               />
               <Dropdown
@@ -767,18 +980,32 @@ export const PersonalSection = forwardRef<
                 options={provincialBarangays || []}
                 get="code"
                 identifier="code"
-                enabled={!!addressCity.provincial?.code && !isProvincialBarangaysLoading}
-                value={provincialAddr?.barangay?.code || ({ code: "" } as Barangay)}
+                enabled={
+                  !!addressCity.provincial?.code &&
+                  !isProvincialBarangaysLoading
+                }
+                value={
+                  provincialAddr?.barangay?.code || ({ code: "" } as Barangay)
+                }
                 onChange={(val: any) => {
-                  onChange(`student.addresses.${PROVINCIAL_IDX}.address.barangay`, { code: val });
+                  onChange(
+                    `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
+                    { code: val },
+                  );
                   setErrors((prev: FormErrors) => {
                     const u = { ...prev };
-                    delete u[`student.addresses.${PROVINCIAL_IDX}.address.barangay`];
+                    delete u[
+                      `student.addresses.${PROVINCIAL_IDX}.address.barangay`
+                    ];
                     return u;
                   });
                 }}
-                lockedReason={!addressCity.provincial?.code ? "Select a City first" : ""}
-                error={errors[`student.addresses.${PROVINCIAL_IDX}.address.barangay`]}
+                lockedReason={
+                  !addressCity.provincial?.code ? "Select a City first" : ""
+                }
+                error={
+                  errors[`student.addresses.${PROVINCIAL_IDX}.address.barangay`]
+                }
                 required
               />
               <div className="md:col-span-2">
@@ -786,7 +1013,12 @@ export const PersonalSection = forwardRef<
                   label="Street / Landmark"
                   value={provincialAddr?.streetDetail || ""}
                   placeholder="Street name, Lot, Blk, or House No."
-                  onChange={(val: any) => onChange(`student.addresses.${PROVINCIAL_IDX}.address.streetDetail`, val)}
+                  onChange={(val: any) =>
+                    onChange(
+                      `student.addresses.${PROVINCIAL_IDX}.address.streetDetail`,
+                      val,
+                    )
+                  }
                   noSpecialCharacters={true}
                 />
               </div>
@@ -794,10 +1026,10 @@ export const PersonalSection = forwardRef<
           </div>
 
           {/* Residential Address */}
-          <div className="pt-10 border-t border-border/50">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <h4 className="text-sm font-bold text-foreground/80 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+          <div className="border-t border-border/50 pt-10">
+            <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <h4 className="flex items-center gap-2 text-sm font-bold text-foreground/80">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 Residential Address
               </h4>
               <Checkbox
@@ -805,12 +1037,20 @@ export const PersonalSection = forwardRef<
                 label="Same as provincial"
                 name="sameAsProvincial"
                 checked={residentialSync.isSynced}
-                onCheckedChange={(checked: any) => residentialSync.toggleSync(checked === true)}
+                onCheckedChange={(checked: any) =>
+                  residentialSync.toggleSync(checked === true)
+                }
                 className="text-xs"
               />
             </div>
 
-            <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 transition-opacity duration-300 ${residentialSync.isReadOnly ? "opacity-60 pointer-events-none" : ""}`}>
+            <div
+              className={cn(
+              "grid grid-cols-1 gap-6 transition-opacity duration-300",
+              "md:grid-cols-2",
+              residentialSync.isReadOnly && "pointer-events-none opacity-60",
+            )}
+          >
               <Dropdown
                 formStyle
                 labelKey="name"
@@ -818,19 +1058,37 @@ export const PersonalSection = forwardRef<
                 options={regions}
                 get="code"
                 identifier="code"
-                value={addressRegion.residential?.code || ({ code: "" } as Region)}
+                value={
+                  addressRegion.residential?.code || ({ code: "" } as Region)
+                }
                 onChange={(val: any) => {
-                  onChange(`student.addresses.${RESIDENTIAL_IDX}.address.region`, { code: val });
-                  onChange(`student.addresses.${RESIDENTIAL_IDX}.address.province`, { code: "" } as Province);
-                  onChange(`student.addresses.${RESIDENTIAL_IDX}.address.city`, { code: "" } as City);
-                  onChange(`student.addresses.${RESIDENTIAL_IDX}.address.barangay`, { code: "" } as Barangay);
+                  onChange(
+                    `student.addresses.${RESIDENTIAL_IDX}.address.region`,
+                    { code: val },
+                  );
+                  onChange(
+                    `student.addresses.${RESIDENTIAL_IDX}.address.province`,
+                    { code: "" } as Province,
+                  );
+                  onChange(
+                    `student.addresses.${RESIDENTIAL_IDX}.address.city`,
+                    { code: "" } as City,
+                  );
+                  onChange(
+                    `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
+                    { code: "" } as Barangay,
+                  );
                   setErrors((prev: FormErrors) => {
                     const u = { ...prev };
-                    delete u[`student.addresses.${RESIDENTIAL_IDX}.address.region`];
+                    delete u[
+                      `student.addresses.${RESIDENTIAL_IDX}.address.region`
+                    ];
                     return u;
                   });
                 }}
-                error={errors[`student.addresses.${RESIDENTIAL_IDX}.address.region`]}
+                error={
+                  errors[`student.addresses.${RESIDENTIAL_IDX}.address.region`]
+                }
                 required
                 enabled={!residentialSync.isReadOnly}
               />
@@ -842,19 +1100,40 @@ export const PersonalSection = forwardRef<
                   options={residentialProvinces}
                   get="code"
                   identifier="code"
-                  enabled={!!addressRegion.residential?.code && !residentialSync.isReadOnly}
-                  value={addressProvince.residential?.code || ({ code: "" } as Province)}
+                  enabled={
+                    !!addressRegion.residential?.code &&
+                    !residentialSync.isReadOnly
+                  }
+                  value={
+                    addressProvince.residential?.code ||
+                    ({ code: "" } as Province)
+                  }
                   onChange={(val: any) => {
-                    onChange(`student.addresses.${RESIDENTIAL_IDX}.address.province`, { code: val });
-                    onChange(`student.addresses.${RESIDENTIAL_IDX}.address.city`, { code: "" } as City);
-                    onChange(`student.addresses.${RESIDENTIAL_IDX}.address.barangay`, { code: "" } as Barangay);
+                    onChange(
+                      `student.addresses.${RESIDENTIAL_IDX}.address.province`,
+                      { code: val },
+                    );
+                    onChange(
+                      `student.addresses.${RESIDENTIAL_IDX}.address.city`,
+                      { code: "" } as City,
+                    );
+                    onChange(
+                      `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
+                      { code: "" } as Barangay,
+                    );
                     setErrors((prev: FormErrors) => {
                       const u = { ...prev };
-                      delete u[`student.addresses.${RESIDENTIAL_IDX}.address.province`];
+                      delete u[
+                        `student.addresses.${RESIDENTIAL_IDX}.address.province`
+                      ];
                       return u;
                     });
                   }}
-                  error={errors[`student.addresses.${RESIDENTIAL_IDX}.address.province`]}
+                  error={
+                    errors[
+                      `student.addresses.${RESIDENTIAL_IDX}.address.province`
+                    ]
+                  }
                   required
                 />
               )}
@@ -865,19 +1144,42 @@ export const PersonalSection = forwardRef<
                 options={residentialCities}
                 get="code"
                 identifier="code"
-                enabled={(isResidentialNCR ? !!addressRegion.residential?.code && !isResidentialCitiesLoading : !!addressProvince.residential?.code && !isResidentialCitiesLoading) && !residentialSync.isReadOnly}
+                enabled={
+                  (isResidentialNCR
+                    ? !!addressRegion.residential?.code &&
+                      !isResidentialCitiesLoading
+                    : !!addressProvince.residential?.code &&
+                      !isResidentialCitiesLoading) &&
+                  !residentialSync.isReadOnly
+                }
                 value={addressCity.residential?.code || ({ code: "" } as City)}
                 onChange={(val: any) => {
-                  onChange(`student.addresses.${RESIDENTIAL_IDX}.address.city`, { code: val });
-                  onChange(`student.addresses.${RESIDENTIAL_IDX}.address.barangay`, { code: "" } as Barangay);
+                  onChange(
+                    `student.addresses.${RESIDENTIAL_IDX}.address.city`,
+                    { code: val },
+                  );
+                  onChange(
+                    `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
+                    { code: "" } as Barangay,
+                  );
                   setErrors((prev: FormErrors) => {
                     const u = { ...prev };
-                    delete u[`student.addresses.${RESIDENTIAL_IDX}.address.city`];
+                    delete u[
+                      `student.addresses.${RESIDENTIAL_IDX}.address.city`
+                    ];
                     return u;
                   });
                 }}
-                lockedReason={residentialSync.isReadOnly ? "Synced with Provincial Address" : !addressRegion.residential?.code ? "Select a Region first" : ""}
-                error={errors[`student.addresses.${RESIDENTIAL_IDX}.address.city`]}
+                lockedReason={
+                  residentialSync.isReadOnly
+                    ? "Synced with Provincial Address"
+                    : !addressRegion.residential?.code
+                      ? "Select a Region first"
+                      : ""
+                }
+                error={
+                  errors[`student.addresses.${RESIDENTIAL_IDX}.address.city`]
+                }
                 required
               />
               <Dropdown
@@ -887,18 +1189,39 @@ export const PersonalSection = forwardRef<
                 options={residentialBarangays || []}
                 get="code"
                 identifier="code"
-                enabled={!!addressCity.residential?.code && !isResidentialBarangaysLoading && !residentialSync.isReadOnly}
-                value={residentialAddr?.barangay?.code || ({ code: "" } as Barangay)}
+                enabled={
+                  !!addressCity.residential?.code &&
+                  !isResidentialBarangaysLoading &&
+                  !residentialSync.isReadOnly
+                }
+                value={
+                  residentialAddr?.barangay?.code || ({ code: "" } as Barangay)
+                }
                 onChange={(val: any) => {
-                  onChange(`student.addresses.${RESIDENTIAL_IDX}.address.barangay`, { code: val });
+                  onChange(
+                    `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
+                    { code: val },
+                  );
                   setErrors((prev: FormErrors) => {
                     const u = { ...prev };
-                    delete u[`student.addresses.${RESIDENTIAL_IDX}.address.barangay`];
+                    delete u[
+                      `student.addresses.${RESIDENTIAL_IDX}.address.barangay`
+                    ];
                     return u;
                   });
                 }}
-                lockedReason={residentialSync.isReadOnly ? "Synced with Provincial Address" : !addressCity.residential?.code ? "Select a City first" : ""}
-                error={errors[`student.addresses.${RESIDENTIAL_IDX}.address.barangay`]}
+                lockedReason={
+                  residentialSync.isReadOnly
+                    ? "Synced with Provincial Address"
+                    : !addressCity.residential?.code
+                      ? "Select a City first"
+                      : ""
+                }
+                error={
+                  errors[
+                    `student.addresses.${RESIDENTIAL_IDX}.address.barangay`
+                  ]
+                }
                 required
               />
               <div className="md:col-span-2">
@@ -906,7 +1229,12 @@ export const PersonalSection = forwardRef<
                   label="Street / Landmark"
                   value={residentialAddr?.streetDetail || ""}
                   placeholder="Street name, Lot, Blk, or House No."
-                  onChange={(val: any) => onChange(`student.addresses.${RESIDENTIAL_IDX}.address.streetDetail`, val)}
+                  onChange={(val: any) =>
+                    onChange(
+                      `student.addresses.${RESIDENTIAL_IDX}.address.streetDetail`,
+                      val,
+                    )
+                  }
                   disabled={residentialSync.isReadOnly}
                   noSpecialCharacters={true}
                 />
@@ -923,11 +1251,18 @@ export const PersonalSection = forwardRef<
         icon={Phone}
       >
         <div className="flex flex-col gap-8">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
             <FormInput
               label="Last Name"
-              value={studentInfo?.personalInfo?.emergencyContact?.lastName || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.emergencyContact.lastName", val)}
+              value={
+                studentInfo?.personalInfo?.emergencyContact?.lastName || ""
+              }
+              onChange={(val: any) =>
+                handleInputChange(
+                  "student.personalInfo.emergencyContact.lastName",
+                  val,
+                )
+              }
               error={errors["student.personalInfo.emergencyContact.lastName"]}
               placeholder="Last name"
               noSpecialCharacters={true}
@@ -935,8 +1270,15 @@ export const PersonalSection = forwardRef<
             />
             <FormInput
               label="First Name"
-              value={studentInfo?.personalInfo?.emergencyContact?.firstName || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.emergencyContact.firstName", val)}
+              value={
+                studentInfo?.personalInfo?.emergencyContact?.firstName || ""
+              }
+              onChange={(val: any) =>
+                handleInputChange(
+                  "student.personalInfo.emergencyContact.firstName",
+                  val,
+                )
+              }
               error={errors["student.personalInfo.emergencyContact.firstName"]}
               placeholder="First name"
               noSpecialCharacters={true}
@@ -944,8 +1286,15 @@ export const PersonalSection = forwardRef<
             />
             <FormInput
               label="Middle Name"
-              value={studentInfo?.personalInfo?.emergencyContact?.middleName || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.emergencyContact.middleName", val)}
+              value={
+                studentInfo?.personalInfo?.emergencyContact?.middleName || ""
+              }
+              onChange={(val: any) =>
+                handleInputChange(
+                  "student.personalInfo.emergencyContact.middleName",
+                  val,
+                )
+              }
               error={errors["student.personalInfo.emergencyContact.middleName"]}
               placeholder="Middle name"
               noSpecialCharacters={true}
@@ -953,9 +1302,18 @@ export const PersonalSection = forwardRef<
             <FormInput
               label="Contact Number"
               inputMode="numeric"
-              value={studentInfo?.personalInfo?.emergencyContact?.contactNumber || ""}
-              onChange={(val: any) => handleInputChange("student.personalInfo.emergencyContact.contactNumber", val.replace(/[^0-9]/g, ""))}
-              error={errors["student.personalInfo.emergencyContact.contactNumber"]}
+              value={
+                studentInfo?.personalInfo?.emergencyContact?.contactNumber || ""
+              }
+              onChange={(val: any) =>
+                handleInputChange(
+                  "student.personalInfo.emergencyContact.contactNumber",
+                  val.replace(/[^0-9]/g, ""),
+                )
+              }
+              error={
+                errors["student.personalInfo.emergencyContact.contactNumber"]
+              }
               placeholder="Phone number"
               required
             />
@@ -964,18 +1322,28 @@ export const PersonalSection = forwardRef<
                 formStyle
                 label="Relationship"
                 options={studentRelationshipTypes}
-                value={studentInfo?.personalInfo?.emergencyContact?.relationship?.id || ""}
-                onChange={(val: any) => handleInputChange("student.personalInfo.emergencyContact.relationship", { id: val })}
-                error={errors["student.personalInfo.emergencyContact.relationship"]}
+                value={
+                  studentInfo?.personalInfo?.emergencyContact?.relationship
+                    ?.id || ""
+                }
+                onChange={(val: any) =>
+                  handleInputChange(
+                    "student.personalInfo.emergencyContact.relationship",
+                    { id: val },
+                  )
+                }
+                error={
+                  errors["student.personalInfo.emergencyContact.relationship"]
+                }
                 required
               />
             </div>
           </div>
 
-          <div className="pt-8 border-t border-border/50">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-              <h4 className="text-sm font-bold text-foreground/80 flex items-center gap-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-primary" />
+          <div className="border-t border-border/50 pt-8">
+            <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+              <h4 className="flex items-center gap-2 text-sm font-bold text-foreground/80">
+                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
                 Contact Address
               </h4>
               <Checkbox
@@ -983,12 +1351,20 @@ export const PersonalSection = forwardRef<
                 label="Same as residential address"
                 name="emergencySameAsResidential"
                 checked={emergencySync.isSynced}
-                onCheckedChange={(checked: any) => emergencySync.toggleSync(checked === true)}
+                onCheckedChange={(checked: any) =>
+                  emergencySync.toggleSync(checked === true)
+                }
                 className="text-xs"
               />
             </div>
 
-            <div className={`grid grid-cols-1 md:grid-cols-2 gap-6 transition-opacity duration-300 ${emergencySync.isReadOnly ? "opacity-60 pointer-events-none" : ""}`}>
+            <div
+              className={cn(
+              "grid grid-cols-1 gap-6 transition-opacity duration-300",
+              "md:grid-cols-2",
+              emergencySync.isReadOnly && "pointer-events-none opacity-60",
+            )}
+          >
               <Dropdown
                 formStyle
                 labelKey="name"
@@ -996,19 +1372,37 @@ export const PersonalSection = forwardRef<
                 options={regions}
                 get="code"
                 identifier="code"
-                value={addressRegion.emergency?.code || ({ code: "" } as Region)}
+                value={
+                  addressRegion.emergency?.code || ({ code: "" } as Region)
+                }
                 onChange={(val: any) => {
-                  onChange(`student.personalInfo.emergencyContact.address.region`, { code: val });
-                  onChange(`student.personalInfo.emergencyContact.address.province`, { code: "" } as Province);
-                  onChange(`student.personalInfo.emergencyContact.address.city`, { code: "" } as City);
-                  onChange(`student.personalInfo.emergencyContact.address.barangay`, { code: "" } as Barangay);
+                  onChange(
+                    `student.personalInfo.emergencyContact.address.region`,
+                    { code: val },
+                  );
+                  onChange(
+                    `student.personalInfo.emergencyContact.address.province`,
+                    { code: "" } as Province,
+                  );
+                  onChange(
+                    `student.personalInfo.emergencyContact.address.city`,
+                    { code: "" } as City,
+                  );
+                  onChange(
+                    `student.personalInfo.emergencyContact.address.barangay`,
+                    { code: "" } as Barangay,
+                  );
                   setErrors((prev: FormErrors) => {
                     const u = { ...prev };
-                    delete u[`student.personalInfo.emergencyContact.address.region`];
+                    delete u[
+                      `student.personalInfo.emergencyContact.address.region`
+                    ];
                     return u;
                   });
                 }}
-                error={errors[`student.personalInfo.emergencyContact.address.region`]}
+                error={
+                  errors[`student.personalInfo.emergencyContact.address.region`]
+                }
                 required
                 enabled={!emergencySync.isReadOnly}
               />
@@ -1020,19 +1414,39 @@ export const PersonalSection = forwardRef<
                   options={residentialProvinces}
                   get="code"
                   identifier="code"
-                  enabled={!!addressRegion.emergency?.code && !emergencySync.isReadOnly}
-                  value={addressProvince.emergency?.code || ({ code: "" } as Province)}
+                  enabled={
+                    !!addressRegion.emergency?.code && !emergencySync.isReadOnly
+                  }
+                  value={
+                    addressProvince.emergency?.code ||
+                    ({ code: "" } as Province)
+                  }
                   onChange={(val: any) => {
-                    onChange(`student.personalInfo.emergencyContact.address.province`, { code: val });
-                    onChange(`student.personalInfo.emergencyContact.address.city`, { code: "" } as City);
-                    onChange(`student.personalInfo.emergencyContact.address.barangay`, { code: "" } as Barangay);
+                    onChange(
+                      `student.personalInfo.emergencyContact.address.province`,
+                      { code: val },
+                    );
+                    onChange(
+                      `student.personalInfo.emergencyContact.address.city`,
+                      { code: "" } as City,
+                    );
+                    onChange(
+                      `student.personalInfo.emergencyContact.address.barangay`,
+                      { code: "" } as Barangay,
+                    );
                     setErrors((prev: FormErrors) => {
                       const u = { ...prev };
-                      delete u[`student.personalInfo.emergencyContact.address.province`];
+                      delete u[
+                        `student.personalInfo.emergencyContact.address.province`
+                      ];
                       return u;
                     });
                   }}
-                  error={errors[`student.personalInfo.emergencyContact.address.province`]}
+                  error={
+                    errors[
+                      `student.personalInfo.emergencyContact.address.province`
+                    ]
+                  }
                   required
                 />
               )}
@@ -1043,19 +1457,41 @@ export const PersonalSection = forwardRef<
                 options={residentialCities}
                 get="code"
                 identifier="code"
-                enabled={(isResidentialNCR ? !!addressRegion.emergency?.code && !isResidentialCitiesLoading : !!addressProvince.emergency?.code && !isResidentialCitiesLoading) && !emergencySync.isReadOnly}
+                enabled={
+                  (isResidentialNCR
+                    ? !!addressRegion.emergency?.code &&
+                      !isResidentialCitiesLoading
+                    : !!addressProvince.emergency?.code &&
+                      !isResidentialCitiesLoading) && !emergencySync.isReadOnly
+                }
                 value={addressCity.emergency?.code || ({ code: "" } as City)}
                 onChange={(val: any) => {
-                  onChange(`student.personalInfo.emergencyContact.address.city`, { code: val });
-                  onChange(`student.personalInfo.emergencyContact.address.barangay`, { code: "" } as Barangay);
+                  onChange(
+                    `student.personalInfo.emergencyContact.address.city`,
+                    { code: val },
+                  );
+                  onChange(
+                    `student.personalInfo.emergencyContact.address.barangay`,
+                    { code: "" } as Barangay,
+                  );
                   setErrors((prev: FormErrors) => {
                     const u = { ...prev };
-                    delete u[`student.personalInfo.emergencyContact.address.city`];
+                    delete u[
+                      `student.personalInfo.emergencyContact.address.city`
+                    ];
                     return u;
                   });
                 }}
-                lockedReason={emergencySync.isReadOnly ? "Synced with Residential Address" : !addressRegion.emergency?.code ? "Select a Region first" : ""}
-                error={errors[`student.personalInfo.emergencyContact.address.city`]}
+                lockedReason={
+                  emergencySync.isReadOnly
+                    ? "Synced with Residential Address"
+                    : !addressRegion.emergency?.code
+                      ? "Select a Region first"
+                      : ""
+                }
+                error={
+                  errors[`student.personalInfo.emergencyContact.address.city`]
+                }
                 required
               />
               <Dropdown
@@ -1065,18 +1501,39 @@ export const PersonalSection = forwardRef<
                 options={residentialBarangays || []}
                 get="code"
                 identifier="code"
-                enabled={!!addressCity.emergency?.code && !isResidentialBarangaysLoading && !emergencySync.isReadOnly}
-                value={emergencyAddr?.barangay?.code || ({ code: "" } as Barangay)}
+                enabled={
+                  !!addressCity.emergency?.code &&
+                  !isResidentialBarangaysLoading &&
+                  !emergencySync.isReadOnly
+                }
+                value={
+                  emergencyAddr?.barangay?.code || ({ code: "" } as Barangay)
+                }
                 onChange={(val: any) => {
-                  onChange(`student.personalInfo.emergencyContact.address.barangay`, { code: val });
+                  onChange(
+                    `student.personalInfo.emergencyContact.address.barangay`,
+                    { code: val },
+                  );
                   setErrors((prev: FormErrors) => {
                     const u = { ...prev };
-                    delete u[`student.personalInfo.emergencyContact.address.barangay`];
+                    delete u[
+                      `student.personalInfo.emergencyContact.address.barangay`
+                    ];
                     return u;
                   });
                 }}
-                lockedReason={emergencySync.isReadOnly ? "Synced with Residential Address" : !addressCity.emergency?.code ? "Select a City first" : ""}
-                error={errors[`student.personalInfo.emergencyContact.address.barangay`]}
+                lockedReason={
+                  emergencySync.isReadOnly
+                    ? "Synced with Residential Address"
+                    : !addressCity.emergency?.code
+                      ? "Select a City first"
+                      : ""
+                }
+                error={
+                  errors[
+                    `student.personalInfo.emergencyContact.address.barangay`
+                  ]
+                }
                 required
               />
               <div className="md:col-span-2">
@@ -1084,7 +1541,12 @@ export const PersonalSection = forwardRef<
                   label="Street / Landmark"
                   value={emergencyAddr?.streetDetail || ""}
                   placeholder="Street name, Lot, Blk, or House No."
-                  onChange={(val: any) => onChange(`student.personalInfo.emergencyContact.address.streetDetail`, val)}
+                  onChange={(val: any) =>
+                    onChange(
+                      `student.personalInfo.emergencyContact.address.streetDetail`,
+                      val,
+                    )
+                  }
                   disabled={emergencySync.isReadOnly}
                 />
               </div>

@@ -1,4 +1,8 @@
-import { FieldValidationSchema, commonRules, ValidationRule } from "@/services/validationSchema";
+import {
+  FieldValidationSchema,
+  commonRules,
+  ValidationRule,
+} from "@/services/validationSchema";
 const currentYear = new Date().getFullYear();
 
 export const validYearRule = (): ValidationRule => ({
@@ -6,7 +10,12 @@ export const validYearRule = (): ValidationRule => ({
   validate: (value: any) => {
     if (!value) return true;
     const year = Number(value);
-    return !isNaN(year) && Number.isInteger(year) && year >= 1900 && year <= currentYear;
+    return (
+      !isNaN(year) &&
+      Number.isInteger(year) &&
+      year >= 1900 &&
+      year <= currentYear
+    );
   },
   message: `Must be a valid year (2002-${currentYear})`,
 });
@@ -19,7 +28,9 @@ export const yearCompletedRule = (startedKey: string): ValidationRule => ({
     if (isNaN(completedYear)) return true; // validYearRule handles this
     // Retrieve yearStarted from rootData based on the exact path
     // We assume startedKey is the full path e.g. "education.schools.0.yearStarted"
-    const startedValue = startedKey.split('.').reduce((obj, p) => obj?.[p], rootData);
+    const startedValue = startedKey
+      .split(".")
+      .reduce((obj, p) => obj?.[p], rootData);
     if (!startedValue) return true;
 
     const startedYear = Number(startedValue);
@@ -40,9 +51,10 @@ export const educationValidationSchema: FieldValidationSchema = {
         }
         return true;
       },
-      message: "Reason for interruption is required and must be at least 2 characters",
+      message:
+        "Reason for interruption is required and must be at least 2 characters",
     },
-    commonRules.noSpecialChars("Reason for interruption")
+    commonRules.noSpecialChars("Reason for interruption"),
   ],
 };
 
@@ -59,8 +71,7 @@ for (let i = 0; i < 5; i++) {
   educationValidationSchema[`education.schools.${i}.awards`] = [
     commonRules.noSpecialChars("Awards"),
   ];
-  educationValidationSchema[`education.schools.${i}.schoolType`] = [
-  ];
+  educationValidationSchema[`education.schools.${i}.schoolType`] = [];
   educationValidationSchema[`education.schools.${i}.yearStarted`] = [
     validYearRule(),
   ];

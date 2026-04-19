@@ -1,6 +1,7 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { cn } from "@/lib/utils";
 
 export const addStudentSchema = z.object({
   name: z.string().min(2, "Name is required"),
@@ -43,87 +44,105 @@ export default function AddStudentModal({
 
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
-      <div className="bg-card rounded-lg shadow-lg w-full max-w-lg p-6 max-h-[90vh] overflow-y-auto">
-        <h3 className="text-lg font-semibold mb-4">Add Student Record</h3>
+      <div className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-lg bg-card p-6 shadow-lg">
+        <h3 className="mb-4 text-lg font-semibold">Add Student Record</h3>
         <form
           onSubmit={form.handleSubmit(handleSubmit)}
           className="space-y-4"
         >
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="mb-2 block text-sm font-medium text-foreground">
                 Name *
               </label>
               <input
                 {...form.register("name")}
-                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className={cn(
+                  "w-full rounded-lg border border-border bg-input px-4 py-2",
+                  "focus:outline-none focus:ring-2 focus:ring-primary",
+                )}
               />
               {form.formState.errors.name && (
-                <p className="text-sm text-destructive mt-1">
+                <p className="mt-1 text-sm text-destructive">
                   {String(form.formState.errors.name.message)}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="mb-2 block text-sm font-medium text-foreground">
                 Course *
               </label>
               <select
                 {...form.register("course")}
-                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className={cn(
+                  "w-full rounded-lg border border-border bg-input px-4 py-2",
+                  "focus:outline-none focus:ring-2 focus:ring-primary",
+                )}
               >
                 <option value="">Select Course</option>
                 {courses.slice(1).map((course) => (
-                  <option key={course.value} value={course.value}>
+                  <option
+                    key={course.value}
+                    value={course.value}
+                  >
                     {course.label}
                   </option>
                 ))}
               </select>
               {form.formState.errors.course && (
-                <p className="text-sm text-destructive mt-1">
+                <p className="mt-1 text-sm text-destructive">
                   {String(form.formState.errors.course.message)}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="mb-2 block text-sm font-medium text-foreground">
                 Email *
               </label>
               <input
                 {...form.register("email")}
-                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className={cn(
+                  "w-full rounded-lg border border-border bg-input px-4 py-2",
+                  "focus:outline-none focus:ring-2 focus:ring-primary",
+                )}
               />
               {form.formState.errors.email && (
-                <p className="text-sm text-destructive mt-1">
+                <p className="mt-1 text-sm text-destructive">
                   {String(form.formState.errors.email.message)}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="mb-2 block text-sm font-medium text-foreground">
                 Phone *
               </label>
               <input
                 {...form.register("phone")}
-                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className={cn(
+                  "w-full rounded-lg border border-border bg-input px-4 py-2",
+                  "focus:outline-none focus:ring-2 focus:ring-primary",
+                )}
               />
               {form.formState.errors.phone && (
-                <p className="text-sm text-destructive mt-1">
+                <p className="mt-1 text-sm text-destructive">
                   {String(form.formState.errors.phone.message)}
                 </p>
               )}
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="mb-2 block text-sm font-medium text-foreground">
                 Institution Type
               </label>
               <select
                 {...form.register("institutionType")}
-                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className={cn(
+                  "w-full rounded-lg border border-border bg-input px-4 py-2",
+                  "focus:outline-none focus:ring-2 focus:ring-primary",
+                )}
               >
                 <option value="Private">Private</option>
                 <option value="Public">Public</option>
@@ -131,7 +150,7 @@ export default function AddStudentModal({
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-foreground mb-2">
+              <label className="mb-2 block text-sm font-medium text-foreground">
                 Number of Siblings
               </label>
               <input
@@ -140,7 +159,10 @@ export default function AddStudentModal({
                 {...form.register("numberOfSiblings", {
                   valueAsNumber: true,
                 })}
-                className="bg-input w-full px-4 py-2 border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-primary"
+                className={cn(
+                  "w-full rounded-lg border border-border bg-input px-4 py-2",
+                  "focus:outline-none focus:ring-2 focus:ring-primary",
+                )}
               />
             </div>
           </div>
@@ -152,13 +174,19 @@ export default function AddStudentModal({
                 onClose();
                 form.reset();
               }}
-              className="px-4 py-2 rounded-lg border border-gray-300 text-foreground hover:bg-gray-50 transition-colors font-medium"
+              className={cn(
+                "rounded-lg border border-gray-300 px-4 py-2 font-medium",
+                "text-foreground transition-colors hover:bg-gray-50",
+              )}
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition-colors font-medium"
+              className={cn(
+                "rounded-lg bg-primary px-4 py-2 font-medium",
+                "text-primary-foreground transition-colors hover:bg-primary/90",
+              )}
             >
               Add Record
             </button>

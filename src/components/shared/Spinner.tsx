@@ -35,7 +35,7 @@ export const Spinner: React.FC<SpinnerProps> = ({
   }, []);
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4 h-full w-full bg-transparent">
+    <div className="flex h-full w-full flex-col items-center justify-center gap-4 bg-transparent">
       <style
         dangerouslySetInnerHTML={{
           __html: `
@@ -72,27 +72,20 @@ export const Spinner: React.FC<SpinnerProps> = ({
         }}
       />
 
-      <div
-        className={`relative ${container} flex items-center
-        justify-center`}
-      >
+      <div className={`relative ${container} flex items-center justify-center`}>
         {/* Primary Cube */}
         <div
-          className={`absolute inset-0 m-auto bg-primary/20 border-2
-          border-primary rounded-sm ${cube} cube-anim
-          shadow-[0_0_15px_rgba(var(--primary),0.3)]`}
+          className={`absolute inset-0 m-auto rounded-sm border-2 border-primary bg-primary/20 ${cube} cube-anim shadow-[0_0_15px_rgba(var(--primary),0.3)]`}
         />
 
         {/* Secondary Cube */}
         <div
-          className={`absolute inset-0 m-auto bg-secondary/20 border-2
-          border-secondary rounded-sm ${cube} cube-anim-delayed
-          shadow-[0_0_15px_rgba(var(--secondary),0.3)]`}
+          className={`absolute inset-0 m-auto rounded-sm border-2 border-secondary bg-secondary/20 ${cube} cube-anim-delayed shadow-[0_0_15px_rgba(var(--secondary),0.3)]`}
         />
       </div>
 
-      <div className="flex flex-col items-center gap-1 animate-pulse">
-        <Label className="text-sm font-bold tracking-widest text-muted-foreground uppercase opacity-80">
+      <div className="flex animate-pulse flex-col items-center gap-1">
+        <Label className="text-sm font-bold uppercase tracking-widest text-muted-foreground opacity-80">
           {message}
         </Label>
       </div>

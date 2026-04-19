@@ -14,7 +14,12 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { AlertCircle, Users } from "lucide-react";
-import { useCourses, useGenders, useIIRPagination, useStudentStatuses } from "@/features/iir/hooks";
+import {
+  useCourses,
+  useGenders,
+  useIIRPagination,
+  useStudentStatuses,
+} from "@/features/iir/hooks";
 import { IIRProfileView } from "@/features/iir/types";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Spinner } from "@/components/shared";
@@ -86,7 +91,8 @@ export default function StudentRecords() {
 
   usePageMetadata({
     title: "Student Records",
-    description: "Access and manage student cumulative records and personal information",
+    description:
+      "Access and manage student cumulative records and personal information",
     badgeText: "Admin Management",
     badgeIcon: <Users className="h-4 w-4" />,
     isLoading,
@@ -94,7 +100,7 @@ export default function StudentRecords() {
 
   return (
     <>
-      <div className="space-y-8 animate-in fade-in slide-in-from-bottom-4 duration-700">
+      <div className="animate-in fade-in slide-in-from-bottom-4 space-y-8 duration-700">
         <StudentFilters
           searchTerm={searchTerm}
           onSearchChange={(value) => {
@@ -134,15 +140,23 @@ export default function StudentRecords() {
 
         <div className="relative min-h-[400px]">
           {(isStudentsLoading || isDeleting) && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center bg-glass-bg/5 backdrop-blur-[2px] rounded-[32px]">
+            <div
+              className={cn(
+                "bg-glass-bg/5 absolute inset-0 z-20 flex items-center",
+                "justify-center rounded-[32px] backdrop-blur-[2px]",
+              )}
+            >
               <Spinner size="lg" />
             </div>
           )}
 
-          <div className={cn(
-            "space-y-8 transition-all duration-700",
-            (isStudentsLoading || isDeleting) && "opacity-40 blur-[1px] pointer-events-none"
-          )}>
+          <div
+            className={cn(
+              "space-y-8 transition-all duration-700",
+              (isStudentsLoading || isDeleting) &&
+                "pointer-events-none opacity-40 blur-[1px]",
+            )}
+          >
             <StudentGrid
               students={allStudents}
               isStudentsLoading={false} // Loading handled by parent
@@ -179,7 +193,10 @@ export default function StudentRecords() {
       /> */}
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteConfirmOpen} onOpenChange={setDeleteConfirmOpen}>
+      <AlertDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Delete Student Record</AlertDialogTitle>
@@ -202,7 +219,7 @@ export default function StudentRecords() {
             <AlertDialogAction
               // onClick={handleConfirmDelete}
               disabled={isDeleting}
-              className="bg-red-600 hover:bg-red-700 text-white"
+              className="bg-red-600 text-white hover:bg-red-700"
             >
               {isDeleting ? "Deleting..." : "Delete"}
             </AlertDialogAction>

@@ -48,7 +48,7 @@ export const formatAppointmentTime = (timeString: string): string => {
  * @returns Tailwind CSS classes for the status badge
  */
 export const getStatusBadgeColor = (
-  status: string
+  status: string,
 ): { bg: string; text: string } => {
   switch (status) {
     case "Pending":
@@ -72,7 +72,7 @@ export const getStatusBadgeColor = (
  * @returns Array of available status transitions
  */
 export const getAvailableStatusTransitions = (
-  currentStatus: string
+  currentStatus: string,
 ): Array<{ status: string; label: string; color: string }> => {
   switch (currentStatus) {
     case "Pending":
@@ -82,7 +82,11 @@ export const getAvailableStatusTransitions = (
       ];
     case "Approved":
       return [
-        { status: "Completed", label: "Mark as Completed", color: "bg-blue-500" },
+        {
+          status: "Completed",
+          label: "Mark as Completed",
+          color: "bg-blue-500",
+        },
         { status: "Cancelled", label: "Cancel", color: "bg-red-500" },
       ];
     case "Rescheduled":
@@ -100,13 +104,9 @@ export const getAvailableStatusTransitions = (
  * @param appointment - Appointment object
  * @returns Boolean indicating if appointment can be rescheduled
  */
-export const canRescheduleAppointment = (
-  appointment: Appointment,
-): boolean => {
+export const canRescheduleAppointment = (appointment: Appointment): boolean => {
   const statusName = appointment.status?.name;
-  return ["Pending", "Approved", "Rescheduled"].includes(
-    statusName || "",
-  );
+  return ["Pending", "Approved", "Rescheduled"].includes(statusName || "");
 };
 
 /**
@@ -114,13 +114,9 @@ export const canRescheduleAppointment = (
  * @param appointment - Appointment object
  * @returns Boolean indicating if appointment can be cancelled
  */
-export const canCancelAppointment = (
-  appointment: Appointment,
-): boolean => {
+export const canCancelAppointment = (appointment: Appointment): boolean => {
   const statusName = appointment.status?.name;
-  return ["Pending", "Approved", "Rescheduled"].includes(
-    statusName || "",
-  );
+  return ["Pending", "Approved", "Rescheduled"].includes(statusName || "");
 };
 
 /**
@@ -128,42 +124,31 @@ export const canCancelAppointment = (
  * @param appointment - Appointment object
  * @returns Human-readable string (e.g., "in 2 hours")
  */
-export const getTimeUntilAppointment = (
-  appointment: Appointment,
-): string => {
+export const getTimeUntilAppointment = (appointment: Appointment): string => {
   try {
     const appointmentDateTime = new Date(
       `${appointment.whenDate}T${appointment.timeSlot.time}`,
     );
     const now = new Date();
-    const diffMs = appointmentDateTime.getTime() -
-      now.getTime();
+    const diffMs = appointmentDateTime.getTime() - now.getTime();
 
     if (diffMs < 0) {
       return "Past due";
     }
 
-    const diffHours = Math.floor(
-      diffMs / (1000 * 60 * 60),
-    );
+    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
     const diffDays = Math.floor(diffHours / 24);
 
     if (diffDays > 0) {
-      return `in ${diffDays} day${
-        diffDays > 1 ? "s" : ""
-      }`;
+      return `in ${diffDays} day${diffDays > 1 ? "s" : ""}`;
     }
 
     if (diffHours > 0) {
-      return `in ${diffHours} hour${
-        diffHours > 1 ? "s" : ""
-      }`;
+      return `in ${diffHours} hour${diffHours > 1 ? "s" : ""}`;
     }
 
     const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    return `in ${diffMinutes} minute${
-      diffMinutes > 1 ? "s" : ""
-    }`;
+    return `in ${diffMinutes} minute${diffMinutes > 1 ? "s" : ""}`;
   } catch {
     return "Unknown";
   }
@@ -180,12 +165,8 @@ export const sortAppointments = (
   ascending: boolean = true,
 ): Appointment[] => {
   return [...appointments].sort((a, b) => {
-    const dateA = new Date(
-      `${a.whenDate}T${a.timeSlot.time}`,
-    ).getTime();
-    const dateB = new Date(
-      `${b.whenDate}T${b.timeSlot.time}`,
-    ).getTime();
+    const dateA = new Date(`${a.whenDate}T${a.timeSlot.time}`).getTime();
+    const dateB = new Date(`${b.whenDate}T${b.timeSlot.time}`).getTime();
     return ascending ? dateA - dateB : dateB - dateA;
   });
 };

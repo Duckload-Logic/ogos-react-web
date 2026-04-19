@@ -100,15 +100,21 @@ export default function AppointmentLogs() {
         colorKey: "stale" as const,
         count: totalCount,
       },
-      ...appointmentStats.map(stat => ({
+      ...appointmentStats.map((stat) => ({
         ...stat,
-        colorKey: (stat.name.toLowerCase() === "pending" ? "pending" :
-          stat.name.toLowerCase() === "scheduled" ? "scheduled" :
-            stat.name.toLowerCase() === "completed" ? "completed" :
-              stat.name.toLowerCase() === "cancelled" ? "cancelled" :
-                stat.name.toLowerCase() === "rejected" ? "rejected" :
-                  stat.name.toLowerCase() === "rescheduled" ? "rescheduled" :
-                    "stale") as keyof typeof STATUS_COLORS
+        colorKey: (stat.name.toLowerCase() === "pending"
+          ? "pending"
+          : stat.name.toLowerCase() === "scheduled"
+            ? "scheduled"
+            : stat.name.toLowerCase() === "completed"
+              ? "completed"
+              : stat.name.toLowerCase() === "cancelled"
+                ? "cancelled"
+                : stat.name.toLowerCase() === "rejected"
+                  ? "rejected"
+                  : stat.name.toLowerCase() === "rescheduled"
+                    ? "rescheduled"
+                    : "stale") as keyof typeof STATUS_COLORS,
       })),
     ];
   }, [appointmentStats]);
@@ -126,20 +132,24 @@ export default function AppointmentLogs() {
 
   usePageMetadata({
     title: "Appointment Logs",
-    description: "Historical record of all counseling sessions with date and status filters",
+    description:
+      "Historical record of all counseling sessions with date and status filters",
     badgeText: "Audit Trail",
     badgeIcon: <Calendar className="h-4 w-4" />,
     isLoading: isPageLoading,
   });
 
   const currentSelectedStatus = useMemo(() => {
-    return appointmentStatusesWithAll.find(s => s.id === statusFilter) || appointmentStatusesWithAll[0];
+    return (
+      appointmentStatusesWithAll.find((s) => s.id === statusFilter) ||
+      appointmentStatusesWithAll[0]
+    );
   }, [appointmentStatusesWithAll, statusFilter]);
 
   return (
     <div className="space-y-6">
       {/* Filters Section */}
-      <Card className="border-glass-border bg-glass-bg/40 shadow-2xl backdrop-blur-2xl">
+      <Card className="bg-glass-bg/40 border-glass-border shadow-2xl backdrop-blur-2xl">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <Calendar className="h-5 w-5 text-primary" />
@@ -147,7 +157,7 @@ export default function AppointmentLogs() {
           </CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <Dropdown
               label="Year"
               options={yearsList}

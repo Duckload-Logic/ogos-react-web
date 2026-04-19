@@ -1,4 +1,5 @@
 import { ElementType, ReactNode } from "react";
+import { cn } from "@/lib/utils";
 
 export default function CardBlock({
   icon: Icon,
@@ -10,8 +11,18 @@ export default function CardBlock({
   children: ReactNode;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-muted/20 p-4 shadow-md hover:shadow-lg transition-shadow h-full flex flex-col">
-      <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-3">
+    <div
+      className={cn(
+        "flex h-full flex-col rounded-xl border border-border",
+        "bg-muted/20 p-4 shadow-md transition-shadow hover:shadow-lg",
+      )}
+    >
+      <div
+        className={cn(
+          "mb-3 flex items-center gap-2 text-[10px] font-bold uppercase",
+          "tracking-wider text-muted-foreground",
+        )}
+      >
         {Icon && (
           // 3. Render the Icon directly
           <Icon className="h-4 w-4 text-primary" />

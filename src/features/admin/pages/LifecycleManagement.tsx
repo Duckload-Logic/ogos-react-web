@@ -13,7 +13,11 @@ import {
   Users,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { useCourses, useIIRPagination, useStudentStatuses } from "@/features/iir/hooks";
+import {
+  useCourses,
+  useIIRPagination,
+  useStudentStatuses,
+} from "@/features/iir/hooks";
 import { Course, IIRProfileView } from "@/features/iir/types";
 import { iirService } from "@/features/iir/services/service";
 import { useDebounce } from "@/hooks/useDebounce";
@@ -76,7 +80,13 @@ function SelectionBanner({
   if (mode === "none") return null;
 
   return (
-    <div className="flex items-center justify-between px-4 py-2.5 rounded-2xl bg-primary/5 border border-primary/20 text-sm font-medium mb-2 animate-in fade-in duration-300">
+    <div
+      className={cn(
+        "animate-in fade-in mb-2 flex items-center justify-between",
+        "rounded-2xl border border-primary/20 bg-primary/5 px-4 py-2.5",
+        "text-sm font-medium duration-300",
+      )}
+    >
       <span className="text-primary">
         {mode === "all"
           ? `All ${totalCount} matching students selected`
@@ -91,7 +101,13 @@ function SelectionBanner({
             Select all {totalCount} matching students
           </button>
         )}
-        <button onClick={onClearAll} className="flex items-center gap-1 text-xs text-muted-foreground hover:text-destructive transition-colors">
+        <button
+          onClick={onClearAll}
+          className={cn(
+            "flex items-center gap-1 text-xs text-muted-foreground",
+            "transition-colors hover:text-destructive",
+          )}
+        >
           <X size={12} /> Clear
         </button>
       </div>
@@ -121,49 +137,46 @@ function StudentRow({
   return (
     <div
       className={cn(
-        "grid grid-cols-[auto_1fr_auto] gap-4 items-center px-5 py-4 rounded-2xl border transition-all duration-200 cursor-pointer hover:bg-glass-bg/40",
+        "hover:bg-glass-bg/40 grid cursor-pointer grid-cols-[auto_1fr_auto] items-center gap-4 rounded-2xl border px-5 py-4 transition-all duration-200",
         isSelected
           ? "border-primary/30 bg-primary/[0.02]"
-          : "border-glass-border bg-glass-bg/20"
+          : "bg-glass-bg/20 border-glass-border",
       )}
       onClick={onToggle}
     >
       {/* Checkbox */}
       <div
         className={cn(
-          "h-5 w-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 transition-all duration-200",
+          "flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-md border-2 transition-all duration-200",
           isSelected
-            ? "bg-primary border-primary"
-            : "border-glass-border bg-white/5"
+            ? "border-primary bg-primary"
+            : "border-glass-border bg-white/5",
         )}
       >
-        {isSelected && (
-          <div className="h-2 w-2 rounded-[2px] bg-white" />
-        )}
+        {isSelected && <div className="h-2 w-2 rounded-[2px] bg-white" />}
       </div>
 
       {/* Student info */}
-      <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr] gap-3 min-w-0">
+      <div className="grid min-w-0 grid-cols-[2fr_1.5fr_1fr_1fr] gap-3">
         <div className="min-w-0">
-          <p className="font-semibold text-sm truncate">
-            {student.lastName}, {student.firstName}{" "}
-            {student.middleName ?? ""}
+          <p className="truncate text-sm font-semibold">
+            {student.lastName}, {student.firstName} {student.middleName ?? ""}
           </p>
-          <p className="text-[11px] text-muted-foreground truncate">
+          <p className="truncate text-[11px] text-muted-foreground">
             {student.email}
           </p>
         </div>
-        <p className="text-xs text-muted-foreground self-center truncate">
+        <p className="self-center truncate text-xs text-muted-foreground">
           {student.course?.name ?? "—"}
         </p>
-        <p className="text-xs text-center self-center text-muted-foreground">
+        <p className="self-center text-center text-xs text-muted-foreground">
           Year {student.yearLevel}
         </p>
-        <div className="self-center flex justify-center">
+        <div className="flex justify-center self-center">
           <span
             className={cn(
-              "px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
-              statusColors[student.status?.id ?? 1]
+              "rounded-full border px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider",
+              statusColors[student.status?.id ?? 1],
             )}
           >
             {student.status?.name ?? "Active"}
@@ -179,7 +192,10 @@ function StudentRow({
             state: { student },
           });
         }}
-        className="text-[11px] font-bold text-primary/50 hover:text-primary transition-colors uppercase tracking-wider"
+        className={cn(
+          "text-[11px] font-bold uppercase tracking-wider",
+          "text-primary/50 transition-colors hover:text-primary",
+        )}
       >
         View
       </button>
@@ -236,7 +252,11 @@ export default function LifecycleManagement() {
       const next = new Set(prev);
       next.has(id) ? next.delete(id) : next.add(id);
       const nextMode =
-        next.size === students.length ? "page" : next.size > 0 ? "page" : "none";
+        next.size === students.length
+          ? "page"
+          : next.size > 0
+            ? "page"
+            : "none";
       setSelectionMode(nextMode);
       return next;
     });
@@ -272,7 +292,9 @@ export default function LifecycleManagement() {
   }, [students, selectedIds, excludedIds, selectionMode]); // eslint-disable-line
 
   // Bulk action flow
-  const [pendingAction, setPendingAction] = useState<PendingAction | null>(null);
+  const [pendingAction, setPendingAction] = useState<PendingAction | null>(
+    null,
+  );
   const [graduationYear, setGraduationYear] = useState(CURRENT_YEAR);
   const [isProcessing, setIsProcessing] = useState(false);
   const [destructiveWarning, setDestructiveWarning] = useState(false);
@@ -297,8 +319,7 @@ export default function LifecycleManagement() {
         excludedIirIds: selectionMode === "all" ? [...excludedIds] : undefined,
         selectAllMatching: selectionMode === "all",
         statusId: pendingAction.statusId,
-        graduationYear:
-          pendingAction.needsYear ? graduationYear : undefined,
+        graduationYear: pendingAction.needsYear ? graduationYear : undefined,
         filters: {
           search: debouncedSearch,
           courseId,
@@ -318,7 +339,8 @@ export default function LifecycleManagement() {
 
   usePageMetadata({
     title: "Records Lifecycle",
-    description: "Bulk manage student record statuses — graduation, archival, and more.",
+    description:
+      "Bulk manage student record statuses — graduation, archival, and more.",
     badgeText: "Admin Management",
     badgeIcon: <GraduationCap className="h-4 w-4" />,
     isLoading,
@@ -328,20 +350,31 @@ export default function LifecycleManagement() {
 
   return (
     <>
-      <div className="space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-700">
-
+      <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 duration-700">
         {/* ── Filters ─────────────────────────────────────── */}
-        <div className="bg-glass-bg backdrop-blur-glass rounded-3xl border border-glass-border p-6 shadow-sm">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div
+          className={cn(
+            "rounded-3xl border border-glass-border bg-glass-bg p-6",
+            "shadow-sm backdrop-blur-glass",
+          )}
+        >
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {/* Search */}
             <div className="relative sm:col-span-2 lg:col-span-1">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <input
                 type="text"
                 placeholder="Search by name or student number…"
                 value={search}
-                onChange={(e) => { setSearch(e.target.value); setPage(1); }}
-                className="w-full pl-9 pr-4 h-11 rounded-xl border border-glass-border bg-white/5 text-sm focus:outline-none focus:border-primary/30 transition-colors"
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1);
+                }}
+                className={cn(
+                  "h-11 w-full rounded-xl border border-glass-border bg-white/5",
+                  "pl-9 pr-4 text-sm transition-colors focus:border-primary/30",
+                  "focus:outline-none",
+                )}
               />
             </div>
 
@@ -349,23 +382,47 @@ export default function LifecycleManagement() {
             <div className="relative">
               <select
                 value={courseId}
-                onChange={(e) => { setCourseId(Number(e.target.value)); setPage(1); }}
-                className="w-full h-11 rounded-xl border border-glass-border bg-white/5 text-sm px-3 pr-8 appearance-none focus:outline-none focus:border-primary/30 transition-colors"
+                onChange={(e) => {
+                  setCourseId(Number(e.target.value));
+                  setPage(1);
+                }}
+                className={cn(
+                  "h-11 w-full appearance-none rounded-xl border",
+                  "border-glass-border bg-white/5 px-3 pr-8 text-sm",
+                  "transition-colors focus:border-primary/30 focus:outline-none",
+                )}
               >
                 <option value={0}>All Courses</option>
                 {courses?.map((c: Course) => (
-                  <option key={c.id} value={c.id}>{c.code}</option>
+                  <option
+                    key={c.id}
+                    value={c.id}
+                  >
+                    {c.code}
+                  </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <ChevronDown
+                className={cn(
+                  "pointer-events-none absolute right-3 top-1/2 h-4 w-4",
+                  "-translate-y-1/2 text-muted-foreground",
+                )}
+              />
             </div>
 
             {/* Year Level */}
             <div className="relative">
               <select
                 value={yearLevel}
-                onChange={(e) => { setYearLevel(Number(e.target.value)); setPage(1); }}
-                className="w-full h-11 rounded-xl border border-glass-border bg-white/5 text-sm px-3 pr-8 appearance-none focus:outline-none focus:border-primary/30 transition-colors"
+                onChange={(e) => {
+                  setYearLevel(Number(e.target.value));
+                  setPage(1);
+                }}
+                className={cn(
+                  "h-11 w-full appearance-none rounded-xl border",
+                  "border-glass-border bg-white/5 px-3 pr-8 text-sm",
+                  "transition-colors focus:border-primary/30 focus:outline-none",
+                )}
               >
                 <option value={0}>All Year Levels</option>
                 <option value={1}>1st Year</option>
@@ -373,22 +430,44 @@ export default function LifecycleManagement() {
                 <option value={3}>3rd Year</option>
                 <option value={4}>4th Year</option>
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <ChevronDown
+                className={cn(
+                  "pointer-events-none absolute right-3 top-1/2 h-4 w-4",
+                  "-translate-y-1/2 text-muted-foreground",
+                )}
+              />
             </div>
 
             {/* Enrollment year */}
             <div className="relative">
               <select
                 value={enrollYear}
-                onChange={(e) => { setEnrollYear(Number(e.target.value)); setPage(1); }}
-                className="w-full h-11 rounded-xl border border-glass-border bg-white/5 text-sm px-3 pr-8 appearance-none focus:outline-none focus:border-primary/30 transition-colors"
+                onChange={(e) => {
+                  setEnrollYear(Number(e.target.value));
+                  setPage(1);
+                }}
+                className={cn(
+                  "h-11 w-full appearance-none rounded-xl border",
+                  "border-glass-border bg-white/5 px-3 pr-8 text-sm",
+                  "transition-colors focus:border-primary/30 focus:outline-none",
+                )}
               >
                 <option value={0}>All Enrollment Years</option>
                 {enrollYears.map((y) => (
-                  <option key={y} value={y}>{y}</option>
+                  <option
+                    key={y}
+                    value={y}
+                  >
+                    {y}
+                  </option>
                 ))}
               </select>
-              <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground pointer-events-none" />
+              <ChevronDown
+                className={cn(
+                  "pointer-events-none absolute right-3 top-1/2 h-4 w-4",
+                  "-translate-y-1/2 text-muted-foreground",
+                )}
+              />
             </div>
           </div>
         </div>
@@ -396,34 +475,81 @@ export default function LifecycleManagement() {
         {/* ── List ────────────────────────────────────────── */}
         <div className="relative min-h-[400px]">
           {isLoading && (
-            <div className="absolute inset-0 z-20 flex items-center justify-center bg-glass-bg/5 backdrop-blur-[2px] rounded-[32px]">
+            <div
+              className={cn(
+                "bg-glass-bg/5 absolute inset-0 z-20 flex items-center",
+                "justify-center rounded-[32px] backdrop-blur-[2px]",
+              )}
+            >
               <Spinner size="lg" />
             </div>
           )}
 
-          <div className={cn("space-y-2 transition-all duration-500", isLoading && "opacity-40 blur-[1px] pointer-events-none")}>
+          <div
+            className={cn(
+              "space-y-2 transition-all duration-500",
+              isLoading && "pointer-events-none opacity-40 blur-[1px]",
+            )}
+          >
             {/* Header row */}
-            <div className="grid grid-cols-[auto_1fr_auto] gap-4 items-center px-5 py-2">
+            <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4 px-5 py-2">
               {/* Select All Page toggle */}
               <button
-                onClick={selectionMode === "page" && selectedIds.size === students.length ? clearAll : selectPage}
-                className="h-5 w-5 flex items-center justify-center"
+                onClick={
+                  selectionMode === "page" &&
+                  selectedIds.size === students.length
+                    ? clearAll
+                    : selectPage
+                }
+                className="flex h-5 w-5 items-center justify-center"
               >
-                {selectionMode !== "none" && selectedIds.size === students.length ? (
-                  <CheckSquare size={16} className="text-primary" />
+                {selectionMode !== "none" &&
+                selectedIds.size === students.length ? (
+                  <CheckSquare
+                    size={16}
+                    className="text-primary"
+                  />
                 ) : (
-                  <Square size={16} className="text-muted-foreground" />
+                  <Square
+                    size={16}
+                    className="text-muted-foreground"
+                  />
                 )}
               </button>
 
               <div className="grid grid-cols-[2fr_1.5fr_1fr_1fr] gap-3">
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Student</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">Course</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-center">Year</p>
-                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground text-center">Status</p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Student
+                </p>
+                <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                  Course
+                </p>
+                <p
+                  className={cn(
+                    "text-center text-[10px] font-bold uppercase tracking-widest",
+                    "text-muted-foreground",
+                  )}
+                >
+                  Year
+                </p>
+                <p
+                  className={cn(
+                    "text-center text-[10px] font-bold uppercase tracking-widest",
+                    "text-muted-foreground",
+                  )}
+                >
+                  Status
+                </p>
               </div>
 
-              <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground opacity-0 select-none">View</p>
+              <p
+                className={cn(
+                  "select-none text-[10px] font-bold uppercase tracking-widest",
+                  "text-muted-foreground opacity-0",
+                )}
+              >
+                View
+              </p>
             </div>
 
             <SelectionBanner
@@ -436,9 +562,13 @@ export default function LifecycleManagement() {
 
             {students.length === 0 && !isLoading ? (
               <div className="flex flex-col items-center justify-center py-24 text-center">
-                <Users className="h-16 w-16 text-muted-foreground/20 mb-4" />
-                <p className="text-lg font-bold text-muted-foreground">No students found</p>
-                <p className="text-sm text-muted-foreground/60 mt-1">Try adjusting your filters</p>
+                <Users className="mb-4 h-16 w-16 text-muted-foreground/20" />
+                <p className="text-lg font-bold text-muted-foreground">
+                  No students found
+                </p>
+                <p className="mt-1 text-sm text-muted-foreground/60">
+                  Try adjusting your filters
+                </p>
               </div>
             ) : (
               students.map((s) => (
@@ -452,7 +582,7 @@ export default function LifecycleManagement() {
             )}
 
             {/* Pagination */}
-            <div className="flex justify-between items-center pt-4 px-1">
+            <div className="flex items-center justify-between px-1 pt-4">
               <p className="text-xs text-muted-foreground">
                 {total} total records
               </p>
@@ -468,43 +598,104 @@ export default function LifecycleManagement() {
 
       {/* ── Floating Bulk Action Bar ─────────────────────── */}
       {effectivelySelectedCount > 0 && (
-        <div className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 w-full max-w-xl px-4 animate-in fade-in slide-in-from-bottom-6 duration-400">
-          <div className="bg-glass-bg/90 backdrop-blur-xl border border-primary/20 rounded-3xl shadow-2xl overflow-hidden">
-            <div className="px-5 py-3 border-b border-glass-border/40 flex items-center gap-3">
-              <div className="h-7 w-7 rounded-xl bg-primary flex items-center justify-center text-white text-xs font-bold">
-                {effectivelySelectedCount > 99 ? "99+" : effectivelySelectedCount}
+        <div
+          className={cn(
+            "animate-in fade-in slide-in-from-bottom-6 duration-400 fixed",
+            "bottom-8 left-1/2 z-50 w-full max-w-xl -translate-x-1/2 px-4",
+          )}
+        >
+          <div
+            className={cn(
+              "bg-glass-bg/90 overflow-hidden rounded-3xl border",
+              "border-primary/20 shadow-2xl backdrop-blur-xl",
+            )}
+          >
+            <div className="border-glass-border/40 flex items-center gap-3 border-b px-5 py-3">
+              <div
+                className={cn(
+                  "flex h-7 w-7 items-center justify-center rounded-xl",
+                  "bg-primary text-xs font-bold text-white",
+                )}
+              >
+                {effectivelySelectedCount > 99
+                  ? "99+"
+                  : effectivelySelectedCount}
               </div>
               <p className="text-sm font-bold">
-                {selectionMode === "all" ? "All matching" : effectivelySelectedCount} students selected
+                {selectionMode === "all"
+                  ? "All matching"
+                  : effectivelySelectedCount}{" "}
+                students selected
               </p>
-              <button onClick={clearAll} className="ml-auto text-muted-foreground hover:text-destructive transition-colors">
+              <button
+                onClick={clearAll}
+                className="ml-auto text-muted-foreground transition-colors hover:text-destructive"
+              >
                 <X size={14} />
               </button>
             </div>
 
             <div className="flex items-center justify-center gap-2 p-3">
               <button
-                onClick={() => initiateAction({ type: "graduate", label: "Graduate", statusId: 2, needsYear: true })}
+                onClick={() =>
+                  initiateAction({
+                    type: "graduate",
+                    label: "Graduate",
+                    statusId: 2,
+                    needsYear: true,
+                  })
+                }
                 disabled={isProcessing}
-                className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-500/10 hover:bg-emerald-500 text-emerald-600 hover:text-white border border-emerald-500/20 transition-all duration-300 text-xs font-bold uppercase tracking-wider disabled:opacity-40"
+                className={cn(
+                  "flex items-center gap-2 rounded-2xl border",
+                  "border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-xs",
+                  "font-bold uppercase tracking-wider text-emerald-600",
+                  "transition-all duration-300 hover:bg-emerald-500",
+                  "hover:text-white disabled:opacity-40",
+                )}
               >
                 <GraduationCap size={15} />
                 Graduate
               </button>
 
               <button
-                onClick={() => initiateAction({ type: "archive", label: "Archive", statusId: 4, needsYear: false })}
+                onClick={() =>
+                  initiateAction({
+                    type: "archive",
+                    label: "Archive",
+                    statusId: 4,
+                    needsYear: false,
+                  })
+                }
                 disabled={isProcessing}
-                className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/10 hover:bg-amber-500 text-amber-600 hover:text-white border border-amber-500/20 transition-all duration-300 text-xs font-bold uppercase tracking-wider disabled:opacity-40"
+                className={cn(
+                  "flex items-center gap-2 rounded-2xl border",
+                  "border-amber-500/20 bg-amber-500/10 px-4 py-2 text-xs",
+                  "font-bold uppercase tracking-wider text-amber-600",
+                  "transition-all duration-300 hover:bg-amber-500",
+                  "hover:text-white disabled:opacity-40",
+                )}
               >
                 <Archive size={15} />
                 Archive
               </button>
 
               <button
-                onClick={() => initiateAction({ type: "active", label: "Set Active", statusId: 1, needsYear: false })}
+                onClick={() =>
+                  initiateAction({
+                    type: "active",
+                    label: "Set Active",
+                    statusId: 1,
+                    needsYear: false,
+                  })
+                }
                 disabled={isProcessing}
-                className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-primary/10 hover:bg-primary text-primary hover:text-white border border-primary/20 transition-all duration-300 text-xs font-bold uppercase tracking-wider disabled:opacity-40"
+                className={cn(
+                  "flex items-center gap-2 rounded-2xl border border-primary/20",
+                  "bg-primary/10 px-4 py-2 text-xs font-bold uppercase",
+                  "tracking-wider text-primary transition-all duration-300",
+                  "hover:bg-primary hover:text-white disabled:opacity-40",
+                )}
               >
                 <UserCheck size={15} />
                 Set Active
@@ -515,11 +706,19 @@ export default function LifecycleManagement() {
       )}
 
       {/* ── Destructive Warning Modal ────────────────────── */}
-      <AlertDialog open={destructiveWarning} onOpenChange={setDestructiveWarning}>
-        <AlertDialogContent className="rounded-3xl border-amber-500/20 bg-glass-bg backdrop-blur-xl max-w-md">
+      <AlertDialog
+        open={destructiveWarning}
+        onOpenChange={setDestructiveWarning}
+      >
+        <AlertDialogContent className="max-w-md rounded-3xl border-amber-500/20 bg-glass-bg backdrop-blur-xl">
           <AlertDialogHeader>
-            <div className="flex items-start gap-4 mb-2">
-              <div className="h-12 w-12 rounded-2xl bg-amber-500/10 flex items-center justify-center text-amber-500 flex-shrink-0">
+            <div className="mb-2 flex items-start gap-4">
+              <div
+                className={cn(
+                  "flex h-12 w-12 flex-shrink-0 items-center justify-center",
+                  "rounded-2xl bg-amber-500/10 text-amber-500",
+                )}
+              >
                 <AlertTriangle size={26} />
               </div>
               <div>
@@ -531,18 +730,26 @@ export default function LifecycleManagement() {
             <AlertDialogDescription asChild>
               <div className="space-y-3 text-sm leading-relaxed">
                 <p>
-                  Your selection includes <strong className="text-amber-600">{ineligibleCount} student{ineligibleCount !== 1 ? "s" : ""}</strong> who have not yet reached their final year.
+                  Your selection includes{" "}
+                  <strong className="text-amber-600">
+                    {ineligibleCount} student{ineligibleCount !== 1 ? "s" : ""}
+                  </strong>{" "}
+                  who have not yet reached their final year.
                 </p>
-                <div className="bg-amber-500/5 border border-amber-500/20 rounded-xl p-3 text-xs text-amber-700">
-                  <p className="font-semibold mb-1">Graduation is only valid for:</p>
-                  <ul className="list-disc list-inside space-y-0.5">
+                <div className="rounded-xl border border-amber-500/20 bg-amber-500/5 p-3 text-xs text-amber-700">
+                  <p className="mb-1 font-semibold">
+                    Graduation is only valid for:
+                  </p>
+                  <ul className="list-inside list-disc space-y-0.5">
                     <li>Diploma programs — 3rd Year students</li>
                     <li>Bachelor's programs — 4th Year students</li>
                   </ul>
                 </div>
                 <p className="text-muted-foreground">
-                  If you continue, <strong>only eligible students</strong> will be graduated.
-                  Ineligible students will be skipped automatically. This action <strong>cannot be undone</strong> — graduated records are permanently locked.
+                  If you continue, <strong>only eligible students</strong> will
+                  be graduated. Ineligible students will be skipped
+                  automatically. This action <strong>cannot be undone</strong> —
+                  graduated records are permanently locked.
                 </p>
               </div>
             </AlertDialogDescription>
@@ -550,7 +757,7 @@ export default function LifecycleManagement() {
 
           {pendingAction?.needsYear && (
             <div className="py-2">
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest block mb-2">
+              <label className="mb-2 block text-xs font-bold uppercase tracking-widest text-muted-foreground">
                 Graduation Year
               </label>
               <Input
@@ -564,14 +771,17 @@ export default function LifecycleManagement() {
             </div>
           )}
 
-          <AlertDialogFooter className="gap-2 mt-2">
-            <AlertDialogCancel className="rounded-xl border-glass-border hover:bg-glass-bg/50">
+          <AlertDialogFooter className="mt-2 gap-2">
+            <AlertDialogCancel className="hover:bg-glass-bg/50 rounded-xl border-glass-border">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmAction}
               disabled={isProcessing}
-              className="rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold px-6 shadow-lg shadow-amber-500/20"
+              className={cn(
+                "rounded-xl bg-amber-500 px-6 font-bold text-white shadow-lg",
+                "shadow-amber-500/20 hover:bg-amber-600",
+              )}
             >
               {isProcessing ? "Processing…" : "Graduate Eligible Students"}
             </AlertDialogAction>
@@ -584,13 +794,18 @@ export default function LifecycleManagement() {
         open={!!pendingAction && !destructiveWarning}
         onOpenChange={(open) => !open && setPendingAction(null)}
       >
-        <AlertDialogContent className="rounded-3xl border-glass-border bg-glass-bg backdrop-blur-xl max-w-sm">
+        <AlertDialogContent className="max-w-sm rounded-3xl border-glass-border bg-glass-bg backdrop-blur-xl">
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm — {pendingAction?.label}</AlertDialogTitle>
+            <AlertDialogTitle>
+              Confirm — {pendingAction?.label}
+            </AlertDialogTitle>
             <AlertDialogDescription>
               You are about to mark{" "}
-              <strong>{effectivelySelectedCount} student{effectivelySelectedCount !== 1 ? "s" : ""}</strong> as{" "}
-              <strong>{pendingAction?.label}</strong>.
+              <strong>
+                {effectivelySelectedCount} student
+                {effectivelySelectedCount !== 1 ? "s" : ""}
+              </strong>{" "}
+              as <strong>{pendingAction?.label}</strong>.
               {pendingAction?.type === "archive" && (
                 <> This will lock their records from further edits.</>
               )}
@@ -599,7 +814,7 @@ export default function LifecycleManagement() {
 
           {pendingAction?.needsYear && (
             <div className="py-2">
-              <label className="text-xs font-bold text-muted-foreground uppercase tracking-widest block mb-2">
+              <label className="mb-2 block text-xs font-bold uppercase tracking-widest text-muted-foreground">
                 Graduation Year
               </label>
               <Input
@@ -614,13 +829,13 @@ export default function LifecycleManagement() {
           )}
 
           <AlertDialogFooter className="gap-2">
-            <AlertDialogCancel className="rounded-xl border-glass-border hover:bg-glass-bg/50">
+            <AlertDialogCancel className="hover:bg-glass-bg/50 rounded-xl border-glass-border">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
               onClick={confirmAction}
               disabled={isProcessing}
-              className="rounded-xl bg-primary text-white font-bold"
+              className="rounded-xl bg-primary font-bold text-white"
             >
               {isProcessing ? "Processing…" : "Confirm"}
             </AlertDialogAction>

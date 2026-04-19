@@ -87,17 +87,12 @@ export interface UseAppointmentsReturn {
   error: string | null;
   success: string | null;
   isLoading: boolean;
-  fetchAppointments: (
-    isMe?: boolean,
-    status?: string,
-  ) => Promise<void>;
+  fetchAppointments: (isMe?: boolean, status?: string) => Promise<void>;
   fetchAvailableSlots: (date: string) => Promise<void>;
   createAppointment: (
     data: CreateAppointmentRequest,
   ) => Promise<Appointment | null>;
-  cancelAppointment: (
-    appointment: Appointment,
-  ) => Promise<boolean>;
+  cancelAppointment: (appointment: Appointment) => Promise<boolean>;
   clearError: () => void;
   clearSuccess: () => void;
 }

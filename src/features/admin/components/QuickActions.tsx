@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import { cn } from "@/lib/utils";
 
 interface QuickAction {
   title: string;
@@ -11,25 +12,22 @@ interface QuickActionsProps {
   actions: QuickAction[];
 }
 
-export default function QuickActions({
-  actions,
-}: QuickActionsProps) {
+export default function QuickActions({ actions }: QuickActionsProps) {
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
       {actions.map((action) => (
         <Link
           key={action.title}
           to={action.href}
-          className="bg-card rounded-lg shadow border border-gray-200 p-4 hover:shadow-md transition-shadow"
+          className={cn(
+            "rounded-lg border border-gray-200 bg-card p-4 shadow",
+            "transition-shadow hover:shadow-md",
+          )}
         >
           <div className="flex gap-3">
-            <div className="text-primary">
-              {action.icon}
-            </div>
+            <div className="text-primary">{action.icon}</div>
             <div>
-              <h3 className="font-semibold text-foreground">
-                {action.title}
-              </h3>
+              <h3 className="font-semibold text-foreground">{action.title}</h3>
               <p className="text-sm text-muted-foreground">
                 {action.description}
               </p>

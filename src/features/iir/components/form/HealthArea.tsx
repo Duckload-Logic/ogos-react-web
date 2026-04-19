@@ -14,8 +14,8 @@ export function HealthArea({
   onChange: (path: string, value: any) => void;
 }) {
   return (
-    <div className="p-4 border border-border rounded-lg bg-card">
-      <div className="flex items-center gap-3 mb-3">
+    <div className="rounded-lg border border-border bg-card p-4">
+      <div className="mb-3 flex items-center gap-3">
         <Checkbox
           id={`has-${title}`}
           label={`Has ${title.toLowerCase()} Problem`}

@@ -1,6 +1,13 @@
 import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Archive, CheckCircle2, Clock3, FileText, RotateCcw, XCircle } from "lucide-react";
+import {
+  Archive,
+  CheckCircle2,
+  Clock3,
+  FileText,
+  RotateCcw,
+  XCircle,
+} from "lucide-react";
 
 import { useDebounce } from "@/hooks/useDebounce";
 import { Button } from "@/components/ui/button";
@@ -34,11 +41,15 @@ export default function ReviewSlips() {
     },
   });
 
-  const { data: slipStatuses, isLoading: isStatusesLoading } = useGetSlipStatuses();
+  const { data: slipStatuses, isLoading: isStatusesLoading } =
+    useGetSlipStatuses();
 
   const statusWithAll = useMemo(() => {
     if (!slipStatuses) return [];
-    return [{ id: "0", name: "All Statuses", colorKey: "stale" }, ...slipStatuses];
+    return [
+      { id: "0", name: "All Statuses", colorKey: "stale" },
+      ...slipStatuses,
+    ];
   }, [slipStatuses]);
 
   const [selectedStatus, setSelectedStatus] = useState<SlipStatus>({
@@ -47,13 +58,13 @@ export default function ReviewSlips() {
     colorKey: "stale",
   } as any);
 
-
   const { data, isLoading } = useSlips({
     isAdmin: true,
     params: {
       page: currentPage,
       search: debouncedSearch,
-      statusId: String(selectedStatus?.id) === "0" ? undefined : selectedStatus?.id,
+      statusId:
+        String(selectedStatus?.id) === "0" ? undefined : selectedStatus?.id,
       startDate: dateRange.startDate,
       endDate: dateRange.endDate,
     },
@@ -65,7 +76,6 @@ export default function ReviewSlips() {
   const handleViewSlip = (slip: Slip) => {
     navigate(`/admin/slips/${slip.id}`);
   };
-
 
   const isPageLoading = isStatusesLoading;
 
@@ -89,19 +99,20 @@ export default function ReviewSlips() {
         <Button
           variant="outline"
           onClick={() => navigate("/admin/slips/logs")}
-          className="h-10 rounded-xl px-4 shadow-sm gap-2"
+          className="h-10 gap-2 rounded-xl px-4 shadow-sm"
         >
           <Archive className="h-4 w-4" />
           View All Logs
         </Button>
       </div>
     ),
-    [timeFilter, navigate]
+    [timeFilter, navigate],
   );
 
   usePageMetadata({
     title: "Review Excuse Slips",
-    description: "Review submissions, filter the queue, and process student requests.",
+    description:
+      "Review submissions, filter the queue, and process student requests.",
     badgeText: "Slip Management",
     badgeIcon: <FileText className="h-4 w-4" />,
     isLoading: isPageLoading,
@@ -110,8 +121,7 @@ export default function ReviewSlips() {
 
   return (
     <>
-      <div className="py-2 space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-300">
-
+      <div className="animate-in fade-in slide-in-from-bottom-4 space-y-6 py-2 duration-300">
         <SlipList
           slips={slips}
           isLoading={isLoading}

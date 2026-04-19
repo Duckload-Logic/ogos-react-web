@@ -10,25 +10,52 @@ import {
 
 export const personalInformationValidationSchema: FieldValidationSchema = {
   // Basic Information
-  "student.basicInfo.firstName": [commonRules.required("First name"), commonRules.minLength(2), commonRules.nameFormat(), commonRules.noSpecialChars("First name")],
-  "student.basicInfo.lastName": [commonRules.required("Last name"), commonRules.minLength(2), commonRules.nameFormat(), commonRules.noSpecialChars("Last name")],
-  "student.basicInfo.email": [commonRules.required("Email"), commonRules.email()],
+  "student.basicInfo.firstName": [
+    commonRules.required("First name"),
+    commonRules.minLength(2),
+    commonRules.nameFormat(),
+    commonRules.noSpecialChars("First name"),
+  ],
+  "student.basicInfo.lastName": [
+    commonRules.required("Last name"),
+    commonRules.minLength(2),
+    commonRules.nameFormat(),
+    commonRules.noSpecialChars("Last name"),
+  ],
+  "student.basicInfo.email": [
+    commonRules.required("Email"),
+    commonRules.email(),
+  ],
 
   // Personal Details
-  "student.personalInfo.studentNumber": [commonRules.required("Student number"), commonRules.studentNumber()],
+  "student.personalInfo.studentNumber": [
+    commonRules.required("Student number"),
+    commonRules.studentNumber(),
+  ],
   "student.personalInfo.suffix": [commonRules.suffixFormat()],
-  "student.personalInfo.dateOfBirth": [commonRules.required("Date of birth"), commonRules.validDate()],
-  "student.personalInfo.placeOfBirth": [commonRules.required("Place of birth"), commonRules.minLength(2), commonRules.noSpecialChars("Place of birth")],
+  "student.personalInfo.dateOfBirth": [
+    commonRules.required("Date of birth"),
+    commonRules.validDate(),
+  ],
+  "student.personalInfo.placeOfBirth": [
+    commonRules.required("Place of birth"),
+    commonRules.minLength(2),
+    commonRules.noSpecialChars("Place of birth"),
+  ],
   "student.personalInfo.gender": [commonRules.required("Gender")],
   "student.personalInfo.civilStatus": [commonRules.required("Civil status")],
   "student.personalInfo.religion": [commonRules.required("Religion")],
   "student.personalInfo.course": [commonRules.required("Course")],
-  "student.personalInfo.yearLevel": [commonRules.required("Year level"), commonRules.minValue(1), commonRules.maxValue(4)],
+  "student.personalInfo.yearLevel": [
+    commonRules.required("Year level"),
+    commonRules.minValue(1),
+    commonRules.maxValue(4),
+  ],
   "student.personalInfo.section": [
     commonRules.required("Section"),
     commonRules.numeric(),
     commonRules.minValue(1),
-    commonRules.maxValue(5)
+    commonRules.maxValue(5),
   ],
   "student.personalInfo.complexion": [
     commonRules.required("Complexion"),
@@ -58,15 +85,13 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
     commonRules.required("Mobile number"),
     commonRules.phone(),
   ],
-  "student.personalInfo.telephoneNumber": [
-    commonRules.telephone(),
-  ],
+  "student.personalInfo.telephoneNumber": [commonRules.telephone()],
   "student.personalInfo.isEmployed": [
     {
       type: "required",
       validate: (value: any) => value !== undefined && value !== null,
       message: "Please indicate if you are currently employed",
-    }
+    },
   ],
   "student.personalInfo.employerName": [
     {
@@ -91,7 +116,7 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
         return true;
       },
       message: "Employer address is required if employed",
-    }
+    },
   ],
 
   // Emergency Contact
@@ -114,40 +139,66 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
   ],
 
   // Addresses – Provincial
-  "student.addresses.0.address.region": [commonRules.required("Region (Provincial)")],
+  "student.addresses.0.address.region": [
+    commonRules.required("Region (Provincial)"),
+  ],
   "student.addresses.0.address.province": [
     {
       type: "required",
       validate: (value: any, rootData: any) => {
-        const regionCode = rootData?.student?.addresses?.[0]?.address?.region?.code;
+        const regionCode =
+          rootData?.student?.addresses?.[0]?.address?.region?.code;
         if (regionCode && regionCode !== "1300000000") {
-          return (value?.id !== undefined && value?.id !== "") || (value?.code !== undefined && value?.code !== "");
+          return (
+            (value?.id !== undefined && value?.id !== "") ||
+            (value?.code !== undefined && value?.code !== "")
+          );
         }
         return true;
       },
       message: "Province (Provincial) is required",
-    }
+    },
   ],
-  "student.addresses.0.address.city": [commonRules.required("City/Municipality (Provincial)")],
-  "student.addresses.0.address.barangay": [commonRules.required("Barangay (Provincial)")],
-  "student.addresses.0.address.streetDetail": [commonRules.required("Street (Provincial)"), commonRules.noSpecialChars("Street (Provincial)")],
+  "student.addresses.0.address.city": [
+    commonRules.required("City/Municipality (Provincial)"),
+  ],
+  "student.addresses.0.address.barangay": [
+    commonRules.required("Barangay (Provincial)"),
+  ],
+  "student.addresses.0.address.streetDetail": [
+    commonRules.required("Street (Provincial)"),
+    commonRules.noSpecialChars("Street (Provincial)"),
+  ],
 
   // Addresses – Residential
-  "student.addresses.1.address.region": [commonRules.required("Region (Residential)")],
+  "student.addresses.1.address.region": [
+    commonRules.required("Region (Residential)"),
+  ],
   "student.addresses.1.address.province": [
     {
       type: "required",
       validate: (value: any, rootData: any) => {
-        const regionCode = rootData?.student?.addresses?.[1]?.address?.region?.code;
+        const regionCode =
+          rootData?.student?.addresses?.[1]?.address?.region?.code;
         if (regionCode && regionCode !== "1300000000") {
-          return (value?.id !== undefined && value?.id !== "") || (value?.code !== undefined && value?.code !== "");
+          return (
+            (value?.id !== undefined && value?.id !== "") ||
+            (value?.code !== undefined && value?.code !== "")
+          );
         }
         return true;
       },
       message: "Province (Residential) is required",
-    }
+    },
   ],
-  "student.addresses.1.address.city": [commonRules.required("City/Municipality (Residential)")],
-  "student.addresses.1.address.barangay": [commonRules.required("Barangay (Residential)")],
-  "student.addresses.1.address.streetDetail": [commonRules.required("Street (Residential)"), commonRules.noSpecialChars("Street (Residential)")],
+  "student.addresses.1.address.city": [
+    commonRules.required("City/Municipality (Residential)"),
+  ],
+  "student.addresses.1.address.barangay": [
+    commonRules.required("Barangay (Residential)"),
+  ],
+  "student.addresses.1.address.streetDetail": [
+    commonRules.required("Street (Residential)"),
+    commonRules.noSpecialChars("Street (Residential)"),
+  ],
 };

@@ -6,6 +6,7 @@ import HealthView from "./HealthView";
 import InterestsHobbiesView from "./InterestsView";
 import TestResultsView from "./TestResultsView";
 import NotesView from "./NotesView";
+import { cn } from "@/lib/utils";
 
 export default function InfoContent({
   activeTab,
@@ -26,12 +27,23 @@ export default function InfoContent({
     interests: <InterestsHobbiesView data={studentData?.interests} />,
     testResults: <TestResultsView data={studentData?.testResults} />,
     ...(showSignificantNotes && {
-      significantNotes: <NotesView data={studentData?.significantNotes} iirId={iirId} />,
+      significantNotes: (
+        <NotesView
+          data={studentData?.significantNotes}
+          iirId={iirId}
+        />
+      ),
     }),
   } as Record<TabId, JSX.Element>;
 
   return (
-    <div className="bg-card w-full border-2 border-glass-border rounded-b-lg sm:rounded-t-lg shadow-lg p-4 sm:p-6 mb-4 z-10 min-h-[500px]">
+    <div
+      className={cn(
+        "z-10 mb-4 min-h-[500px] w-full rounded-b-lg border-2",
+        "border-glass-border bg-card p-4 shadow-lg sm:rounded-t-lg",
+        "sm:p-6",
+      )}
+    >
       {views[activeTab]}
     </div>
   );

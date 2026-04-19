@@ -7,7 +7,13 @@ import { useToast } from "@/context";
 import SignificantNotes from "@/features/notes/components/SignificantNotes";
 import EmptyState from "./EmptyState";
 
-export default function NotesView({ data, iirId }: { data: any; iirId?: string }) {
+export default function NotesView({
+  data,
+  iirId,
+}: {
+  data: any;
+  iirId?: string;
+}) {
   const { data: me } = useMe({});
   const resolvedId = iirId;
 
@@ -23,7 +29,7 @@ export default function NotesView({ data, iirId }: { data: any; iirId?: string }
   // Don't render if no IIR ID
   if (!resolvedId) {
     return (
-      <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="animate-in fade-in space-y-6 duration-500">
         <EmptyState label="No student ID found" />
       </div>
     );

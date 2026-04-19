@@ -133,7 +133,10 @@ export const ANIMATION_KEYFRAMES = `
 /**
  * Animation delay utilities for staggered animations
  */
-export const getAnimationDelay = (index: number, delayIncrement: number = 0.05) => {
+export const getAnimationDelay = (
+  index: number,
+  delayIncrement: number = 0.05,
+) => {
   return `${0.2 + index * delayIncrement}s`;
 };
 
@@ -141,9 +144,7 @@ export const getAnimationDelay = (index: number, delayIncrement: number = 0.05) 
  * Component wrapper for animation styles
  * Use this to inject animation keyframes into your pages
  */
-export const AnimationStyles = () => (
-  <style>{ANIMATION_KEYFRAMES}</style>
-);
+export const AnimationStyles = () => <style>{ANIMATION_KEYFRAMES}</style>;
 
 /**
  * Helper function to create staggered animation classes

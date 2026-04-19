@@ -120,7 +120,9 @@ export const commonRules = {
       validate: (value: any) => {
         if (value === "" || value === null || value === undefined) return true;
         const n = Number(value);
-        return !isNaN(n) && Number.isInteger(n) && n >= 1900 && n <= currentYear;
+        return (
+          !isNaN(n) && Number.isInteger(n) && n >= 1900 && n <= currentYear
+        );
       },
       message: `Must be a valid year between 1900 and ${new Date().getFullYear()}`,
     };
@@ -136,9 +138,21 @@ export const commonRules = {
         const year = parseInt(match[1], 10);
         const month = parseInt(match[2], 10);
         const day = parseInt(match[3], 10);
-        if (year < 1900 || year > currentYear || month < 1 || month > 12 || day < 1 || day > 31) return false;
+        if (
+          year < 1900 ||
+          year > currentYear ||
+          month < 1 ||
+          month > 12 ||
+          day < 1 ||
+          day > 31
+        )
+          return false;
         const d = new Date(year, month - 1, day);
-        return d.getFullYear() === year && d.getMonth() === month - 1 && d.getDate() === day;
+        return (
+          d.getFullYear() === year &&
+          d.getMonth() === month - 1 &&
+          d.getDate() === day
+        );
       },
       message: `Must be a valid date (year between 1900 and ${new Date().getFullYear()})`,
     };
@@ -155,10 +169,11 @@ export const commonRules = {
   telephone: (): ValidationRule => ({
     validate: (value: any) => {
       if (value === undefined || value === null || value === "") return true;
-      const clean = String(value).replace(/[\s\-\(\)]/g, '');
+      const clean = String(value).replace(/[\s\-\(\)]/g, "");
       return /^(\+63|0)(2[3578]\d{7}|[3-9]\d{1,2}\d{7})$/.test(clean);
     },
-    message: "Must be a valid Philippine telephone number (e.g. 02XXXXXXXXX or 09XXXXXXXXX)",
+    message:
+      "Must be a valid Philippine telephone number (e.g. 02XXXXXXXXX or 09XXXXXXXXX)",
   }),
 
   nameFormat: (): ValidationRule => ({
@@ -180,20 +195,29 @@ export const commonRules = {
   suffixFormat: (): ValidationRule => ({
     validate: (value: any) => {
       if (value === undefined || value === null || value === "") return true;
-      return /^(Jr\.|Sr\.|I|II|III|IV|V|VI|VII|VIII|IX|X)$/i.test(String(value).trim());
+      return /^(Jr\.|Sr\.|I|II|III|IV|V|VI|VII|VIII|IX|X)$/i.test(
+        String(value).trim(),
+      );
     },
-    message: "Invalid suffix. Allowed: Jr., Sr., or Roman Numerals (I, II, III, etc.)",
+    message:
+      "Invalid suffix. Allowed: Jr., Sr., or Roman Numerals (I, II, III, etc.)",
   }),
 
   complexionFormat: (): ValidationRule => ({
     validate: (value: any) => {
       if (value === undefined || value === null || value === "") return true;
-      return /^(Very Fair|Fair|Medium|Olive|Brown|Black)$/i.test(String(value).trim());
+      return /^(Very Fair|Fair|Medium|Olive|Brown|Black)$/i.test(
+        String(value).trim(),
+      );
     },
-    message: "Invalid complexion. Allowed: Very Fair, Fair, Medium, Olive, Brown, or Black",
+    message:
+      "Invalid complexion. Allowed: Very Fair, Fair, Medium, Olive, Brown, or Black",
   }),
 
-  siblingCount: (brothersField: string, sistersField: string): ValidationRule => ({
+  siblingCount: (
+    brothersField: string,
+    sistersField: string,
+  ): ValidationRule => ({
     validate: (value: any, rootData: any) => {
       if (value === "" || value === null || value === undefined) return true;
       const brothers = Number(getValueByPath(rootData, brothersField)) || 0;
@@ -203,7 +227,10 @@ export const commonRules = {
     message: "Employed siblings cannot exceed total number of siblings",
   }),
 
-  ordinalPosition: (brothersField: string, sistersField: string): ValidationRule => ({
+  ordinalPosition: (
+    brothersField: string,
+    sistersField: string,
+  ): ValidationRule => ({
     validate: (value: any, rootData: any) => {
       if (value === "" || value === null || value === undefined) return true;
       const brothers = Number(getValueByPath(rootData, brothersField)) || 0;
@@ -246,9 +273,9 @@ export const validateField = (
       }
     } catch (error) {
       console.error(`[ValidationSystem] Error in rule validate:`, {
-        ruleType: rule.type || 'unknown',
+        ruleType: rule.type || "unknown",
         value,
-        error
+        error,
       });
       // Return null on internal error to avoid blocking the user/crashing
       return null;
@@ -296,4 +323,3 @@ export const isFieldRequired = (
   if (!rules) return false;
   return rules.some((rule) => rule.type === "required");
 };
-
