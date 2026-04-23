@@ -67,6 +67,8 @@ export default function Callback() {
         let roleKey = "student";
 
         // Use returned data if available (OAuth)
+        let user: any;
+
         if (!isNative) {
           if (!code) {
             console.error("[AuthCallback] {Extract Params}: missing code");
@@ -77,24 +79,30 @@ export default function Callback() {
 
           // Exchange code for tokens (OAuth only)
           await PostIDPTokenExchange({ code });
-          const user = await GetCurrentUser();
+          user = await GetCurrentUser();
 
           // Synchronize AuthContext state before proceeding
           await refresh();
 
           roleKey =
-            user.role?.name?.toLowerCase().replace(/\s+/g, "") || "student";
+            user.roles?.[0]?.name?.toLowerCase().replace(/\s+/g, "") || "student";
         } else {
           // Synchronize AuthContext state (Native already refetched in Login.tsx
           // but we call it anyway for robustness)
           await refresh();
 
-          const user = await GetCurrentUser();
-          if (!user.role) {
+          user = await GetCurrentUser();
+          if (!user.roles || user.roles.length === 0) {
             throw new Error("User has no roles assigned");
           }
           roleKey =
-            user.role?.name?.toLowerCase().replace(/\s+/g, "") || "student";
+            user.roles?.[0]?.name?.toLowerCase().replace(/\s+/g, "") || "student";
+        }
+
+        // If multi-role, go to selection gateway
+        if (user && user.roles.length > 1) {
+          navigate("/auth/role-selection", { replace: true });
+          return;
         }
 
         const dashboardRoute = (ROLE_ROUTES_INTERNAL as Record<string, string>)[

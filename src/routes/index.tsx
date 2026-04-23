@@ -7,7 +7,6 @@ import Layout from "@/components/layout/Layout";
 import { usePageMetadata } from "@/context";
 import NotFound from "@/components/shared/NotFound";
 
-
 // Student Features
 import StudentDashboard from "@/pages/student/Dashboard";
 import StudentAppointments from "@/pages/student/appointments/StudentAppointments";
@@ -36,6 +35,7 @@ import Callback from "@/pages/auth/Callback";
 import NotificationsPage from "@/pages/shared/Notifications";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
+import RoleSelection from "@/pages/auth/RoleSelection";
 
 // Super Admin Pages
 import SuperAdminDashboard from "@/pages/superadmin/SuperAdminDashboard";
@@ -278,7 +278,7 @@ export const routes: RouteObject[] = [
 
   // Developer routes
   {
-    path: "/dev",
+    path: "/developer",
     element: (
       <ProtectedRoute requiredRole="developer">
         <Layout />
@@ -293,10 +293,17 @@ export const routes: RouteObject[] = [
     ],
   },
 
-  // OAuth callback route (public, no layout)
   {
     path: "/auth/callback",
     element: <Callback />,
+  },
+  {
+    path: "/auth/role-selection",
+    element: (
+      <ProtectedRoute>
+        <RoleSelection />
+      </ProtectedRoute>
+    ),
   },
 
   // 404
