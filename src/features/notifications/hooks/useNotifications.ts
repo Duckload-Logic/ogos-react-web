@@ -1,11 +1,15 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { GetMyNotifications, PatchNotificationRead } from "../services";
 import { QUERY_KEYS } from "@/config/queryKeys";
+import { useAuth } from "@/context";
 
 export function useGetNotifications() {
+  const { isAuthenticated } = useAuth();
+
   return useQuery({
     queryKey: QUERY_KEYS.notifications.me,
     queryFn: () => GetMyNotifications(),
+    enabled: isAuthenticated,
   });
 }
 

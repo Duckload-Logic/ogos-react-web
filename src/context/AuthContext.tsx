@@ -8,7 +8,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useMe } from "@/features/users/hooks/useMe";
 import { useLogout as useLogoutMutation } from "@/features/auth/hooks";
-import { BootstrapApp } from "@/services/bootstrapper";
 import { User } from "@/features/users/types/user";
 
 interface AuthContextType {
@@ -17,6 +16,10 @@ interface AuthContextType {
   isLoading: boolean;
   user: User | null;
   refresh: () => Promise<void>;
+  isStudent: boolean;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
+  isDeveloper: boolean;
 }
 
 export const AuthContext = createContext<AuthContextType | undefined>(
@@ -44,12 +47,19 @@ export const AuthProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const isCallbackPage = window.location.pathname === "/auth/callback";
+  const isAuthPage =
+    window.location.pathname === "/" ||
+    window.location.pathname === "/login" ||
+    window.location.pathname === "/register" ||
+    window.location.pathname.startsWith("/auth");
+  const hasSessionFlag = localStorage.getItem("session_active") === "true";
+
   const {
     data: user,
     status,
     isError,
     refetch,
-  } = useMe({ enabled: !isCallbackPage });
+  } = useMe({ enabled: !isCallbackPage && (hasSessionFlag || !isAuthPage) });
   const { logout: logoutMutation } = useLogoutMutation();
   const [hasTimedOut, setHasTimedOut] = useState(false);
 
@@ -74,16 +84,13 @@ export const AuthProvider: React.FC<{
   }, [status]);
 
   /**
-   * Trigger bootstrap when user is authenticated
-   * Fetches critical data once on successful auth
+   * Clear session flag on error
    */
   useEffect(() => {
-    if (user && status === "success" && !isError) {
-      BootstrapApp().catch((error: any) => {
-        console.error("[AuthProvider] {Bootstrap}: " + `${error.message}`);
-      });
+    if (isError) {
+      localStorage.removeItem("session_active");
     }
-  }, [user, status, isError]);
+  }, [isError]);
 
   const logout = () => {
     logoutMutation();
@@ -94,6 +101,15 @@ export const AuthProvider: React.FC<{
    * and we have a user object
    */
   const isAuthenticated = status === "success" && !!user;
+
+  /**
+   * Role identification based on backend-provided role name
+   */
+  const userRole = user?.role?.name?.toLowerCase().replace(/\s+/g, "") || "";
+  const isStudent = userRole === "student";
+  const isAdmin = userRole === "admin";
+  const isSuperAdmin = userRole === "superadmin";
+  const isDeveloper = userRole === "developer";
 
   /**
    * Loading is true only while query is pending
@@ -115,6 +131,10 @@ export const AuthProvider: React.FC<{
         refresh: async () => {
           await refetch();
         },
+        isStudent,
+        isAdmin,
+        isSuperAdmin,
+        isDeveloper,
       }}
     >
       {children}

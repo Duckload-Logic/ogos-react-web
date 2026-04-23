@@ -24,15 +24,31 @@ export const IIRGate = ({
   children,
   allowOnGuidancePage = false,
 }: IIRGateProps) => {
-  const { data: isSubmitted, isLoading: isIIRLoading } = useIIRStatus();
+  const { user, isLoading: isAuthLoading } = useAuth();
+  const {
+    data: isSubmitted,
+    isPending: isIIRPending,
+    isFetching: isIIRFetching,
+  } = useIIRStatus();
 
-  if (isIIRLoading) {
+  // Non-students (Admin, SuperAdmin, Dev) bypass the gate
+  const roleName = user?.role?.name?.toLowerCase();
+  const isStudent = roleName === "student";
+
+  // While auth or IIR status is being determined, show loading
+  // For students, we MUST wait for the IIR check to complete
+  if (isAuthLoading || (isStudent && isIIRPending)) {
     return (
       <Spinner
         size="lg"
-        message="Checking your profile..."
+        message="Verifying your profile..."
       />
     );
+  }
+
+  // Non-students bypass the rest of the gate logic
+  if (!isStudent) {
+    return <>{children}</>;
   }
 
   // If PDS is not completed and this is not the form page
