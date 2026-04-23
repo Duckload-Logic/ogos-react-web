@@ -59,7 +59,7 @@ export default function IIRProfile() {
 
   const isLoading = isWaitingForMe || isWaitingForIirId || isWaitingForProfile;
 
-  const isAdmin = me?.role.name.toLowerCase() === "admin";
+  const isAdmin = me?.roles?.some(r => r.name.toLowerCase() === "admin") || false;
   const showSignificantNotes = isAdmin;
 
   usePageMetadata({

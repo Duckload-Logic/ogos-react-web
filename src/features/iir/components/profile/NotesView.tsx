@@ -18,8 +18,8 @@ export default function NotesView({
   const resolvedId = iirId;
 
   // Check if user has authorized role
-  const userRole = me?.role.name.toLowerCase();
-  const isAuthorized = userRole === "admin" || userRole === "counselor";
+  const roles = me?.roles?.map(r => r.name.toLowerCase()) || [];
+  const isAuthorized = roles.includes("admin") || roles.includes("counselor");
 
   // Don't render for unauthorized users
   if (!isAuthorized) {
