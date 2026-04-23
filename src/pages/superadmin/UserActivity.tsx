@@ -44,9 +44,17 @@ export default function UserActivity() {
             </h2>
             <div className="flex items-center gap-2 mt-0.5">
               <span className="text-sm text-muted-foreground">{targetUser.email}</span>
-              <Badge variant="outline" className="text-[10px] h-5 rounded-full uppercase tracking-wider">
-                {targetUser.role.name}
-              </Badge>
+              <div className="flex flex-wrap gap-1">
+                {targetUser.roles.map((role) => (
+                  <Badge
+                    key={role.id}
+                    variant="outline"
+                    className="text-[10px] h-5 rounded-full uppercase tracking-wider"
+                  >
+                    {role.name}
+                  </Badge>
+                ))}
+              </div>
             </div>
           </div>
         </div>

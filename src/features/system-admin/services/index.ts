@@ -389,6 +389,35 @@ export const GetUserActivity = async (
     throw error;
   }
 };
+/**
+ * Update user roles with audit trail
+ */
+export const PostUpdateUserRoles = async (
+  userId: string,
+  roleIds: number[],
+  reason: string,
+  referenceId: string,
+  config?: AxiosConfigWithMeta,
+): Promise<void> => {
+  try {
+    await apiClient.post(
+      API_ROUTES.superadmin.users.updateRoles,
+      {
+        userId,
+        roleIds,
+        reason,
+        referenceId,
+      },
+      config,
+    );
+  } catch (error) {
+    const handlerName = config?.handlerName || "PostUpdateUserRoles";
+    const stepName = config?.stepName || "Update User Roles";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+    throw error;
+  }
+};
+
 export const superadminService = {
   listM2MClients: GetM2MClients,
   createM2MClient: PostM2MClient,
@@ -398,6 +427,7 @@ export const superadminService = {
   listUsers: GetUsers,
   getUserDistribution: GetUserDistribution,
   toggleUserStatus: PostToggleUserStatus,
+  updateUserRoles: PostUpdateUserRoles,
   getAdminAnalytics: GetAdminAnalytics,
   getSecurityLogs: GetSecurityLogs,
   getSystemLogs: GetSystemLogs,

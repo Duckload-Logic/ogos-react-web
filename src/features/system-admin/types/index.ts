@@ -36,7 +36,7 @@ export interface UserAccount {
   lastName: string;
   suffixName?: string;
   email: string;
-  role: UserRole;
+  roles: UserRole[];
   isActive: boolean;
   createdAt: string;
   updatedAt: string;

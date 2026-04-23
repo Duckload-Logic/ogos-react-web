@@ -99,6 +99,28 @@ export function useToggleUserStatus() {
   });
 }
 
+export function useUpdateUserRoles() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      userId,
+      roleIds,
+      reason,
+      referenceId,
+    }: {
+      userId: string;
+      roleIds: number[];
+      reason: string;
+      referenceId: string;
+    }) => superadminService.updateUserRoles(userId, roleIds, reason, referenceId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: ["superadmin", "users"],
+      });
+    },
+  });
+}
+
 // Analytics hooks
 export function useAdminAnalytics(range?: "daily" | "weekly" | "monthly" | "yearly") {
   return useQuery({
