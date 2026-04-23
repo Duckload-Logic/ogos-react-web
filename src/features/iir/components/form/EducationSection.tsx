@@ -22,7 +22,7 @@ interface FormErrors {
 }
 
 interface EducationSectionRef {
-  validate: () => { isValid: boolean; errors: FormErrors };
+  validate: (step?: number) => { isValid: boolean; errors: FormErrors };
 }
 
 export const EducationSection = forwardRef<
@@ -39,7 +39,7 @@ export const EducationSection = forwardRef<
 ) {
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const validate = (): { isValid: boolean; errors: FormErrors } => {
+  const validate = (step?: number): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors = validateObject(
       { education },
       educationValidationSchema,
@@ -52,7 +52,7 @@ export const EducationSection = forwardRef<
   };
 
   useImperativeHandle(ref, () => ({
-    validate,
+    validate: (step?: number) => validate(step),
   }));
 
   const clearError = (field: string) => {
