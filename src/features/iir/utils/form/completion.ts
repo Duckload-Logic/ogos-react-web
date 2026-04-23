@@ -13,6 +13,7 @@ import { educationValidationSchema } from "../../config/educationValidationSchem
 import { familyValidationSchema } from "../../config/familyValidationSchema";
 import { healthValidationSchema } from "../../config/healthValidationSchema";
 import { interestsValidationSchema } from "../../config/interestsValidationSchema";
+import { PERSONAL_SUBSTEP_FIELDS, FAMILY_SUBSTEP_FIELDS } from "../../config/subStepFields";
 
 /**
  * Calculate completion from a schema by identifying "active" required fields
@@ -20,15 +21,17 @@ import { interestsValidationSchema } from "../../config/interestsValidationSchem
 function calculateCompletionFromSchema(
   schema: FieldValidationSchema,
   data: any,
+  allowedFields?: string[],
 ): number {
   let totalCount = 0;
   let filledCount = 0;
 
   Object.entries(schema).forEach(([fieldPath, rules]) => {
+    // If allowedFields is provided, skip fields not in the list
+    if (allowedFields && !allowedFields.includes(fieldPath)) return;
+
     // A field is "active required" if the required rule is present
     // AND passes when the field is empty (meaning it's technically optional under current conditions)
-    // Actually, isActive logic in line 29 was: !requiredRule.validate(null, data);
-    // This means "if I pass null, does it fail?". If yes, it's currently required.
     const requiredRule = rules.find((r) => r.type === "required");
     if (!requiredRule) return;
 
@@ -62,21 +65,32 @@ export function calculateSectionCompletion(
 
   switch (sectionIndex) {
     case 1:
-      // Personal Information
+    case 2:
+    case 3:
+    case 4:
+      // Personal Information sub-steps
       return calculateCompletionFromSchema(
         personalInformationValidationSchema,
         formData,
+        PERSONAL_SUBSTEP_FIELDS[sectionIndex],
       );
 
-    case 2:
+    case 5:
       // Education
       return calculateCompletionFromSchema(educationValidationSchema, formData);
 
-    case 3:
-      // Family Background
-      return calculateCompletionFromSchema(familyValidationSchema, formData);
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+      // Family Background sub-steps
+      return calculateCompletionFromSchema(
+        familyValidationSchema,
+        formData,
+        FAMILY_SUBSTEP_FIELDS[sectionIndex - 5],
+      );
 
-    case 4: {
+    case 10: {
       // Health Information
       // Helper to map consultations by type for easy access in rules
       const _consultations = (formData.health?.consultations || []).reduce(
@@ -92,7 +106,7 @@ export function calculateSectionCompletion(
       });
     }
 
-    case 5:
+    case 11:
       // Interests and Hobbies
       return calculateCompletionFromSchema(interestsValidationSchema, formData);
 
