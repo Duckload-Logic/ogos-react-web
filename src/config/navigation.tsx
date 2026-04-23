@@ -126,17 +126,17 @@ export const NAV_CONFIG: Record<string, NavItem[]>[] = [
     developer: [
       {
         label: "Developer Hub",
-        href: "/dev",
+        href: "/developer",
         icon: <Code size={ICON_SIZE} />,
       },
       {
         label: "API Documentation",
-        href: "/dev/docs",
+        href: "/developer/docs",
         icon: <BookOpen size={ICON_SIZE} />,
       },
       {
         label: "Dev Guides",
-        href: "/dev/guides",
+        href: "/developer/guides",
         icon: <FileText size={ICON_SIZE} />,
       },
     ],
