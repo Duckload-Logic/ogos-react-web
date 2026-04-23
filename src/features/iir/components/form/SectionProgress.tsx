@@ -54,8 +54,7 @@ export function SectionProgress({
   const isSectionFinished = (id: number) => {
     const hasError = sectionsWithErrors.includes(id);
     const completionPercent = calculateCompletion ? calculateCompletion(id) : 0;
-    const wasVisited = visitedSections.includes(id);
-    return !hasError && completionPercent === 100 && wasVisited;
+    return !hasError && completionPercent === 100;
   };
 
   const isNavigable = (id: number) => {
@@ -158,113 +157,144 @@ export function SectionProgress({
           )}
         </div>
 
-        {/* === Desktop Professional Segmented Bar === */}
-        <div className="hidden md:block">
-          <div className="mb-3 flex items-center justify-between px-1">
-            <div className="flex items-center gap-3">
-              <h2 className="text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground">
-                Form Progress
-              </h2>
-              {lastSaved && (
-                <span className="text-[10px] italic text-muted-foreground/40">
-                  Draft saved {lastSaved}
-                </span>
-              )}
-            </div>
-            <div
-              className={cn(
-                "flex items-center gap-4 text-[10px] font-bold uppercase",
-                "tracking-wider text-muted-foreground/60",
-              )}
-            >
-              <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-primary" /> Active
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="h-2 w-2 rounded-full bg-green-500" /> Complete
-              </div>
-            </div>
-          </div>
-
+        {/* === Desktop Professional Vertical Sidebar === */}
+        <div className="hidden lg:block">
           <div
             className={cn(
-              "flex w-full overflow-hidden rounded-2xl border",
-              "border-neutral-200 bg-neutral-100/50 shadow-sm",
-              "dark:border-neutral-800 dark:bg-neutral-900/50",
+              "sticky top-24 flex flex-col gap-6 rounded-[32px] border",
+              "border-white/20 bg-white/40 p-6 shadow-2xl backdrop-blur-2xl",
+              "dark:border-white/10 dark:bg-white/[0.04]",
             )}
           >
-            {sections.map((section, index) => {
-              const active = currentSection === section.id;
-              const finished = isSectionFinished(section.id);
-              const hasError = sectionsWithErrors.includes(section.id);
-              const navigable = isNavigable(section.id);
-              const isShaking = shakingSection === section.id;
-
-              return (
-                <button
-                  key={section.id}
-                  onClick={() => handleSectionClick(section.id)}
-                  className={cn(
-                    "relative flex flex-1 items-center justify-center",
-                    "gap-2.5 border-r border-neutral-200 py-4.5 px-4",
-                    "transition-all last:border-r-0 dark:border-neutral-800",
-                    active
-                      ? "bg-white text-foreground dark:bg-neutral-800"
-                      : cn(
-                          "text-muted-foreground hover:bg-white/50",
-                          "dark:hover:bg-neutral-800/50",
-                        ),
-                    !navigable && !active
-                      ? "cursor-not-allowed opacity-30"
-                      : "cursor-pointer",
-                    isShaking && "animate-subtle-shake bg-destructive/5",
-                  )}
-                >
+            <div className="flex flex-col gap-1 px-1">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.25em] text-primary">
+                IIR Wizard Progress
+              </h2>
+              <div className="flex items-center gap-2">
+                <div className="h-1 w-12 rounded-full bg-primary/20">
                   <div
+                    className="h-full bg-primary transition-all duration-500"
+                    style={{
+                      width: `${(visitedSections.length / sections.length) * 100}%`,
+                    }}
+                  />
+                </div>
+                <span className="text-[10px] font-bold text-muted-foreground/60">
+                  {visitedSections.length}/{sections.length} Steps
+                </span>
+              </div>
+            </div>
+
+            <nav className="flex flex-col gap-1">
+              {sections.map((section, index) => {
+                const active = currentSection === section.id;
+                const finished = isSectionFinished(section.id);
+                const hasError = sectionsWithErrors.includes(section.id);
+                const navigable = isNavigable(section.id);
+                const isShaking = shakingSection === section.id;
+                const sectionTitle =
+                  section.title.split(". ")[1] || section.title;
+
+                return (
+                  <button
+                    key={section.id}
+                    onClick={() => handleSectionClick(section.id)}
                     className={cn(
-                      "flex h-6 w-6 flex-shrink-0 items-center",
-                      "justify-center rounded-lg border text-[11px]",
-                      "font-bold",
+                      "group relative flex items-start gap-4 rounded-2xl p-3",
+                      "text-left transition-all duration-300",
                       active
-                        ? "border-primary bg-primary text-white"
-                        : finished
-                          ? "border-green-500/20 bg-green-500/10 text-green-600"
-                          : "bg-neutral-200/50 dark:border-neutral-700",
-                      !active && !finished && "text-muted-foreground",
+                        ? "bg-white shadow-xl shadow-primary/5 dark:bg-white/10"
+                        : cn(
+                            "hover:bg-white/50 dark:hover:bg-white/5",
+                            "opacity-80 hover:opacity-100",
+                          ),
+                      !navigable && !active && "cursor-not-allowed grayscale",
+                      isShaking && "animate-subtle-shake",
                     )}
                   >
-                    {finished ? (
-                      <Check
-                        className="h-3.5 w-3.5"
-                        strokeWidth={4}
+                    {/* Vertical Line Connector */}
+                    {index !== sections.length - 1 && (
+                      <div
+                        className={cn(
+                          "absolute left-[23px] top-[44px] h-[calc(100%-12px)] w-[2px]",
+                          finished
+                            ? "bg-green-500/30"
+                            : "bg-neutral-200 dark:bg-neutral-800",
+                        )}
                       />
-                    ) : (
-                      section.id
                     )}
-                  </div>
 
-                  <span
-                    className={cn(
-                      "text-[11px] font-bold uppercase tracking-tight",
-                      active ? "opacity-100" : "opacity-60",
+                    {/* Step Icon/Number */}
+                    <div
+                      className={cn(
+                        "relative z-10 flex h-7 w-7 flex-shrink-0 items-center",
+                        "justify-center rounded-xl border-2 text-[12px]",
+                        "font-black transition-all duration-300",
+                        active
+                          ? "scale-110 border-primary bg-primary text-white shadow-lg shadow-primary/30"
+                          : finished
+                            ? "border-green-500 bg-green-500 text-white"
+                            : "border-neutral-200 bg-neutral-100 text-neutral-400 dark:border-neutral-800 dark:bg-neutral-900",
+                        !navigable && !active && "opacity-40",
+                      )}
+                    >
+                      {finished ? (
+                        <Check
+                          className="h-4 w-4"
+                          strokeWidth={4}
+                        />
+                      ) : hasError ? (
+                        <AlertCircle className="h-4 w-4" />
+                      ) : (
+                        section.id
+                      )}
+                    </div>
+
+                    <div className="flex flex-col gap-0.5">
+                      <span
+                        className={cn(
+                          "text-[12px] font-bold tracking-tight transition-colors",
+                          active
+                            ? "text-foreground"
+                            : finished
+                              ? "text-green-600 dark:text-green-500"
+                              : "text-muted-foreground",
+                          !navigable && !active && "opacity-50",
+                        )}
+                      >
+                        {sectionTitle}
+                      </span>
+                      {active && (
+                        <span className="text-[9px] font-medium uppercase tracking-widest text-primary/70">
+                          Current Step
+                        </span>
+                      )}
+                      {!navigable && !active && (
+                        <div className="flex items-center gap-1">
+                          <Lock className="h-2.5 w-2.5 text-neutral-400" />
+                          <span className="text-[9px] font-bold text-neutral-400">
+                            Locked
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {active && (
+                      <div className="absolute right-3 top-1/2 h-1.5 w-1.5 -translate-y-1/2 animate-pulse rounded-full bg-primary" />
                     )}
-                  >
-                    {section.title.split(". ")[1] || section.title}
-                  </span>
+                  </button>
+                );
+              })}
+            </nav>
 
-                  {!navigable && !active && (
-                    <Lock className="ml-1 h-3 w-3 opacity-40" />
-                  )}
-                  {hasError && (
-                    <AlertCircle className="ml-1 h-3 w-3 text-orange-500" />
-                  )}
-
-                  {active && (
-                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary" />
-                  )}
-                </button>
-              );
-            })}
+            {lastSaved && (
+              <div className="mt-2 flex items-center gap-2 rounded-xl bg-primary/5 px-3 py-2">
+                <div className="h-1 w-1 animate-pulse rounded-full bg-primary" />
+                <span className="text-[8px] font-bold text-primary/60">
+                  Last auto-saved: {lastSaved}
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </div>
