@@ -26,7 +26,7 @@ interface FormErrors {
 }
 
 interface InterestsSectionRef {
-  validate: () => { isValid: boolean; errors: FormErrors };
+  validate: (step?: number) => { isValid: boolean; errors: FormErrors };
 }
 
 export const InterestsSection = forwardRef<
@@ -44,7 +44,7 @@ export const InterestsSection = forwardRef<
   const [errors, setErrors] = useState<FormErrors>({});
   const { data: activityOptions = [] } = useActivityOptions();
 
-  const validate = (): { isValid: boolean; errors: FormErrors } => {
+  const validate = (step?: number): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors = validateObject(
       { interests },
       interestsValidationSchema,
@@ -57,7 +57,7 @@ export const InterestsSection = forwardRef<
   };
 
   useImperativeHandle(ref, () => ({
-    validate,
+    validate: (step?: number) => validate(step),
   }));
 
   const clearError = (field: string) => {

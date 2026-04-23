@@ -55,12 +55,14 @@ import {
 } from "@/features/iir/config/personalInfoValidationSchema";
 import { cn } from "@/lib/utils";
 
+import { PERSONAL_SUBSTEP_FIELDS } from "@/features/iir/config/subStepFields";
+
 interface FormErrors {
   [key: string]: string;
 }
 
 interface PersonalSectionRef {
-  validate: () => { isValid: boolean; errors: FormErrors };
+  validate: (step?: number) => { isValid: boolean; errors: FormErrors };
 }
 
 export const PersonalSection = forwardRef<
@@ -70,6 +72,7 @@ export const PersonalSection = forwardRef<
     onChange: (path: string, value: any) => void;
     onFieldBlur?: (fieldPath: string) => void;
     shouldShowError?: (fieldPath: string) => boolean;
+    subStep?: number;
   }
 >(function PersonalSection(
   {
@@ -77,15 +80,17 @@ export const PersonalSection = forwardRef<
     onChange,
     onFieldBlur,
     shouldShowError,
+    subStep = 1,
   }: {
     studentInfo: StudentSection;
     onChange: (path: string, value: any) => void;
     onFieldBlur?: (fieldPath: string) => void;
     shouldShowError?: (fieldPath: string) => boolean;
+    subStep?: number;
   },
   ref,
 ) {
-  const { data: courses = [] } = useCourses();
+  const { data: courses = [], isLoading: isCoursesLoading } = useCourses();
   const { data: genders = [] } = useGenders();
   const { data: civilStatuses = [] } = useCivilStatuses();
   const { data: religions = [] } = useReligions();
@@ -229,9 +234,10 @@ export const PersonalSection = forwardRef<
     emergency: emergencyAddr?.city,
   };
 
-  // Detect if provincial region is NCR (code: 1300000000)
+  // Detect if regions are NCR (code: 1300000000)
   const isProvincialNCR = addressRegion.provincial?.code === "1300000000";
   const isResidentialNCR = addressRegion.residential?.code === "1300000000";
+  const isEmergencyNCR = addressRegion.emergency?.code === "1300000000";
 
   // Get provinces for provincial address
   const { data: provincialProvinces = [] } = useGetProvinces(
@@ -247,6 +253,13 @@ export const PersonalSection = forwardRef<
       : undefined,
   );
 
+  // Get provinces for emergency address
+  const { data: emergencyProvinces = [] } = useGetProvinces(
+    !isEmergencyNCR && addressRegion.emergency?.code
+      ? addressRegion.emergency.code
+      : undefined,
+  );
+
   // Get cities for provincial address
   const { data: provincialCities = [], isLoading: isProvincialCitiesLoading } =
     useGetCities(addressRegion.provincial?.code || "", "");
@@ -256,6 +269,10 @@ export const PersonalSection = forwardRef<
     data: residentialCities = [],
     isLoading: isResidentialCitiesLoading,
   } = useGetCities(addressRegion.residential?.code || "", "");
+
+  // Get cities for emergency address
+  const { data: emergencyCities = [], isLoading: isEmergencyCitiesLoading } =
+    useGetCities(addressRegion.emergency?.code || "", "");
 
   // Get barangays for provincial address
   const {
@@ -268,6 +285,12 @@ export const PersonalSection = forwardRef<
     data: residentialBarangays = [],
     isLoading: isResidentialBarangaysLoading,
   } = useGetBarangays(addressCity.residential?.code || "");
+
+  // Get barangays for emergency address
+  const {
+    data: emergencyBarangays = [],
+    isLoading: isEmergencyBarangaysLoading,
+  } = useGetBarangays(addressCity.emergency?.code || "");
 
   const getRuntimeSchema = (): FieldValidationSchema => {
     const schema: FieldValidationSchema = {
@@ -285,15 +308,28 @@ export const PersonalSection = forwardRef<
   };
   const runtimeSchema = getRuntimeSchema();
 
-  const validate = (): { isValid: boolean; errors: FormErrors } => {
+  const validate = (step?: number): { isValid: boolean; errors: FormErrors } => {
     const runtimeSchema = getRuntimeSchema();
+    const activeStep = step ?? subStep;
 
+    // Filter schema to only include fields for the specified sub-step
+    const filteredSchema: FieldValidationSchema = {};
+    const targetFields = PERSONAL_SUBSTEP_FIELDS[activeStep] || [];
+
+    targetFields.forEach((field) => {
+      if (runtimeSchema[field]) {
+        filteredSchema[field] = runtimeSchema[field];
+      }
+    });
+
+    // If no step specified or invalid, validate nothing (or all if that's desired)
+    // For specific sub-step transitions, we only care about visible fields.
     const sectionErrors = validateObject(
       { student: studentInfo },
-      runtimeSchema,
+      filteredSchema,
     );
 
-    setErrors(sectionErrors);
+    setErrors((prev) => ({ ...prev, ...sectionErrors }));
     return {
       isValid: Object.keys(sectionErrors).length === 0,
       errors: sectionErrors,
@@ -301,7 +337,7 @@ export const PersonalSection = forwardRef<
   };
 
   useImperativeHandle(ref, () => ({
-    validate,
+    validate: (step?: number) => validate(step),
   }));
 
   const clearError = (field: string) => {
@@ -354,13 +390,14 @@ export const PersonalSection = forwardRef<
   };
 
   return (
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-6">
       {/* 1. Primary Information */}
-      <SectionContainer
-        title="Primary Information"
-        description="Official academic identity and name"
-        icon={User}
-      >
+      {subStep === 1 && (
+        <SectionContainer
+          title="Primary Information"
+          description="Official academic identity and name"
+          icon={User}
+        >
         <div className="grid grid-cols-1 gap-6 md:grid-cols-6">
           <div className="md:col-span-2">
             <FormInput
@@ -455,6 +492,7 @@ export const PersonalSection = forwardRef<
                 runtimeSchema,
                 "student.personalInfo.course",
               )}
+              enabled={!isCoursesLoading}
             />
           </div>
 
@@ -518,13 +556,15 @@ export const PersonalSection = forwardRef<
           </div>
         </div>
       </SectionContainer>
+      )}
 
       {/* 2. Personal Profile */}
-      <SectionContainer
-        title="Personal Profile"
-        description="Detailed personal characteristics"
-        icon={Activity}
-      >
+      {subStep === 2 && (
+        <SectionContainer
+          title="Personal Profile"
+          description="Detailed personal characteristics"
+          icon={Activity}
+        >
         <div className="grid grid-cols-1 gap-6 md:grid-cols-6">
           <div className="md:col-span-2">
             <Dropdown
@@ -715,845 +755,832 @@ export const PersonalSection = forwardRef<
           </div>
         </div>
       </SectionContainer>
-
-      {/* 3. Contact Details */}
-      <SectionContainer
-        title="Contact Details"
-        description="Channels for communication"
-        icon={Mail}
-      >
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-6">
-          <div className="md:col-span-6">
-            <FormInput
-              label="Email Address"
-              type="email"
-              value={studentInfo?.basicInfo?.email || ""}
-              onChange={(val: any) =>
-                handleInputChange("student.basicInfo.email", val)
-              }
-              error={errors["student.basicInfo.email"]}
-              placeholder="student@example.com"
-              required={isFieldRequired(
-                runtimeSchema,
-                "student.basicInfo.email",
-              )}
-              disabled
-            />
-          </div>
-          <div className="md:col-span-3">
-            <FormInput
-              label="Mobile Number"
-              inputMode="numeric"
-              value={studentInfo?.personalInfo?.mobileNumber || ""}
-              onChange={(val: any) => {
-                const cleaned = val.replace(/[^0-9]/g, "");
-                handleInputChange(
-                  "student.personalInfo.mobileNumber",
-                  cleaned.slice(0, 11),
-                );
-              }}
-              error={errors["student.personalInfo.mobileNumber"]}
-              placeholder="09XXXXXXXXX"
-              required={isFieldRequired(
-                runtimeSchema,
-                "student.personalInfo.mobileNumber",
-              )}
-            />
-          </div>
-          <div className="md:col-span-3">
-            <FormInput
-              label="Telephone Number"
-              inputMode="numeric"
-              value={studentInfo?.personalInfo?.telephoneNumber || ""}
-              onChange={(val: any) => {
-                const cleaned = val.replace(/[^0-9]/g, "");
-                handleInputChange(
-                  "student.personalInfo.telephoneNumber",
-                  cleaned.slice(0, 10),
-                );
-              }}
-              error={errors["student.personalInfo.telephoneNumber"]}
-              placeholder="Optional"
-            />
-          </div>
-        </div>
-      </SectionContainer>
+      )}
 
       {/* 4. Employment Profile */}
-      <SectionContainer
-        title="Employment Profile"
-        description="Current employment status and details"
-        icon={Briefcase}
-      >
-        <div className="flex flex-col gap-6">
-          <Checkbox
-            id="isEmployed"
-            label="Currently Employed"
-            name="isEmployed"
-            checked={studentInfo?.personalInfo?.isEmployed || false}
-            onCheckedChange={(checked: boolean | "indeterminate") => {
-              const isChecked = checked === true;
-              handleInputChange("student.personalInfo.isEmployed", isChecked);
-            }}
-            info={cn(
-              "Mark this if you're currently working.",
-              "Additional fields will appear below.",
-            )}
-          />
-
-          {studentInfo?.personalInfo?.isEmployed && (
-            <div
-              className={cn(
-                "animate-fade-in grid grid-cols-1 gap-6 border-t",
-                "border-border/10 pt-6 md:grid-cols-2",
+      {subStep === 4 && (
+        <SectionContainer
+          title="Employment Profile"
+          description="Current employment status and details"
+          icon={Briefcase}
+        >
+          <div className="flex flex-col gap-6">
+            <Checkbox
+              id="isEmployed"
+              label="Currently Employed"
+              name="isEmployed"
+              checked={studentInfo?.personalInfo?.isEmployed || false}
+              onCheckedChange={(checked: boolean | "indeterminate") => {
+                const isChecked = checked === true;
+                handleInputChange("student.personalInfo.isEmployed", isChecked);
+              }}
+              info={cn(
+                "Mark this if you're currently working.",
+                "Additional fields will appear below.",
               )}
-            >
-              <FormInput
-                label="Employer Name"
-                value={studentInfo?.personalInfo?.employerName || ""}
-                onChange={(val: any) =>
-                  handleInputChange("student.personalInfo.employerName", val)
-                }
-                placeholder="Company name"
-                error={errors["student.personalInfo.employerName"]}
-                required={isFieldRequired(
-                  runtimeSchema,
-                  "student.personalInfo.employerName",
+            />
+
+            {studentInfo?.personalInfo?.isEmployed && (
+              <div
+                className={cn(
+                  "animate-fade-in grid grid-cols-1 gap-6 border-t",
+                  "border-border/10 pt-6 md:grid-cols-2",
                 )}
-              />
-              <FormInput
-                label="Employer Address"
-                value={studentInfo?.personalInfo?.employerAddress || ""}
-                onChange={(val: any) =>
-                  handleInputChange("student.personalInfo.employerAddress", val)
-                }
-                placeholder="Company address"
-                error={errors["student.personalInfo.employerAddress"]}
-                required={isFieldRequired(
-                  runtimeSchema,
-                  "student.personalInfo.employerAddress",
-                )}
-              />
-            </div>
-          )}
-        </div>
-      </SectionContainer>
+              >
+                <FormInput
+                  label="Employer Name"
+                  value={studentInfo?.personalInfo?.employerName || ""}
+                  onChange={(val: any) =>
+                    handleInputChange("student.personalInfo.employerName", val)
+                  }
+                  placeholder="Company name"
+                  error={errors["student.personalInfo.employerName"]}
+                  required={isFieldRequired(
+                    runtimeSchema,
+                    "student.personalInfo.employerName",
+                  )}
+                />
+                <FormInput
+                  label="Employer Address"
+                  value={studentInfo?.personalInfo?.employerAddress || ""}
+                  onChange={(val: any) =>
+                    handleInputChange("student.personalInfo.employerAddress", val)
+                  }
+                  placeholder="Company address"
+                  error={errors["student.personalInfo.employerAddress"]}
+                  required={isFieldRequired(
+                    runtimeSchema,
+                    "student.personalInfo.employerAddress",
+                  )}
+                />
+              </div>
+            )}
+          </div>
+        </SectionContainer>
+      )}
 
       {/* 5. Address Information */}
-      <SectionContainer
-        title="Address Information"
-        description="Permanent and current residential addresses"
-        icon={MapPin}
-      >
-        <div className="flex flex-col gap-10">
-          {/* Provincial Address */}
-          <div>
-            <h4 className="mb-6 flex items-center gap-2 text-sm font-bold text-foreground/80">
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-              Provincial Address
-            </h4>
-            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <Dropdown
-                formStyle
-                labelKey="name"
-                label="Region"
-                options={regions}
-                get="code"
-                identifier="code"
-                value={
-                  addressRegion.provincial?.code || ({ code: "" } as Region)
-                }
-                onChange={(val: any) => {
-                  onChange(
-                    `student.addresses.${PROVINCIAL_IDX}.address.region`,
-                    { code: val },
-                  );
-                  onChange(
-                    `student.addresses.${PROVINCIAL_IDX}.address.province`,
-                    { code: "" } as Province,
-                  );
-                  onChange(`student.addresses.${PROVINCIAL_IDX}.address.city`, {
-                    code: "",
-                  } as City);
-                  onChange(
-                    `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
-                    { code: "" } as Barangay,
-                  );
-                  setErrors((prev: FormErrors) => {
-                    const u = { ...prev };
-                    delete u[
-                      `student.addresses.${PROVINCIAL_IDX}.address.region`
-                    ];
-                    return u;
-                  });
-                }}
-                error={
-                  errors[`student.addresses.${PROVINCIAL_IDX}.address.region`]
-                }
-                required
-              />
-              {!isProvincialNCR && (
-                <Dropdown
-                  formStyle
-                  labelKey="name"
-                  label="Province"
-                  options={provincialProvinces}
-                  get="code"
-                  identifier="code"
-                  enabled={!!addressRegion.provincial?.code}
-                  value={
-                    addressProvince.provincial?.code ||
-                    ({ code: "" } as Province)
-                  }
-                  onChange={(val: any) => {
-                    onChange(
-                      `student.addresses.${PROVINCIAL_IDX}.address.province`,
-                      { code: val },
-                    );
-                    onChange(
-                      `student.addresses.${PROVINCIAL_IDX}.address.city`,
-                      { code: "" } as City,
-                    );
-                    onChange(
-                      `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
-                      { code: "" } as Barangay,
-                    );
-                    setErrors((prev: FormErrors) => {
-                      const u = { ...prev };
-                      delete u[
-                        `student.addresses.${PROVINCIAL_IDX}.address.province`
-                      ];
-                      return u;
-                    });
-                  }}
-                  error={
-                    errors[
-                      `student.addresses.${PROVINCIAL_IDX}.address.province`
-                    ]
-                  }
-                  required
-                />
-              )}
-              <Dropdown
-                formStyle
-                labelKey="name"
-                label="City/Municipality"
-                options={provincialCities}
-                get="code"
-                identifier="code"
-                enabled={
-                  isProvincialNCR
-                    ? !!addressRegion.provincial?.code &&
-                      !isProvincialCitiesLoading
-                    : !!addressProvince.provincial?.code &&
-                      !isProvincialCitiesLoading
-                }
-                value={addressCity.provincial?.code || ({ code: "" } as City)}
-                onChange={(val: any) => {
-                  onChange(`student.addresses.${PROVINCIAL_IDX}.address.city`, {
-                    code: val,
-                  });
-                  onChange(
-                    `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
-                    { code: "" } as Barangay,
-                  );
-                  setErrors((prev: FormErrors) => {
-                    const u = { ...prev };
-                    delete u[
-                      `student.addresses.${PROVINCIAL_IDX}.address.city`
-                    ];
-                    return u;
-                  });
-                }}
-                lockedReason={
-                  !addressRegion.provincial?.code ? "Select a Region first" : ""
-                }
-                error={
-                  errors[`student.addresses.${PROVINCIAL_IDX}.address.city`]
-                }
-                required
-              />
-              <Dropdown
-                formStyle
-                labelKey="name"
-                label="Barangay"
-                options={provincialBarangays || []}
-                get="code"
-                identifier="code"
-                enabled={
-                  !!addressCity.provincial?.code &&
-                  !isProvincialBarangaysLoading
-                }
-                value={
-                  provincialAddr?.barangay?.code || ({ code: "" } as Barangay)
-                }
-                onChange={(val: any) => {
-                  onChange(
-                    `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
-                    { code: val },
-                  );
-                  setErrors((prev: FormErrors) => {
-                    const u = { ...prev };
-                    delete u[
-                      `student.addresses.${PROVINCIAL_IDX}.address.barangay`
-                    ];
-                    return u;
-                  });
-                }}
-                lockedReason={
-                  !addressCity.provincial?.code ? "Select a City first" : ""
-                }
-                error={
-                  errors[`student.addresses.${PROVINCIAL_IDX}.address.barangay`]
-                }
-                required
-              />
-              <div className="md:col-span-2">
+      {subStep === 3 && (
+        <>
+          <SectionContainer
+            title="Address Information"
+            description="Permanent and current residential addresses"
+            icon={MapPin}
+          >
+            <div className="flex flex-col gap-10">
+              {/* Provincial Address */}
+              <div>
+                <h4 className="mb-6 flex items-center gap-2 text-sm font-bold text-foreground/80">
+                  <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                  Provincial Address
+                </h4>
+                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                  <Dropdown
+                    formStyle
+                    labelKey="name"
+                    label="Region"
+                    options={regions}
+                    get="code"
+                    identifier="code"
+                    value={
+                      addressRegion.provincial?.code || ({ code: "" } as Region)
+                    }
+                    onChange={(val: any) => {
+                      onChange(
+                        `student.addresses.${PROVINCIAL_IDX}.address.region`,
+                        { code: val },
+                      );
+                      onChange(
+                        `student.addresses.${PROVINCIAL_IDX}.address.province`,
+                        { code: "" } as Province,
+                      );
+                      onChange(
+                        `student.addresses.${PROVINCIAL_IDX}.address.city`,
+                        {
+                          code: "",
+                        } as City,
+                      );
+                      onChange(
+                        `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
+                        { code: "" } as Barangay,
+                      );
+                      setErrors((prev: FormErrors) => {
+                        const u = { ...prev };
+                        delete u[
+                          `student.addresses.${PROVINCIAL_IDX}.address.region`
+                        ];
+                        return u;
+                      });
+                    }}
+                    error={
+                      errors[
+                        `student.addresses.${PROVINCIAL_IDX}.address.region`
+                      ]
+                    }
+                    required
+                  />
+                  {!isProvincialNCR && (
+                    <Dropdown
+                      formStyle
+                      labelKey="name"
+                      label="Province"
+                      options={provincialProvinces}
+                      get="code"
+                      identifier="code"
+                      enabled={!!addressRegion.provincial?.code}
+                      value={
+                        addressProvince.provincial?.code ||
+                        ({ code: "" } as Province)
+                      }
+                      onChange={(val: any) => {
+                        onChange(
+                          `student.addresses.${PROVINCIAL_IDX}.address.province`,
+                          { code: val },
+                        );
+                        onChange(
+                          `student.addresses.${PROVINCIAL_IDX}.address.city`,
+                          { code: "" } as City,
+                        );
+                        onChange(
+                          `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
+                          { code: "" } as Barangay,
+                        );
+                        setErrors((prev: FormErrors) => {
+                          const u = { ...prev };
+                          delete u[
+                            `student.addresses.${PROVINCIAL_IDX}.address.province`
+                          ];
+                          return u;
+                        });
+                      }}
+                      error={
+                        errors[
+                          `student.addresses.${PROVINCIAL_IDX}.address.province`
+                        ]
+                      }
+                      required
+                    />
+                  )}
+                  <Dropdown
+                    formStyle
+                    labelKey="name"
+                    label="City/Municipality"
+                    options={provincialCities}
+                    get="code"
+                    identifier="code"
+                    enabled={
+                      isProvincialNCR
+                        ? !!addressRegion.provincial?.code &&
+                          !isProvincialCitiesLoading
+                        : !!addressProvince.provincial?.code &&
+                          !isProvincialCitiesLoading
+                    }
+                    value={
+                      addressCity.provincial?.code || ({ code: "" } as City)
+                    }
+                    onChange={(val: any) => {
+                      onChange(
+                        `student.addresses.${PROVINCIAL_IDX}.address.city`,
+                        {
+                          code: val,
+                        },
+                      );
+                      onChange(
+                        `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
+                        { code: "" } as Barangay,
+                      );
+                      setErrors((prev: FormErrors) => {
+                        const u = { ...prev };
+                        delete u[
+                          `student.addresses.${PROVINCIAL_IDX}.address.city`
+                        ];
+                        return u;
+                      });
+                    }}
+                    lockedReason={
+                      !addressRegion.provincial?.code
+                        ? "Select a Region first"
+                        : ""
+                    }
+                    error={
+                      errors[`student.addresses.${PROVINCIAL_IDX}.address.city`]
+                    }
+                    required
+                  />
+                  <Dropdown
+                    formStyle
+                    labelKey="name"
+                    label="Barangay"
+                    options={provincialBarangays || []}
+                    get="code"
+                    identifier="code"
+                    enabled={
+                      !!addressCity.provincial?.code &&
+                      !isProvincialBarangaysLoading
+                    }
+                    value={
+                      provincialAddr?.barangay?.code ||
+                      ({ code: "" } as Barangay)
+                    }
+                    onChange={(val: any) => {
+                      onChange(
+                        `student.addresses.${PROVINCIAL_IDX}.address.barangay`,
+                        { code: val },
+                      );
+                      setErrors((prev: FormErrors) => {
+                        const u = { ...prev };
+                        delete u[
+                          `student.addresses.${PROVINCIAL_IDX}.address.barangay`
+                        ];
+                        return u;
+                      });
+                    }}
+                    lockedReason={
+                      !addressCity.provincial?.code ? "Select a City first" : ""
+                    }
+                    error={
+                      errors[
+                        `student.addresses.${PROVINCIAL_IDX}.address.barangay`
+                      ]
+                    }
+                    required
+                  />
+                  <div className="md:col-span-2">
+                    <FormInput
+                      label="Street / Landmark"
+                      value={provincialAddr?.streetDetail || ""}
+                      placeholder="Street name, Lot, Blk, or House No."
+                      onChange={(val: any) =>
+                        onChange(
+                          `student.addresses.${PROVINCIAL_IDX}.address.streetDetail`,
+                          val,
+                        )
+                      }
+                      noSpecialCharacters={true}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Residential Address */}
+              <div className="border-t border-border/50 pt-10">
+                <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                  <h4 className="flex items-center gap-2 text-sm font-bold text-foreground/80">
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                    Residential Address
+                  </h4>
+                  <Checkbox
+                    id="sameAsProvincial"
+                    label="Same as provincial"
+                    name="sameAsProvincial"
+                    checked={residentialSync.isSynced}
+                    onCheckedChange={(checked: any) =>
+                      residentialSync.toggleSync(checked === true)
+                    }
+                    className="text-xs"
+                  />
+                </div>
+
+                <div
+                  className={cn(
+                    "grid grid-cols-1 gap-6 transition-opacity duration-300",
+                    "md:grid-cols-2",
+                    residentialSync.isReadOnly && "pointer-events-none opacity-60",
+                  )}
+                >
+                  <Dropdown
+                    formStyle
+                    labelKey="name"
+                    label="Region"
+                    options={regions}
+                    get="code"
+                    identifier="code"
+                    value={
+                      addressRegion.residential?.code ||
+                      ({ code: "" } as Region)
+                    }
+                    onChange={(val: any) => {
+                      onChange(
+                        `student.addresses.${RESIDENTIAL_IDX}.address.region`,
+                        { code: val },
+                      );
+                      onChange(
+                        `student.addresses.${RESIDENTIAL_IDX}.address.province`,
+                        { code: "" } as Province,
+                      );
+                      onChange(
+                        `student.addresses.${RESIDENTIAL_IDX}.address.city`,
+                        { code: "" } as City,
+                      );
+                      onChange(
+                        `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
+                        { code: "" } as Barangay,
+                      );
+                      setErrors((prev: FormErrors) => {
+                        const u = { ...prev };
+                        delete u[
+                          `student.addresses.${RESIDENTIAL_IDX}.address.region`
+                        ];
+                        return u;
+                      });
+                    }}
+                    error={
+                      errors[
+                        `student.addresses.${RESIDENTIAL_IDX}.address.region`
+                      ]
+                    }
+                    required
+                    enabled={!residentialSync.isReadOnly}
+                  />
+                  {!isResidentialNCR && (
+                    <Dropdown
+                      formStyle
+                      labelKey="name"
+                      label="Province"
+                      options={residentialProvinces}
+                      get="code"
+                      identifier="code"
+                      enabled={
+                        !!addressRegion.residential?.code &&
+                        !residentialSync.isReadOnly
+                      }
+                      value={
+                        addressProvince.residential?.code ||
+                        ({ code: "" } as Province)
+                      }
+                      onChange={(val: any) => {
+                        onChange(
+                          `student.addresses.${RESIDENTIAL_IDX}.address.province`,
+                          { code: val },
+                        );
+                        onChange(
+                          `student.addresses.${RESIDENTIAL_IDX}.address.city`,
+                          { code: "" } as City,
+                        );
+                        onChange(
+                          `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
+                          { code: "" } as Barangay,
+                        );
+                        setErrors((prev: FormErrors) => {
+                          const u = { ...prev };
+                          delete u[
+                            `student.addresses.${RESIDENTIAL_IDX}.address.province`
+                          ];
+                          return u;
+                        });
+                      }}
+                      error={
+                        errors[
+                          `student.addresses.${RESIDENTIAL_IDX}.address.province`
+                        ]
+                      }
+                      required
+                    />
+                  )}
+                  <Dropdown
+                    formStyle
+                    labelKey="name"
+                    label="City/Municipality"
+                    options={residentialCities}
+                    get="code"
+                    identifier="code"
+                    enabled={
+                      (isResidentialNCR
+                        ? !!addressRegion.residential?.code &&
+                          !isResidentialCitiesLoading
+                        : !!addressProvince.residential?.code &&
+                          !isResidentialCitiesLoading) &&
+                      !residentialSync.isReadOnly
+                    }
+                    value={
+                      addressCity.residential?.code || ({ code: "" } as City)
+                    }
+                    onChange={(val: any) => {
+                      onChange(
+                        `student.addresses.${RESIDENTIAL_IDX}.address.city`,
+                        { code: val },
+                      );
+                      onChange(
+                        `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
+                        { code: "" } as Barangay,
+                      );
+                      setErrors((prev: FormErrors) => {
+                        const u = { ...prev };
+                        delete u[
+                          `student.addresses.${RESIDENTIAL_IDX}.address.city`
+                        ];
+                        return u;
+                      });
+                    }}
+                    lockedReason={
+                      residentialSync.isReadOnly
+                        ? "Synced with Provincial Address"
+                        : !addressRegion.residential?.code
+                          ? "Select a Region first"
+                          : ""
+                    }
+                    error={
+                      errors[
+                        `student.addresses.${RESIDENTIAL_IDX}.address.city`
+                      ]
+                    }
+                    required
+                  />
+                  <Dropdown
+                    formStyle
+                    labelKey="name"
+                    label="Barangay"
+                    options={residentialBarangays || []}
+                    get="code"
+                    identifier="code"
+                    enabled={
+                      !!addressCity.residential?.code &&
+                      !isResidentialBarangaysLoading &&
+                      !residentialSync.isReadOnly
+                    }
+                    value={
+                      residentialAddr?.barangay?.code ||
+                      ({ code: "" } as Barangay)
+                    }
+                    onChange={(val: any) => {
+                      onChange(
+                        `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
+                        { code: val },
+                      );
+                      setErrors((prev: FormErrors) => {
+                        const u = { ...prev };
+                        delete u[
+                          `student.addresses.${RESIDENTIAL_IDX}.address.barangay`
+                        ];
+                        return u;
+                      });
+                    }}
+                    lockedReason={
+                      residentialSync.isReadOnly
+                        ? "Synced with Provincial Address"
+                        : !addressCity.residential?.code
+                          ? "Select a City first"
+                          : ""
+                    }
+                    error={
+                      errors[
+                        `student.addresses.${RESIDENTIAL_IDX}.address.barangay`
+                      ]
+                    }
+                    required
+                  />
+                  <div className="md:col-span-2">
+                    <FormInput
+                      label="Street / Landmark"
+                      value={residentialAddr?.streetDetail || ""}
+                      placeholder="Street name, Lot, Blk, or House No."
+                      onChange={(val: any) =>
+                        onChange(
+                          `student.addresses.${RESIDENTIAL_IDX}.address.streetDetail`,
+                          val,
+                        )
+                      }
+                      disabled={residentialSync.isReadOnly}
+                      noSpecialCharacters={true}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+          </SectionContainer>
+
+          <SectionContainer
+            title="Emergency Contact"
+            description="Person to contact in case of emergency"
+            icon={Phone}
+          >
+            <div className="flex flex-col gap-8">
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
                 <FormInput
-                  label="Street / Landmark"
-                  value={provincialAddr?.streetDetail || ""}
-                  placeholder="Street name, Lot, Blk, or House No."
+                  label="Last Name"
+                  value={
+                    studentInfo?.personalInfo?.emergencyContact?.lastName || ""
+                  }
                   onChange={(val: any) =>
-                    onChange(
-                      `student.addresses.${PROVINCIAL_IDX}.address.streetDetail`,
+                    handleInputChange(
+                      "student.personalInfo.emergencyContact.lastName",
                       val,
                     )
                   }
+                  error={
+                    errors["student.personalInfo.emergencyContact.lastName"]
+                  }
+                  placeholder="Last name"
+                  noSpecialCharacters={true}
+                  required
+                />
+                <FormInput
+                  label="First Name"
+                  value={
+                    studentInfo?.personalInfo?.emergencyContact?.firstName || ""
+                  }
+                  onChange={(val: any) =>
+                    handleInputChange(
+                      "student.personalInfo.emergencyContact.firstName",
+                      val,
+                    )
+                  }
+                  error={
+                    errors["student.personalInfo.emergencyContact.firstName"]
+                  }
+                  placeholder="First name"
+                  noSpecialCharacters={true}
+                  required
+                />
+                <FormInput
+                  label="Middle Name"
+                  value={
+                    studentInfo?.personalInfo?.emergencyContact?.middleName || ""
+                  }
+                  onChange={(val: any) =>
+                    handleInputChange(
+                      "student.personalInfo.emergencyContact.middleName",
+                      val,
+                    )
+                  }
+                  error={
+                    errors["student.personalInfo.emergencyContact.middleName"]
+                  }
+                  placeholder="Middle name"
                   noSpecialCharacters={true}
                 />
-              </div>
-            </div>
-          </div>
-
-          {/* Residential Address */}
-          <div className="border-t border-border/50 pt-10">
-            <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <h4 className="flex items-center gap-2 text-sm font-bold text-foreground/80">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                Residential Address
-              </h4>
-              <Checkbox
-                id="sameAsProvincial"
-                label="Same as provincial"
-                name="sameAsProvincial"
-                checked={residentialSync.isSynced}
-                onCheckedChange={(checked: any) =>
-                  residentialSync.toggleSync(checked === true)
-                }
-                className="text-xs"
-              />
-            </div>
-
-            <div
-              className={cn(
-              "grid grid-cols-1 gap-6 transition-opacity duration-300",
-              "md:grid-cols-2",
-              residentialSync.isReadOnly && "pointer-events-none opacity-60",
-            )}
-          >
-              <Dropdown
-                formStyle
-                labelKey="name"
-                label="Region"
-                options={regions}
-                get="code"
-                identifier="code"
-                value={
-                  addressRegion.residential?.code || ({ code: "" } as Region)
-                }
-                onChange={(val: any) => {
-                  onChange(
-                    `student.addresses.${RESIDENTIAL_IDX}.address.region`,
-                    { code: val },
-                  );
-                  onChange(
-                    `student.addresses.${RESIDENTIAL_IDX}.address.province`,
-                    { code: "" } as Province,
-                  );
-                  onChange(
-                    `student.addresses.${RESIDENTIAL_IDX}.address.city`,
-                    { code: "" } as City,
-                  );
-                  onChange(
-                    `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
-                    { code: "" } as Barangay,
-                  );
-                  setErrors((prev: FormErrors) => {
-                    const u = { ...prev };
-                    delete u[
-                      `student.addresses.${RESIDENTIAL_IDX}.address.region`
-                    ];
-                    return u;
-                  });
-                }}
-                error={
-                  errors[`student.addresses.${RESIDENTIAL_IDX}.address.region`]
-                }
-                required
-                enabled={!residentialSync.isReadOnly}
-              />
-              {!isResidentialNCR && (
-                <Dropdown
-                  formStyle
-                  labelKey="name"
-                  label="Province"
-                  options={residentialProvinces}
-                  get="code"
-                  identifier="code"
-                  enabled={
-                    !!addressRegion.residential?.code &&
-                    !residentialSync.isReadOnly
-                  }
-                  value={
-                    addressProvince.residential?.code ||
-                    ({ code: "" } as Province)
-                  }
-                  onChange={(val: any) => {
-                    onChange(
-                      `student.addresses.${RESIDENTIAL_IDX}.address.province`,
-                      { code: val },
-                    );
-                    onChange(
-                      `student.addresses.${RESIDENTIAL_IDX}.address.city`,
-                      { code: "" } as City,
-                    );
-                    onChange(
-                      `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
-                      { code: "" } as Barangay,
-                    );
-                    setErrors((prev: FormErrors) => {
-                      const u = { ...prev };
-                      delete u[
-                        `student.addresses.${RESIDENTIAL_IDX}.address.province`
-                      ];
-                      return u;
-                    });
-                  }}
-                  error={
-                    errors[
-                      `student.addresses.${RESIDENTIAL_IDX}.address.province`
-                    ]
-                  }
-                  required
-                />
-              )}
-              <Dropdown
-                formStyle
-                labelKey="name"
-                label="City/Municipality"
-                options={residentialCities}
-                get="code"
-                identifier="code"
-                enabled={
-                  (isResidentialNCR
-                    ? !!addressRegion.residential?.code &&
-                      !isResidentialCitiesLoading
-                    : !!addressProvince.residential?.code &&
-                      !isResidentialCitiesLoading) &&
-                  !residentialSync.isReadOnly
-                }
-                value={addressCity.residential?.code || ({ code: "" } as City)}
-                onChange={(val: any) => {
-                  onChange(
-                    `student.addresses.${RESIDENTIAL_IDX}.address.city`,
-                    { code: val },
-                  );
-                  onChange(
-                    `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
-                    { code: "" } as Barangay,
-                  );
-                  setErrors((prev: FormErrors) => {
-                    const u = { ...prev };
-                    delete u[
-                      `student.addresses.${RESIDENTIAL_IDX}.address.city`
-                    ];
-                    return u;
-                  });
-                }}
-                lockedReason={
-                  residentialSync.isReadOnly
-                    ? "Synced with Provincial Address"
-                    : !addressRegion.residential?.code
-                      ? "Select a Region first"
-                      : ""
-                }
-                error={
-                  errors[`student.addresses.${RESIDENTIAL_IDX}.address.city`]
-                }
-                required
-              />
-              <Dropdown
-                formStyle
-                labelKey="name"
-                label="Barangay"
-                options={residentialBarangays || []}
-                get="code"
-                identifier="code"
-                enabled={
-                  !!addressCity.residential?.code &&
-                  !isResidentialBarangaysLoading &&
-                  !residentialSync.isReadOnly
-                }
-                value={
-                  residentialAddr?.barangay?.code || ({ code: "" } as Barangay)
-                }
-                onChange={(val: any) => {
-                  onChange(
-                    `student.addresses.${RESIDENTIAL_IDX}.address.barangay`,
-                    { code: val },
-                  );
-                  setErrors((prev: FormErrors) => {
-                    const u = { ...prev };
-                    delete u[
-                      `student.addresses.${RESIDENTIAL_IDX}.address.barangay`
-                    ];
-                    return u;
-                  });
-                }}
-                lockedReason={
-                  residentialSync.isReadOnly
-                    ? "Synced with Provincial Address"
-                    : !addressCity.residential?.code
-                      ? "Select a City first"
-                      : ""
-                }
-                error={
-                  errors[
-                    `student.addresses.${RESIDENTIAL_IDX}.address.barangay`
-                  ]
-                }
-                required
-              />
-              <div className="md:col-span-2">
                 <FormInput
-                  label="Street / Landmark"
-                  value={residentialAddr?.streetDetail || ""}
-                  placeholder="Street name, Lot, Blk, or House No."
+                  label="Contact Number"
+                  inputMode="numeric"
+                  value={
+                    studentInfo?.personalInfo?.emergencyContact?.contactNumber ||
+                    ""
+                  }
                   onChange={(val: any) =>
-                    onChange(
-                      `student.addresses.${RESIDENTIAL_IDX}.address.streetDetail`,
-                      val,
+                    handleInputChange(
+                      "student.personalInfo.emergencyContact.contactNumber",
+                      val.replace(/[^0-9]/g, ""),
                     )
                   }
-                  disabled={residentialSync.isReadOnly}
-                  noSpecialCharacters={true}
-                />
-              </div>
-            </div>
-          </div>
-        </div>
-      </SectionContainer>
-
-      {/* 6. Emergency Contact */}
-      <SectionContainer
-        title="Emergency Contact"
-        description="Person to contact in case of emergency"
-        icon={Phone}
-      >
-        <div className="flex flex-col gap-8">
-          <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-            <FormInput
-              label="Last Name"
-              value={
-                studentInfo?.personalInfo?.emergencyContact?.lastName || ""
-              }
-              onChange={(val: any) =>
-                handleInputChange(
-                  "student.personalInfo.emergencyContact.lastName",
-                  val,
-                )
-              }
-              error={errors["student.personalInfo.emergencyContact.lastName"]}
-              placeholder="Last name"
-              noSpecialCharacters={true}
-              required
-            />
-            <FormInput
-              label="First Name"
-              value={
-                studentInfo?.personalInfo?.emergencyContact?.firstName || ""
-              }
-              onChange={(val: any) =>
-                handleInputChange(
-                  "student.personalInfo.emergencyContact.firstName",
-                  val,
-                )
-              }
-              error={errors["student.personalInfo.emergencyContact.firstName"]}
-              placeholder="First name"
-              noSpecialCharacters={true}
-              required
-            />
-            <FormInput
-              label="Middle Name"
-              value={
-                studentInfo?.personalInfo?.emergencyContact?.middleName || ""
-              }
-              onChange={(val: any) =>
-                handleInputChange(
-                  "student.personalInfo.emergencyContact.middleName",
-                  val,
-                )
-              }
-              error={errors["student.personalInfo.emergencyContact.middleName"]}
-              placeholder="Middle name"
-              noSpecialCharacters={true}
-            />
-            <FormInput
-              label="Contact Number"
-              inputMode="numeric"
-              value={
-                studentInfo?.personalInfo?.emergencyContact?.contactNumber || ""
-              }
-              onChange={(val: any) =>
-                handleInputChange(
-                  "student.personalInfo.emergencyContact.contactNumber",
-                  val.replace(/[^0-9]/g, ""),
-                )
-              }
-              error={
-                errors["student.personalInfo.emergencyContact.contactNumber"]
-              }
-              placeholder="Phone number"
-              required
-            />
-            <div className="md:col-span-2">
-              <Dropdown
-                formStyle
-                label="Relationship"
-                options={studentRelationshipTypes}
-                value={
-                  studentInfo?.personalInfo?.emergencyContact?.relationship
-                    ?.id || ""
-                }
-                onChange={(val: any) =>
-                  handleInputChange(
-                    "student.personalInfo.emergencyContact.relationship",
-                    { id: val },
-                  )
-                }
-                error={
-                  errors["student.personalInfo.emergencyContact.relationship"]
-                }
-                required
-              />
-            </div>
-          </div>
-
-          <div className="border-t border-border/50 pt-8">
-            <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
-              <h4 className="flex items-center gap-2 text-sm font-bold text-foreground/80">
-                <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-                Contact Address
-              </h4>
-              <Checkbox
-                id="emergencySameAsResidential"
-                label="Same as residential address"
-                name="emergencySameAsResidential"
-                checked={emergencySync.isSynced}
-                onCheckedChange={(checked: any) =>
-                  emergencySync.toggleSync(checked === true)
-                }
-                className="text-xs"
-              />
-            </div>
-
-            <div
-              className={cn(
-              "grid grid-cols-1 gap-6 transition-opacity duration-300",
-              "md:grid-cols-2",
-              emergencySync.isReadOnly && "pointer-events-none opacity-60",
-            )}
-          >
-              <Dropdown
-                formStyle
-                labelKey="name"
-                label="Region"
-                options={regions}
-                get="code"
-                identifier="code"
-                value={
-                  addressRegion.emergency?.code || ({ code: "" } as Region)
-                }
-                onChange={(val: any) => {
-                  onChange(
-                    `student.personalInfo.emergencyContact.address.region`,
-                    { code: val },
-                  );
-                  onChange(
-                    `student.personalInfo.emergencyContact.address.province`,
-                    { code: "" } as Province,
-                  );
-                  onChange(
-                    `student.personalInfo.emergencyContact.address.city`,
-                    { code: "" } as City,
-                  );
-                  onChange(
-                    `student.personalInfo.emergencyContact.address.barangay`,
-                    { code: "" } as Barangay,
-                  );
-                  setErrors((prev: FormErrors) => {
-                    const u = { ...prev };
-                    delete u[
-                      `student.personalInfo.emergencyContact.address.region`
-                    ];
-                    return u;
-                  });
-                }}
-                error={
-                  errors[`student.personalInfo.emergencyContact.address.region`]
-                }
-                required
-                enabled={!emergencySync.isReadOnly}
-              />
-              {!isResidentialNCR && (
-                <Dropdown
-                  formStyle
-                  labelKey="name"
-                  label="Province"
-                  options={residentialProvinces}
-                  get="code"
-                  identifier="code"
-                  enabled={
-                    !!addressRegion.emergency?.code && !emergencySync.isReadOnly
-                  }
-                  value={
-                    addressProvince.emergency?.code ||
-                    ({ code: "" } as Province)
-                  }
-                  onChange={(val: any) => {
-                    onChange(
-                      `student.personalInfo.emergencyContact.address.province`,
-                      { code: val },
-                    );
-                    onChange(
-                      `student.personalInfo.emergencyContact.address.city`,
-                      { code: "" } as City,
-                    );
-                    onChange(
-                      `student.personalInfo.emergencyContact.address.barangay`,
-                      { code: "" } as Barangay,
-                    );
-                    setErrors((prev: FormErrors) => {
-                      const u = { ...prev };
-                      delete u[
-                        `student.personalInfo.emergencyContact.address.province`
-                      ];
-                      return u;
-                    });
-                  }}
                   error={
                     errors[
-                      `student.personalInfo.emergencyContact.address.province`
+                      "student.personalInfo.emergencyContact.contactNumber"
                     ]
                   }
+                  placeholder="Phone number"
                   required
                 />
-              )}
-              <Dropdown
-                formStyle
-                labelKey="name"
-                label="City/Municipality"
-                options={residentialCities}
-                get="code"
-                identifier="code"
-                enabled={
-                  (isResidentialNCR
-                    ? !!addressRegion.emergency?.code &&
-                      !isResidentialCitiesLoading
-                    : !!addressProvince.emergency?.code &&
-                      !isResidentialCitiesLoading) && !emergencySync.isReadOnly
-                }
-                value={addressCity.emergency?.code || ({ code: "" } as City)}
-                onChange={(val: any) => {
-                  onChange(
-                    `student.personalInfo.emergencyContact.address.city`,
-                    { code: val },
-                  );
-                  onChange(
-                    `student.personalInfo.emergencyContact.address.barangay`,
-                    { code: "" } as Barangay,
-                  );
-                  setErrors((prev: FormErrors) => {
-                    const u = { ...prev };
-                    delete u[
-                      `student.personalInfo.emergencyContact.address.city`
-                    ];
-                    return u;
-                  });
-                }}
-                lockedReason={
-                  emergencySync.isReadOnly
-                    ? "Synced with Residential Address"
-                    : !addressRegion.emergency?.code
-                      ? "Select a Region first"
-                      : ""
-                }
-                error={
-                  errors[`student.personalInfo.emergencyContact.address.city`]
-                }
-                required
-              />
-              <Dropdown
-                formStyle
-                labelKey="name"
-                label="Barangay"
-                options={residentialBarangays || []}
-                get="code"
-                identifier="code"
-                enabled={
-                  !!addressCity.emergency?.code &&
-                  !isResidentialBarangaysLoading &&
-                  !emergencySync.isReadOnly
-                }
-                value={
-                  emergencyAddr?.barangay?.code || ({ code: "" } as Barangay)
-                }
-                onChange={(val: any) => {
-                  onChange(
-                    `student.personalInfo.emergencyContact.address.barangay`,
-                    { code: val },
-                  );
-                  setErrors((prev: FormErrors) => {
-                    const u = { ...prev };
-                    delete u[
-                      `student.personalInfo.emergencyContact.address.barangay`
-                    ];
-                    return u;
-                  });
-                }}
-                lockedReason={
-                  emergencySync.isReadOnly
-                    ? "Synced with Residential Address"
-                    : !addressCity.emergency?.code
-                      ? "Select a City first"
-                      : ""
-                }
-                error={
-                  errors[
-                    `student.personalInfo.emergencyContact.address.barangay`
-                  ]
-                }
-                required
-              />
-              <div className="md:col-span-2">
-                <FormInput
-                  label="Street / Landmark"
-                  value={emergencyAddr?.streetDetail || ""}
-                  placeholder="Street name, Lot, Blk, or House No."
-                  onChange={(val: any) =>
-                    onChange(
-                      `student.personalInfo.emergencyContact.address.streetDetail`,
-                      val,
-                    )
-                  }
-                  disabled={emergencySync.isReadOnly}
-                />
+                <div className="md:col-span-2">
+                  <Dropdown
+                    formStyle
+                    label="Relationship"
+                    options={studentRelationshipTypes}
+                    value={
+                      studentInfo?.personalInfo?.emergencyContact?.relationship
+                        ?.id || ""
+                    }
+                    onChange={(val: any) =>
+                      handleInputChange(
+                        "student.personalInfo.emergencyContact.relationship",
+                        { id: val },
+                      )
+                    }
+                    error={
+                      errors[
+                        "student.personalInfo.emergencyContact.relationship"
+                      ]
+                    }
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="border-t border-border/50 pt-8">
+                <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+                  <h4 className="flex items-center gap-2 text-sm font-bold text-foreground/80">
+                    <span className="h-1.5 w-1.5 rounded-full bg-primary" />
+                    Contact Address
+                  </h4>
+                  <Checkbox
+                    id="emergencySameAsResidential"
+                    label="Same as residential address"
+                    name="emergencySameAsResidential"
+                    checked={emergencySync.isSynced}
+                    onCheckedChange={(checked: any) =>
+                      emergencySync.toggleSync(checked === true)
+                    }
+                    className="text-xs"
+                  />
+                </div>
+
+                <div
+                  className={cn(
+                    "grid grid-cols-1 gap-6 transition-opacity duration-300",
+                    "md:grid-cols-2",
+                    emergencySync.isReadOnly && "pointer-events-none opacity-60",
+                  )}
+                >
+                  <Dropdown
+                    formStyle
+                    labelKey="name"
+                    label="Region"
+                    options={regions}
+                    get="code"
+                    identifier="code"
+                    value={
+                      addressRegion.emergency?.code || ({ code: "" } as Region)
+                    }
+                    onChange={(val: any) => {
+                      onChange(
+                        `student.personalInfo.emergencyContact.address.region`,
+                        { code: val },
+                      );
+                      onChange(
+                        `student.personalInfo.emergencyContact.address.province`,
+                        { code: "" } as Province,
+                      );
+                      onChange(
+                        `student.personalInfo.emergencyContact.address.city`,
+                        { code: "" } as City,
+                      );
+                      onChange(
+                        `student.personalInfo.emergencyContact.address.barangay`,
+                        { code: "" } as Barangay,
+                      );
+                      setErrors((prev: FormErrors) => {
+                        const u = { ...prev };
+                        delete u[
+                          `student.personalInfo.emergencyContact.address.region`
+                        ];
+                        return u;
+                      });
+                    }}
+                    error={
+                      errors[
+                        `student.personalInfo.emergencyContact.address.region`
+                      ]
+                    }
+                    required
+                    enabled={!emergencySync.isReadOnly}
+                  />
+                  {!isEmergencyNCR && (
+                    <Dropdown
+                      formStyle
+                      labelKey="name"
+                      label="Province"
+                      options={emergencyProvinces}
+                      get="code"
+                      identifier="code"
+                      enabled={
+                        !!addressRegion.emergency?.code &&
+                        !emergencySync.isReadOnly
+                      }
+                      value={
+                        addressProvince.emergency?.code ||
+                        ({ code: "" } as Province)
+                      }
+                      onChange={(val: any) => {
+                        onChange(
+                          `student.personalInfo.emergencyContact.address.province`,
+                          { code: val },
+                        );
+                        onChange(
+                          `student.personalInfo.emergencyContact.address.city`,
+                          { code: "" } as City,
+                        );
+                        onChange(
+                          `student.personalInfo.emergencyContact.address.barangay`,
+                          { code: "" } as Barangay,
+                        );
+                        setErrors((prev: FormErrors) => {
+                          const u = { ...prev };
+                          delete u[
+                            `student.personalInfo.emergencyContact.address.province`
+                          ];
+                          return u;
+                        });
+                      }}
+                      error={
+                        errors[
+                          `student.personalInfo.emergencyContact.address.province`
+                        ]
+                      }
+                      required
+                    />
+                  )}
+                  <Dropdown
+                    formStyle
+                    labelKey="name"
+                    label="City/Municipality"
+                    options={emergencyCities}
+                    get="code"
+                    identifier="code"
+                    enabled={
+                      (isEmergencyNCR
+                        ? !!addressRegion.emergency?.code &&
+                          !isEmergencyCitiesLoading
+                        : !!addressProvince.emergency?.code &&
+                          !isEmergencyCitiesLoading) &&
+                      !emergencySync.isReadOnly
+                    }
+                    value={
+                      addressCity.emergency?.code || ({ code: "" } as City)
+                    }
+                    onChange={(val: any) => {
+                      onChange(
+                        `student.personalInfo.emergencyContact.address.city`,
+                        { code: val },
+                      );
+                      onChange(
+                        `student.personalInfo.emergencyContact.address.barangay`,
+                        { code: "" } as Barangay,
+                      );
+                      setErrors((prev: FormErrors) => {
+                        const u = { ...prev };
+                        delete u[
+                          `student.personalInfo.emergencyContact.address.city`
+                        ];
+                        return u;
+                      });
+                    }}
+                    lockedReason={
+                      emergencySync.isReadOnly
+                        ? "Synced with Residential Address"
+                        : !addressRegion.emergency?.code
+                          ? "Select a Region first"
+                          : ""
+                    }
+                    error={
+                      errors[
+                        `student.personalInfo.emergencyContact.address.city`
+                      ]
+                    }
+                    required
+                  />
+                  <Dropdown
+                    formStyle
+                    labelKey="name"
+                    label="Barangay"
+                    options={emergencyBarangays}
+                    get="code"
+                    identifier="code"
+                    enabled={
+                      !!addressCity.emergency?.code &&
+                      !isEmergencyBarangaysLoading &&
+                      !emergencySync.isReadOnly
+                    }
+                    value={
+                      emergencyAddr?.barangay?.code ||
+                      ({ code: "" } as Barangay)
+                    }
+                    onChange={(val: any) => {
+                      onChange(
+                        `student.personalInfo.emergencyContact.address.barangay`,
+                        { code: val },
+                      );
+                      setErrors((prev: FormErrors) => {
+                        const u = { ...prev };
+                        delete u[
+                          `student.personalInfo.emergencyContact.address.barangay`
+                        ];
+                        return u;
+                      });
+                    }}
+                    lockedReason={
+                      emergencySync.isReadOnly
+                        ? "Synced with Residential Address"
+                        : !addressCity.emergency?.code
+                          ? "Select a City first"
+                          : ""
+                    }
+                    error={
+                      errors[
+                        `student.personalInfo.emergencyContact.address.barangay`
+                      ]
+                    }
+                    required
+                  />
+                  <div className="md:col-span-2">
+                    <FormInput
+                      label="Street / Landmark"
+                      value={emergencyAddr?.streetDetail || ""}
+                      placeholder="Street name, Lot, Blk, or House No."
+                      onChange={(val: any) =>
+                        onChange(
+                          `student.personalInfo.emergencyContact.address.streetDetail`,
+                          val,
+                        )
+                      }
+                      disabled={emergencySync.isReadOnly}
+                      noSpecialCharacters={true}
+                    />
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </div>
-      </SectionContainer>
+          </SectionContainer>
+        </>
+      )}
     </div>
   );
 });

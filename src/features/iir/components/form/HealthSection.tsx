@@ -27,7 +27,7 @@ interface FormErrors {
 }
 
 interface HealthSectionRef {
-  validate: () => { isValid: boolean; errors: FormErrors };
+  validate: (step?: number) => { isValid: boolean; errors: FormErrors };
 }
 
 export const HealthSection = forwardRef<
@@ -44,7 +44,7 @@ export const HealthSection = forwardRef<
 ) {
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const validate = (): { isValid: boolean; errors: FormErrors } => {
+  const validate = (step?: number): { isValid: boolean; errors: FormErrors } => {
     // Helper to map consultations by type for easy access in rules
     const _consultations = (health?.consultations || []).reduce(
       (acc: any, c: any) => {
@@ -66,7 +66,7 @@ export const HealthSection = forwardRef<
   };
 
   useImperativeHandle(ref, () => ({
-    validate,
+    validate: (step?: number) => validate(step),
   }));
 
   const clearError = (field: string) => {
