@@ -8,13 +8,15 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { useMe } from "@/features/users/hooks/useMe";
 import { useLogout as useLogoutMutation } from "@/features/auth/hooks";
-import { User } from "@/features/users/types/user";
+import { User, UserRole } from "@/features/users/types/user";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   logout: () => void;
   isLoading: boolean;
   user: User | null;
+  activeRole: UserRole | null;
+  setActiveRole: (role: UserRole) => void;
   refresh: () => Promise<void>;
   isStudent: boolean;
   isAdmin: boolean;
@@ -63,6 +65,21 @@ export const AuthProvider: React.FC<{
   const { logout: logoutMutation } = useLogoutMutation();
   const [hasTimedOut, setHasTimedOut] = useState(false);
 
+  // Active Role state with persistence
+  const [activeRole, setActiveRoleState] = useState<UserRole | null>(() => {
+    const saved = localStorage.getItem("active_role");
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const setActiveRole = (role: UserRole) => {
+    setActiveRoleState(role);
+    localStorage.setItem("active_role", JSON.stringify(role));
+  };
+
   /**
    * Timeout safeguard: If auth check takes too long,
    * force loading to false to prevent app lockout
@@ -84,11 +101,35 @@ export const AuthProvider: React.FC<{
   }, [status]);
 
   /**
+   * Sync activeRole with user roles
+   */
+  useEffect(() => {
+    if (user && user.roles) {
+      const isRoleValid =
+        activeRole && user.roles.some((r) => r.id === activeRole.id);
+
+      if (!isRoleValid) {
+        if (user.roles.length === 1) {
+          setActiveRole(user.roles[0]);
+        } else if (
+          !window.location.pathname.startsWith("/auth/role-selection")
+        ) {
+          // If multi-role and not on selection page, reset
+          setActiveRoleState(null);
+          localStorage.removeItem("active_role");
+        }
+      }
+    }
+  }, [user, activeRole]);
+
+  /**
    * Clear session flag on error
    */
   useEffect(() => {
     if (isError) {
       localStorage.removeItem("session_active");
+      localStorage.removeItem("active_role");
+      setActiveRoleState(null);
     }
   }, [isError]);
 
@@ -103,13 +144,14 @@ export const AuthProvider: React.FC<{
   const isAuthenticated = status === "success" && !!user;
 
   /**
-   * Role identification based on backend-provided role name
+   * Role identification based on backend-provided roles collection
    */
-  const userRole = user?.role?.name?.toLowerCase().replace(/\s+/g, "") || "";
-  const isStudent = userRole === "student";
-  const isAdmin = userRole === "admin";
-  const isSuperAdmin = userRole === "superadmin";
-  const isDeveloper = userRole === "developer";
+  const userRoles =
+    user?.roles?.map((r) => r.name.toLowerCase().replace(/\s+/g, "")) || [];
+  const isStudent = userRoles.includes("student");
+  const isAdmin = userRoles.includes("admin");
+  const isSuperAdmin = userRoles.includes("superadmin");
+  const isDeveloper = userRoles.includes("developer");
 
   /**
    * Loading is true only while query is pending
@@ -126,6 +168,8 @@ export const AuthProvider: React.FC<{
       value={{
         isAuthenticated,
         user: user || null,
+        activeRole,
+        setActiveRole,
         logout,
         isLoading: isAuthLoading,
         refresh: async () => {

@@ -87,7 +87,7 @@ export default function Layout({
       : (pageMetadata.isLoading ?? false);
   const showSubHeader = pageMetadata.showSubHeader !== false;
 
-  const { user, logout } = useAuth();
+  const { user, logout, activeRole } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
   const [sessionAccepted, setSessionAccepted] = useState(() => {
@@ -139,20 +139,19 @@ export default function Layout({
   };
 
   const navigationItems = useMemo(() => {
-    if (!user || !user.role?.name) return [];
+    if (!user || !activeRole) return [];
 
-    const roleKey =
-      user.role?.name?.toLowerCase().replace(/\s+/g, "") || "student";
+    const roleKey = activeRole.name.toLowerCase().replace(/\s+/g, "");
     if (!roleKey) return [];
 
     const roleData = NAV_CONFIG.find((config) => !!config[roleKey]);
 
     return roleData ? roleData[roleKey] : [];
-  }, [user]);
+  }, [user, activeRole]);
 
   const getRoleLabel = () => {
-    if (!user || !user.role) return "";
-    const roleName = user.role?.name?.toLowerCase();
+    if (!user || !activeRole) return "";
+    const roleName = activeRole.name.toLowerCase();
     if (roleName === "admin") return "Admin Account";
     if (roleName === "superadmin") return "Super Admin Account";
     if (roleName === "developer") return "Developer Account";
@@ -166,7 +165,7 @@ export default function Layout({
     }
   }, [location.pathname, sidebarHovered, setSidebarHovered]);
 
-  const currentRole: string | undefined = user?.role?.name?.toLowerCase();
+  const currentRole: string | undefined = activeRole?.name?.toLowerCase();
 
   useEffect(() => {
     const node = contentRef.current;

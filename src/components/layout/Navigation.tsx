@@ -11,11 +11,20 @@ import {
   ChevronLeft,
   Pin,
   PinOff,
+  RefreshCw,
+  LayoutDashboard,
 } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from "@/components/ui/dropdown-menu";
 import { Drawer, DrawerContent } from "@/components/ui/drawer";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { useDebouncedCallback } from "@/hooks/useDebounce";
-import { useUI } from "@/context";
+import { useUI, useAuth } from "@/context";
 import { UISettingsModal } from "@/components/shared/UISettingsModal";
 import { cn } from "@/lib/utils";
 
@@ -122,6 +131,22 @@ export default function Navigation({
     sidebarHovered,
     setSidebarHovered,
   } = useUI();
+  const { activeRole, setActiveRole } = useAuth();
+  const navigate = useNavigate();
+
+  const ROLE_ROUTES: Record<string, string> = {
+    student: "/student",
+    counselor: "/counselor",
+    superadmin: "/superadmin",
+    developer: "/developer",
+  };
+
+  const handleRoleSwitch = (r: any) => {
+    setActiveRole(r);
+    const roleKey = r.name.toLowerCase().replace(/\s+/g, "");
+    navigate(ROLE_ROUTES[roleKey] || "/");
+    setSidebarHovered(false);
+  };
 
   const isExpanded = sidebarPinned || sidebarHovered;
   const isMobile = useIsMobile();
@@ -140,7 +165,7 @@ export default function Navigation({
       "/admin",
       "/student",
       "/superadmin",
-      "/dev",
+      "/developer",
       "/",
     ].includes(item.href);
     if (isRootPath) {
@@ -244,6 +269,8 @@ export default function Navigation({
                   setOpenDrawer(false);
                   setUiSettingsOpen(true);
                 }}
+                activeRole={activeRole}
+                onRoleSwitch={handleRoleSwitch}
               />
             )}
           </DrawerContent>
@@ -277,8 +304,75 @@ export default function Navigation({
           })}
         </nav>
 
+        {/* Role Switcher (Desktop) */}
+        {user?.roles?.length > 1 && (
+          <div className="mb-2 mt-auto p-3">
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button
+                  className={cn(
+                    "sidebar-icon-tilt group flex w-full items-center gap-3 rounded-xl px-3 py-3 transition-all duration-200 hover:shadow-sm",
+                    "border border-secondary/20 bg-secondary/10 text-secondary hover:bg-secondary/20",
+                  )}
+                  title="Switch Workspace"
+                >
+                  <div className="flex w-6 shrink-0 items-center justify-center">
+                    <RefreshCw
+                      className={cn(
+                        "h-5 w-5",
+                        isExpanded && "animate-spin-once",
+                      )}
+                    />
+                  </div>
+                  {isExpanded && (
+                    <span className="flex-1 overflow-hidden whitespace-nowrap text-left text-xs font-bold uppercase tracking-wider">
+                      Switch Role
+                    </span>
+                  )}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent
+                side={isExpanded ? "bottom" : "right"}
+                align="start"
+                className="w-56 rounded-2xl border-white/20 bg-white/80 backdrop-blur-2xl dark:border-white/10 dark:bg-neutral-900/90"
+              >
+                <p className="px-3 py-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+                  Your Workspaces
+                </p>
+                <DropdownMenuSeparator className="bg-white/10" />
+                {user.roles.map((r: any) => {
+                  const isActiveRole = r.id === activeRole?.id;
+                  return (
+                    <DropdownMenuItem
+                      key={r.id}
+                      onClick={() => handleRoleSwitch(r)}
+                      className={cn(
+                        "flex items-center gap-3 rounded-xl px-3 py-2.5 transition-all focus:bg-primary/10",
+                        isActiveRole && "bg-primary/5 font-bold text-primary",
+                      )}
+                    >
+                      <div
+                        className={cn(
+                          "flex h-8 w-8 items-center justify-center rounded-lg bg-muted/50",
+                          isActiveRole && "bg-primary/20",
+                        )}
+                      >
+                        <LayoutDashboard size={16} />
+                      </div>
+                      <span className="text-sm">{r.name}</span>
+                      {isActiveRole && (
+                        <div className="ml-auto h-1.5 w-1.5 rounded-full bg-primary" />
+                      )}
+                    </DropdownMenuItem>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        )}
+
         {/* Pin Toggle (Desktop Only) - Balanced spacing */}
-        <div className="mb-2 mt-auto p-3">
+        <div className={cn("mb-2 p-3", user?.roles?.length <= 1 && "mt-auto")}>
           <button
             onClick={toggleSidebarPinned}
             className={`sidebar-icon-tilt group flex w-full items-center gap-3 rounded-xl px-3 py-3 transition-all duration-200 hover:shadow-sm ${
@@ -319,6 +413,8 @@ function MobileSettingsContent({
   onLogout,
   closeDrawer,
   onOpenUISettings,
+  activeRole,
+  onRoleSwitch,
 }: any) {
   const navigate = useNavigate();
 
@@ -345,9 +441,56 @@ function MobileSettingsContent({
           <p className="font-bold">
             {user?.firstName} {user?.lastName}
           </p>
-          <p className="text-xs text-muted-foreground">{roleLabel}</p>
+          <p className="text-xs text-muted-foreground">
+            {activeRole?.name || roleLabel} Context
+          </p>
         </div>
       </div>
+
+      {/* Mobile Role Switcher */}
+      {user?.roles?.length > 1 && (
+        <div className="space-y-3">
+          <p className="px-2 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">
+            Switch Workspace
+          </p>
+          <div className="grid grid-cols-1 gap-2">
+            {user.roles.map((r: any) => {
+              const isActiveRole = r.id === activeRole?.id;
+              return (
+                <button
+                  key={r.id}
+                  onClick={() => onRoleSwitch(r)}
+                  className={cn(
+                    "flex items-center gap-4 rounded-2xl border p-4 transition-all active:scale-95",
+                    isActiveRole
+                      ? "border-primary/50 bg-primary/10 text-primary shadow-sm"
+                      : "border-border/50 bg-muted/30",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "flex h-10 w-10 items-center justify-center rounded-xl bg-background",
+                      isActiveRole && "bg-primary/20 text-primary",
+                    )}
+                  >
+                    <LayoutDashboard size={20} />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-sm font-bold">{r.name}</p>
+                    <p className="text-[10px] text-muted-foreground">
+                      Switch to {r.name.toLowerCase()} view
+                    </p>
+                  </div>
+                  {isActiveRole && (
+                    <div className="ml-auto h-2 w-2 rounded-full bg-primary" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      )}
+
       <div className="my-2 border-t border-border" />
       <div className="flex flex-col gap-2">
         <button

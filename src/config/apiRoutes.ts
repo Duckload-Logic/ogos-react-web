@@ -196,6 +196,7 @@ export const API_ROUTES = Object.freeze({
       revokeSession: (id: string, sessionId: string) =>
         `/users/${id}/sessions/${sessionId}`,
       activity: (id: string) => `/users/${id}/activity`,
+      updateRoles: "/users/update-roles",
     }),
     analytics: Object.freeze({
       admin: "/analytics/admin-dashboard",

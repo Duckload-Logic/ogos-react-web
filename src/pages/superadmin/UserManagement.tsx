@@ -35,14 +35,16 @@ import {
 } from "lucide-react";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useToggleUserStatus, useUsers } from "@/features/system-admin/hooks";
+import { useToggleUserStatus, useUpdateUserRoles, useUsers } from "@/features/system-admin/hooks";
 import type { UserAccount } from "@/features/system-admin/types";
+import { RoleManagementModal } from "./RoleManagementModal";
 
 export default function UserManagement() {
   const [page, setPage] = useState(1);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<number | undefined>();
   const [userToToggle, setUserToToggle] = useState<UserAccount | null>(null);
+  const [userToManageRoles, setUserToManageRoles] = useState<UserAccount | null>(null);
   const navigate = useNavigate();
 
   const { data, isLoading } = useUsers({
@@ -53,6 +55,7 @@ export default function UserManagement() {
   });
 
   const toggleStatusMutation = useToggleUserStatus();
+  const updateRolesMutation = useUpdateUserRoles();
 
   usePageMetadata({
     title: "User Management",
@@ -66,6 +69,17 @@ export default function UserManagement() {
     const action = userToToggle.isActive ? "block" : "unblock";
     await toggleStatusMutation.mutateAsync({ id: userToToggle.id, action });
     setUserToToggle(null);
+  };
+
+  const handleUpdateRoles = async (roleIds: number[], reason: string, referenceId: string) => {
+    if (!userToManageRoles) return;
+    await updateRolesMutation.mutateAsync({
+      userId: userToManageRoles.id,
+      roleIds,
+      reason,
+      referenceId,
+    });
+    setUserToManageRoles(null);
   };
 
   const formatDate = (dateStr: string) => {
@@ -238,15 +252,20 @@ export default function UserManagement() {
                         </div>
                       </td>
                       <td className="px-6 py-4">
-                        <Badge
-                          variant="outline"
-                          className={cn(
-                            "rounded-full px-3 font-medium transition-all",
-                            getRoleBadgeColor(user.role.name)
-                          )}
-                        >
-                          {user.role.name}
-                        </Badge>
+                        <div className="flex flex-wrap gap-1">
+                          {user.roles.map((role) => (
+                            <Badge
+                              key={role.id}
+                              variant="outline"
+                              className={cn(
+                                "rounded-full px-3 font-medium transition-all",
+                                getRoleBadgeColor(role.name)
+                              )}
+                            >
+                              {role.name}
+                            </Badge>
+                          ))}
+                        </div>
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex items-center gap-1.5 font-bold tracking-tight">
@@ -286,6 +305,13 @@ export default function UserManagement() {
                             >
                               <ShieldAlert size={14} />
                               Audit Sessions
+                            </DropdownMenuItem>
+                            <DropdownMenuItem
+                              className="gap-2 focus:bg-primary/10"
+                              onClick={() => setUserToManageRoles(user)}
+                            >
+                              <Shield size={14} />
+                              Manage Roles
                             </DropdownMenuItem>
                             <DropdownMenuSeparator className="bg-white/10" />
                             <DropdownMenuItem
@@ -365,6 +391,15 @@ export default function UserManagement() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Role Management Modal */}
+      <RoleManagementModal
+        user={userToManageRoles}
+        isOpen={!!userToManageRoles}
+        onClose={() => setUserToManageRoles(null)}
+        onUpdate={handleUpdateRoles}
+        isUpdating={updateRolesMutation.isPending}
+      />
     </div>
   );
 }

@@ -197,16 +197,18 @@ export default function Profile() {
                 >
                   {user.type.toUpperCase()} ACCOUNT
                 </Badge>
-                <Badge
-                  key={user.role.id}
-                  variant="secondary"
-                  className={cn(
-                    "rounded-full bg-muted/60 px-3 py-1 text-[10px] font-semibold",
-                    "uppercase tracking-wider text-foreground",
-                  )}
-                >
-                  {user.role.name}
-                </Badge>
+                {user.roles.map((role) => (
+                  <Badge
+                    key={role.id}
+                    variant="secondary"
+                    className={cn(
+                      "rounded-full bg-muted/60 px-3 py-1 text-[10px] font-semibold",
+                      "uppercase tracking-wider text-foreground",
+                    )}
+                  >
+                    {role.name}
+                  </Badge>
+                ))}
               </div>
               <h1
                 className={cn(
