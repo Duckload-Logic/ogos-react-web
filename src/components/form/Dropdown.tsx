@@ -176,24 +176,31 @@ export default function Dropdown({
                   <CommandEmpty>No {label.toLowerCase()} found.</CommandEmpty>
                 )}
                 <CommandGroup>
-                  {options.map((option) => (
-                    <CommandItem
-                      key={String(option[identifier])}
-                      value={`${getLabel(option)}|${String(option[identifier])}`} // Ensure unique value for cmdk search/matching
-                      onSelect={() => handleSelect(String(option[identifier]))}
-                      className={cn(
-                        "mb-0.5 flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors",
-                        String(option[identifier]) === String(value)
-                          ? "bg-primary/10 font-bold text-primary"
-                          : "text-foreground hover:bg-primary/5",
-                      )}
-                    >
-                      <span className="truncate">{getLabel(option)}</span>
-                      {String(option[identifier]) === String(value) && (
-                        <Check className="size-4 flex-shrink-0" />
-                      )}
-                    </CommandItem>
-                  ))}
+                  {options.map((option, index) => {
+                    const optId = option?.[identifier];
+                    const key =
+                      optId !== undefined ? String(optId) : `opt-${index}`;
+                    const label = getLabel(option);
+
+                    return (
+                      <CommandItem
+                        key={key}
+                        value={`${label}|${key}`}
+                        onSelect={() => handleSelect(String(optId))}
+                        className={cn(
+                          "mb-0.5 flex cursor-pointer items-center justify-between rounded-lg px-3 py-2 text-sm transition-colors",
+                          String(optId) === String(value)
+                            ? "bg-primary/10 font-bold text-primary"
+                            : "text-foreground hover:bg-primary/5",
+                        )}
+                      >
+                        <span className="truncate">{label}</span>
+                        {String(optId) === String(value) && (
+                          <Check className="size-4 flex-shrink-0" />
+                        )}
+                      </CommandItem>
+                    );
+                  })}
                 </CommandGroup>
               </CommandList>
             </Command>

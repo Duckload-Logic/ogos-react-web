@@ -5,14 +5,23 @@ import { cn } from "@/lib/utils";
 
 const ICON_SIZE = 20;
 
+interface SearchInputProps {
+  className?: string;
+  searchTerm?: string;
+  onSearchChange?: (val: string) => void;
+  placeholder?: string;
+  hasHeader?: boolean;
+  noSpecialCharacters?: boolean;
+}
+
 export default function SearchInput({
   className = "",
-  searchTerm,
+  searchTerm = "",
   onSearchChange,
   placeholder = "Search...",
   hasHeader = true,
   noSpecialCharacters = false,
-}: any) {
+}: SearchInputProps) {
   const [error, setError] = useState("");
 
   const handleChange = (val: string) => {
@@ -21,7 +30,7 @@ export default function SearchInput({
     } else {
       setError("");
     }
-    onSearchChange(val);
+    onSearchChange?.(val);
   };
 
   return (

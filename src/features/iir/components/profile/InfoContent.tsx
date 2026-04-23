@@ -1,3 +1,4 @@
+import React from "react";
 import { TabId } from "../../constants";
 import PersonalView from "./PersonalView";
 import EducationView from "./EducationView";
@@ -19,7 +20,7 @@ export default function InfoContent({
   showSignificantNotes?: boolean;
   iirId?: string;
 }) {
-  const views: Record<TabId, JSX.Element> = {
+  const views: Record<TabId, React.JSX.Element> = {
     personal: <PersonalView data={studentData?.student} />,
     education: <EducationView data={studentData?.education} />,
     family: <FamilyView data={studentData?.family} />,
@@ -34,7 +35,7 @@ export default function InfoContent({
         />
       ),
     }),
-  } as Record<TabId, JSX.Element>;
+  } as Record<TabId, React.JSX.Element>;
 
   return (
     <div

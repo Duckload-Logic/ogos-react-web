@@ -13,6 +13,7 @@ interface ProfileMenuProps {
   section?: string;
   studentNumber?: string;
   profilePath: string;
+  role: string;
   onLogout: () => void;
 }
 
@@ -21,6 +22,7 @@ export default function ProfileMenu({
   middleName,
   lastName,
   roleLabel,
+  role,
   section,
   studentNumber,
   profilePath,
@@ -109,6 +111,54 @@ export default function ProfileMenu({
                 </div>
               </div>
             </button>
+
+            {role === "superadmin" && (
+              <div className="border-b border-border bg-muted/20 pb-2 pt-2">
+                <p className="px-4 pb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+                  Switch Portal
+                </p>
+                <button
+                  onClick={() => {
+                    navigate("/superadmin");
+                    setOpen(false);
+                  }}
+                  className="flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition hover:bg-muted"
+                >
+                  <ShieldCheck size={14} className="text-primary" />
+                  <span>Super Admin Portal</span>
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/admin");
+                    setOpen(false);
+                  }}
+                  className="flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition hover:bg-muted"
+                >
+                  <ShieldCheck size={14} className="text-primary" />
+                  <span>Admin Portal</span>
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/student");
+                    setOpen(false);
+                  }}
+                  className="flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition hover:bg-muted"
+                >
+                  <ShieldCheck size={14} className="text-primary" />
+                  <span>Student Portal</span>
+                </button>
+                <button
+                  onClick={() => {
+                    navigate("/dev");
+                    setOpen(false);
+                  }}
+                  className="flex w-full items-center gap-3 px-4 py-2 text-left text-xs transition hover:bg-muted"
+                >
+                  <ShieldCheck size={14} className="text-primary" />
+                  <span>Dev Portal</span>
+                </button>
+              </div>
+            )}
 
             <button
               onClick={() => {

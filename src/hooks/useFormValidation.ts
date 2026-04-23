@@ -31,7 +31,7 @@ export const useFormValidation = (
   debounceMs = 300,
 ): UseFormValidationReturn => {
   const [errors, setErrors] = useState<Record<string, string>>({});
-  const debounceTimer = useRef<ReturnType<typeof setTimeout>>();
+  const debounceTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   useEffect(() => {
     return () => {

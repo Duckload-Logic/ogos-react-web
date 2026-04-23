@@ -3,39 +3,55 @@ import { ProtectedRoute } from "@/features/auth/components/ProtectedRoute";
 import { IIRGate } from "@/features/auth/components/IIRGate";
 
 // Shared
-import Layout, { usePageMetadata } from "@/components/layout/Layout";
+import Layout from "@/components/layout/Layout";
+import { usePageMetadata } from "@/context";
 import NotFound from "@/components/shared/NotFound";
 
-// Auth Feature
-import Login from "@/features/auth/pages/Login";
-import Register from "@/features/auth/pages/Register";
 
 // Student Features
-import { Dashboard as StudentDashboard } from "@/features/students/pages/Dashboard";
-import StudentAppointments from "@/features/appointments/pages/student/StudentAppointments";
-import StudentAppointmentDetails from "@/features/appointments/pages/student/AppointmentDetails";
-import { StudentSlips, SubmitSlip } from "@/features/slips/pages/student";
-import StudentSlipDetails from "@/features/slips/pages/student/SlipDetails";
+import StudentDashboard from "@/pages/student/Dashboard";
+import StudentAppointments from "@/pages/student/appointments/StudentAppointments";
+import StudentAppointmentDetails from "@/pages/student/appointments/AppointmentDetails";
+import { StudentSlips, SubmitSlip } from "@/pages/student/slips";
+import StudentSlipDetails from "@/pages/student/slips/SlipDetails";
+import IIRProfile from "@/pages/student/iir/IIRProfile";
+import IIRForm from "@/pages/student/iir/IIRForm";
 
 // Admin Feature
-import Dashboard from "@/features/admin/pages/Dashboard";
-import StudentRecords from "@/features/admin/pages/StudentRecords";
-import AppointmentsManagement from "@/features/appointments/pages/admin/AppointmentsManagement";
-import AppointmentDetails from "@/features/appointments/pages/admin/AppointmentDetails";
-import AppointmentLogs from "@/features/appointments/pages/admin/AppointmentLogs";
-import ReviewSlips from "@/features/slips/pages/admin/ReviewSlips";
-import SlipDetails from "@/features/slips/pages/admin/SlipDetails";
-import SlipLogs from "@/features/slips/pages/admin/SlipLogs";
-import Analytics from "@/features/analytics/pages/Analytics";
-import LifecycleManagement from "@/features/admin/pages/LifecycleManagement";
-import IIRProfile from "@/features/iir/pages/IIRProfile";
-import IIRForm from "@/features/iir/pages/IIRForm";
-import { CreateAppointment } from "@/features/appointments";
-import StatementPage from "@/features/consents/pages/StatementPage";
-import Profile from "@/features/users/pages/Profile";
+// Admin Feature
+import Dashboard from "@/pages/admin/Dashboard";
+import StudentRecords from "@/pages/admin/StudentRecords";
+import AppointmentsManagement from "@/pages/admin/appointments/AppointmentsManagement";
+import AppointmentDetails from "@/pages/admin/appointments/AppointmentDetails";
+import AppointmentLogs from "@/pages/admin/appointments/AppointmentLogs";
+import ReviewSlips from "@/pages/admin/slips/ReviewSlips";
+import SlipDetails from "@/pages/admin/slips/SlipDetails";
+import SlipLogs from "@/pages/admin/slips/SlipLogs";
+import Analytics from "@/pages/admin/Analytics";
+import LifecycleManagement from "@/pages/admin/LifecycleManagement";
+import CreateAppointment from "@/pages/student/appointments/CreateAppointment";
+import StatementPage from "@/pages/shared/Statement";
+import Profile from "@/pages/shared/Profile";
+import Callback from "@/pages/auth/Callback";
+import NotificationsPage from "@/pages/shared/Notifications";
+import Login from "@/pages/auth/Login";
+import Register from "@/pages/auth/Register";
 
-import Callback from "@/features/auth/pages/Callback";
-import NotificationsPage from "@/features/notifications/pages/Notifications";
+// Super Admin Pages
+import SuperAdminDashboard from "@/pages/superadmin/SuperAdminDashboard";
+import SAM2M from "@/pages/superadmin/M2MManagement";
+import UserManagement from "@/pages/superadmin/UserManagement";
+import AnalyticsOverview from "@/pages/superadmin/AnalyticsOverview";
+import SecurityLogs from "@/pages/superadmin/SecurityLogs";
+import SystemLogs from "@/pages/superadmin/SystemLogs";
+import AuditLogs from "@/pages/superadmin/AuditLogs";
+import UserActivity from "@/pages/superadmin/UserActivity";
+import UserSessions from "@/pages/superadmin/UserSessions";
+
+// Dev Portal Pages
+import DevM2M from "@/pages/dev/M2MManagement";
+import Documentation from "@/pages/dev/Documentation";
+import Guides from "@/pages/dev/Guides";
 
 const TermsContent = () => {
   usePageMetadata({
@@ -234,6 +250,46 @@ export const routes: RouteObject[] = [
         path: "notifications",
         element: <NotificationsPage />,
       },
+    ],
+  },
+
+  // SuperAdmin routes
+  {
+    path: "/superadmin",
+    element: (
+      <ProtectedRoute requiredRole="superadmin">
+        <Layout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <SuperAdminDashboard /> },
+      { path: "m2m-management", element: <SAM2M /> },
+      { path: "users", element: <UserManagement /> },
+      { path: "analytics", element: <AnalyticsOverview /> },
+      { path: "security-logs", element: <SecurityLogs /> },
+      { path: "system-logs", element: <SystemLogs /> },
+      { path: "audit-logs", element: <AuditLogs /> },
+      { path: "users/:userId/activity", element: <UserActivity /> },
+      { path: "users/:userId/sessions", element: <UserSessions /> },
+      { path: "profile", element: <Profile /> },
+      { path: "notifications", element: <NotificationsPage /> },
+    ],
+  },
+
+  // Developer routes
+  {
+    path: "/dev",
+    element: (
+      <ProtectedRoute requiredRole="developer">
+        <Layout />
+      </ProtectedRoute>
+    ),
+    children: [
+      { index: true, element: <DevM2M /> },
+      { path: "docs", element: <Documentation /> },
+      { path: "guides", element: <Guides /> },
+      { path: "profile", element: <Profile /> },
+      { path: "notifications", element: <NotificationsPage /> },
     ],
   },
 

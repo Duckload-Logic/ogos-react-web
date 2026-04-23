@@ -8,6 +8,12 @@ import {
   TrendingUp,
   User,
   GraduationCap,
+  Shield,
+  Server,
+  Activity,
+  Code,
+  BookOpen,
+  Settings,
 } from "lucide-react";
 
 export interface NavItem {
@@ -74,6 +80,64 @@ export const NAV_CONFIG: Record<string, NavItem[]>[] = [
         label: "IIR Profile",
         href: "/student/iir",
         icon: <User size={ICON_SIZE} />,
+      },
+    ],
+  },
+  {
+    superadmin: [
+      {
+        label: "System Dashboard",
+        href: "/superadmin",
+        icon: <Home size={ICON_SIZE} />,
+      },
+      {
+        label: "M2M Clients",
+        href: "/superadmin/m2m-management",
+        icon: <Server size={ICON_SIZE} />,
+      },
+      {
+        label: "User Accounts",
+        href: "/superadmin/users",
+        icon: <Users size={ICON_SIZE} />,
+      },
+      {
+        label: "System Analytics",
+        href: "/superadmin/analytics",
+        icon: <TrendingUp size={ICON_SIZE} />,
+      },
+      {
+        label: "Audit Logs",
+        href: "/superadmin/audit-logs",
+        icon: <FileText size={ICON_SIZE} />,
+      },
+      {
+        label: "Security Events",
+        href: "/superadmin/security-logs",
+        icon: <Shield size={ICON_SIZE} />,
+      },
+      {
+        label: "Health Monitor",
+        href: "/superadmin/system-logs",
+        icon: <Activity size={ICON_SIZE} />,
+      },
+    ],
+  },
+  {
+    developer: [
+      {
+        label: "Developer Hub",
+        href: "/dev",
+        icon: <Code size={ICON_SIZE} />,
+      },
+      {
+        label: "API Documentation",
+        href: "/dev/docs",
+        icon: <BookOpen size={ICON_SIZE} />,
+      },
+      {
+        label: "Dev Guides",
+        href: "/dev/guides",
+        icon: <FileText size={ICON_SIZE} />,
       },
     ],
   },

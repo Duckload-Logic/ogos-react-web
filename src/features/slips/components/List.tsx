@@ -117,12 +117,12 @@ export function SlipList({
       <CardContent className="flex-1 p-0">
         {isLoading ? (
           <div className="flex min-h-[320px] items-center justify-center px-4 text-center">
-            <p className="text-muted-foreground">
+            <div className="text-muted-foreground">
               <Spinner
                 size="sm"
                 message="Loading excuse slips"
               />
-            </p>
+            </div>
           </div>
         ) : slips.length === 0 ? (
           <div className="flex min-h-[340px] flex-col items-center justify-center px-6 text-center">

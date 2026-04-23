@@ -54,9 +54,13 @@ export const ProtectedRoute = ({
   /**
    * Check role-based access if required
    */
+  const userRole = user.role?.name?.toLowerCase().replace(/\s+/g, "") || "";
+  const normRequiredRole = requiredRole?.toLowerCase().replace(/\s+/g, "");
+
   if (
-    requiredRole &&
-    user.role.name.toLowerCase() !== requiredRole.toLowerCase()
+    normRequiredRole &&
+    userRole !== normRequiredRole &&
+    userRole !== "superadmin"
   ) {
     return (
       <Navigate

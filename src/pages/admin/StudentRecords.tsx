@@ -1,0 +1,232 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import StudentFilters from "@/features/counseling/components/StudentFilters";
+import StudentGrid from "@/features/counseling/components/StudentGrid";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { AlertCircle, Users } from "lucide-react";
+import {
+  useCourses,
+  useGenders,
+  useIIRPagination,
+  useStudentStatuses,
+} from "@/features/iir/hooks";
+import { IIRProfileView } from "@/features/iir/types";
+import { useDebounce } from "@/hooks/useDebounce";
+import { Spinner } from "@/components/shared";
+import { Pagination } from "@/components/shared";
+import Layout from "@/components/layout/Layout";
+import { usePageMetadata } from "@/context";
+import { cn } from "@/lib/utils";
+
+export default function StudentRecords() {
+  const {
+    data: courses,
+    isLoading: isCoursesLoading,
+    isError: isCoursesError,
+  } = useCourses();
+  const {
+    data: genders,
+    isLoading: isGendersLoading,
+    isError: isGendersError,
+  } = useGenders();
+  const {
+    data: statuses,
+    isLoading: isStatusesLoading,
+    isError: isStatusesError,
+  } = useStudentStatuses();
+  const yearLevels = [
+    { id: 1, name: "1st Year" },
+    { id: 2, name: "2nd Year" },
+    { id: 3, name: "3rd Year" },
+    { id: 4, name: "4th Year" },
+  ];
+
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(12);
+  const [selectedCourseId, setSelectedCourseId] = useState(0);
+  const [selectedGenderId, setSelectedGenderId] = useState(0);
+  const [selectedYearLevelId, setSelectedYearLevelId] = useState(0);
+  const [selectedStatusId, setSelectedStatusId] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
+  const debouncedSearch = useDebounce(searchTerm, 500);
+
+  const {
+    data,
+    isLoading: isStudentsLoading,
+    isError: isStudentsError,
+    error: studentsError,
+  } = useIIRPagination({
+    page,
+    pageSize,
+    search: debouncedSearch,
+    courseId: selectedCourseId,
+    genderId: selectedGenderId,
+    yearLevel: selectedYearLevelId,
+    statusId: selectedStatusId,
+  });
+
+  const allStudents = data?.students || [];
+  const totalRecords = data?.total || 0;
+
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [studentToDelete, setStudentToDelete] = useState<IIRProfileView | null>(
+    null,
+  );
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [showAdd, setShowAdd] = useState(false);
+  const navigate = useNavigate();
+
+  const isLoading =
+    isCoursesLoading || isGendersLoading || isStudentsLoading || isDeleting;
+
+  usePageMetadata({
+    title: "Student Records",
+    description:
+      "Access and manage student cumulative records and personal information",
+    badgeText: "Admin Management",
+    badgeIcon: <Users className="h-4 w-4" />,
+    isLoading,
+  });
+
+  return (
+    <>
+      <div className="animate-in fade-in slide-in-from-bottom-4 space-y-8 duration-700">
+        <StudentFilters
+          searchTerm={searchTerm}
+          onSearchChange={(value) => {
+            if (value === searchTerm) return;
+            setSearchTerm(value);
+            setPage(1);
+          }}
+          courses={courses}
+          selectedCourseId={selectedCourseId}
+          onCourseChange={(id: number) => {
+            if (id === selectedCourseId) return;
+            setSelectedCourseId(id);
+            setPage(1);
+          }}
+          genders={genders}
+          selectedGenderId={selectedGenderId}
+          onGenderChange={(id: number) => {
+            if (id === selectedGenderId) return;
+            setSelectedGenderId(id);
+            setPage(1);
+          }}
+          yearLevels={yearLevels}
+          selectedYearLevelId={selectedYearLevelId}
+          onYearLevelChange={(level: number) => {
+            if (level === selectedYearLevelId) return;
+            setSelectedYearLevelId(level);
+            setPage(1);
+          }}
+          statuses={statuses}
+          selectedStatusId={selectedStatusId}
+          onStatusChange={(id: number) => {
+            if (id === selectedStatusId) return;
+            setSelectedStatusId(id);
+            setPage(1);
+          }}
+        />
+
+        <div className="relative min-h-[400px]">
+          {(isStudentsLoading || isDeleting) && (
+            <div
+              className={cn(
+                "bg-glass-bg/5 absolute inset-0 z-20 flex items-center",
+                "justify-center rounded-[32px] backdrop-blur-[2px]",
+              )}
+            >
+              <Spinner size="lg" />
+            </div>
+          )}
+
+          <div
+            className={cn(
+              "space-y-8 transition-all duration-700",
+              (isStudentsLoading || isDeleting) &&
+                "pointer-events-none opacity-40 blur-[1px]",
+            )}
+          >
+            <StudentGrid
+              students={allStudents}
+              isStudentsLoading={false} // Loading handled by parent
+              onViewClick={(student: any) => {
+                navigate(`/admin/student-records/${student.iirId}`, {
+                  state: { student },
+                });
+              }}
+              onDeleteClick={(student: any) => {
+                setStudentToDelete(student);
+                setDeleteConfirmOpen(true);
+              }}
+              yearLevels={yearLevels}
+            />
+
+            <div className="flex justify-center pt-4">
+              <Pagination
+                currentPage={page}
+                totalPages={data?.meta?.totalPages || 1}
+                onPageChange={setPage}
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+      {/* <AddStudentModal
+        isOpen={showAdd}
+        onClose={() => {
+          setShowAdd(false);
+          form.reset();
+        }}
+        onSubmit={onSubmit}
+        courses={courses}
+      /> */}
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={deleteConfirmOpen}
+        onOpenChange={setDeleteConfirmOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Student Record</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete the student record for{" "}
+              {studentToDelete?.firstName} {studentToDelete?.lastName}? This
+              action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          {deleteError && (
+            <Alert variant="destructive">
+              <AlertCircle className="h-4 w-4" />
+              <AlertDescription>{deleteError}</AlertDescription>
+            </Alert>
+          )}
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              // onClick={handleConfirmDelete}
+              disabled={isDeleting}
+              className="bg-red-600 text-white hover:bg-red-700"
+            >
+              {isDeleting ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </>
+  );
+}

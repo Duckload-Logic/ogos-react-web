@@ -38,14 +38,17 @@ apiClient.interceptors.request.use((config) => {
  * on 401, then rejects if refresh fails to allow
  * AuthProvider to handle session expiration.
  */
-// Module-level promise to coordinate concurrent refresh attempts
+// Module-level state to coordinate concurrent refresh attempts
 let refreshPromise: Promise<void> | null = null;
+let isRefreshLockedOut = false;
 
 apiClient.interceptors.response.use(
   (response) => {
+    const contentType = response.headers["content-type"];
     if (
       response.data &&
-      response.headers["content-type"]?.includes("application/json")
+      typeof contentType === "string" &&
+      contentType.includes("application/json")
     ) {
       response.data = camelizeKeys(response.data);
 
@@ -70,15 +73,22 @@ apiClient.interceptors.response.use(
     // Log the error with precision format
     console.error(`[${handlerName}] {${stepName}}: ${errorMsg}`);
 
+    // If we are locked out from refreshing, don't even try
+    if (isRefreshLockedOut && error.response?.status === 401) {
+      return Promise.reject(error);
+    }
+
     // Only attempt refresh if:
     // - status is 401 (Unauthorized)
     // - not already retried (prevent infinite loops)
     // - not the refresh endpoint itself (avoid loops)
+    // - if user is logged in
     if (
       error.response?.status === 401 &&
       !originalRequest?._retry &&
       !originalRequest?.url?.includes("/auth/refresh") &&
-      !originalRequest?.url?.includes("auth/idp/token")
+      !originalRequest?.url?.includes("auth/idp/token") &&
+      localStorage.getItem("session_active") === "true"
     ) {
       if (originalRequest) {
         originalRequest._retry = true;
@@ -88,18 +98,21 @@ apiClient.interceptors.response.use(
         // Handle concurrent refresh: multiple simultaneous 401s
         // will await the same singleton refresh promise
         if (!refreshPromise) {
-          console.debug(`[${handlerName}] {Session Refresh}: Initiating...`);
           refreshPromise = apiClient
             .post("/auth/refresh")
             .then(() => {
               refreshPromise = null;
+              isRefreshLockedOut = false;
             })
             .catch((refreshError) => {
               refreshPromise = null;
+              isRefreshLockedOut = true;
+              // Reset lockout after 10s to allow manual retry if needed
+              setTimeout(() => {
+                isRefreshLockedOut = false;
+              }, 10000);
               throw refreshError;
             });
-        } else {
-          console.debug(`[${handlerName}] {Session Refresh}: Waiting...`);
         }
 
         // Await the shared refresh effort (cookies updated by server)

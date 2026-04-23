@@ -172,16 +172,48 @@ export const API_ROUTES = Object.freeze({
       submit: "/students/inventory/records/iir/draft",
     }),
     submit: "/students/inventory/records/iir",
-    checkOnboarding: (userId: string) => `/students/record/${userId}`,
+    checkOnboarding: (userId: string) =>
+      `/students/inventory/records/user/${userId}`,
     bulkStatus: "/students/inventory/records/bulk-status",
   }),
   /**
    * Superadmin related endpoints
    */
   superadmin: Object.freeze({
+    m2mClients: Object.freeze({
+      list: "/m2m-clients",
+      create: "/m2m-clients",
+      revoke: (id: number) => `/m2m-clients/${id}`,
+      rotateSecret: (id: number) => `/m2m-clients/${id}/secret`,
+      verify: (id: number) => `/m2m-clients/${id}/verify`,
+    }),
+    users: Object.freeze({
+      list: "/users/all",
+      distribution: "/users/distribution",
+      toggleStatus: (id: string, action: "block" | "unblock") =>
+        `/users/${id}/${action}`,
+      sessions: (id: string) => `/users/${id}/sessions`,
+      revokeSession: (id: string, sessionId: string) =>
+        `/users/${id}/sessions/${sessionId}`,
+      activity: (id: string) => `/users/${id}/activity`,
+    }),
+    analytics: Object.freeze({
+      admin: "/analytics/admin-dashboard",
+    }),
     logs: Object.freeze({
+      security: "/activity-meta/security",
+      system: "/activity-meta/system",
+      audit: "/activity-meta/audit",
+      stats: "/activity-meta/stats",
+      activity: "/activity-meta/activity-stats",
       myLogs: "/activity-meta/me",
     }),
+  }),
+  /**
+   * Developer portal related endpoints
+   */
+  developer: Object.freeze({
+    docs: "/docs/integrations/doc.json",
   }),
   /**
    * Notification related endpoints
