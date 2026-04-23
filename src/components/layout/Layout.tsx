@@ -141,7 +141,8 @@ export default function Layout({
   const navigationItems = useMemo(() => {
     if (!user || !user.role?.name) return [];
 
-    const roleKey = user.role?.name?.toLowerCase();
+    const roleKey =
+      user.role?.name?.toLowerCase().replace(/\s+/g, "") || "student";
     if (!roleKey) return [];
 
     const roleData = NAV_CONFIG.find((config) => !!config[roleKey]);
@@ -153,6 +154,8 @@ export default function Layout({
     if (!user || !user.role) return "";
     const roleName = user.role?.name?.toLowerCase();
     if (roleName === "admin") return "Admin Account";
+    if (roleName === "superadmin") return "Super Admin Account";
+    if (roleName === "developer") return "Developer Account";
     return "Student Account";
   };
 
@@ -199,7 +202,7 @@ export default function Layout({
 
   return (
     <ErrorBoundary>
-      <ScrollToTop targetRef={scrollRef} />
+      <ScrollToTop targetRef={scrollRef as React.RefObject<HTMLDivElement>} />
       <div
         className={`relative flex h-screen flex-col overflow-hidden bg-neutral-100 text-foreground dark:bg-neutral-950 ${
           grayscale ? "grayscale" : ""
@@ -348,48 +351,4 @@ export default function Layout({
       </div>
     </ErrorBoundary>
   );
-}
-
-/**
- * Hook for child pages to set layout metadata when using Shared Layout
- */
-export function usePageMetadata(metadata: Partial<PageMetadata>) {
-  const { setPageMetadata } = useUI();
-
-  useEffect(() => {
-    setPageMetadata((prev) => {
-      // Shallow comparison of all metadata fields
-      const hasChanged = Object.entries(metadata).some(([key, value]) => {
-        return prev[key as keyof PageMetadata] !== value;
-      });
-
-      if (!hasChanged) return prev;
-      return { ...prev, ...metadata };
-    });
-
-    // Clean up metadata when the component unmounts to prevent stale data
-    // on the next page (e.g., persistent stats or actions)
-    return () => {
-      setPageMetadata({
-        title: "",
-        description: undefined,
-        badgeText: undefined,
-        badgeIcon: undefined,
-        headerActions: undefined,
-        headerStats: undefined,
-        showDate: false,
-        isLoading: false,
-      });
-    };
-  }, [
-    metadata.title,
-    metadata.description,
-    metadata.badgeText,
-    metadata.headerActions,
-    metadata.headerStats,
-    metadata.showDate,
-    metadata.showSubHeader,
-    metadata.isLoading,
-    setPageMetadata,
-  ]);
 }

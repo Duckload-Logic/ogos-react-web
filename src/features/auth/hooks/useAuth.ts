@@ -6,7 +6,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { PostLogin, LoginPayload, GetLogoutURL } from "../services/index";
-import { ResetBootstrap } from "@/services/bootstrapper";
 import { QUERY_KEYS } from "@/config/queryKeys";
 
 /**
@@ -22,6 +21,9 @@ export function useLogin() {
     mutationFn: (payload: LoginPayload) => PostLogin(payload),
     onSuccess: async () => {
       try {
+        // Set session flag to enable auth queries
+        localStorage.setItem("session_active", "true");
+
         // Invalidate user query to refetch
         queryClient.invalidateQueries({
           queryKey: QUERY_KEYS.users.me,
@@ -49,10 +51,8 @@ export function useLogin() {
  */
 export function useLogout() {
   const logout = () => {
-    // Clear bootstrap state before navigating
-    ResetBootstrap();
-
-    // Trigger full page navigation to handle API redirect to IDP
+    // Clear local session state
+    localStorage.removeItem("session_active");
     window.location.href = GetLogoutURL();
   };
 

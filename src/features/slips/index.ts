@@ -21,6 +21,3 @@ export { useSubmitSlip, useUpdateSlipStatus } from "./hooks";
 // Services (re-export for legacy imports)
 export * from "./services";
 
-// Pages
-export { default as ReviewSlips } from "./pages/admin/ReviewSlips";
-export { default as SlipLogs } from "./pages/admin/SlipLogs";

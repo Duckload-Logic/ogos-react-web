@@ -80,7 +80,7 @@ function NavItem({
     <Link
       to={item.href}
       onClick={onClick}
-      className={`sidebar-icon-tilt group flex items-center gap-3 rounded-xl px-3 py-3 transition-all duration-200 hover:shadow-sm ${
+      className={`sidebar-icon-tilt group flex cursor-pointer items-center gap-3 rounded-xl px-3 py-3 transition-all duration-200 hover:shadow-sm ${
         active
           ? "bg-primary text-primary-foreground shadow-sm"
           : "text-muted-foreground hover:bg-muted/60 hover:text-foreground"
@@ -136,7 +136,13 @@ export default function Navigation({
       return true;
     }
 
-    const isRootPath = ["/admin", "/student", "/"].includes(item.href);
+    const isRootPath = [
+      "/admin",
+      "/student",
+      "/superadmin",
+      "/dev",
+      "/",
+    ].includes(item.href);
     if (isRootPath) {
       return false;
     }

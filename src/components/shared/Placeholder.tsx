@@ -1,4 +1,5 @@
-import Layout, { usePageMetadata } from "../layout/Layout";
+import Layout from "../layout/Layout";
+import { usePageMetadata } from "@/context";
 import { AlertCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 

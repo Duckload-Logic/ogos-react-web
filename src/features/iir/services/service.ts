@@ -109,7 +109,7 @@ export const CheckStudentOnboarding = async (
       API_ROUTES.iir.checkOnboarding(userID),
       config,
     );
-    return data?.studentRecord?.isSubmitted;
+    return data?.isSubmitted;
   } catch (error) {
     const handlerName = config?.handlerName || "CheckStudentOnboarding";
     const stepName = config?.stepName || "Check Onboarding";

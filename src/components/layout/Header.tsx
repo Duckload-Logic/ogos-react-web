@@ -46,7 +46,10 @@ export default function Header({
         <img
           src={LOGO_SRC}
           alt="Logo"
-          className="h-12 w-12 rounded-full transition-transform duration-200 hover:scale-110"
+          className={cn(
+            "h-12 w-12 rounded-full transition-transform duration-200",
+            "hover:scale-110",
+          )}
         />
         <div className="hidden flex-col gap-1 text-xs md:flex">
           <p className="font-semibold">
@@ -72,16 +75,7 @@ export default function Header({
             setShowNotifications={setShowNotifications}
           />
         )}
-        {/* <button
-          onClick={() => setSettingsOpen(true)}
-          className={cn(
-    "p-2 hover:bg-muted/30 rounded-lg transition-colors",
-    "duration-300 text-primary-foreground"
-  )}
-          aria-label="UI Settings"
-        >
-          <Settings size={18} />
-        </button> */}
+
         <ThemeToggle
           darkMode={darkMode}
           setDarkMode={setDarkMode}
@@ -93,6 +87,7 @@ export default function Header({
               middleName={user?.middleName}
               lastName={user?.lastName}
               roleLabel={getRoleLabel()}
+              role={role}
               profilePath={`/${role}/profile`}
               onLogout={handleLogout}
             />
