@@ -3,7 +3,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Pagination } from "@/components/shared";
 import { STATUS_COLORS } from "@/config/constants";
 import { Appointment, AppointmentStatus, StatusCount } from "../types";
-import { CalendarX, Eye, Tag, User, CalendarDays, Clock } from "lucide-react";
+import { CalendarX, Eye, Tag, User, CalendarDays, Clock, AlertTriangle } from "lucide-react";
 import { useMemo } from "react";
 import { SearchInput } from "@/components/form";
 import { format12HourTime } from "../utils";
@@ -12,6 +12,49 @@ import { Spinner } from "@/components/shared";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Dropdown } from "@/components/form";
+
+
+function getUrgencyValue(apt: Appointment) {
+  const raw = apt.urgencyLevel ?? apt.urgency;
+  if (!raw) return null;
+
+  if (typeof raw === "string") {
+    return { label: raw, key: raw.toLowerCase() };
+  }
+
+  return {
+    label: raw.name || "Urgency",
+    key: raw.colorKey || raw.name?.toLowerCase() || "default",
+  };
+}
+
+function UrgencyCapsule({ appointment }: { appointment: Appointment }) {
+  const urgency = getUrgencyValue(appointment);
+  if (!urgency?.label) return null;
+
+  const level = urgency.key.toLowerCase();
+  const tone = level.includes("high") || level.includes("urgent")
+    ? "border-red-500/25 bg-red-500/10 text-red-600 dark:text-red-300"
+    : level.includes("medium") || level.includes("moderate")
+      ? "border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+      : level.includes("low")
+        ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+        : "border-primary/20 bg-primary/10 text-primary";
+
+  return (
+    <span
+      className={cn(
+        "inline-flex w-fit items-center gap-1.5 rounded-full border",
+        "px-2.5 py-1 text-[10px] font-black uppercase tracking-wide",
+        tone,
+      )}
+      title={`Urgency level: ${urgency.label}`}
+    >
+      <AlertTriangle className="h-3 w-3" />
+      {urgency.label}
+    </span>
+  );
+}
 
 interface AppointmentListProps {
   title?: string;
@@ -158,6 +201,7 @@ export default function AppointmentList({
                     <th className="px-6 py-4 text-left">Session Time</th>
                     <th className="px-6 py-4 text-left">Category</th>
                     <th className="px-6 py-4 text-left">Status</th>
+                    <th className="px-6 py-4 text-left">Urgency</th>
                     <th className="px-6 py-4 pr-10 text-right">Actions</th>
                   </tr>
                 </thead>
@@ -209,6 +253,10 @@ export default function AppointmentList({
                         </span>
                       </td>
 
+                      <td className="px-4 py-4">
+                        <UrgencyCapsule appointment={apt} />
+                      </td>
+
                       <td className="rounded-r-xl px-4 py-4">
                         <Button
                           variant="outline"
@@ -247,14 +295,17 @@ export default function AppointmentList({
                       </span>
                     </div>
 
-                    <Badge
-                      className={cn(
-                        "rounded-full border px-3 py-1 text-[9px] font-bold tracking-wide shadow-sm",
-                        STATUS_COLORS[apt.status?.colorKey || "info"],
-                      )}
-                    >
-                      {apt.status?.name}
-                    </Badge>
+                    <div className="flex flex-col items-end gap-2">
+                      <Badge
+                        className={cn(
+                          "rounded-full border px-3 py-1 text-[9px] font-bold tracking-wide shadow-sm",
+                          STATUS_COLORS[apt.status?.colorKey || "info"],
+                        )}
+                      >
+                        {apt.status?.name}
+                      </Badge>
+                      <UrgencyCapsule appointment={apt} />
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-2 gap-4 text-[10px] font-bold">
