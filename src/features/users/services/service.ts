@@ -60,6 +60,9 @@ export async function UploadProfilePicture(
   const uploadWithField = async (fieldName: "profilePicture" | "file") => {
     const formData = new FormData();
     formData.append(fieldName, file);
+  try {
+    const formData = new FormData();
+    formData.append("profilePicture", file);
 
     const response = await apiClient.post(
       API_ROUTES.users.profilePicture,
@@ -86,6 +89,11 @@ export async function UploadProfilePicture(
       );
       throw fallbackError;
     }
+  } catch (error: any) {
+    const handlerName = config?.handlerName || "UploadProfilePicture";
+    const stepName = config?.stepName || "Upload Profile Picture";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
+    throw error;
   }
 }
 
