@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect, useMemo } from "react";
-import { useAuth } from "@/context";
+import { useAuth, useToast } from "@/context";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -35,15 +35,18 @@ import {
 } from "@/features/activity-meta/services/logService";
 import { format12HourTime, formatDate } from "@/utils";
 import { cn } from "@/lib/utils";
+import { UploadProfilePicture } from "@/features/users/services/service";
 
 export default function Profile() {
-  const { user, logout } = useAuth();
+  const { user, logout, refresh } = useAuth();
+  const { triggerToast } = useToast();
   const [previewImage, setPreviewImage] = useState<string | null>(
     user?.profilePicture || null,
   );
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activities, setActivities] = useState<LogEntry[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
+  const [isUploadingPicture, setIsUploadingPicture] = useState(false);
 
   useEffect(() => {
     const fetchActivities = async () => {
@@ -99,14 +102,41 @@ export default function Profile() {
     return Math.round((filledFields.length / fields.length) * 100);
   }, [user]);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setPreviewImage(reader.result as string);
-      };
-      reader.readAsDataURL(file);
+    if (!file) return;
+
+    const maxSize = 10 * 1024 * 1024;
+    const allowedTypes = ["image/jpeg", "image/png", "image/webp"];
+
+    if (!allowedTypes.includes(file.type)) {
+      triggerToast("Please upload a JPG, PNG, or WEBP image.");
+      e.target.value = "";
+      return;
+    }
+
+    if (file.size > maxSize) {
+      triggerToast("Profile picture must be 10MB or smaller.");
+      e.target.value = "";
+      return;
+    }
+
+    const localPreview = URL.createObjectURL(file);
+    setPreviewImage(localPreview);
+    setIsUploadingPicture(true);
+
+    try {
+      const updatedUser = await UploadProfilePicture(file);
+      setPreviewImage(updatedUser.profilePicture || localPreview);
+      await refresh();
+      triggerToast("Profile picture updated successfully.");
+    } catch (error) {
+      console.error("Profile picture upload failed:", error);
+      setPreviewImage(user?.profilePicture || null);
+      triggerToast("Unable to upload profile picture. Please try again.");
+    } finally {
+      setIsUploadingPicture(false);
+      e.target.value = "";
     }
   };
 
@@ -171,7 +201,8 @@ export default function Profile() {
                 "transition-all duration-300 hover:rotate-12 hover:scale-110",
                 "active:scale-95",
               )}
-              title="Change profile picture"
+              title={isUploadingPicture ? "Uploading..." : "Change profile picture"}
+              disabled={isUploadingPicture}
             >
               <Camera size={20} />
             </button>
@@ -180,7 +211,7 @@ export default function Profile() {
               ref={fileInputRef}
               onChange={handleImageChange}
               className="hidden"
-              accept="image/*"
+              accept="image/jpeg,image/png,image/webp"
             />
           </div>
 

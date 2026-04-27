@@ -57,6 +57,9 @@ export async function UploadProfilePicture(
   file: File,
   config?: AxiosConfigWithMeta,
 ): Promise<User> {
+  const uploadWithField = async (fieldName: "profilePicture" | "file") => {
+    const formData = new FormData();
+    formData.append(fieldName, file);
   try {
     const formData = new FormData();
     formData.append("profilePicture", file);
@@ -71,6 +74,21 @@ export async function UploadProfilePicture(
     );
 
     return response.data;
+  };
+
+  try {
+    return await uploadWithField("profilePicture");
+  } catch (error: any) {
+    try {
+      return await uploadWithField("file");
+    } catch (fallbackError: any) {
+      const handlerName = config?.handlerName || "UploadProfilePicture";
+      const stepName = config?.stepName || "Upload Profile Picture";
+      console.error(
+        `[${handlerName}] {${stepName}}: ${fallbackError.message}`,
+      );
+      throw fallbackError;
+    }
   } catch (error: any) {
     const handlerName = config?.handlerName || "UploadProfilePicture";
     const stepName = config?.stepName || "Upload Profile Picture";

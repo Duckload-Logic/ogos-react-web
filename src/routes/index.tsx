@@ -15,6 +15,7 @@ import { StudentSlips, SubmitSlip } from "@/pages/student/slips";
 import StudentSlipDetails from "@/pages/student/slips/SlipDetails";
 import IIRProfile from "@/pages/student/iir/IIRProfile";
 import IIRForm from "@/pages/student/iir/IIRForm";
+import CorUpload from "@/pages/student/cor/CorUpload";
 
 // Admin Feature
 // Admin Feature
@@ -177,6 +178,14 @@ export const routes: RouteObject[] = [
       {
         path: "iir/form",
         element: <IIRForm />,
+      },
+      {
+        path: "cor-upload",
+        element: (
+          <IIRGate>
+            <CorUpload />
+          </IIRGate>
+        ),
       },
       {
         path: "profile",
