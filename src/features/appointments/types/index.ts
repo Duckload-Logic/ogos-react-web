@@ -60,6 +60,8 @@ export interface Appointment {
   appointmentCategory: ConcernCategory;
   /** Status can be either an object or string */
   status?: AppointmentStatus;
+  urgencyLevel?: string | { id?: number; name?: string; colorKey?: string };
+  urgency?: string | { id?: number; name?: string; colorKey?: string };
   hasSignificantNote?: boolean;
   createdAt?: string;
   updatedAt?: string;

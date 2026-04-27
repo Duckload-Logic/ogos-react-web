@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useParams, Link, useSearchParams } from "react-router-dom";
+import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
 import { Spinner } from "@/components/shared";
 import {
   useIIRProfile,
@@ -18,6 +18,7 @@ import { cn } from "@/lib/utils";
 const ICON_SIZE = 20;
 
 export default function IIRProfile() {
+  const navigate = useNavigate();
   const { studentId, iirId: paramIirId } = useParams();
   const targetRecordId = studentId || paramIirId;
 
@@ -114,11 +115,15 @@ export default function IIRProfile() {
           </button>
         ) : (
           <button
+            onClick={() =>
+              finalIirId && navigate(`/student/iir/form?edit=true&iirId=${finalIirId}`)
+            }
             className={cn(
               "group flex h-10 w-10 items-center justify-center rounded-xl",
               "border border-primary/20 p-0 transition-colors",
               "hover:bg-primary/10",
             )}
+            title="Edit IIR profile"
           >
             <Edit
               size={ICON_SIZE}

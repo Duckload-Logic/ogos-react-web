@@ -14,6 +14,7 @@ export const API_ROUTES = Object.freeze({
    */
   users: Object.freeze({
     byId: (id: string) => `/users/${id}`,
+    profilePicture: "/users/me/profile-picture",
   }),
 
   /**
@@ -166,12 +167,15 @@ export const API_ROUTES = Object.freeze({
         `/students/inventory/records/iir/${iirId}/significant-notes`,
       download: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/download`,
+      cor: (iirId: string) =>
+        `/students/inventory/records/iir/${iirId}/cor`,
     }),
     draft: Object.freeze({
       save: "/students/inventory/records/iir/draft",
       submit: "/students/inventory/records/iir/draft",
     }),
     submit: "/students/inventory/records/iir",
+    update: (iirId: string) => `/students/inventory/records/iir/${iirId}`,
     checkOnboarding: (userId: string) =>
       `/students/inventory/records/user/${userId}`,
     bulkStatus: "/students/inventory/records/bulk-status",

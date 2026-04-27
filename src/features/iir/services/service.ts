@@ -170,6 +170,8 @@ const DRAFT_ROUTES = {
 
 const POST_ROUTES = {
   submit: API_ROUTES.iir.submit,
+  update: API_ROUTES.iir.update,
+  cor: API_ROUTES.iir.inventory.cor,
 };
 
 /**
@@ -376,6 +378,53 @@ export const PostIIRSubmit = async (
   }
 };
 
+
+/**
+ * Update an existing IIR form/profile.
+ * Assumption: backend accepts PATCH /students/inventory/records/iir/:iirId
+ * with the same normalized payload as creation.
+ */
+export const PatchIIRSubmit = async (
+  iirID: string,
+  iir: IIRForm,
+  config?: AxiosConfigWithMeta,
+): Promise<void> => {
+  try {
+    const payload = normalizeIIRPayload({ ...iir, id: iirID });
+    await apiClient.patch(POST_ROUTES.update(iirID), payload, config);
+  } catch (error) {
+    const handlerName = config?.handlerName || "PatchIIRSubmit";
+    const stepName = config?.stepName || "Update IIR Form";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+    throw error;
+  }
+};
+
+/**
+ * Upload a student's Certificate of Registration (COR) for an IIR record.
+ * Assumption: backend accepts multipart/form-data with field name `cor`.
+ */
+export const UploadIIRCor = async (
+  iirID: string,
+  file: File,
+  config?: AxiosConfigWithMeta,
+): Promise<void> => {
+  try {
+    const formData = new FormData();
+    formData.append("cor", file);
+
+    await apiClient.post(POST_ROUTES.cor(iirID), formData, {
+      ...config,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  } catch (error) {
+    const handlerName = config?.handlerName || "UploadIIRCor";
+    const stepName = config?.stepName || "Upload COR";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+    throw error;
+  }
+};
+
 /**
  * Downloads the student's IIR as a PDF blob.
  * @param iirID - The ID of the student's IIR.
@@ -459,6 +508,14 @@ export const iirService = {
 
   async submitIIRForm(iir: IIRForm): Promise<void> {
     return PostIIRSubmit(iir);
+  },
+
+  async updateIIRForm(iirID: string, iir: IIRForm): Promise<void> {
+    return PatchIIRSubmit(iirID, iir);
+  },
+
+  async uploadIIRCor(iirID: string, file: File): Promise<void> {
+    return UploadIIRCor(iirID, file);
   },
 
   async bulkUpdateStudentStatus(payload: {
