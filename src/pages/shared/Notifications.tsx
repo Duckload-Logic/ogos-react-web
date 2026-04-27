@@ -22,6 +22,7 @@ import { cn } from "@/lib/utils";
 import {
   useGetNotifications,
   useMarkNotificationRead,
+  useNotificationsStream,
 } from "@/features/notifications/hooks/useNotifications";
 
 // Simple relative time formatter
@@ -63,6 +64,7 @@ export default function NotificationsPage() {
   });
 
   const [filter, setFilter] = useState<"all" | "unread">("all");
+  useNotificationsStream();
   const { data, isLoading } = useGetNotifications();
   const markRead = useMarkNotificationRead();
 

@@ -1,5 +1,8 @@
 import { Bell } from "lucide-react";
-import { useGetNotifications } from "../hooks/useNotifications";
+import {
+  useGetNotifications,
+  useNotificationsStream,
+} from "../hooks/useNotifications";
 import { cn } from "@/lib/utils";
 
 interface Props {
@@ -11,6 +14,7 @@ export default function NotificationBell({
   showNotifications,
   setShowNotifications,
 }: Props) {
+  useNotificationsStream();
   const { data } = useGetNotifications();
   const notifications = data?.notifications;
   const unreadCount = notifications?.filter((n) => !n.isRead).length || 0;

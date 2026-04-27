@@ -17,6 +17,7 @@ import {
 import {
   useGetNotifications,
   useMarkNotificationRead,
+  useNotificationsStream,
 } from "../hooks/useNotifications";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/hooks";
@@ -63,6 +64,7 @@ export default function NotificationModal({
   setShowNotifications,
 }: Props) {
   const [filter, setFilter] = useState<"all" | "unread">("all");
+  useNotificationsStream();
   const { data, isLoading } = useGetNotifications();
   const markRead = useMarkNotificationRead();
   const { user } = useAuth();
