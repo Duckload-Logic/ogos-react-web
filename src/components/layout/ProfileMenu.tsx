@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef } from "react";
-import { Settings, LogOut, Gavel, ShieldCheck } from "lucide-react";
+import { Settings, LogOut, Gavel, ShieldCheck, FileText } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UISettingsModal } from "@/components/shared/UISettingsModal";
 import { cn } from "@/lib/utils";
+import { useAuth } from "@/context";
 
 interface ProfileMenuProps {
   firstName?: string;
@@ -32,6 +33,7 @@ export default function ProfileMenu({
   const [settingsOpen, setSettingsOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const { user, isStudent } = useAuth();
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -62,6 +64,7 @@ export default function ProfileMenu({
           )}
         >
           <Avatar className="h-7 w-7">
+            <AvatarImage src={user?.profilePicture || ""} />
             <AvatarFallback className="text-xs font-semibold text-foreground">
               {firstName?.charAt(0)}
               {lastName?.charAt(0)}
@@ -90,6 +93,7 @@ export default function ProfileMenu({
             >
               <div className="flex items-center gap-3">
                 <Avatar className="h-9 w-9">
+                  <AvatarImage src={user?.profilePicture || ""} />
                   <AvatarFallback className="font-semibold">
                     {firstName?.charAt(0)}
                     {lastName?.charAt(0)}
@@ -158,6 +162,23 @@ export default function ProfileMenu({
                   <span>Dev Portal</span>
                 </button>
               </div>
+            )}
+
+
+            {isStudent && (
+              <button
+                onClick={() => {
+                  navigate("/student/cor-upload");
+                  setOpen(false);
+                }}
+                className={cn(
+                  "flex w-full items-center gap-3 px-4 py-3 text-left text-sm",
+                  "transition hover:bg-muted",
+                )}
+              >
+                <FileText size={16} />
+                <span>Upload COR</span>
+              </button>
             )}
 
             <button
