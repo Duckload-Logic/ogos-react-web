@@ -5,6 +5,7 @@ import { Dropdown } from "@/components/form";
 import { useCategories } from "../hooks";
 import { useState } from "react";
 import { FormInput } from "@/components/form";
+import { cn } from "@/lib/utils";
 
 interface AppointmentFormProps {
   data: Appointment;
@@ -25,8 +26,8 @@ export default function AppointmentForm({
   const isFormValid = data.whenDate && data.timeSlot;
 
   return (
-    <Card className="border border-border shadow-sm bg-card">
-      <CardHeader className="bg-gradient-to-r from-muted/50 to-muted border-b border-border rounded-t-md">
+    <Card className="border border-border bg-card shadow-sm">
+      <CardHeader className="rounded-t-md border-b border-border bg-gradient-to-r from-muted/50 to-muted">
         <CardTitle className="text-lg text-foreground">
           Appointment Details
         </CardTitle>
@@ -80,7 +81,11 @@ export default function AppointmentForm({
             <Button
               onClick={onSubmit}
               disabled={!isFormValid || isSubmitting || isLoading}
-              className="w-full bg-primary hover:bg-primary/90 text-primary-foreground font-semibold py-3 h-auto text-base transition-colors md:w-1/2"
+              className={cn(
+                "h-auto w-full bg-primary py-3 text-base font-semibold",
+                "text-primary-foreground transition-colors hover:bg-primary/90",
+                "md:w-1/2",
+              )}
             >
               {isSubmitting ? "Scheduling..." : "Confirm Appointment"}
             </Button>

@@ -1,4 +1,5 @@
 import { Check } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 export default function Checkbox({
   id,
@@ -25,8 +26,8 @@ export default function Checkbox({
 }) {
   return (
     <div className={className}>
-      <div className="flex items-center gap-3 group">
-        <div className="relative flex items-center justify-center h-4 w-4 shrink-0">
+      <div className="group flex items-center gap-3">
+        <div className="relative flex h-4 w-4 shrink-0 items-center justify-center">
           <input
             type="checkbox"
             id={id}
@@ -37,23 +38,32 @@ export default function Checkbox({
               onCheckedChange?.(e.target.checked);
             }}
             disabled={disabled}
-            className={`peer absolute h-full w-full opacity-0 cursor-pointer z-10  ${className}`}
+            className={`peer absolute z-10 h-full w-full cursor-pointer opacity-0 ${className}`}
           />
           <div
-            className={`h-full w-full ${square ? "rounded-md" : "rounded-full"} border border-white/30 bg-white/40 transition-all duration-200
-            peer-checked:bg-primary peer-checked:border-primary peer-hover:border-primary dark:border-white/10 dark:bg-white/[0.04]`}
+            className={`h-full w-full ${square ? "rounded-md" : "rounded-full"} border border-white/30 bg-white/40 transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary peer-hover:border-primary dark:border-white/10 dark:bg-white/[0.04]`}
           />
-          <Check className="absolute h-3 w-3 text-white pointer-events-none scale-50 opacity-0 peer-checked:opacity-100 peer-checked:scale-100 transition-all duration-200" />
+          <Check
+            className={cn(
+              "pointer-events-none absolute h-3 w-3 scale-50 text-white",
+              "opacity-0 transition-all duration-200 peer-checked:scale-100",
+              "peer-checked:opacity-100",
+            )}
+          />
         </div>
         <label
           htmlFor={id}
-          className="text-sm font-medium text-foreground cursor-pointer select-none group-hover:text-primary transition-colors duration-200 disabled:opacity-50"
+          className={cn(
+            "cursor-pointer select-none text-sm font-medium",
+            "text-foreground transition-colors duration-200",
+            "disabled:opacity-50 group-hover:text-primary",
+          )}
         >
           {label}
         </label>
       </div>
       {info && (
-        <p className="text-xs text-muted-foreground mt-1 ml-7">{info}</p>
+        <p className="ml-7 mt-1 text-xs text-muted-foreground">{info}</p>
       )}
     </div>
   );

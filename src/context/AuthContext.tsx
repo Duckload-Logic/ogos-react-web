@@ -5,28 +5,28 @@
  * timeout safeguards to prevent infinite loading
  */
 
-import React, {
-  createContext,
-  useContext,
-  useEffect,
-  useState,
-} from "react";
+import React, { createContext, useContext, useEffect, useState } from "react";
 import { useMe } from "@/features/users/hooks/useMe";
 import { useLogout as useLogoutMutation } from "@/features/auth/hooks";
-import { BootstrapApp } from "@/services/bootstrapper";
-import { User } from "@/features/users/types/user";
+import { User, UserRole } from "@/features/users/types/user";
 
 interface AuthContextType {
   isAuthenticated: boolean;
   logout: () => void;
   isLoading: boolean;
   user: User | null;
+  activeRole: UserRole | null;
+  setActiveRole: (role: UserRole) => void;
   refresh: () => Promise<void>;
+  isStudent: boolean;
+  isAdmin: boolean;
+  isSuperAdmin: boolean;
+  isDeveloper: boolean;
 }
 
-export const AuthContext = createContext<
-  AuthContextType | undefined
->(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(
+  undefined,
+);
 
 /**
  * Timeout duration (ms) to prevent infinite loading
@@ -49,14 +49,36 @@ export const AuthProvider: React.FC<{
   children: React.ReactNode;
 }> = ({ children }) => {
   const isCallbackPage = window.location.pathname === "/auth/callback";
+  const isAuthPage =
+    window.location.pathname === "/" ||
+    window.location.pathname === "/login" ||
+    window.location.pathname === "/register" ||
+    window.location.pathname.startsWith("/auth");
+  const hasSessionFlag = localStorage.getItem("session_active") === "true";
+
   const {
     data: user,
     status,
     isError,
     refetch,
-  } = useMe({ enabled: !isCallbackPage });
+  } = useMe({ enabled: !isCallbackPage && (hasSessionFlag || !isAuthPage) });
   const { logout: logoutMutation } = useLogoutMutation();
   const [hasTimedOut, setHasTimedOut] = useState(false);
+
+  // Active Role state with persistence
+  const [activeRole, setActiveRoleState] = useState<UserRole | null>(() => {
+    const saved = localStorage.getItem("active_role");
+    try {
+      return saved ? JSON.parse(saved) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  const setActiveRole = (role: UserRole) => {
+    setActiveRoleState(role);
+    localStorage.setItem("active_role", JSON.stringify(role));
+  };
 
   /**
    * Timeout safeguard: If auth check takes too long,
@@ -67,7 +89,7 @@ export const AuthProvider: React.FC<{
       const timeoutId = setTimeout(() => {
         console.warn(
           "[AuthProvider] {Timeout}: Auth check " +
-          "exceeded 5s, forcing loading state to false",
+            "exceeded 5s, forcing loading state to false",
         );
         setHasTimedOut(true);
       }, AUTH_TIMEOUT_MS);
@@ -79,19 +101,37 @@ export const AuthProvider: React.FC<{
   }, [status]);
 
   /**
-   * Trigger bootstrap when user is authenticated
-   * Fetches critical data once on successful auth
+   * Sync activeRole with user roles
    */
   useEffect(() => {
-    if (user && status === "success" && !isError) {
-      BootstrapApp().catch((error: any) => {
-        console.error(
-          "[AuthProvider] {Bootstrap}: " +
-          `${error.message}`,
-        );
-      });
+    if (user && user.roles) {
+      const isRoleValid =
+        activeRole && user.roles.some((r) => r.id === activeRole.id);
+
+      if (!isRoleValid) {
+        if (user.roles.length === 1) {
+          setActiveRole(user.roles[0]);
+        } else if (
+          !window.location.pathname.startsWith("/auth/role-selection")
+        ) {
+          // If multi-role and not on selection page, reset
+          setActiveRoleState(null);
+          localStorage.removeItem("active_role");
+        }
+      }
     }
-  }, [user, status, isError]);
+  }, [user, activeRole]);
+
+  /**
+   * Clear session flag on error
+   */
+  useEffect(() => {
+    if (isError) {
+      localStorage.removeItem("session_active");
+      localStorage.removeItem("active_role");
+      setActiveRoleState(null);
+    }
+  }, [isError]);
 
   const logout = () => {
     logoutMutation();
@@ -104,6 +144,16 @@ export const AuthProvider: React.FC<{
   const isAuthenticated = status === "success" && !!user;
 
   /**
+   * Role identification based on backend-provided roles collection
+   */
+  const userRoles =
+    user?.roles?.map((r) => r.name.toLowerCase().replace(/\s+/g, "")) || [];
+  const isStudent = userRoles.includes("student");
+  const isAdmin = userRoles.includes("admin");
+  const isSuperAdmin = userRoles.includes("superadmin");
+  const isDeveloper = userRoles.includes("developer");
+
+  /**
    * Loading is true only while query is pending
    * AND no error has occurred AND timeout hasn't fired
    * This ensures loading state resolves in all cases:
@@ -111,23 +161,27 @@ export const AuthProvider: React.FC<{
    * - Error: status becomes "error"
    * - Timeout: hasTimedOut becomes true
    */
-  const isAuthLoading =
-    status === "pending" && !isError && !hasTimedOut;
+  const isAuthLoading = status === "pending" && !isError && !hasTimedOut;
 
   return (
     <AuthContext.Provider
       value={{
         isAuthenticated,
         user: user || null,
+        activeRole,
+        setActiveRole,
         logout,
         isLoading: isAuthLoading,
         refresh: async () => {
           await refetch();
         },
+        isStudent,
+        isAdmin,
+        isSuperAdmin,
+        isDeveloper,
       }}
     >
       {children}
     </AuthContext.Provider>
   );
 };
-

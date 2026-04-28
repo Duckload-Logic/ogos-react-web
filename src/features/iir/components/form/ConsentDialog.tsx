@@ -10,8 +10,9 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface ConsentDialogProps {
   open: boolean;
@@ -27,22 +28,25 @@ export default function ConsentDialog({
   isSubmitting = false,
 }: ConsentDialogProps) {
   return (
-    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && !isSubmitting && onCancel()}>
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => !isOpen && !isSubmitting && onCancel()}
+    >
       <DialogContent className="sm:max-w-[600px]">
         <DialogHeader>
           <DialogTitle className="text-2xl">Confirm Submission</DialogTitle>
-          <DialogDescription className="text-base pt-4">
-            I confirm that the information given is legitimate and accurate, and that this
-            information will be processed in our system under the terms of use and privacy
-            policy of the{' '}
+          <DialogDescription className="pt-4 text-base">
+            I confirm that the information given is legitimate and accurate,
+            and that this information will be processed in our system under
+            the terms of use and privacy policy of the{" "}
             <a
               href="https://www.pup.edu.ph"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-primary underline hover:text-primary/80 font-medium"
+              className="font-medium text-primary underline hover:text-primary/80"
             >
               Polytechnic University of the Philippines
-            </a>{' '}
+            </a>{" "}
             website.
           </DialogDescription>
         </DialogHeader>
@@ -61,15 +65,20 @@ export default function ConsentDialog({
             type="button"
             onClick={onAccept}
             disabled={isSubmitting}
-            className="bg-destructive hover:bg-destructive/90 text-white"
+            className="bg-destructive text-white hover:bg-destructive/90"
           >
             {isSubmitting ? (
               <>
-                <div className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></div>
+                <div
+                  className={cn(
+                    "mr-2 h-4 w-4 animate-spin rounded-full border-2 border-white",
+                    "border-t-transparent",
+                  )}
+                ></div>
                 Submitting...
               </>
             ) : (
-              'I Agree & Submit'
+              "I Agree & Submit"
             )}
           </Button>
         </DialogFooter>

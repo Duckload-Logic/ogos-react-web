@@ -19,6 +19,7 @@ interface HeaderProps {
 }
 
 import { useUI } from "@/context";
+import { cn } from "@/lib/utils";
 
 export default function Header({
   title,
@@ -34,14 +35,23 @@ export default function Header({
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   return (
-    <header className="h-20 flex items-center justify-between px-6 bg-glass-bg border border-glass-border backdrop-blur-lg sticky top-0 z-30 rounded-3xl rounded-tl-none rounded-tr-none">
+    <header
+      className={cn(
+        "sticky top-0 z-30 flex h-20 items-center justify-between",
+        "rounded-3xl rounded-tl-none rounded-tr-none border",
+        "border-glass-border bg-glass-bg px-6 backdrop-blur-lg",
+      )}
+    >
       <div className="flex items-center gap-3 text-foreground">
         <img
           src={LOGO_SRC}
           alt="Logo"
-          className="w-12 h-12 rounded-full transition-transform duration-200 hover:scale-110"
+          className={cn(
+            "h-12 w-12 rounded-full transition-transform duration-200",
+            "hover:scale-110",
+          )}
         />
-        <div className="md:flex flex-col text-xs hidden gap-1">
+        <div className="hidden flex-col gap-1 text-xs md:flex">
           <p className="font-semibold">
             Polytechnic University of the Philippines – Taguig
           </p>
@@ -51,7 +61,7 @@ export default function Header({
 
       {isLoggedIn && (
         <div className="text-center md:block">
-          <p className="text-sm text-foreground font-medium">{title}</p>
+          <p className="text-sm font-medium text-foreground">{title}</p>
           <p className="text-xs text-foreground/50">
             Welcome back, {user?.firstName}
           </p>
@@ -65,14 +75,11 @@ export default function Header({
             setShowNotifications={setShowNotifications}
           />
         )}
-        {/* <button
-          onClick={() => setSettingsOpen(true)}
-          className="p-2 hover:bg-muted/30 rounded-lg transition-colors duration-300 text-primary-foreground"
-          aria-label="UI Settings"
-        >
-          <Settings size={18} />
-        </button> */}
-        <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
+
+        <ThemeToggle
+          darkMode={darkMode}
+          setDarkMode={setDarkMode}
+        />
         {isLoggedIn && (
           <div className="hidden md:block">
             <ProfileMenu
@@ -80,6 +87,7 @@ export default function Header({
               middleName={user?.middleName}
               lastName={user?.lastName}
               roleLabel={getRoleLabel()}
+              role={role}
               profilePath={`/${role}/profile`}
               onLogout={handleLogout}
             />

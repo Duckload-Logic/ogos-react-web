@@ -14,7 +14,14 @@ import {
 } from "recharts";
 import { ChartContainer, ChartConfig } from "@/components/ui/chart";
 
-const COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981", "#06b6d4"];
+const COLORS = [
+  "#3b82f6",
+  "#8b5cf6",
+  "#ec4899",
+  "#f59e0b",
+  "#10b981",
+  "#06b6d4",
+];
 
 interface StudentAnalytics {
   civilStatus?: string;
@@ -54,19 +61,23 @@ export default function CivilStatusAnalytics({
 
   return (
     <div className="space-y-4">
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           Civil Status Distribution
         </h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          Students with recorded civil status: {students.filter((s) => s.civilStatus).length}
+        <p className="mb-4 text-sm text-muted-foreground">
+          Students with recorded civil status:{" "}
+          {students.filter((s) => s.civilStatus).length}
         </p>
 
         {validData ? (
           <>
             {/* Pie Chart */}
             <div className="mb-6">
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer
+                width="100%"
+                height={300}
+              >
                 <PieChart>
                   <Pie
                     data={civilStatusData}
@@ -100,11 +111,11 @@ export default function CivilStatusAnalytics({
               {civilStatusData.map((item, index) => (
                 <div
                   key={item.name}
-                  className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                  className="flex items-center justify-between rounded-lg bg-muted p-3"
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-4 h-4 rounded"
+                      className="h-4 w-4 rounded"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
                     <span className="font-medium text-foreground">
@@ -124,7 +135,7 @@ export default function CivilStatusAnalytics({
             </div>
           </>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             No civil status data available
           </div>
         )}

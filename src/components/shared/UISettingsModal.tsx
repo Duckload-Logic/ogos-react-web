@@ -3,23 +3,20 @@ import {
   ResponsiveModal,
   ResponsiveModalContent,
 } from "@/components/ui/responsive-modal";
-import {
-  X,
-  Palette,
-  Type,
-  Volume2,
-  Leaf,
-  Zap,
-} from "lucide-react";
+import { X, Palette, Type, Volume2, Leaf, Zap } from "lucide-react";
 import { useUI } from "@/context";
 import { Slider } from "@/components/ui/slider";
+import { cn } from "@/lib/utils";
 
 interface UISettingsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClose }) => {
+export const UISettingsModal: React.FC<UISettingsModalProps> = ({
+  isOpen,
+  onClose,
+}) => {
   const [mounted, setMounted] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -42,7 +39,8 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
   const [draftFontScale, setDraftFontScale] = useState(fontScale);
   const [draftGrayscale, setDraftGrayscale] = useState(grayscale);
   const [draftDyslexic, setDraftDyslexic] = useState(dyslexiaMode);
-  const [draftPerformanceMode, setDraftPerformanceMode] = useState(performanceMode);
+  const [draftPerformanceMode, setDraftPerformanceMode] =
+    useState(performanceMode);
   const [draftSpeechRate, setDraftSpeechRate] = useState(speechRate);
   const [draftSpeechVoice, setDraftSpeechVoice] = useState(speechVoice);
 
@@ -63,7 +61,15 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
       setDraftSpeechRate(speechRate);
       setDraftSpeechVoice(speechVoice);
     }
-  }, [isOpen, fontScale, grayscale, dyslexiaMode, performanceMode, speechRate, speechVoice]);
+  }, [
+    isOpen,
+    fontScale,
+    grayscale,
+    dyslexiaMode,
+    performanceMode,
+    speechRate,
+    speechVoice,
+  ]);
 
   const hasPendingChanges =
     draftFontScale !== fontScale ||
@@ -131,8 +137,14 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
     // Apply Font Scale Preview
     root.style.fontSize = `${(draftFontScale / 100) * 16}px`;
 
-    return () => { };
-  }, [isOpen, draftGrayscale, draftDyslexic, draftPerformanceMode, draftFontScale]);
+    return () => {};
+  }, [
+    isOpen,
+    draftGrayscale,
+    draftDyslexic,
+    draftPerformanceMode,
+    draftFontScale,
+  ]);
 
   // Revert preview on cancel/close
   useEffect(() => {
@@ -162,16 +174,32 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
   }, [isOpen, grayscale, dyslexiaMode, performanceMode, fontScale, mounted]);
 
   return (
-    <ResponsiveModal open={isOpen} onOpenChange={handleCancelSettings}>
-      <ResponsiveModalContent className="flex flex-col w-full h-[95dvh] sm:h-auto sm:max-h-[80vh] sm:max-w-2xl overflow-hidden p-0 border-t sm:border border-slate-300/90 bg-[rgb(246,247,249)] text-slate-800 shadow-2xl dark:border-white/10 dark:bg-[#1a1c1e] dark:text-white">
+    <ResponsiveModal
+      open={isOpen}
+      onOpenChange={handleCancelSettings}
+    >
+      <ResponsiveModalContent
+        className={cn(
+          "flex h-[95dvh] w-full flex-col overflow-hidden border-t",
+          "border-slate-300/90 bg-[rgb(246,247,249)] p-0 text-slate-800",
+          "shadow-2xl dark:border-white/10 dark:bg-[#1a1c1e]",
+          "dark:text-white sm:h-auto sm:max-h-[80vh] sm:max-w-2xl",
+          "sm:border",
+        )}
+      >
         {/* Header */}
-        <div className="border-b border-slate-300/90 bg-white/50 px-5 py-4 sm:px-7 sm:py-6 dark:border-white/10 dark:bg-white/5 shrink-0">
+        <div
+          className={cn(
+            "shrink-0 border-b border-slate-300/90 bg-white/50 px-5 py-4",
+            "dark:border-white/10 dark:bg-white/5 sm:px-7 sm:py-6",
+          )}
+        >
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
+              <h2 className="text-xl font-bold tracking-tight text-slate-900 dark:text-white sm:text-2xl">
                 Display & Accessibility
               </h2>
-              <p className="mt-1 text-xs sm:text-sm text-slate-600 dark:text-white/60">
+              <p className="mt-1 text-xs text-slate-600 dark:text-white/60 sm:text-sm">
                 Customize your viewing and reading experience
               </p>
             </div>
@@ -179,76 +207,159 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Content */}
-        <div className="space-y-4 sm:space-y-6 px-4 py-6 sm:px-7 sm:py-8 overflow-y-auto overflow-x-hidden flex-1">
+        <div
+          className={cn(
+            "flex-1 space-y-4 overflow-y-auto overflow-x-hidden px-4 py-6",
+            "sm:space-y-6 sm:px-7 sm:py-8",
+          )}
+        >
           {/* Grayscale */}
-          <div className="rounded-3xl border border-slate-200 bg-white/40 p-5 dark:border-white/5 dark:bg-white/[0.02]">
+          <div
+            className={cn(
+              "rounded-3xl border border-slate-200 bg-white/40 p-5",
+              "dark:border-white/5 dark:bg-white/[0.02]",
+            )}
+          >
             <div className="mb-4 flex items-center gap-2">
-              <Palette size={18} className="text-primary" />
-              <p className="text-lg font-thin text-slate-900 dark:text-white">Grayscale Mode</p>
+              <Palette
+                size={18}
+                className="text-primary"
+              />
+              <p className="text-lg font-thin text-slate-900 dark:text-white">
+                Grayscale Mode
+              </p>
             </div>
             <button
               onClick={() => setDraftGrayscale(!draftGrayscale)}
-              className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 transition hover:border-primary/50 dark:border-white/10 dark:bg-white/5"
+              className={cn(
+                "flex w-full items-center justify-between rounded-2xl border",
+                "border-slate-200 bg-white px-5 py-4 transition",
+                "hover:border-primary/50 dark:border-white/10 dark:bg-white/5",
+              )}
             >
-              <span className="font-medium">{draftGrayscale ? "On" : "Off"}</span>
-              <div className={`relative h-6 w-11 rounded-full p-1 transition-colors ${draftGrayscale ? 'bg-primary' : 'bg-slate-300 dark:bg-white/20'}`}>
-                <div className={`h-4 w-4 rounded-full bg-white transition-transform ${draftGrayscale ? 'translate-x-5' : 'translate-x-0'}`} />
+              <span className="font-medium">
+                {draftGrayscale ? "On" : "Off"}
+              </span>
+              <div
+                className={`relative h-6 w-11 rounded-full p-1 transition-colors ${draftGrayscale ? "bg-primary" : "bg-slate-300 dark:bg-white/20"}`}
+              >
+                <div
+                  className={`h-4 w-4 rounded-full bg-white transition-transform ${draftGrayscale ? "translate-x-5" : "translate-x-0"}`}
+                />
               </div>
             </button>
           </div>
 
           {/* Dyslexia Friendly */}
-          <div className="rounded-3xl border border-slate-200 bg-white/40 p-5 dark:border-white/5 dark:bg-white/[0.02]">
+          <div
+            className={cn(
+              "rounded-3xl border border-slate-200 bg-white/40 p-5",
+              "dark:border-white/5 dark:bg-white/[0.02]",
+            )}
+          >
             <div className="mb-4 flex items-center gap-2">
-              <Type size={18} className="text-primary" />
-              <p className="text-lg font-thin text-slate-900 dark:text-white">Dyslexia Friendly Font</p>
+              <Type
+                size={18}
+                className="text-primary"
+              />
+              <p className="text-lg font-thin text-slate-900 dark:text-white">
+                Dyslexia Friendly Font
+              </p>
             </div>
             <button
               onClick={() => setDraftDyslexic(!draftDyslexic)}
-              className="flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 transition hover:border-primary/50 dark:border-white/10 dark:bg-white/5"
+              className={cn(
+                "flex w-full items-center justify-between rounded-2xl border",
+                "border-slate-200 bg-white px-5 py-4 transition",
+                "hover:border-primary/50 dark:border-white/10 dark:bg-white/5",
+              )}
             >
-              <span className="font-medium">{draftDyslexic ? "On" : "Off"}</span>
-              <div className={`relative h-6 w-11 rounded-full p-1 transition-colors ${draftDyslexic ? 'bg-primary' : 'bg-slate-300 dark:bg-white/20'}`}>
-                <div className={`h-4 w-4 rounded-full bg-white transition-transform ${draftDyslexic ? 'translate-x-5' : 'translate-x-0'}`} />
+              <span className="font-medium">
+                {draftDyslexic ? "On" : "Off"}
+              </span>
+              <div
+                className={`relative h-6 w-11 rounded-full p-1 transition-colors ${draftDyslexic ? "bg-primary" : "bg-slate-300 dark:bg-white/20"}`}
+              >
+                <div
+                  className={`h-4 w-4 rounded-full bg-white transition-transform ${draftDyslexic ? "translate-x-5" : "translate-x-0"}`}
+                />
               </div>
             </button>
           </div>
 
           {/* Performance Mode */}
-          <div className="rounded-3xl border border-slate-200 bg-white/40 p-5 dark:border-white/5 dark:bg-white/[0.02]">
+          <div
+            className={cn(
+              "rounded-3xl border border-slate-200 bg-white/40 p-5",
+              "dark:border-white/5 dark:bg-white/[0.02]",
+            )}
+          >
             <div className="mb-4 flex items-center justify-between gap-2">
               <div className="flex items-center gap-2">
-                {draftPerformanceMode ? <Leaf size={18} className="text-emerald-500 shrink-0" /> : <Zap size={18} className="text-amber-500 shrink-0" />}
-                <p className="text-[17px] sm:text-lg font-thin text-slate-900 dark:text-white leading-tight">Graphics Quality</p>
+                {draftPerformanceMode ? (
+                  <Leaf
+                    size={18}
+                    className="shrink-0 text-emerald-500"
+                  />
+                ) : (
+                  <Zap
+                    size={18}
+                    className="shrink-0 text-amber-500"
+                  />
+                )}
+                <p className="text-[17px] font-thin leading-tight text-slate-900 dark:text-white sm:text-lg">
+                  Graphics Quality
+                </p>
               </div>
             </div>
             <button
               onClick={() => setDraftPerformanceMode(!draftPerformanceMode)}
-              className={`flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 transition hover:border-amber-500/50 dark:border-white/10 dark:bg-white/5 ${draftPerformanceMode ? 'hover:border-emerald-500/50' : 'hover:border-amber-500/50'}`}
+              className={`flex w-full items-center justify-between rounded-2xl border border-slate-200 bg-white px-5 py-4 transition hover:border-amber-500/50 dark:border-white/10 dark:bg-white/5 ${draftPerformanceMode ? "hover:border-emerald-500/50" : "hover:border-amber-500/50"}`}
             >
-              <span className="font-medium">{draftPerformanceMode ? "Performance" : "High Quality"}</span>
-              <div className={`relative h-6 w-11 rounded-full p-1 transition-colors ${draftPerformanceMode ? 'bg-emerald-500' : 'bg-amber-500'}`}>
-                <div className={`h-4 w-4 rounded-full bg-white transition-transform ${draftPerformanceMode ? 'translate-x-5' : 'translate-x-0'}`} />
+              <span className="font-medium">
+                {draftPerformanceMode ? "Performance" : "High Quality"}
+              </span>
+              <div
+                className={`relative h-6 w-11 rounded-full p-1 transition-colors ${draftPerformanceMode ? "bg-emerald-500" : "bg-amber-500"}`}
+              >
+                <div
+                  className={`h-4 w-4 rounded-full bg-white transition-transform ${draftPerformanceMode ? "translate-x-5" : "translate-x-0"}`}
+                />
               </div>
             </button>
           </div>
 
           {/* Font Size Section */}
-          <div className="rounded-3xl border border-slate-300 bg-[rgb(241,243,246)] p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] dark:border-white/10 dark:bg-white/[0.045] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]">
+          <div
+            className={cn(
+              "rounded-3xl border border-slate-300 bg-[rgb(241,243,246)]",
+              "p-5 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)]",
+              "dark:border-white/10 dark:bg-white/[0.045]",
+              "dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]",
+            )}
+          >
             <div className="mb-4 flex items-center gap-2">
-              <Type size={18} className="text-primary" />
+              <Type
+                size={18}
+                className="text-primary"
+              />
               <p className="text-lg font-medium text-slate-900 dark:text-white">
                 Font Size
               </p>
             </div>
 
-            <div className="flex items-center justify-center gap-3 px-2 md:px-6 w-full max-w-sm mx-auto min-h-[60px]">
+            <div
+              className={cn(
+                "mx-auto flex min-h-[60px] w-full max-w-sm items-center",
+                "justify-center gap-3 px-2 md:px-6",
+              )}
+            >
               {/* Desktop Font Scale Slider */}
-              <span className="hidden md:block text-xl font-medium text-slate-900 dark:text-white shrink-0">
+              <span className="hidden shrink-0 text-xl font-medium text-slate-900 dark:text-white md:block">
                 A
               </span>
 
-              <div className="hidden md:flex flex-1 items-center justify-between px-1">
+              <div className="hidden flex-1 items-center justify-between px-1 md:flex">
                 {fontSteps.map((step, index) => {
                   const isActive = step === draftFontScale;
 
@@ -258,7 +369,12 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
                       className="relative flex flex-1 items-center justify-center"
                     >
                       {index < fontSteps.length - 1 && (
-                        <span className="absolute left-1/2 top-1/2 h-1 w-full -translate-y-1/2 bg-slate-300 dark:bg-white/12" />
+                        <span
+                          className={cn(
+                            "dark:bg-white/12 absolute left-1/2 top-1/2 h-1 w-full",
+                            "-translate-y-1/2 bg-slate-300",
+                          )}
+                        />
                       )}
 
                       <button
@@ -268,10 +384,11 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
                         aria-label={`Set font size to ${step}%`}
                       >
                         <span
-                          className={`relative h-2 w-2 rounded-full border transition ${isActive
-                            ? "scale-125 border-primary bg-primary shadow-[0_0_0_6px_rgba(128,0,0,0.18)]"
-                            : "border-slate-300 bg-white hover:scale-110 hover:border-primary/50 hover:bg-primary/15 dark:border-white/15 dark:bg-white/80"
-                            }`}
+                          className={`relative h-2 w-2 rounded-full border transition ${
+                            isActive
+                              ? "scale-125 border-primary bg-primary shadow-[0_0_0_6px_rgba(128,0,0,0.18)]"
+                              : "border-slate-300 bg-white hover:scale-110 hover:border-primary/50 hover:bg-primary/15 dark:border-white/15 dark:bg-white/80"
+                          }`}
                         />
                       </button>
                     </div>
@@ -279,14 +396,25 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
                 })}
               </div>
 
-              <span className="hidden md:block text-5xl font-medium leading-none text-slate-900 dark:text-white shrink-0">
+              <span
+                className={cn(
+                  "hidden shrink-0 text-5xl font-medium leading-none",
+                  "text-slate-900 dark:text-white md:block",
+                )}
+              >
                 A
               </span>
 
               {/* Mobile Text Preview */}
-              <div className="md:hidden flex items-center justify-center h-16 w-full rounded-2xl bg-white/50 border border-slate-200 dark:bg-black/20 dark:border-white/10 shadow-inner">
+              <div
+                className={cn(
+                  "flex h-16 w-full items-center justify-center rounded-2xl",
+                  "border border-slate-200 bg-white/50 shadow-inner",
+                  "dark:border-white/10 dark:bg-black/20 md:hidden",
+                )}
+              >
                 <span
-                  className="font-medium text-slate-900 dark:text-white transition-all duration-300"
+                  className="font-medium text-slate-900 transition-all duration-300 dark:text-white"
                   style={{ fontSize: `${(draftFontScale / 100) * 1.5}rem` }}
                 >
                   Aa
@@ -298,7 +426,15 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
               <button
                 onClick={decreaseFont}
                 disabled={draftFontScale <= 80}
-                className="rounded-xl border border-slate-300 bg-[rgb(249,250,251)] px-3 py-1.5 text-sm font-medium text-slate-900 shadow-sm transition hover:bg-white hover:border-primary/25 hover:text-primary hover:shadow-md hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-white/[0.05] dark:text-white dark:hover:bg-white/[0.08]"
+                className={cn(
+                  "rounded-xl border border-slate-300 bg-[rgb(249,250,251)]",
+                  "px-3 py-1.5 text-sm font-medium text-slate-900 shadow-sm",
+                  "transition hover:scale-105 hover:border-primary/25",
+                  "hover:bg-white hover:text-primary hover:shadow-md",
+                  "active:scale-95 disabled:cursor-not-allowed",
+                  "disabled:opacity-50 dark:border-white/10 dark:bg-white/[0.05]",
+                  "dark:text-white dark:hover:bg-white/[0.08]",
+                )}
               >
                 −
               </button>
@@ -310,7 +446,15 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
               <button
                 onClick={increaseFont}
                 disabled={draftFontScale >= 120}
-                className="rounded-xl border border-slate-300 bg-[rgb(249,250,251)] px-3 py-1.5 text-sm font-medium text-slate-900 shadow-sm transition hover:bg-white hover:border-primary/25 hover:text-primary hover:shadow-md hover:scale-105 active:scale-95 disabled:cursor-not-allowed disabled:opacity-50 dark:border-white/10 dark:bg-white/[0.05] dark:text-white dark:hover:bg-white/[0.08]"
+                className={cn(
+                  "rounded-xl border border-slate-300 bg-[rgb(249,250,251)]",
+                  "px-3 py-1.5 text-sm font-medium text-slate-900 shadow-sm",
+                  "transition hover:scale-105 hover:border-primary/25",
+                  "hover:bg-white hover:text-primary hover:shadow-md",
+                  "active:scale-95 disabled:cursor-not-allowed",
+                  "disabled:opacity-50 dark:border-white/10 dark:bg-white/[0.05]",
+                  "dark:text-white dark:hover:bg-white/[0.08]",
+                )}
               >
                 +
               </button>
@@ -318,13 +462,25 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
           </div>
 
           {/* Voice Speed */}
-          <div className="rounded-3xl border border-slate-200 bg-white/40 p-5 dark:border-white/5 dark:bg-white/[0.02]">
+          <div
+            className={cn(
+              "rounded-3xl border border-slate-200 bg-white/40 p-5",
+              "dark:border-white/5 dark:bg-white/[0.02]",
+            )}
+          >
             <div className="mb-4 flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Volume2 size={18} className="text-primary" />
-                <p className="text-lg font-thin text-slate-900 dark:text-white">Reading Speed</p>
+                <Volume2
+                  size={18}
+                  className="text-primary"
+                />
+                <p className="text-lg font-thin text-slate-900 dark:text-white">
+                  Reading Speed
+                </p>
               </div>
-              <span className="text-sm font-bold text-primary px-3 py-1 bg-primary/10 rounded-full">{draftSpeechRate}x</span>
+              <span className="rounded-full bg-primary/10 px-3 py-1 text-sm font-bold text-primary">
+                {draftSpeechRate}x
+              </span>
             </div>
             <div className="px-2">
               <Slider
@@ -340,25 +496,37 @@ export const UISettingsModal: React.FC<UISettingsModalProps> = ({ isOpen, onClos
         </div>
 
         {/* Footer */}
-        <div className="border-t border-slate-300/90 bg-white/50 p-4 sm:px-7 sm:py-5 flex flex-col-reverse sm:flex-row items-stretch sm:items-center justify-end gap-3 dark:border-white/10 dark:bg-white/5 shrink-0 pb-6 sm:pb-5">
+        <div
+          className={cn(
+            "flex shrink-0 flex-col-reverse items-stretch justify-end",
+            "gap-3 border-t border-slate-300/90 bg-white/50 p-4 pb-6",
+            "dark:border-white/10 dark:bg-white/5 sm:flex-row",
+            "sm:items-center sm:px-7 sm:py-5 sm:pb-5",
+          )}
+        >
           {!hasPendingChanges && (
-            <p className="hidden sm:block mr-auto text-xs font-medium text-slate-500 dark:text-white/40">
+            <p className="mr-auto hidden text-xs font-medium text-slate-500 dark:text-white/40 sm:block">
               Settings are up to date
             </p>
           )}
           <button
             onClick={handleCancelSettings}
-            className="rounded-2xl border border-slate-300 bg-white px-6 py-3.5 sm:py-2.5 text-sm font-medium transition hover:bg-slate-50 dark:border-white/10 dark:bg-white/5 w-full sm:w-auto"
+            className={cn(
+              "w-full rounded-2xl border border-slate-300 bg-white px-6",
+              "py-3.5 text-sm font-medium transition hover:bg-slate-50",
+              "dark:border-white/10 dark:bg-white/5 sm:w-auto sm:py-2.5",
+            )}
           >
             Cancel
           </button>
           <button
             onClick={handleApplySettings}
             disabled={!hasPendingChanges}
-            className={`rounded-2xl px-8 py-3.5 sm:py-2.5 text-sm font-bold transition shadow-lg w-full sm:w-auto ${hasPendingChanges
-              ? 'bg-primary text-white hover:bg-primary/90'
-              : 'bg-slate-200 text-slate-400 cursor-not-allowed dark:bg-white/5 dark:text-white/20'
-              }`}
+            className={`w-full rounded-2xl px-8 py-3.5 text-sm font-bold shadow-lg transition sm:w-auto sm:py-2.5 ${
+              hasPendingChanges
+                ? "bg-primary text-white hover:bg-primary/90"
+                : "cursor-not-allowed bg-slate-200 text-slate-400 dark:bg-white/5 dark:text-white/20"
+            }`}
           >
             Apply Changes
           </button>

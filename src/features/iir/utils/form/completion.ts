@@ -4,35 +4,44 @@
  */
 
 import { IIRForm } from "../../types";
-import { FieldValidationSchema, getValueByPath } from '@/services/validationSchema';
-import { personalInformationValidationSchema } from '../../config/personalInfoValidationSchema';
-import { educationValidationSchema } from '../../config/educationValidationSchema';
-import { familyValidationSchema } from '../../config/familyValidationSchema';
-import { healthValidationSchema } from '../../config/healthValidationSchema';
-import { interestsValidationSchema } from '../../config/interestsValidationSchema';
+import {
+  FieldValidationSchema,
+  getValueByPath,
+} from "@/services/validationSchema";
+import { personalInformationValidationSchema } from "../../config/personalInfoValidationSchema";
+import { educationValidationSchema } from "../../config/educationValidationSchema";
+import { familyValidationSchema } from "../../config/familyValidationSchema";
+import { healthValidationSchema } from "../../config/healthValidationSchema";
+import { interestsValidationSchema } from "../../config/interestsValidationSchema";
+import { PERSONAL_SUBSTEP_FIELDS, FAMILY_SUBSTEP_FIELDS } from "../../config/subStepFields";
 
 /**
  * Calculate completion from a schema by identifying "active" required fields
  */
-function calculateCompletionFromSchema(schema: FieldValidationSchema, data: any): number {
+function calculateCompletionFromSchema(
+  schema: FieldValidationSchema,
+  data: any,
+  allowedFields?: string[],
+): number {
   let totalCount = 0;
   let filledCount = 0;
 
   Object.entries(schema).forEach(([fieldPath, rules]) => {
-    // A field is "active required" if the required rule is present 
+    // If allowedFields is provided, skip fields not in the list
+    if (allowedFields && !allowedFields.includes(fieldPath)) return;
+
+    // A field is "active required" if the required rule is present
     // AND passes when the field is empty (meaning it's technically optional under current conditions)
-    // Actually, isActive logic in line 29 was: !requiredRule.validate(null, data);
-    // This means "if I pass null, does it fail?". If yes, it's currently required.
-    const requiredRule = rules.find(r => r.type === 'required');
+    const requiredRule = rules.find((r) => r.type === "required");
     if (!requiredRule) return;
 
     const isActive = !requiredRule.validate(null, data);
-    
+
     if (isActive) {
       totalCount++;
       // Check if it's currently valid against ALL rules
       const value = getValueByPath(data, fieldPath);
-      const isValid = rules.every(r => r.validate(value, data));
+      const isValid = rules.every((r) => r.validate(value, data));
       if (isValid) {
         filledCount++;
       }
@@ -50,34 +59,54 @@ function calculateCompletionFromSchema(schema: FieldValidationSchema, data: any)
  */
 export function calculateSectionCompletion(
   sectionIndex: number,
-  formData: IIRForm | null
+  formData: IIRForm | null,
 ): number {
   if (!formData) return 0;
 
   switch (sectionIndex) {
     case 1:
-      // Personal Information
-      return calculateCompletionFromSchema(personalInformationValidationSchema, formData);
-
     case 2:
+    case 3:
+    case 4:
+      // Personal Information sub-steps
+      return calculateCompletionFromSchema(
+        personalInformationValidationSchema,
+        formData,
+        PERSONAL_SUBSTEP_FIELDS[sectionIndex],
+      );
+
+    case 5:
       // Education
       return calculateCompletionFromSchema(educationValidationSchema, formData);
 
-    case 3:
-      // Family Background
-      return calculateCompletionFromSchema(familyValidationSchema, formData);
+    case 6:
+    case 7:
+    case 8:
+    case 9:
+      // Family Background sub-steps
+      return calculateCompletionFromSchema(
+        familyValidationSchema,
+        formData,
+        FAMILY_SUBSTEP_FIELDS[sectionIndex - 5],
+      );
 
-    case 4: {
+    case 10: {
       // Health Information
       // Helper to map consultations by type for easy access in rules
-      const _consultations = (formData.health?.consultations || []).reduce((acc: any, c: any) => {
-        acc[c.professionalType] = c;
-        return acc;
-      }, {});
-      return calculateCompletionFromSchema(healthValidationSchema, { ...formData, _consultations });
+      const _consultations = (formData.health?.consultations || []).reduce(
+        (acc: any, c: any) => {
+          acc[c.professionalType] = c;
+          return acc;
+        },
+        {},
+      );
+      return calculateCompletionFromSchema(healthValidationSchema, {
+        ...formData,
+        _consultations,
+      });
     }
 
-    case 5:
+    case 11:
       // Interests and Hobbies
       return calculateCompletionFromSchema(interestsValidationSchema, formData);
 

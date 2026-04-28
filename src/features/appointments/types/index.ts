@@ -60,6 +60,8 @@ export interface Appointment {
   appointmentCategory: ConcernCategory;
   /** Status can be either an object or string */
   status?: AppointmentStatus;
+  urgencyLevel?: string | { id?: number; name?: string; colorKey?: string };
+  urgency?: string | { id?: number; name?: string; colorKey?: string };
   hasSignificantNote?: boolean;
   createdAt?: string;
   updatedAt?: string;
@@ -87,17 +89,12 @@ export interface UseAppointmentsReturn {
   error: string | null;
   success: string | null;
   isLoading: boolean;
-  fetchAppointments: (
-    isMe?: boolean,
-    status?: string,
-  ) => Promise<void>;
+  fetchAppointments: (isMe?: boolean, status?: string) => Promise<void>;
   fetchAvailableSlots: (date: string) => Promise<void>;
   createAppointment: (
     data: CreateAppointmentRequest,
   ) => Promise<Appointment | null>;
-  cancelAppointment: (
-    appointment: Appointment,
-  ) => Promise<boolean>;
+  cancelAppointment: (appointment: Appointment) => Promise<boolean>;
   clearError: () => void;
   clearSuccess: () => void;
 }

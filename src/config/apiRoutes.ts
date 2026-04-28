@@ -14,6 +14,7 @@ export const API_ROUTES = Object.freeze({
    */
   users: Object.freeze({
     byId: (id: string) => `/users/${id}`,
+    profilePicture: "/users/me/profile-picture",
   }),
 
   /**
@@ -126,6 +127,7 @@ export const API_ROUTES = Object.freeze({
       natureOfResidenceTypes: "/students/lookups/nature-of-residence-types",
       studentRelationshipTypes: "/students/lookups/student-relationship-types",
       activityOptions: "/students/lookups/activity-options",
+      studentStatuses: "/students/lookups/student-statuses",
     }),
     inventory: Object.freeze({
       all: "/students/inventory/records",
@@ -165,55 +167,68 @@ export const API_ROUTES = Object.freeze({
         `/students/inventory/records/iir/${iirId}/significant-notes`,
       download: (iirId: string) =>
         `/students/inventory/records/iir/${iirId}/download`,
+      cor: (iirId: string) =>
+        `/students/inventory/records/iir/${iirId}/cor`,
     }),
     draft: Object.freeze({
       save: "/students/inventory/records/iir/draft",
       submit: "/students/inventory/records/iir/draft",
     }),
     submit: "/students/inventory/records/iir",
-    checkOnboarding: (userId: string) => `/students/record/${userId}`,
+    update: (iirId: string) => `/students/inventory/records/iir/${iirId}`,
+    checkOnboarding: (userId: string) =>
+      `/students/inventory/records/user/${userId}`,
+    bulkStatus: "/students/inventory/records/bulk-status",
   }),
   /**
    * Superadmin related endpoints
    */
 /**
-   * Superadmin related endpoints
+     * Superadmin related endpoints
+     */
+    superadmin: Object.freeze({
+      m2mClients: Object.freeze({
+        list: "/superadmin/m2m-clients",
+        create: "/superadmin/m2m-clients",
+        revoke: (id: string | number) => `/superadmin/m2m-clients/${id}`,
+        rotateSecret: (id: string | number) => `/superadmin/m2m-clients/${id}/rotate-secret`,
+        verify: (id: string | number) => `/superadmin/m2m-clients/${id}/verify`,
+      }),
+      users: Object.freeze({
+        list: "/superadmin/users",
+        distribution: "/superadmin/users/distribution",
+        toggleStatus: (id: string, action: "block" | "unblock") =>
+          `/superadmin/users/${id}/${action}`,
+        sessions: (id: string) => `/superadmin/users/${id}/sessions`,
+        revokeSession: (userId: string, sessionId: string) =>
+          `/superadmin/users/${userId}/sessions/${sessionId}`,
+        activity: (id: string) => `/superadmin/users/${id}/activity`,
+        updateRoles: "/superadmin/users/update-roles",
+      }),
+      analytics: Object.freeze({
+        admin: "/superadmin/analytics",
+      }),
+      logs: Object.freeze({
+        myLogs: "/activity-meta/me",
+        security: "/superadmin/logs/security",
+        system: "/superadmin/logs/system",
+        audit: "/superadmin/logs/audit",
+        stats: "/superadmin/logs/stats",
+        activity: "/superadmin/logs/activity",
+      }),
+    }),
+  /**
+   * Developer portal related endpoints
    */
-  superadmin: Object.freeze({
-    m2mClients: Object.freeze({
-      list: "/superadmin/m2m-clients",
-      create: "/superadmin/m2m-clients",
-      revoke: (id: number) => `/superadmin/m2m-clients/${id}`,
-      rotateSecret: (id: number) => `/superadmin/m2m-clients/${id}/rotate-secret`,
-      verify: (id: number) => `/superadmin/m2m-clients/${id}/verify`,
-    }),
-    users: Object.freeze({
-      list: "/superadmin/users",
-      distribution: "/superadmin/users/distribution",
-      toggleStatus: (id: string, action: "block" | "unblock") => 
-        `/superadmin/users/${id}/${action}`,
-      sessions: (id: string) => `/superadmin/users/${id}/sessions`,
-      revokeSession: (userId: string, sessionId: string) => 
-        `/superadmin/users/${userId}/sessions/${sessionId}`,
-      activity: (id: string) => `/superadmin/users/${id}/activity`,
-    }),
-    analytics: Object.freeze({
-      admin: "/superadmin/analytics",
-    }),
-    logs: Object.freeze({
-      myLogs: "/activity-meta/me",
-      security: "/superadmin/logs/security",
-      system: "/superadmin/logs/system",
-      audit: "/superadmin/logs/audit",
-      stats: "/superadmin/logs/stats",
-      activity: "/superadmin/logs/activity",
-    }),
+  developer: Object.freeze({
+    docs: "/docs/integrations/doc.json",
   }),
   /**
    * Notification related endpoints
    */
   notifications: Object.freeze({
     me: "/notifications/me",
+    stream: "/notifications/stream",
     markAsRead: (id: string) => `/notifications/${id}/read`,
   }),
 });

@@ -99,7 +99,7 @@ export const Pagination: React.FC<PaginationProps> = ({
   return (
     <nav
       className={cn(
-        "flex flex-col-reverse gap-3 sm:flex-row sm:items-center sm:gap-4 sm:justify-between py-3 px-6",
+        "flex flex-col-reverse gap-3 px-6 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-4",
         className,
       )}
       aria-label="Pagination navigation"
@@ -107,8 +107,8 @@ export const Pagination: React.FC<PaginationProps> = ({
     >
       {/* Page Info - Mobile first, then pushed to left on desktop */}
       {showPageInfo && (
-        <div className="flex items-center justify-center sm:justify-start gap-1">
-          <span className="text-xs sm:text-sm text-muted-foreground">
+        <div className="flex items-center justify-center gap-1 sm:justify-start">
+          <span className="text-xs text-muted-foreground sm:text-sm">
             Page{" "}
             <span className="font-semibold text-foreground">{currentPage}</span>{" "}
             of{" "}
@@ -149,7 +149,7 @@ export const Pagination: React.FC<PaginationProps> = ({
         </Button>
 
         {/* Page Numbers */}
-        <div className="items-center gap-1 hidden md:flex">
+        <div className="hidden items-center gap-1 md:flex">
           {paginationRange.map((item, idx) => {
             const isEllipsis = typeof item === "string";
 

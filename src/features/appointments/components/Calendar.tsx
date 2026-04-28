@@ -10,6 +10,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
 interface Legend {
   color: string;
@@ -56,7 +57,7 @@ export default function Calendar({
   legends,
   occupiedDayColor = "bg-primary",
   title = "Select Date",
-  allowPastDates = false,
+  allowPastDates = true,
   allowCurrentDate = true,
   allowWeekends = false,
   hasHeader = false,
@@ -118,32 +119,38 @@ export default function Calendar({
     year: "numeric",
   });
 
-  const isDateDisabled = useCallback((day: number): boolean => {
-    const date = new Date(currentYear, currentMonthIndex, day);
-    const dayOfWeek = date.getDay();
-    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-    const isPast = isCurrentMonth ? day < todayDate : currentMonth < today;
-    const isToday = isCurrentMonth && day === todayDate;
+  const isDateDisabled = useCallback(
+    (day: number): boolean => {
+      const date = new Date(currentYear, currentMonthIndex, day);
+      const dayOfWeek = date.getDay();
+      const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+      const isPast = isCurrentMonth ? day < todayDate : currentMonth < today;
+      const isToday = isCurrentMonth && day === todayDate;
 
-    if (!allowWeekends && isWeekend) return true;
-    if (!allowPastDates && isPast) return true;
-    if (!allowCurrentDate && isToday) return true;
-    return false;
-  }, [
-    currentYear,
-    currentMonthIndex,
-    isCurrentMonth,
-    todayDate,
-    currentMonth,
-    today,
-    allowWeekends,
-    allowPastDates,
-    allowCurrentDate,
-  ]);
+      if (!allowWeekends && isWeekend) return true;
+      if (!allowPastDates && isPast) return true;
+      if (!allowCurrentDate && isToday) return true;
+      return false;
+    },
+    [
+      currentYear,
+      currentMonthIndex,
+      isCurrentMonth,
+      todayDate,
+      currentMonth,
+      today,
+      allowWeekends,
+      allowPastDates,
+      allowCurrentDate,
+    ],
+  );
 
-  const formatDateKey = useCallback((day: number): string => {
-    return `${currentYear}-${String(currentMonthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-  }, [currentYear, currentMonthIndex]);
+  const formatDateKey = useCallback(
+    (day: number): string => {
+      return `${currentYear}-${String(currentMonthIndex + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    },
+    [currentYear, currentMonthIndex],
+  );
 
   const handleDateClick = (day: number) => {
     if (!isDateDisabled(day)) {
@@ -184,33 +191,24 @@ export default function Calendar({
   return (
     <>
       {/* Mobile View: Modal Trigger */}
-      <div className="sm:hidden w-full">
+      <div className="w-full sm:hidden">
         <Dialog>
           <DialogTrigger asChild>
-            <Button
-              className="w-full flex justify-between items-center h-12 px-4
-              border-dashed border-2"
-            >
+            <Button className="flex h-12 w-full items-center justify-between border-2 border-dashed px-4">
               <div className="flex items-center gap-2">
-                <CalendarIcon className="w-4 h-4 text-primary" />
+                <CalendarIcon className="h-4 w-4 text-primary" />
                 <span className="font-semibold">
                   {selectedDate
                     ? selectedDate.toLocaleDateString()
                     : "Select Appointment Date"}
                 </span>
               </div>
-              <span
-                className="text-xs text-muted-foreground bg-muted px-2
-              py-1 rounded"
-              >
+              <span className="rounded bg-muted px-2 py-1 text-xs text-muted-foreground">
                 Change
               </span>
             </Button>
           </DialogTrigger>
-          <DialogContent
-            className="w-[95%] max-w-md p-0 overflow-hidden
-          rounded-2xl border-none"
-          >
+          <DialogContent className="w-[95%] max-w-md overflow-hidden rounded-2xl border-none p-0">
             <DialogTitle className="sr-only">Select Date</DialogTitle>
             <CalendarContent
               monthName={monthName}
@@ -237,17 +235,16 @@ export default function Calendar({
       {/* Desktop View: Inline Card */}
       <div className="hidden sm:block">
         <Card
-          className={`shadow-2xl border-glass-border bg-glass-bg/40 backdrop-blur-2xl h-fit transition-all duration-500 hover:bg-glass-bg/50
-        ${className ?? ""}`}
+          className={`bg-glass-bg/40 hover:bg-glass-bg/50 h-fit border-glass-border shadow-2xl backdrop-blur-2xl transition-all duration-500 ${className ?? ""}`}
         >
           {hasHeader && (
-            <CardHeader
-              className="bg-muted/10 border-b border-glass-border/30 rounded-t-3xl px-6 py-5"
-            >
-              <CardTitle className="text-xl font-bold tracking-tight text-foreground/90">{title}</CardTitle>
+            <CardHeader className="border-glass-border/30 rounded-t-3xl border-b bg-muted/10 px-6 py-5">
+              <CardTitle className="text-xl font-bold tracking-tight text-foreground/90">
+                {title}
+              </CardTitle>
             </CardHeader>
           )}
-          <CardContent className="pt-8 px-6 pb-8">
+          <CardContent className="px-6 pb-8 pt-8">
             <CalendarContent
               monthName={monthName}
               handlePrevMonth={handlePrevMonth}
@@ -271,7 +268,6 @@ export default function Calendar({
       </div>
     </>
   );
-
 }
 
 interface CalendarContentProps {
@@ -314,21 +310,21 @@ function CalendarContent({
   return (
     <div className="flex flex-col p-4 sm:p-0">
       {/* Month Navigation */}
-      <div className="flex items-center justify-between mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <button
           onClick={handlePrevMonth}
-          className="p-2 hover:bg-muted rounded transition-colors"
+          className="rounded p-2 transition-colors hover:bg-muted"
         >
-          <ChevronLeft className="w-5 h-5" />
+          <ChevronLeft className="h-5 w-5" />
         </button>
-        <h2 className="text-lg font-semibold min-w-40 text-center">
+        <h2 className="min-w-40 text-center text-lg font-semibold">
           {monthName}
         </h2>
         <button
           onClick={handleNextMonth}
-          className="p-2 hover:bg-muted rounded transition-colors"
+          className="rounded p-2 transition-colors hover:bg-muted"
         >
-          <ChevronRight className="w-5 h-5" />
+          <ChevronRight className="h-5 w-5" />
         </button>
       </div>
 
@@ -337,7 +333,10 @@ function CalendarContent({
         {/* Day Headers */}
         <div className="grid grid-cols-7 text-center">
           {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
-            <div key={day} className="font-bold text-xs text-muted-foreground">
+            <div
+              key={day}
+              className="text-xs font-bold text-muted-foreground"
+            >
               {day}
             </div>
           ))}
@@ -346,7 +345,10 @@ function CalendarContent({
         {/* Calendar Days */}
         <div className="grid grid-cols-7 gap-1 sm:gap-2">
           {emptyDays.map((_, idx) => (
-            <div key={`empty-${idx}`} className="p-1" />
+            <div
+              key={`empty-${idx}`}
+              className="p-1"
+            />
           ))}
           {days.map((day) => {
             const dateKey = formatDateKey(day);
@@ -355,39 +357,37 @@ function CalendarContent({
               selectedDate?.getDate() === day &&
               selectedDate.getMonth() === currentMonthIndex &&
               selectedDate.getFullYear() === currentYear;
-            const isDisabled = isDateDisabled(day);
-
+            const isWeekend = isDateDisabled(day);
             return (
-              <div key={day} className="relative group p-1 flex justify-center">
+              <div
+                key={day}
+                className="group relative flex justify-center p-1"
+              >
                 <button
                   onClick={() => handleDateClick(day)}
-                  disabled={isDisabled}
-                  className={`
-                      size-12
-                      rounded-lg font-semibold transition-colors text-sm
-                      flex items-center justify-center
-                      focus:outline-none focus:ring-1 focus:ring-primary/50
-                      text-nowrap
-                      ${isDisabled ? "opacity-50 cursor-not-allowed" : "hover:ring-1 hover:ring-primary"}
-                      ${isSelected
+                  className={`flex size-12 items-center justify-center text-nowrap rounded-lg text-sm font-semibold transition-colors focus:outline-none focus:ring-1 focus:ring-primary/50 ${isWeekend ? "cursor-not-allowed opacity-50" : "hover:ring-1 hover:ring-primary"} ${
+                    isSelected
                       ? "bg-primary text-primary-foreground ring-1 ring-primary"
-                      : isDisabled
+                      : isWeekend
                         ? "bg-muted/50 text-muted-foreground"
-                        : "bg-muted hover:bg-muted/80 text-foreground"
-                    }
-                      ${isToday ? "ring-1 ring-primary" : ""}
-                    `}
+                        : "bg-muted text-foreground hover:bg-muted/80"
+                  } ${isToday ? "ring-1 ring-primary" : ""} `}
                   aria-label={`${day} ${monthName}`}
                   aria-pressed={isSelected}
                 >
                   {day}
                 </button>
                 {isAdmin && statsMap[dateKey] && (
-                  <div className="absolute flex -space-x-1 transform -translate-y-1 justify-center pointer-events-none">
+                  <div
+                    className={cn(
+                      "pointer-events-none absolute flex -translate-y-1 transform",
+                      "justify-center -space-x-1",
+                    )}
+                  >
                     {/* Rescheduled is first in row-reverse order to be on top-right */}
                     {statsMap[dateKey].rescheduledCount > 0 && (
                       <div
-                        className="size-3 rounded-full bg-notice-background border-2 border-notice-foreground"
+                        className="size-3 rounded-full border-2 border-notice-foreground bg-notice-background"
                         title="Rescheduled"
                       />
                     )}
@@ -395,7 +395,7 @@ function CalendarContent({
                     {/* Scheduled is rendered second (middle) */}
                     {statsMap[dateKey].scheduledCount > 0 && (
                       <div
-                        className="size-3 rounded-full bg-info-background border-2 border-info-foreground"
+                        className="size-3 rounded-full border-2 border-info-foreground bg-info-background"
                         title="Scheduled"
                       />
                     )}
@@ -403,7 +403,7 @@ function CalendarContent({
                     {/* Pending is rendered last (right-most, top of stack) */}
                     {statsMap[dateKey].pendingCount > 0 && (
                       <div
-                        className="size-3 rounded-full bg-warning-background border-2 border-warning-foreground"
+                        className="size-3 rounded-full border-2 border-warning-foreground bg-warning-background"
                         title="Pending"
                       />
                     )}
@@ -416,9 +416,12 @@ function CalendarContent({
       </div>
 
       {/* Legend */}
-      <div className="mt-8 pt-4 border-t border-border flex flex-wrap gap-3">
+      <div className="mt-8 flex flex-wrap gap-3 border-t border-border pt-4">
         {displayLegends.map(({ color, label }) => (
-          <div key={label} className="flex items-center gap-2 text-xs">
+          <div
+            key={label}
+            className="flex items-center gap-2 text-xs"
+          >
             <div className={`size-3 rounded-full border ${color}`} />
             <span>{label}</span>
           </div>

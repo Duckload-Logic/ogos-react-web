@@ -13,6 +13,7 @@ import InfoItem from "./InfoItem";
 import SectionTitle from "./SectionTitle";
 import { ConsultationRecord, HealthSection } from "../../types";
 import { NOT_SPECIFIED } from "../../constants";
+import { cn } from "@/lib/utils";
 
 export default function HealthView({
   data,
@@ -47,25 +48,43 @@ export default function HealthView({
   ];
 
   return (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div
+      className={cn(
+        "animate-in fade-in slide-in-from-right-4",
+        "space-y-8 duration-500",
+      )}
+    >
       <section>
         <SectionTitle title="Physical Remarks" />
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mt-6">
+        <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {physicalStats.map((stat) => (
             <div
               key={stat.label}
-              className="p-4 rounded-xl border border-glass-border bg-glass-bg shadow-sm hover:shadow-lg transition-shadow"
+              className={cn(
+                "rounded-xl border border-glass-border bg-glass-bg p-4",
+                "shadow-sm transition-shadow hover:shadow-lg",
+              )}
             >
-              <div className="flex items-center gap-3 mb-3 min-h-[62px]">
-                <div className="p-2 rounded-lg bg-muted text-muted-foreground">
+              <div className="mb-3 flex min-h-[62px] items-center gap-3">
+                <div className="rounded-lg bg-muted p-2 text-muted-foreground">
                   <stat.icon size={18} />
                 </div>
-                <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                <span
+                  className={cn(
+                    "text-[10px] font-black uppercase tracking-widest",
+                    "text-muted-foreground",
+                  )}
+                >
                   {stat.label}
                 </span>
               </div>
               <StatusPill value={stat.value} />
-              <div className="border-t border-border mt-3 pt-3 text-xs text-muted-foreground">
+              <div
+                className={cn(
+                  "mt-3 border-t border-border pt-3 text-xs",
+                  "text-muted-foreground",
+                )}
+              >
                 {asText(stat.details)}
               </div>
             </div>
@@ -80,23 +99,33 @@ export default function HealthView({
             data?.consultations.map((consultation: ConsultationRecord) => (
               <div
                 key={consultation.id}
-                className="p-5 rounded-2xl border border-primary/50 bg-primary/5"
+                className="rounded-2xl border border-primary/50 bg-primary/5 p-5"
               >
-                <div className="flex items-center justify-between gap-3 flex-wrap">
+                <div className="flex flex-wrap items-center justify-between gap-3">
                   <h4 className="text-sm font-bold text-card-foreground">
                     {asText(consultation.professionalType)}
                   </h4>
                   {consultation.hasConsulted ? (
-                    <div className="flex items-center gap-1 text-green-700 text-xs font-semibold">
+                    <div
+                      className={cn(
+                        "flex items-center gap-1 text-xs font-semibold",
+                        "text-green-700",
+                      )}
+                    >
                       <CheckCircle2 className="h-4 w-4" /> Consulted
                     </div>
                   ) : (
-                    <div className="flex items-center gap-1 text-muted-foreground text-xs font-semibold">
+                    <div
+                      className={cn(
+                        "flex items-center gap-1 text-xs font-semibold",
+                        "text-muted-foreground",
+                      )}
+                    >
                       <XCircle className="h-4 w-4" /> Not Consulted
                     </div>
                   )}
                 </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                   <InfoItem
                     label="When"
                     value={
@@ -124,18 +153,28 @@ export default function HealthView({
 function StatusPill({ value }: { value: boolean | null | undefined }) {
   if (value === undefined || value === null) {
     return (
-      <div className="text-xs font-bold px-2 py-1 rounded border w-fit">
+      <div className="w-fit rounded border px-2 py-1 text-xs font-bold">
         {NOT_SPECIFIED}
       </div>
     );
   }
 
   return value ? (
-    <div className="text-xs font-bold px-2 py-1 rounded border border-amber-700 text-amber-700 w-fit">
+    <div
+      className={cn(
+        "w-fit rounded border border-amber-700 px-2 py-1 text-xs",
+        "font-bold text-amber-700",
+      )}
+    >
       Has Problem
     </div>
   ) : (
-    <div className="text-xs font-bold px-2 py-1 rounded border border-green-700 text-green-700 w-fit">
+    <div
+      className={cn(
+        "w-fit rounded border border-green-700 px-2 py-1 text-xs",
+        "font-bold text-green-700",
+      )}
+    >
       No Problem
     </div>
   );

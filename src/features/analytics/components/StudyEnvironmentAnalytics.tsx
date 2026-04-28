@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import { ChartContainer, ChartConfig } from "@/components/ui/chart";
 import { CheckCircle2, XCircle } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface StudentAnalytics {
   studyEnvironment?: {
@@ -78,29 +79,35 @@ export default function StudyEnvironmentAnalytics({
   const totalWithData = studyEnvironmentData.reduce((a, b) => a + b.value, 0);
   const percentageWithQuiePlace =
     totalWithData > 0
-      ? (
-          (studyEnvironmentData.find((d) => d.name === "Yes, has quiet place")
-            ?.value || 0) / totalWithData
-        ) * 100
+      ? ((studyEnvironmentData.find((d) => d.name === "Yes, has quiet place")
+          ?.value || 0) /
+          totalWithData) *
+        100
       : 0;
 
   return (
     <div className="space-y-4">
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           Study Environment
         </h2>
-        <p className="text-sm text-muted-foreground mb-6">
+        <p className="mb-6 text-sm text-muted-foreground">
           Do you have a quiet place to study?
         </p>
 
         {studyEnvironmentData.length > 0 ? (
           <>
             {/* Key Metric */}
-            <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-950 dark:to-emerald-950 rounded-lg border border-green-200 dark:border-green-800">
+            <div
+              className={cn(
+                "mb-6 rounded-lg border border-green-200 bg-gradient-to-r",
+                "from-green-50 to-emerald-50 p-4 dark:border-green-800",
+                "dark:from-green-950 dark:to-emerald-950",
+              )}
+            >
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm text-muted-foreground mb-1">
+                  <p className="mb-1 text-sm text-muted-foreground">
                     Students with adequate study environment
                   </p>
                   <p className="text-3xl font-bold text-green-600">
@@ -116,7 +123,10 @@ export default function StudyEnvironmentAnalytics({
 
             {/* Pie Chart */}
             <div className="mb-6">
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer
+                width="100%"
+                height={300}
+              >
                 <PieChart>
                   <Pie
                     data={studyEnvironmentData}
@@ -129,7 +139,10 @@ export default function StudyEnvironmentAnalytics({
                     dataKey="value"
                   >
                     {studyEnvironmentData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color}
+                      />
                     ))}
                   </Pie>
                   <Tooltip
@@ -144,9 +157,17 @@ export default function StudyEnvironmentAnalytics({
 
             {/* Stats Grid */}
             <div className="grid grid-cols-3 gap-4">
-              <div className="bg-green-50 dark:bg-green-950 p-4 rounded-lg border border-green-200 dark:border-green-800">
-                <div className="flex items-center gap-2 mb-2">
-                  <CheckCircle2 size={18} className="text-green-600" />
+              <div
+                className={cn(
+                  "rounded-lg border border-green-200 bg-green-50 p-4",
+                  "dark:border-green-800 dark:bg-green-950",
+                )}
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <CheckCircle2
+                    size={18}
+                    className="text-green-600"
+                  />
                   <span className="text-sm text-muted-foreground">Yes</span>
                 </div>
                 <p className="text-2xl font-bold text-green-600">
@@ -158,47 +179,61 @@ export default function StudyEnvironmentAnalytics({
                 </p>
               </div>
 
-              <div className="bg-red-50 dark:bg-red-950 p-4 rounded-lg border border-red-200 dark:border-red-800">
-                <div className="flex items-center gap-2 mb-2">
-                  <XCircle size={18} className="text-red-600" />
+              <div
+                className={cn(
+                  "rounded-lg border border-red-200 bg-red-50 p-4",
+                  "dark:border-red-800 dark:bg-red-950",
+                )}
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <XCircle
+                    size={18}
+                    className="text-red-600"
+                  />
                   <span className="text-sm text-muted-foreground">No</span>
                 </div>
                 <p className="text-2xl font-bold text-red-600">
                   {
-                    studyEnvironmentData.find((d) => d.name === "No quiet place")
-                      ?.value
+                    studyEnvironmentData.find(
+                      (d) => d.name === "No quiet place",
+                    )?.value
                   }
                 </p>
               </div>
 
-              <div className="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700">
-                <p className="text-xs text-muted-foreground mb-2">
+              <div
+                className={cn(
+                  "rounded-lg border border-gray-200 bg-gray-50 p-4",
+                  "dark:border-gray-700 dark:bg-gray-800",
+                )}
+              >
+                <p className="mb-2 text-xs text-muted-foreground">
                   Not Specified
                 </p>
                 <p className="text-2xl font-bold text-gray-600">
-                  {
-                    studyEnvironmentData.find(
-                      (d) => d.name === "Not specified",
-                    )?.value || 0
-                  }
+                  {studyEnvironmentData.find((d) => d.name === "Not specified")
+                    ?.value || 0}
                 </p>
               </div>
             </div>
 
             {/* Detailed List */}
-            <div className="border-t border-border mt-6 pt-6">
-              <h3 className="font-semibold text-card-foreground mb-4">
+            <div className="mt-6 border-t border-border pt-6">
+              <h3 className="mb-4 font-semibold text-card-foreground">
                 Breakdown
               </h3>
               <div className="space-y-3">
                 {studyEnvironmentData.map((item) => (
                   <div
                     key={item.name}
-                    className="flex items-center justify-between p-4 rounded-lg border border-border hover:bg-muted/50 transition-colors"
+                    className={cn(
+                      "flex items-center justify-between rounded-lg border",
+                      "border-border p-4 transition-colors hover:bg-muted/50",
+                    )}
                   >
                     <div className="flex items-center gap-3">
                       <div
-                        className="w-4 h-4 rounded"
+                        className="h-4 w-4 rounded"
                         style={{ backgroundColor: item.color }}
                       />
                       <span className="font-medium text-foreground">
@@ -206,10 +241,13 @@ export default function StudyEnvironmentAnalytics({
                       </span>
                     </div>
                     <div className="flex items-center gap-6">
-                      <span className="text-xl font-bold" style={{ color: item.color }}>
+                      <span
+                        className="text-xl font-bold"
+                        style={{ color: item.color }}
+                      >
                         {item.value}
                       </span>
-                      <span className="text-sm text-muted-foreground w-12 text-right">
+                      <span className="w-12 text-right text-sm text-muted-foreground">
                         {totalWithData > 0
                           ? ((item.value / totalWithData) * 100).toFixed(1)
                           : 0}
@@ -222,7 +260,7 @@ export default function StudyEnvironmentAnalytics({
             </div>
 
             {/* Insights */}
-            <div className="border-t border-border mt-6 pt-6 bg-blue-50 dark:bg-blue-950 p-4 rounded-lg">
+            <div className="mt-6 rounded-lg border-t border-border bg-blue-50 p-4 pt-6 dark:bg-blue-950">
               <p className="text-sm text-foreground">
                 <span className="font-semibold">Insight:</span> Out of{" "}
                 <span className="font-bold">{totalWithData}</span> students with
@@ -236,7 +274,7 @@ export default function StudyEnvironmentAnalytics({
             </div>
           </>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             No study environment data available
           </div>
         )}

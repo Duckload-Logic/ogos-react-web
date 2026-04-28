@@ -31,7 +31,7 @@ export const ProtectedRoute = ({
    */
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
+      <div className="flex min-h-screen items-center justify-center">
         <Spinner />
       </div>
     );
@@ -44,7 +44,12 @@ export const ProtectedRoute = ({
 
   if (!isAuthenticated || !user) {
     console.error("[ProtectedRoute] Unauthorized access attempt");
-    return <Navigate to="/login" replace />;
+    return (
+      <Navigate
+        to="/login"
+        replace
+      />
+    );
   }
 
   console.log("Current User Role:", user.role); 
@@ -52,11 +57,20 @@ export const ProtectedRoute = ({
   /**
    * Check role-based access if required
    */
+  const userRoles = user.roles?.map(r => r.name.toLowerCase().replace(/\s+/g, "")) || [];
+  const normRequiredRole = requiredRole?.toLowerCase().replace(/\s+/g, "");
+
   if (
-    requiredRole &&
-    user.role.name.toLowerCase() !== requiredRole.toLowerCase()
+    normRequiredRole &&
+    !userRoles.includes(normRequiredRole) &&
+    !userRoles.includes("superadmin")
   ) {
-    return <Navigate to="/" replace />;
+    return (
+      <Navigate
+        to="/"
+        replace
+      />
+    );
   }
 
   return <>{children}</>;

@@ -21,9 +21,7 @@ import type {
  */
 export const useAvailableSlots = (date: Date | undefined) => {
   return useLookup<AvailableTimeSlotView[]>(
-    QUERY_KEYS.appointments.lookups.slots(
-      date ? date.toISOString() : '',
-    ),
+    QUERY_KEYS.appointments.lookups.slots(date ? date.toISOString() : ""),
     () => appointmentService.GetAvailableSlots(date),
     { enabled: !!date },
   );
@@ -39,8 +37,8 @@ export const useCategories = () => {
   return useLookupWithMeta<ConcernCategory[]>(
     QUERY_KEYS.appointments.lookups.categories,
     (config) => appointmentService.GetAppointmentCategories(config),
-    'GetAppointmentCategories',
-    'Fetch Categories',
+    "GetAppointmentCategories",
+    "Fetch Categories",
   );
 };
 
@@ -54,7 +52,7 @@ export const useStatuses = () => {
   return useLookupWithMeta<AppointmentStatus[]>(
     QUERY_KEYS.appointments.lookups.statuses,
     (config) => appointmentService.GetAppointmentStatuses(config),
-    'GetAppointmentStatuses',
-    'Fetch Statuses',
+    "GetAppointmentStatuses",
+    "Fetch Statuses",
   );
 };

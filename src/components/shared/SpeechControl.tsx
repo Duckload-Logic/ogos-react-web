@@ -1,8 +1,15 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { X, Settings as SettingsIcon, MousePointer2, Ear, AudioLines } from "lucide-react";
+import {
+  X,
+  Settings as SettingsIcon,
+  MousePointer2,
+  Ear,
+  AudioLines,
+} from "lucide-react";
 import { useSpeechSynthesis } from "@/hooks/useSpeechSynthesis";
 import { useIsMobile } from "@/hooks/useIsMobile";
 import { useUI } from "@/context";
+import { cn } from "@/lib/utils";
 
 export const SpeechControl: React.FC = () => {
   const isMobile = useIsMobile();
@@ -34,7 +41,7 @@ export const SpeechControl: React.FC = () => {
     if (!newState) {
       stop();
       // Remove any leftover outlines
-      document.querySelectorAll(".reader-highlight").forEach(el => {
+      document.querySelectorAll(".reader-highlight").forEach((el) => {
         el.classList.remove("reader-highlight");
       });
     }
@@ -47,12 +54,15 @@ export const SpeechControl: React.FC = () => {
     const handleMouseOver = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       // Filter out speech control UI and any portaled content (like dropdowns)
-      if (target.closest('.speech-control-ui') ||
-        target.closest('.speech-control-ignore') ||
-        target.closest('[data-radix-portal]')) return;
+      if (
+        target.closest(".speech-control-ui") ||
+        target.closest(".speech-control-ignore") ||
+        target.closest("[data-radix-portal]")
+      )
+        return;
 
       // Clean up previous
-      document.querySelectorAll(".reader-highlight").forEach(el => {
+      document.querySelectorAll(".reader-highlight").forEach((el) => {
         el.classList.remove("reader-highlight");
       });
 
@@ -63,20 +73,25 @@ export const SpeechControl: React.FC = () => {
     const handleClick = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       // Filter out speech control UI and any portaled content (like dropdowns)
-      if (target.closest('.speech-control-ui') ||
-        target.closest('.speech-control-ignore') ||
-        target.closest('[data-radix-portal]')) return;
+      if (
+        target.closest(".speech-control-ui") ||
+        target.closest(".speech-control-ignore") ||
+        target.closest("[data-radix-portal]")
+      )
+        return;
 
       e.preventDefault();
       e.stopPropagation();
 
-      const text = target.innerText || target.getAttribute('aria-label') || "";
+      const text = target.innerText || target.getAttribute("aria-label") || "";
       if (text.trim()) {
-        const voice = voices.find(v => v.name === speechVoice || v.voiceURI === speechVoice);
-        speak(text, { 
-          rate: speechRate, 
+        const voice = voices.find(
+          (v) => v.name === speechVoice || v.voiceURI === speechVoice,
+        );
+        speak(text, {
+          rate: speechRate,
           voiceName: voice?.name || speechVoice,
-          voiceURI: voice?.voiceURI 
+          voiceURI: voice?.voiceURI,
         });
       }
     };
@@ -87,7 +102,7 @@ export const SpeechControl: React.FC = () => {
     return () => {
       document.removeEventListener("mouseover", handleMouseOver);
       document.removeEventListener("click", handleClick, true);
-      document.querySelectorAll(".reader-highlight").forEach(el => {
+      document.querySelectorAll(".reader-highlight").forEach((el) => {
         el.classList.remove("reader-highlight");
       });
     };
@@ -96,20 +111,49 @@ export const SpeechControl: React.FC = () => {
   if (!isVisible) return null;
 
   return (
-    <div className={`speech-control-ui fixed z-50 flex flex-col items-end gap-3 transition-all duration-500 ${isMobile ? "bottom-24 right-4" : "bottom-6 right-6"}`}>
+    <div
+      className={`speech-control-ui fixed z-50 flex flex-col items-end gap-3 transition-all duration-500 ${isMobile ? "bottom-24 right-4" : "bottom-6 right-6"}`}
+    >
       {/* Quick Tip */}
       {showTip && !readerActive && (
-        <div className="pointer-events-auto mb-2 mr-2 bg-primary text-primary-foreground p-4 rounded-2xl shadow-xl max-w-[220px] animate-in slide-in-from-right-4 fade-in duration-500 relative">
-          <button onClick={dismissTip} className="absolute -top-1 -right-1 bg-slate-900 rounded-full p-1 border border-white/20"><X size={10} /></button>
-          <p className="text-xs font-semibold flex items-center gap-1.5 mb-1"><Ear size={14} /> Interactive Reader</p>
-          <p className="text-[10px] leading-tight opacity-90">Turn it on and click any part of the page to have it read aloud!</p>
+        <div
+          className={cn(
+            "animate-in slide-in-from-right-4 fade-in pointer-events-auto",
+            "relative mb-2 mr-2 max-w-[220px] rounded-2xl bg-primary p-4",
+            "text-primary-foreground shadow-xl duration-500",
+          )}
+        >
+          <button
+            onClick={dismissTip}
+            className="absolute -right-1 -top-1 rounded-full border border-white/20 bg-slate-900 p-1"
+          >
+            <X size={10} />
+          </button>
+          <p className="mb-1 flex items-center gap-1.5 text-xs font-semibold">
+            <Ear size={14} /> Interactive Reader
+          </p>
+          <p className="text-[10px] leading-tight opacity-90">
+            Turn it on and click any part of the page to have it read aloud!
+          </p>
         </div>
       )}
 
       {/* Reader Status Indicator */}
       {readerActive && (
-        <div className="pointer-events-none flex flex-col items-end gap-2 mb-2 animate-in slide-in-from-bottom-4 fade-in duration-300">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary text-primary-foreground text-[10px] font-bold uppercase tracking-widest shadow-lg border border-white/20 animate-pulse">
+        <div
+          className={cn(
+            "animate-in slide-in-from-bottom-4 fade-in",
+            "pointer-events-none mb-2 flex flex-col items-end gap-2",
+            "duration-300",
+          )}
+        >
+          <div
+            className={cn(
+              "flex animate-pulse items-center gap-2 rounded-full border",
+              "border-white/20 bg-primary px-3 py-1.5 text-[10px] font-bold",
+              "uppercase tracking-widest text-primary-foreground shadow-lg",
+            )}
+          >
             <MousePointer2 size={12} /> Live Reader
           </div>
         </div>
@@ -119,27 +163,31 @@ export const SpeechControl: React.FC = () => {
       <div className="pointer-events-auto">
         <button
           onClick={handleToggle}
-          className={`
-            group relative flex items-center justify-center transition-all duration-500
-            shadow-[0_12px_40px_-8px_rgb(0,0,0,0.15)] border
-            h-16 w-16
-            ${readerActive
-              ? "rounded-full bg-primary border-primary text-primary-foreground"
-              : "rounded-full bg-primary text-primary-foreground border-white/20 hover:scale-110 active:scale-95"}
-          `}
+          className={`group relative flex h-16 w-16 items-center justify-center border shadow-[0_12px_40px_-8px_rgb(0,0,0,0.15)] transition-all duration-500 ${
+            readerActive
+              ? "rounded-full border-primary bg-primary text-primary-foreground"
+              : "rounded-full border-white/20 bg-primary text-primary-foreground hover:scale-110 active:scale-95"
+          } `}
         >
           {readerActive ? <Ear size={30} /> : <AudioLines size={30} />}
 
           {/* Status Label (Desktop) */}
           {!readerActive && !isMobile && (
-            <span className="absolute right-full mr-3 px-3 py-1.5 rounded-lg bg-slate-900 text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity translate-x-2 group-hover:translate-x-0 duration-200">
+            <span
+              className={cn(
+                "absolute right-full mr-3 translate-x-2 whitespace-nowrap",
+                "rounded-lg bg-slate-900 px-3 py-1.5 text-xs font-medium",
+                "text-white opacity-0 transition-opacity duration-200",
+                "group-hover:translate-x-0 group-hover:opacity-100",
+              )}
+            >
               Turn On Reader Mode
             </span>
           )}
 
           {/* Active Ping */}
           {readerActive && (
-            <span className="absolute inset-0 rounded-full animate-ping bg-primary/20 -z-10" />
+            <span className="absolute inset-0 -z-10 animate-ping rounded-full bg-primary/20" />
           )}
         </button>
       </div>

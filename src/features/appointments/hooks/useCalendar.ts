@@ -13,13 +13,8 @@ export const useCalendarStats = ({
   params: QueryParam;
 }) => {
   return useQuery<DailyStatusCount[]>({
-    queryKey: [
-      ...QUERY_KEYS.appointments.stats,
-      isAdmin,
-      params.startDate,
-    ],
-    queryFn: () =>
-      appointmentService.GetCalendarStats(params),
+    queryKey: [...QUERY_KEYS.appointments.stats, isAdmin, params.startDate],
+    queryFn: () => appointmentService.GetCalendarStats(params),
     staleTime: CACHE_TIMING.SHORT.staleTime,
     gcTime: CACHE_TIMING.SHORT.gcTime,
     refetchOnWindowFocus: false,

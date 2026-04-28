@@ -29,6 +29,7 @@ import RescheduleModal from "./RescheduleModal";
 import { set } from "zod";
 import { format12HourTime } from "../utils";
 import { formatDate } from "@/features/schedules/utils/formatters";
+import { cn } from "@/lib/utils";
 
 interface ViewModalProps {
   appointment: Appointment | null;
@@ -113,17 +114,17 @@ export default function ViewModal({
   const actionIcon = (action: string) => {
     switch (action) {
       case "Approve":
-        return <CheckCircle className="w-4 h-4" />;
+        return <CheckCircle className="h-4 w-4" />;
       case "Reject":
-        return <XCircle className="w-4 h-4" />;
+        return <XCircle className="h-4 w-4" />;
       case "Cancel":
-        return <AlertCircle className="w-4 h-4" />;
+        return <AlertCircle className="h-4 w-4" />;
       case "Complete":
-        return <CheckCircle className="w-4 h-4" />;
+        return <CheckCircle className="h-4 w-4" />;
       case "No-show":
-        return <Clock3 className="w-4 h-4" />;
+        return <Clock3 className="h-4 w-4" />;
       case "Reschedule":
-        return <CalendarRange className="w-4 h-4" />;
+        return <CalendarRange className="h-4 w-4" />;
       default:
         return null;
     }
@@ -165,21 +166,30 @@ export default function ViewModal({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={onClose}>
-        <DialogContent className="sm:max-w-3xl animate-in fade-in zoom-in-95 duration-200">
+      <Dialog
+        open={isOpen}
+        onOpenChange={onClose}
+      >
+        <DialogContent className="animate-in fade-in zoom-in-95 duration-200 sm:max-w-3xl">
           <DialogHeader>
-            <DialogTitle className="text-xl font-semibold flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-primary" />
+            <DialogTitle className="flex items-center gap-2 text-xl font-semibold">
+              <Calendar className="h-5 w-5 text-primary" />
               Appointment Details
             </DialogTitle>
             {/* Timestamps */}
             {(appointment.createdAt || appointment.updatedAt) && (
-              <div className="border-t border-border pt-4 text-xs text-muted-foreground space-y-1">
+              <div className="space-y-1 border-t border-border pt-4 text-xs text-muted-foreground">
                 {appointment.updatedAt &&
-                  appointment.updatedAt !== appointment.createdAt ? (
-                  <p>Last updated: {formatDate(appointment.updatedAt)} at {format12HourTime(appointment.updatedAt)}</p>
+                appointment.updatedAt !== appointment.createdAt ? (
+                  <p>
+                    Last updated: {formatDate(appointment.updatedAt)} at{" "}
+                    {format12HourTime(appointment.updatedAt)}
+                  </p>
                 ) : (
-                  <p>Created: {formatDate(appointment.createdAt || "")} at {format12HourTime(appointment.createdAt || "")}</p>
+                  <p>
+                    Created: {formatDate(appointment.createdAt || "")} at{" "}
+                    {format12HourTime(appointment.createdAt || "")}
+                  </p>
                 )}
               </div>
             )}
@@ -189,28 +199,29 @@ export default function ViewModal({
             {/* Status Badge */}
             <div className="flex justify-start">
               <span
-                className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-sm font-medium border transition-all duration-200 hover:scale-105 ${STATUS_COLORS[appointment.status?.colorKey || "info"]
-                  }`}
+                className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-all duration-200 hover:scale-105 ${
+                  STATUS_COLORS[appointment.status?.colorKey || "info"]
+                }`}
               >
                 {appointment.status?.name}
               </span>
             </div>
 
             {/* Two-column layout for main info */}
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
               {/* Student Info */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
                   Student
                 </h3>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-foreground">
-                    <User className="w-4 h-4 text-muted-foreground" />
+                    <User className="h-4 w-4 text-muted-foreground" />
                     <span className="font-medium">{fullName}</span>
                   </div>
                   {appointment.user?.email && (
                     <div className="flex items-center gap-2 text-foreground">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
+                      <Mail className="h-4 w-4 text-muted-foreground" />
                       <span>{appointment.user.email}</span>
                     </div>
                   )}
@@ -219,16 +230,16 @@ export default function ViewModal({
 
               {/* Date & Time */}
               <div className="space-y-3">
-                <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+                <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
                   Schedule
                 </h3>
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 text-foreground">
-                    <CalendarDays className="w-4 h-4 text-muted-foreground" />
+                    <CalendarDays className="h-4 w-4 text-muted-foreground" />
                     <span>{formatDate(appointment.whenDate)}</span>
                   </div>
                   <div className="flex items-center gap-2 text-foreground">
-                    <Clock className="w-4 h-4 text-muted-foreground" />
+                    <Clock className="h-4 w-4 text-muted-foreground" />
                     <span>{format12HourTime(appointment.timeSlot.time)}</span>
                   </div>
                 </div>
@@ -237,18 +248,18 @@ export default function ViewModal({
 
             {/* Category & Reason */}
             <div className="space-y-3">
-              <h3 className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
+              <h3 className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
                 Details
               </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-foreground">
+              <div className="grid grid-cols-1 gap-x-6 gap-y-4 text-foreground md:grid-cols-2">
                 {/* Category Column */}
                 <div className="flex items-start gap-2">
-                  <Tag className="size-4 text-muted-foreground mt-1 flex-shrink-0" />
+                  <Tag className="mt-1 size-4 flex-shrink-0 text-muted-foreground" />
                   <div className="flex flex-col gap-1">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Category
                     </span>
-                    <span className="px-2 py-0.5 bg-muted rounded-md text-sm w-fit">
+                    <span className="w-fit rounded-md bg-muted px-2 py-0.5 text-sm">
                       {appointment.appointmentCategory.name}
                     </span>
                   </div>
@@ -256,12 +267,18 @@ export default function ViewModal({
 
                 {/* Reason Column - Full text display */}
                 <div className="flex items-start gap-2">
-                  <FileText className="size-4 text-muted-foreground mt-1 flex-shrink-0" />
+                  <FileText className="mt-1 size-4 flex-shrink-0 text-muted-foreground" />
                   <div className="flex flex-col gap-1">
                     <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                       Reason for Visit
                     </span>
-                    <span className="text-sm leading-relaxed whitespace-pre-wrap max-h-[150px] overflow-y-auto border border-border rounded-md px-3 py-2 bg-muted/50 shadow-sm">
+                    <span
+                      className={cn(
+                        "max-h-[150px] overflow-y-auto whitespace-pre-wrap rounded-md",
+                        "border border-border bg-muted/50 px-3 py-2 text-sm",
+                        "leading-relaxed shadow-sm",
+                      )}
+                    >
                       {appointment.reason || "No reason provided"}
                     </span>
                   </div>
@@ -269,13 +286,18 @@ export default function ViewModal({
 
                 {/* Admin Notes - Spanning full width for better readability */}
                 {appointment.adminNotes && (
-                  <div className="flex items-start gap-2 col-span-full mt-2 pt-4 border-t border-border/50">
-                    <ShieldUser className="size-4 text-notice-foreground mt-1 flex-shrink-0" />
+                  <div className="col-span-full mt-2 flex items-start gap-2 border-t border-border/50 pt-4">
+                    <ShieldUser className="mt-1 size-4 flex-shrink-0 text-notice-foreground" />
                     <div className="flex flex-col gap-1">
                       <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
                         Admin Remarks
                       </span>
-                      <p className="text-sm italic bg-notice-background/20 p-3 rounded-md border-l-2 border-notice-foreground">
+                      <p
+                        className={cn(
+                          "rounded-md border-l-2 border-notice-foreground",
+                          "bg-notice-background/20 p-3 text-sm italic",
+                        )}
+                      >
                         {appointment.adminNotes}
                       </p>
                     </div>
@@ -305,9 +327,11 @@ export default function ViewModal({
           </div>
 
           <div className="flex justify-end">
-            <Button variant="outline"
+            <Button
+              variant="outline"
               onClick={onClose}
-              className="transition-all duration-200 hover:scale-105">
+              className="transition-all duration-200 hover:scale-105"
+            >
               Close
             </Button>
           </div>

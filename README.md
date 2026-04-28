@@ -5,6 +5,7 @@ PUP Student Guidance System Capstone - React + Vite Frontend
 ## Setup Instructions
 
 ### Prerequisites
+
 - Node.js v22+ installed
 - npm v10+
 

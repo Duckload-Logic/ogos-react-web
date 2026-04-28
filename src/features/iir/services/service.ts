@@ -19,30 +19,30 @@ const toNumber = (value: unknown): number => {
 const normalizeIIRPayload = (iir: IIRForm) => {
   const activities = Array.isArray(iir.interests?.activities)
     ? iir.interests.activities.map((activity) => ({
-      id: activity.id,
-      activityOption: activity.activityOption,
-      otherSpecification: activity.otherSpecification,
-      role: activity.role,
-      roleSpecification: activity.roleSpecification,
-    }))
+        id: activity.id,
+        activityOption: activity.activityOption,
+        otherSpecification: activity.otherSpecification,
+        role: activity.role,
+        roleSpecification: activity.roleSpecification,
+      }))
     : [];
 
   const schools = Array.isArray(iir.education?.schools)
     ? iir.education.schools.map((school) => ({
-      ...school,
-      yearStarted: toNumber(school.yearStarted),
-      yearCompleted: toNumber(school.yearCompleted),
-    }))
+        ...school,
+        yearStarted: toNumber(school.yearStarted),
+        yearCompleted: toNumber(school.yearCompleted),
+      }))
     : [];
 
   const addresses = Array.isArray(iir.student?.addresses)
     ? iir.student.addresses.map((addr) => ({
-      ...addr,
-      addressType:
-        addr.addressType?.toLowerCase() === "residential"
-          ? "residential"
-          : addr.addressType,
-    }))
+        ...addr,
+        addressType:
+          addr.addressType?.toLowerCase() === "residential"
+            ? "residential"
+            : addr.addressType,
+      }))
     : [];
 
   return {
@@ -85,9 +85,9 @@ const normalizeIIRPayload = (iir: IIRForm) => {
         : [],
       hobbies: Array.isArray(iir.interests?.hobbies)
         ? iir.interests.hobbies.map((hobby) => ({
-          ...hobby,
-          priorityRank: toNumber(hobby.priorityRank),
-        }))
+            ...hobby,
+            priorityRank: toNumber(hobby.priorityRank),
+          }))
         : [],
     },
     // testResults: Array.isArray(iir.testResults) ? iir.testResults : []
@@ -109,7 +109,7 @@ export const CheckStudentOnboarding = async (
       API_ROUTES.iir.checkOnboarding(userID),
       config,
     );
-    return data?.studentRecord?.isSubmitted;
+    return data?.isSubmitted;
   } catch (error) {
     const handlerName = config?.handlerName || "CheckStudentOnboarding";
     const stepName = config?.stepName || "Check Onboarding";
@@ -131,6 +131,7 @@ const LOOKUP_GET_ROUTES = {
   natureOfResidenceTypes: API_ROUTES.iir.lookups.natureOfResidenceTypes,
   studentRelationshipTypes: API_ROUTES.iir.lookups.studentRelationshipTypes,
   activityOptions: API_ROUTES.iir.lookups.activityOptions,
+  studentStatuses: API_ROUTES.iir.lookups.studentStatuses,
 };
 
 const INVENTORY_GET_ROUTES = {
@@ -159,8 +160,7 @@ const INVENTORY_GET_ROUTES = {
   testResults: (iirID: string) => API_ROUTES.iir.inventory.testResults(iirID),
   significantNotes: (iirID: string) =>
     API_ROUTES.iir.inventory.significantNotes(iirID),
-  download: (iirID: string) =>
-    API_ROUTES.iir.inventory.download(iirID),
+  download: (iirID: string) => API_ROUTES.iir.inventory.download(iirID),
 };
 
 const DRAFT_ROUTES = {
@@ -170,6 +170,8 @@ const DRAFT_ROUTES = {
 
 const POST_ROUTES = {
   submit: API_ROUTES.iir.submit,
+  update: API_ROUTES.iir.update,
+  cor: API_ROUTES.iir.inventory.cor,
 };
 
 /**
@@ -248,9 +250,7 @@ export const GetIIRByUserId = async (
  * @param config - Optional axios config with metadata
  * @returns Promise resolving to IIR record
  */
-export const GetIIRByMe = async (
-  config?: AxiosConfigWithMeta,
-) => {
+export const GetIIRByMe = async (config?: AxiosConfigWithMeta) => {
   try {
     const { data } = await apiClient.get(
       INVENTORY_GET_ROUTES.profileByMe,
@@ -378,6 +378,53 @@ export const PostIIRSubmit = async (
   }
 };
 
+
+/**
+ * Update an existing IIR form/profile.
+ * Assumption: backend accepts PATCH /students/inventory/records/iir/:iirId
+ * with the same normalized payload as creation.
+ */
+export const PatchIIRSubmit = async (
+  iirID: string,
+  iir: IIRForm,
+  config?: AxiosConfigWithMeta,
+): Promise<void> => {
+  try {
+    const payload = normalizeIIRPayload({ ...iir, id: iirID });
+    await apiClient.patch(POST_ROUTES.update(iirID), payload, config);
+  } catch (error) {
+    const handlerName = config?.handlerName || "PatchIIRSubmit";
+    const stepName = config?.stepName || "Update IIR Form";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+    throw error;
+  }
+};
+
+/**
+ * Upload a student's Certificate of Registration (COR) for an IIR record.
+ * Assumption: backend accepts multipart/form-data with field name `cor`.
+ */
+export const UploadIIRCor = async (
+  iirID: string,
+  file: File,
+  config?: AxiosConfigWithMeta,
+): Promise<void> => {
+  try {
+    const formData = new FormData();
+    formData.append("cor", file);
+
+    await apiClient.post(POST_ROUTES.cor(iirID), formData, {
+      ...config,
+      headers: { "Content-Type": "multipart/form-data" },
+    });
+  } catch (error) {
+    const handlerName = config?.handlerName || "UploadIIRCor";
+    const stepName = config?.stepName || "Upload COR";
+    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+    throw error;
+  }
+};
+
 /**
  * Downloads the student's IIR as a PDF blob.
  * @param iirID - The ID of the student's IIR.
@@ -389,20 +436,19 @@ export const DownloadIIRPDF = async (
   config?: AxiosConfigWithMeta,
 ): Promise<{ blob: Blob; fileName: string }> => {
   try {
-    const response = await apiClient.get(
-      INVENTORY_GET_ROUTES.download(iirID),
-      {
-        ...config,
-        responseType: "blob",
-      },
-    );
+    const response = await apiClient.get(INVENTORY_GET_ROUTES.download(iirID), {
+      ...config,
+      responseType: "blob",
+    });
 
     // Extract filename from Content-Disposition header if available
     let fileName = `IIR-Record-${iirID}.pdf`;
     const contentDisposition = response.headers["content-disposition"];
     if (contentDisposition) {
       // Handles filename="name.pdf" or filename=name.pdf
-      const fileNameMatch = contentDisposition.match(/filename=["']?([^"']+)["']?/);
+      const fileNameMatch = contentDisposition.match(
+        /filename=["']?([^"']+)["']?/,
+      );
       if (fileNameMatch?.[1]) {
         fileName = fileNameMatch[1].trim();
       }
@@ -462,5 +508,29 @@ export const iirService = {
 
   async submitIIRForm(iir: IIRForm): Promise<void> {
     return PostIIRSubmit(iir);
+  },
+
+  async updateIIRForm(iirID: string, iir: IIRForm): Promise<void> {
+    return PatchIIRSubmit(iirID, iir);
+  },
+
+  async uploadIIRCor(iirID: string, file: File): Promise<void> {
+    return UploadIIRCor(iirID, file);
+  },
+
+  async bulkUpdateStudentStatus(payload: {
+    iirIds?: string[];
+    excludedIirIds?: string[];
+    selectAllMatching?: boolean;
+    statusId: number;
+    graduationYear?: number;
+    filters?: {
+      search?: string;
+      courseId?: number;
+      yearLevel?: number;
+      enrollYear?: number;
+    };
+  }): Promise<void> {
+    await apiClient.patch(API_ROUTES.iir.bulkStatus, payload);
   },
 };

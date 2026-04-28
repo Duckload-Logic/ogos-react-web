@@ -7,13 +7,19 @@ import { useToast } from "@/context";
 import SignificantNotes from "@/features/notes/components/SignificantNotes";
 import EmptyState from "./EmptyState";
 
-export default function NotesView({ data, iirId }: { data: any; iirId?: string }) {
+export default function NotesView({
+  data,
+  iirId,
+}: {
+  data: any;
+  iirId?: string;
+}) {
   const { data: me } = useMe({});
   const resolvedId = iirId;
 
   // Check if user has authorized role
-  const userRole = me?.role.name.toLowerCase();
-  const isAuthorized = userRole === "admin" || userRole === "counselor";
+  const roles = me?.roles?.map(r => r.name.toLowerCase()) || [];
+  const isAuthorized = roles.includes("admin") || roles.includes("counselor");
 
   // Don't render for unauthorized users
   if (!isAuthorized) {
@@ -23,7 +29,7 @@ export default function NotesView({ data, iirId }: { data: any; iirId?: string }
   // Don't render if no IIR ID
   if (!resolvedId) {
     return (
-      <div className="space-y-6 animate-in fade-in duration-500">
+      <div className="animate-in fade-in space-y-6 duration-500">
         <EmptyState label="No student ID found" />
       </div>
     );

@@ -57,7 +57,8 @@ export const format12HourTime = (input: string): string => {
   }
 
   const period = hour >= NOON_HOUR ? "PM" : "AM";
-  const hour12 = hour % NOON_HOUR === MIDNIGHT_HOUR ? NOON_HOUR : hour % NOON_HOUR;
+  const hour12 =
+    hour % NOON_HOUR === MIDNIGHT_HOUR ? NOON_HOUR : hour % NOON_HOUR;
   const minuteDisplay = String(minute).padStart(2, "0");
 
   return `${hour12}:${minuteDisplay} ${period}`;

@@ -75,7 +75,10 @@ export function useDownloadAttachment() {
 /**
  * Hook to fetch and provide a preview URL for an attachment
  */
-export function useGetAttachmentPreview(slipId?: string, attachmentId?: string) {
+export function useGetAttachmentPreview(
+  slipId?: string,
+  attachmentId?: string,
+) {
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);

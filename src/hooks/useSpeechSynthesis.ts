@@ -1,19 +1,27 @@
-import { useState } from 'react';
+import { useState } from "react";
 
 export const useSpeechSynthesis = (voices: SpeechSynthesisVoice[] = []) => {
   const [speaking, setSpeaking] = useState(false);
   const [paused, setPaused] = useState(false);
 
-  const speak = (text: string, options: { voiceName?: string; voiceURI?: string; rate?: number; pitch?: number } = {}) => {
+  const speak = (
+    text: string,
+    options: {
+      voiceName?: string;
+      voiceURI?: string;
+      rate?: number;
+      pitch?: number;
+    } = {},
+  ) => {
     window.speechSynthesis.cancel();
 
     const utterance = new SpeechSynthesisUtterance(text);
 
     if (options.voiceURI) {
-      const selectedVoice = voices.find(v => v.voiceURI === options.voiceURI);
+      const selectedVoice = voices.find((v) => v.voiceURI === options.voiceURI);
       if (selectedVoice) utterance.voice = selectedVoice;
     } else if (options.voiceName) {
-      const selectedVoice = voices.find(v => v.name === options.voiceName);
+      const selectedVoice = voices.find((v) => v.name === options.voiceName);
       if (selectedVoice) utterance.voice = selectedVoice;
     }
 

@@ -13,16 +13,16 @@ export default function Header({
   subtitle,
 }: HeaderProps) {
   return (
-    <div className="bg-primary text-primary-foreground py-8 md:py-12">
-      <div className="max-w-7xl mx-auto px-4 md:px-8">
+    <div className="bg-primary py-8 text-primary-foreground md:py-12">
+      <div className="mx-auto max-w-7xl px-4 md:px-8">
         <div className="flex items-center gap-4">
           <Link to={backTo}>
-            <ArrowLeft className="w-6 h-6 hover:opacity-80 transition" />
+            <ArrowLeft className="h-6 w-6 transition hover:opacity-80" />
           </Link>
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold">{title}</h1>
+            <h1 className="text-3xl font-bold md:text-4xl">{title}</h1>
             {subtitle && (
-              <p className="text-base md:text-lg mt-2 opacity-90">{subtitle}</p>
+              <p className="mt-2 text-base opacity-90 md:text-lg">{subtitle}</p>
             )}
           </div>
         </div>

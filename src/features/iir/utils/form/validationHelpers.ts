@@ -31,7 +31,7 @@ export function validateAllSections(
   sectionRefs: Record<number, any>,
   formSections: Array<{ title: string; id: number; key: string }>,
   calculateSectionCompletion: (sectionIndex: number) => number,
-  currentSection: number
+  currentSection: number,
 ): ValidationSummary {
   const result: ValidationSummary = {
     hasErrors: false,
@@ -42,12 +42,16 @@ export function validateAllSections(
     rawErrors: {},
   };
 
-  for (let i = 1; i <= 5; i++) {
+  for (let i = 1; i <= 11; i++) {
     const sectionRef = sectionRefs[i];
 
     // Validate fields strictly to pull out raw field errors
     if (sectionRef?.current?.validate) {
-      const validation = sectionRef.current.validate();
+      // Pass the current index 'i' as the specific sub-step to validate
+      // For PersonalSection (1-4), it will validate sub-steps 1, 2, 3, 4
+      // For FamilySection (6-9), we need to pass the relative sub-step
+      const stepToValidate = i >= 6 && i <= 9 ? i - 5 : i;
+      const validation = sectionRef.current.validate(stepToValidate);
       if (!validation.isValid) {
         result.hasErrors = true;
         if (!result.sectionsWithErrors.includes(i)) {
@@ -62,7 +66,7 @@ export function validateAllSections(
     if (completion < 100) {
       result.incompleteCompletionSections.push(i);
       result.incompleteCompletionMessages.push(
-        `${formSections[i - 1].title} — ${completion}% complete (required 100%)`
+        `${formSections[i - 1].title} — ${completion}% complete (required 100%)`,
       );
 
       if (!result.hasErrors) {

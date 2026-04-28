@@ -3,10 +3,7 @@
  * Centralized export for all auth-related types
  */
 
-export type {
-  IDPTokenExchangeRequest,
-  IDPTokenExchangeResponse,
-} from "./idp";
+export type { IDPTokenExchangeRequest, IDPTokenExchangeResponse } from "./idp";
 
 export {
   // ROLE_ROUTES,

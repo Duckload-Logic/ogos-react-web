@@ -79,8 +79,11 @@ export default function RescheduleModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-200">
+    <Dialog
+      open={isOpen}
+      onOpenChange={onClose}
+    >
+      <DialogContent className="animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-200 sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Reschedule Appointment</DialogTitle>
           <DialogDescription className="text-sm leading-relaxed text-muted-foreground">
@@ -88,7 +91,7 @@ export default function RescheduleModal({
           </DialogDescription>
         </DialogHeader>
 
-        <div className="py-4 space-y-5">
+        <div className="space-y-5 py-4">
           <FormInput
             type="date"
             label="New Date"
@@ -99,7 +102,7 @@ export default function RescheduleModal({
           />
 
           {isLoading && (
-            <p className="text-xs text-muted-foreground animate-pulse">
+            <p className="animate-pulse text-xs text-muted-foreground">
               Loading available time slots...
             </p>
           )}

@@ -107,6 +107,7 @@ export const QUERY_KEYS = {
         "student-relationship-types",
       ] as const,
       activityOptions: ["iir", "lookups", "activity-options"] as const,
+      studentStatuses: ["iir", "lookups", "student-statuses"] as const,
     },
     inventory: {
       all: ["iir", "inventory", "all"] as const,
@@ -133,15 +134,25 @@ export const QUERY_KEYS = {
     all: ["notifications"] as const,
     me: ["notifications", "me"] as const,
   },
+
+  /**
+   * Superadmin-related query keys
+   */
   superadmin: {
-    m2mClients: (includeRevoked?: boolean) => ["superadmin", "m2mClients", includeRevoked] as const,
-    users: (params?: unknown) => ["superadmin", "users", params] as const,
-    userDistribution: ["superadmin", "userDistribution"] as const,
-    analytics: ["superadmin", "analytics"] as const,
-    securityLogs: (params?: unknown) => ["superadmin", "securityLogs", params] as const,
-    systemLogs: (params?: unknown) => ["superadmin", "systemLogs", params] as const,
-    auditLogs: (params?: unknown) => ["superadmin", "auditLogs", params] as const,
-    logStats: (startDate?: string, endDate?: string) => ["superadmin", "logStats", startDate, endDate] as const,
-    logActivity: ["superadmin", "logActivity"] as const,
+    m2mClients: (includeRevoked: boolean) =>
+      ["superadmin", "m2mClients", { includeRevoked }] as const,
+    users: (params?: any) => ["superadmin", "users", params] as const,
+    userDistribution: ["superadmin", "users", "distribution"] as const,
+    analytics: ["superadmin", "analytics", "admin"] as const,
+    securityLogs: (params?: any) =>
+      ["superadmin", "logs", "security", params] as const,
+    systemLogs: (params?: any) =>
+      ["superadmin", "logs", "system", params] as const,
+    auditLogs: (params?: any) =>
+      ["superadmin", "logs", "audit", params] as const,
+    logStats: (startDate?: string, endDate?: string) =>
+      ["superadmin", "logs", "stats", { startDate, endDate }] as const,
+    logActivity: ["superadmin", "logs", "activity"] as const,
+    myLogs: ["superadmin", "logs", "me"] as const,
   },
 } as const;

@@ -8,7 +8,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { ChartContainer, ChartConfig } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartConfig,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 interface StudentAnalytics {
   religion?: string;
@@ -48,18 +53,22 @@ export default function ReligionAnalytics({
 
   return (
     <div className="space-y-4">
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           Religion Distribution
         </h2>
-        <p className="text-sm text-muted-foreground mb-4">
-          Students with recorded religion: {students.filter((s) => s.religion).length}
+        <p className="mb-4 text-sm text-muted-foreground">
+          Students with recorded religion:{" "}
+          {students.filter((s) => s.religion).length}
         </p>
 
         {validData ? (
           <>
             {/* Bar Chart */}
-            <ChartContainer config={chartConfig} className="h-80 mb-6">
+            <ChartContainer
+              config={chartConfig}
+              className="mb-6 h-80"
+            >
               <BarChart data={religionData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis
@@ -70,13 +79,11 @@ export default function ReligionAnalytics({
                   interval={0}
                 />
                 <YAxis />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                  }}
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar
+                  dataKey="count"
+                  fill="hsl(var(--color-count))"
                 />
-                <Bar dataKey="count" fill="hsl(var(--color-count))" />
               </BarChart>
             </ChartContainer>
 
@@ -85,7 +92,7 @@ export default function ReligionAnalytics({
               {religionData.slice(0, 10).map((item) => (
                 <div
                   key={item.name}
-                  className="flex justify-between items-center p-3 bg-muted rounded-lg"
+                  className="flex items-center justify-between rounded-lg bg-muted p-3"
                 >
                   <span className="font-medium text-foreground">
                     {item.name}
@@ -103,7 +110,7 @@ export default function ReligionAnalytics({
             </div>
           </>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             No religion data available
           </div>
         )}

@@ -49,12 +49,62 @@ export async function GetUserById(
 }
 
 /**
+ * Upload current user's profile picture.
+ * Assumption: backend accepts multipart/form-data at /users/me/profile-picture
+ * and returns the updated User or { profilePicture }.
+ */
+export async function UploadProfilePicture(
+  file: File,
+  config?: AxiosConfigWithMeta,
+): Promise<User> {
+  const uploadWithField = async (fieldName: "profilePicture" | "file") => {
+    const formData = new FormData();
+    formData.append(fieldName, file);
+  try {
+    const formData = new FormData();
+    formData.append("profilePicture", file);
+
+    const response = await apiClient.post(
+      API_ROUTES.users.profilePicture,
+      formData,
+      {
+        ...config,
+        headers: { "Content-Type": "multipart/form-data" },
+      },
+    );
+
+    return response.data;
+  };
+
+  try {
+    return await uploadWithField("profilePicture");
+  } catch (error: any) {
+    try {
+      return await uploadWithField("file");
+    } catch (fallbackError: any) {
+      const handlerName = config?.handlerName || "UploadProfilePicture";
+      const stepName = config?.stepName || "Upload Profile Picture";
+      console.error(
+        `[${handlerName}] {${stepName}}: ${fallbackError.message}`,
+      );
+      throw fallbackError;
+    }
+  } catch (error: any) {
+    const handlerName = config?.handlerName || "UploadProfilePicture";
+    const stepName = config?.stepName || "Upload Profile Picture";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
+    throw error;
+  }
+}
+
+/**
  * Legacy service object for backward compatibility
  * Gradually migrate to direct function imports
  */
 export const userService = {
   GetMe,
   GetUserById,
+  UploadProfilePicture,
   // Legacy aliases
   getCurrentUser: GetMe,
   getUserByID: GetUserById,

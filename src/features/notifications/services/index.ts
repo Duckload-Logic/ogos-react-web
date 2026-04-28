@@ -32,3 +32,8 @@ export const PatchNotificationRead = async (
     throw error;
   }
 };
+
+export const GetNotificationStreamUrl = (): string => {
+  const baseUrl = import.meta.env.VITE_API_BASE_URL || "";
+  return `${baseUrl}${API_ROUTES.notifications.stream}`;
+};

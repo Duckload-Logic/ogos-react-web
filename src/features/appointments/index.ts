@@ -32,13 +32,6 @@ export {
 // Services (re-export for legacy imports)
 export * from "./services";
 
-// Page components
-export { default as CreateAppointment } from "./pages/student/CreateAppointment";
 
 // UI Components
-export {
-  Header,
-  Messages,
-  SlotSelector,
-  AppointmentForm,
-} from "./components";
+export { Header, Messages, SlotSelector, AppointmentForm } from "./components";

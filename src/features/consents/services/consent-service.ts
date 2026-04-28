@@ -24,11 +24,9 @@ export async function GetLatestStatement(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetLatestStatement';
-    const stepName = config?.stepName || 'Fetch Statement';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetLatestStatement";
+    const stepName = config?.stepName || "Fetch Statement";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -50,12 +48,9 @@ export async function GetStatementContent(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName ||
-      'GetStatementContent';
-    const stepName = config?.stepName || 'Fetch Content';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetStatementContent";
+    const stepName = config?.stepName || "Fetch Content";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -77,11 +72,9 @@ export async function GetUserConsent(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'GetUserConsent';
-    const stepName = config?.stepName || 'Check Consent';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "GetUserConsent";
+    const stepName = config?.stepName || "Check Consent";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }
@@ -106,11 +99,9 @@ export async function PostConsent(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || 'PostConsent';
-    const stepName = config?.stepName || 'Submit Consent';
-    console.error(
-      `[${handlerName}] {${stepName}}: ${error.message}`,
-    );
+    const handlerName = config?.handlerName || "PostConsent";
+    const stepName = config?.stepName || "Submit Consent";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
 }

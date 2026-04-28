@@ -12,17 +12,13 @@ import { User } from "../types/user";
  * @param enabled - Whether to enable the query
  * @returns Query result with user data
  */
-export function useMe({
-  enabled = true,
-}: {
-  enabled?: boolean;
-}) {
+export function useMe({ enabled = true }: { enabled?: boolean }) {
   return useQuery({
     queryKey: QUERY_KEYS.users.me,
     queryFn: async (): Promise<User> => {
       return await userService.GetMe({
-        handlerName: 'useMe',
-        stepName: 'Fetch Current User',
+        handlerName: "useMe",
+        stepName: "Fetch Current User",
       });
     },
     enabled,

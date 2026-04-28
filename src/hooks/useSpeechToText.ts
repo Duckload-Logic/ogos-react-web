@@ -1,7 +1,8 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback, useRef } from "react";
 
 // Handle browser prefixing
-const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+const SpeechRecognition =
+  (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
 
 interface UseSpeechToTextReturn {
   isListening: boolean;
@@ -14,7 +15,7 @@ interface UseSpeechToTextReturn {
 
 export const useSpeechToText = (): UseSpeechToTextReturn => {
   const [isListening, setIsListening] = useState(false);
-  const [transcript, setTranscript] = useState('');
+  const [transcript, setTranscript] = useState("");
   const recognitionRef = useRef<any>(null);
 
   const browserSupportsSpeechRecognition = !!SpeechRecognition;
@@ -25,11 +26,11 @@ export const useSpeechToText = (): UseSpeechToTextReturn => {
     const recognition = new SpeechRecognition();
     recognition.continuous = true;
     recognition.interimResults = true;
-    recognition.lang = 'en-US';
+    recognition.lang = "en-US";
 
     recognition.onresult = (event: any) => {
-      let interimTranscript = '';
-      let finalTranscriptChunk = '';
+      let interimTranscript = "";
+      let finalTranscriptChunk = "";
 
       for (let i = event.resultIndex; i < event.results.length; i++) {
         const transcriptChunk = event.results[i][0].transcript;
@@ -41,7 +42,7 @@ export const useSpeechToText = (): UseSpeechToTextReturn => {
       }
 
       if (finalTranscriptChunk) {
-        setTranscript(prev => prev + finalTranscriptChunk);
+        setTranscript((prev) => prev + finalTranscriptChunk);
       }
     };
 
@@ -50,7 +51,7 @@ export const useSpeechToText = (): UseSpeechToTextReturn => {
     };
 
     recognition.onerror = (event: any) => {
-      console.error('Speech recognition error:', event.error);
+      console.error("Speech recognition error:", event.error);
       setIsListening(false);
     };
 
@@ -69,7 +70,7 @@ export const useSpeechToText = (): UseSpeechToTextReturn => {
         recognitionRef.current.start();
         setIsListening(true);
       } catch (error) {
-        console.error('Failed to start speech recognition:', error);
+        console.error("Failed to start speech recognition:", error);
       }
     }
   }, [isListening]);
@@ -82,7 +83,7 @@ export const useSpeechToText = (): UseSpeechToTextReturn => {
   }, [isListening]);
 
   const resetTranscript = useCallback(() => {
-    setTranscript('');
+    setTranscript("");
   }, []);
 
   return {
@@ -91,6 +92,6 @@ export const useSpeechToText = (): UseSpeechToTextReturn => {
     startListening,
     stopListening,
     resetTranscript,
-    browserSupportsSpeechRecognition
+    browserSupportsSpeechRecognition,
   };
 };

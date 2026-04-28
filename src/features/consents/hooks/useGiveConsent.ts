@@ -13,19 +13,15 @@ export function useGiveConsent() {
   const { data: me } = useMe({});
 
   return useMutation({
-    mutationFn: async (
-      { type, docId }: ConsentPayload,
-    ) => {
+    mutationFn: async ({ type, docId }: ConsentPayload) => {
       return PostConsent(type, docId, {
-        handlerName: 'useGiveConsent',
-        stepName: 'Submit Consent',
+        handlerName: "useGiveConsent",
+        stepName: "Submit Consent",
       });
     },
     onSuccess: (data, variables) => {
       queryClient.invalidateQueries({
-        queryKey: QUERY_KEYS.consents.check(
-          variables.docId,
-        ),
+        queryKey: QUERY_KEYS.consents.check(variables.docId),
       });
     },
   });

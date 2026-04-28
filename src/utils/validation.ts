@@ -13,7 +13,6 @@ export interface ValidationResult {
   errors: ValidationError[];
 }
 
-
 // invalidate inputs with special characters
 // Matches anything that is NOT: alphanumeric, space, period, comma, or hyphen
 export const SPECIAL_CHARS_REGEX = /[^a-zA-Z0-9\s.,-]/;
@@ -46,7 +45,7 @@ export const isValidPassword = (password: string, minLength = 6): boolean => {
 export const isValidUsername = (
   username: string,
   minLength = 3,
-  maxLength = 50
+  maxLength = 50,
 ): boolean => {
   return username.length >= minLength && username.length <= maxLength;
 };
@@ -101,7 +100,7 @@ export const isValidDateOfBirth = (dateString: string): ValidationResult => {
 // Field validation (generic)
 export const validateField = (
   fieldName: string,
-  value: unknown
+  value: unknown,
 ): ValidationError | null => {
   switch (fieldName) {
     case "email":
@@ -152,7 +151,7 @@ export const validateField = (
 // Batch validation
 export const validateFields = (
   data: Record<string, unknown>,
-  requiredFields: string[]
+  requiredFields: string[],
 ): ValidationResult => {
   const errors: ValidationError[] = [];
 
@@ -184,12 +183,12 @@ export const validateFields = (
 // Calculate form completion
 export const calculateFormCompletion = (
   formData: Record<string, unknown>,
-  totalFields: number
+  totalFields: number,
 ): number => {
   if (totalFields === 0) return 0;
 
   const filledFields = Object.values(formData).filter(
-    (value) => value !== "" && value !== null && value !== undefined
+    (value) => value !== "" && value !== null && value !== undefined,
   ).length;
 
   return Math.round((filledFields / totalFields) * 100);

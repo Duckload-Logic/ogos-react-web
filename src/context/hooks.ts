@@ -27,19 +27,45 @@ export const useToast = () => {
   return context;
 };
 
-export const usePageMetadata = (metadata: PageMetadata) => {
-  const context = useContext(UIContext);
-  
-  if (!context) {
-    throw new Error("usePageMetadata must be used within a UIProvider");
-  }
+/**
+ * Hook for child pages to set layout metadata when using Shared Layout
+ */
+export function usePageMetadata(metadata: Partial<PageMetadata>) {
+  const { setPageMetadata } = useUI();
 
   useEffect(() => {
-    context.setPageMetadata(metadata);
+    setPageMetadata((prev) => {
+      // Shallow comparison of primitive metadata fields only
+      // React nodes (like badgeIcon) should be skipped to prevent infinite loops
+      const hasChanged = Object.entries(metadata).some(([key, value]) => {
+        if (typeof value === "object" && value !== null) return false;
+        return prev[key as keyof PageMetadata] !== value;
+      });
+
+      if (!hasChanged) return prev;
+      return { ...prev, ...metadata };
+    });
+
+    // Clean up metadata when the component unmounts to prevent stale data
+    // on the next page (e.g., persistent stats or actions)
+    return () => {
+      setPageMetadata({
+        title: "",
+        description: undefined,
+        badgeText: undefined,
+        badgeIcon: undefined,
+        headerActions: undefined,
+        headerStats: undefined,
+        showDate: false,
+        isLoading: false,
+      });
+    };
   }, [
-    metadata.title, 
-    metadata.description, 
+    metadata.title,
+    metadata.description,
     metadata.badgeText,
-    metadata.isLoading
-  ]); 
-};
+    metadata.showDate,
+    metadata.isLoading,
+    setPageMetadata,
+  ]);
+}

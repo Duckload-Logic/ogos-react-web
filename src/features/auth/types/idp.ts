@@ -22,6 +22,8 @@ export interface IDPTokenExchangeResponse {
 export const ROLE_ROUTES_INTERNAL = Object.freeze({
   student: "/student",
   admin: "/admin",
+  superadmin: "/superadmin",
+  developer: "/developer",
 } as const);
 
 /**

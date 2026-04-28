@@ -11,7 +11,12 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { ChartContainer, ChartConfig } from "@/components/ui/chart";
+import {
+  ChartContainer,
+  ChartConfig,
+  ChartTooltip,
+  ChartTooltipContent,
+} from "@/components/ui/chart";
 
 const COLORS = ["#3b82f6", "#8b5cf6", "#ec4899", "#f59e0b", "#10b981"];
 
@@ -134,11 +139,11 @@ export default function FamilyAnalytics({
   return (
     <div className="space-y-6">
       {/* Father's Education */}
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           Father's Educational Attainment
         </h2>
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="mb-4 text-sm text-muted-foreground">
           Students with recorded father's education:{" "}
           {students.filter((s) => s.family?.fatherEducation).length}
         </p>
@@ -148,7 +153,7 @@ export default function FamilyAnalytics({
             {fatherEducationData.slice(0, 8).map((item, index) => (
               <div
                 key={item.name}
-                className="flex justify-between items-center p-3 bg-muted rounded-lg"
+                className="flex items-center justify-between rounded-lg bg-muted p-3"
               >
                 <span className="font-medium text-foreground">{item.name}</span>
                 <div className="flex items-center gap-4">
@@ -163,18 +168,18 @@ export default function FamilyAnalytics({
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             No father's education data available
           </div>
         )}
       </div>
 
       {/* Mother's Education */}
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           Mother's Educational Attainment
         </h2>
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="mb-4 text-sm text-muted-foreground">
           Students with recorded mother's education:{" "}
           {students.filter((s) => s.family?.motherEducation).length}
         </p>
@@ -184,7 +189,7 @@ export default function FamilyAnalytics({
             {motherEducationData.slice(0, 8).map((item, index) => (
               <div
                 key={item.name}
-                className="flex justify-between items-center p-3 bg-muted rounded-lg"
+                className="flex items-center justify-between rounded-lg bg-muted p-3"
               >
                 <span className="font-medium text-foreground">{item.name}</span>
                 <div className="flex items-center gap-4">
@@ -199,18 +204,18 @@ export default function FamilyAnalytics({
             ))}
           </div>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             No mother's education data available
           </div>
         )}
       </div>
 
       {/* Parent's Marital Status */}
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           Parent's Marital Status
         </h2>
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="mb-4 text-sm text-muted-foreground">
           Students with recorded parent's marital status:{" "}
           {students.filter((s) => s.family?.parentMaritalStatus).length}
         </p>
@@ -219,7 +224,10 @@ export default function FamilyAnalytics({
           <>
             {/* Pie Chart */}
             <div className="mb-6">
-              <ResponsiveContainer width="100%" height={300}>
+              <ResponsiveContainer
+                width="100%"
+                height={300}
+              >
                 <PieChart>
                   <Pie
                     data={parentMaritalData}
@@ -253,11 +261,11 @@ export default function FamilyAnalytics({
               {parentMaritalData.map((item, index) => (
                 <div
                   key={item.name}
-                  className="flex items-center justify-between p-3 bg-muted rounded-lg"
+                  className="flex items-center justify-between rounded-lg bg-muted p-3"
                 >
                   <div className="flex items-center gap-3">
                     <div
-                      className="w-4 h-4 rounded"
+                      className="h-4 w-4 rounded"
                       style={{ backgroundColor: COLORS[index % COLORS.length] }}
                     />
                     <span className="font-medium text-foreground">
@@ -277,35 +285,36 @@ export default function FamilyAnalytics({
             </div>
           </>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             No parent's marital status data available
           </div>
         )}
       </div>
 
       {/* Ordinal Position in Family */}
-      <div className="bg-card rounded-lg shadow border border-border p-6">
-        <h2 className="text-2xl font-bold text-card-foreground mb-2">
+      <div className="rounded-lg border border-border bg-card p-6 shadow">
+        <h2 className="mb-2 text-2xl font-bold text-card-foreground">
           Ordinal Position in the Family
         </h2>
-        <p className="text-sm text-muted-foreground mb-4">
+        <p className="mb-4 text-sm text-muted-foreground">
           Distribution of students by number of siblings
         </p>
 
         {ordinalPositionData.length > 0 ? (
           <>
-            <ChartContainer config={chartConfig} className="h-80 mb-6">
+            <ChartContainer
+              config={chartConfig}
+              className="mb-6 h-80"
+            >
               <BarChart data={ordinalPositionData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="position" />
                 <YAxis />
-                <Tooltip
-                  contentStyle={{
-                    backgroundColor: "hsl(var(--card))",
-                    border: "1px solid hsl(var(--border))",
-                  }}
+                <ChartTooltip content={<ChartTooltipContent />} />
+                <Bar
+                  dataKey="count"
+                  fill="#ec4899"
                 />
-                <Bar dataKey="count" fill="#ec4899" />
               </BarChart>
             </ChartContainer>
 
@@ -313,7 +322,7 @@ export default function FamilyAnalytics({
               {ordinalPositionData.map((item) => (
                 <div
                   key={item.position}
-                  className="flex justify-between items-center p-3 bg-muted rounded-lg"
+                  className="flex items-center justify-between rounded-lg bg-muted p-3"
                 >
                   <span className="font-medium text-foreground">
                     {item.position} Child
@@ -325,7 +334,10 @@ export default function FamilyAnalytics({
                     <span className="text-sm text-muted-foreground">
                       {(
                         (item.count /
-                          ordinalPositionData.reduce((a, b) => a + b.count, 0)) *
+                          ordinalPositionData.reduce(
+                            (a, b) => a + b.count,
+                            0,
+                          )) *
                         100
                       ).toFixed(1)}
                       %
@@ -336,7 +348,7 @@ export default function FamilyAnalytics({
             </div>
           </>
         ) : (
-          <div className="text-center py-8 text-muted-foreground">
+          <div className="py-8 text-center text-muted-foreground">
             No ordinal position data available
           </div>
         )}

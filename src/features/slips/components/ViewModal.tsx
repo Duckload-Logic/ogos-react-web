@@ -30,6 +30,7 @@ import { AttachmentsGrid } from "./AttachmentsGrid";
 import { STATUS_COLORS } from "@/config/constants";
 import { useGetSlipAttachments } from "../hooks";
 import { Textarea } from "@/components/ui/textarea";
+import { cn } from "@/lib/utils";
 
 interface ViewModalProps {
   isOpen: boolean;
@@ -101,11 +102,11 @@ export function ViewModal({
   const getStatusIcon = (colorKey?: string) => {
     switch (colorKey) {
       case "success":
-        return <CheckCircle2 className="w-4 h-4" />;
+        return <CheckCircle2 className="h-4 w-4" />;
       case "danger":
-        return <Ban className="w-4 h-4" />;
+        return <Ban className="h-4 w-4" />;
       case "warning":
-        return <Clock className="w-4 h-4" />;
+        return <Clock className="h-4 w-4" />;
       default:
         return null;
     }
@@ -117,8 +118,17 @@ export function ViewModal({
 
   return (
     <>
-      <Dialog open={isOpen} onOpenChange={handleCloseModal}>
-        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto md:overflow-hidden flex flex-col w-[95vw] sm:w-full animate-in zoom-in-95 fade-in duration-200">
+      <Dialog
+        open={isOpen}
+        onOpenChange={handleCloseModal}
+      >
+        <DialogContent
+          className={cn(
+            "animate-in zoom-in-95 fade-in flex max-h-[90vh] w-[95vw]",
+            "max-w-5xl flex-col overflow-y-auto duration-200 sm:w-full",
+            "md:overflow-hidden",
+          )}
+        >
           <DialogHeader>
             <DialogTitle>Excuse Slip Details</DialogTitle>
             <DialogDescription>
@@ -126,9 +136,14 @@ export function ViewModal({
             </DialogDescription>
           </DialogHeader>
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 flex-1 overflow-hidden animate-in fade-in duration-300">
+          <div
+            className={cn(
+              "animate-in fade-in grid flex-1 grid-cols-1 gap-6",
+              "overflow-hidden duration-300 lg:grid-cols-3",
+            )}
+          >
             {/* Left Column - Details */}
-            <div className="lg:col-span-2 overflow-y-auto pr-4 space-y-6">
+            <div className="space-y-6 overflow-y-auto pr-4 lg:col-span-2">
               {/* Student Info Card */}
               <Card className="transition-all duration-200 hover:shadow-md">
                 <CardContent className="pt-6">
@@ -137,7 +152,7 @@ export function ViewModal({
                       <p className="text-sm font-medium text-muted-foreground">
                         Student Name
                       </p>
-                      <p className="text-lg font-semibold text-foreground mt-1">
+                      <p className="mt-1 text-lg font-semibold text-foreground">
                         {/* @ts-ignore */}
                         {slip.user?.firstName} {slip.user?.lastName}
                       </p>
@@ -147,7 +162,7 @@ export function ViewModal({
                         Status
                       </p>
                       <div
-                        className={`inline-flex items-center gap-2 px-3 py-1 rounded-full text-sm font-medium ${getStatusColor(slip.status?.colorKey)} mt-1`}
+                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${getStatusColor(slip.status?.colorKey)} mt-1`}
                       >
                         {getStatusIcon(slip.status?.colorKey)}
                         {slip.status?.name}
@@ -157,7 +172,7 @@ export function ViewModal({
                       <p className="text-sm font-medium text-muted-foreground">
                         Date of Absence
                       </p>
-                      <p className="text-lg font-semibold text-foreground mt-1">
+                      <p className="mt-1 text-lg font-semibold text-foreground">
                         {new Date(slip.dateOfAbsence).toLocaleDateString(
                           "en-US",
                           {
@@ -172,7 +187,7 @@ export function ViewModal({
                       <p className="text-sm font-medium text-muted-foreground">
                         Date Needed
                       </p>
-                      <p className="text-lg font-semibold text-foreground mt-1">
+                      <p className="mt-1 text-lg font-semibold text-foreground">
                         {new Date(slip.dateNeeded).toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
@@ -184,7 +199,7 @@ export function ViewModal({
                       <p className="text-sm font-medium text-muted-foreground">
                         Submitted
                       </p>
-                      <p className="text-lg font-semibold text-foreground mt-1">
+                      <p className="mt-1 text-lg font-semibold text-foreground">
                         {new Date(slip.createdAt || "").toLocaleDateString(
                           "en-US",
                           {
@@ -205,18 +220,23 @@ export function ViewModal({
                   <p className="text-sm font-medium text-muted-foreground">
                     Reason for Absence
                   </p>
-                  <p className="text-foreground mt-2">{slip.reason}</p>
+                  <p className="mt-2 text-foreground">{slip.reason}</p>
                 </CardContent>
               </Card>
 
               {/* Admin Notes Card (if exists) */}
               {slip.adminNotes && (
-                <Card className="border-info-foreground border-0 border-l-4 bg-muted/20 transition-all duration-200 hover:shadow-sm">
+                <Card
+                  className={cn(
+                    "border-0 border-l-4 border-info-foreground bg-muted/20",
+                    "transition-all duration-200 hover:shadow-sm",
+                  )}
+                >
                   <CardContent className="pt-6">
                     <p className="text-sm font-medium text-info-foreground">
                       Admin Notes
                     </p>
-                    <p className="text-info-foreground mt-2">
+                    <p className="mt-2 text-info-foreground">
                       {slip.adminNotes}
                     </p>
                   </CardContent>
@@ -225,13 +245,16 @@ export function ViewModal({
 
               {/* Admin Actions */}
               {isAdmin && isPending && (
-                <div className="flex gap-3 pt-4 border-t">
+                <div className="flex gap-3 border-t pt-4">
                   <Button
                     onClick={() => handleActionClick("approve")}
                     disabled={isLoading}
-                    className="gap-2 bg-green-600 hover:bg-green-700 transition-all duration-200 hover:scale-105"
+                    className={cn(
+                      "gap-2 bg-green-600 transition-all duration-200",
+                      "hover:scale-105 hover:bg-green-700",
+                    )}
                   >
-                    <CheckCircle2 className="w-4 h-4" />
+                    <CheckCircle2 className="h-4 w-4" />
                     Approve
                   </Button>
                   <Button
@@ -240,7 +263,7 @@ export function ViewModal({
                     variant="outline"
                     className="gap-2 transition-all duration-200 hover:scale-105"
                   >
-                    <RefreshCw className="w-4 h-4" />
+                    <RefreshCw className="h-4 w-4" />
                     For Revision
                   </Button>
                   <Button
@@ -249,7 +272,7 @@ export function ViewModal({
                     variant="destructive"
                     className="gap-2 transition-all duration-200 hover:scale-105"
                   >
-                    <Ban className="w-4 h-4" />
+                    <Ban className="h-4 w-4" />
                     Reject
                   </Button>
                 </div>
@@ -257,11 +280,11 @@ export function ViewModal({
             </div>
 
             {/* Right Column - Attachments (Scrollable) */}
-            <div className="lg:col-span-1 overflow-y-auto">
+            <div className="overflow-y-auto lg:col-span-1">
               {attachments && attachments.length > 0 && (
                 <Card className="h-fit transition-all duration-200 hover:shadow-md">
                   <CardContent className="pt-6">
-                    <p className="text-sm font-medium text-muted-foreground mb-4">
+                    <p className="mb-4 text-sm font-medium text-muted-foreground">
                       Attachments
                     </p>
                     <AttachmentsGrid
@@ -318,7 +341,7 @@ export function ViewModal({
             </div>
           )}
 
-          <div className="flex gap-3 justify-end">
+          <div className="flex justify-end gap-3">
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction
               onClick={handleActionConfirm}

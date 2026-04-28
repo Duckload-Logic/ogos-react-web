@@ -16,9 +16,9 @@ import { GetIIRLookup } from "../services/service";
 export function useCourses() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.courses,
-    (config) => GetIIRLookup('courses', config),
-    'GetIIRLookup',
-    'Fetch Courses',
+    (config) => GetIIRLookup("courses", config),
+    "GetIIRLookup",
+    "Fetch Courses",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
@@ -30,9 +30,9 @@ export function useCourses() {
 export function useGenders() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.genders,
-    (config) => GetIIRLookup('genders', config),
-    'GetIIRLookup',
-    'Fetch Genders',
+    (config) => GetIIRLookup("genders", config),
+    "GetIIRLookup",
+    "Fetch Genders",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
@@ -44,9 +44,9 @@ export function useGenders() {
 export function useCivilStatuses() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.civilStatuses,
-    (config) => GetIIRLookup('civilStatuses', config),
-    'GetIIRLookup',
-    'Fetch Civil Statuses',
+    (config) => GetIIRLookup("civilStatuses", config),
+    "GetIIRLookup",
+    "Fetch Civil Statuses",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
@@ -58,9 +58,9 @@ export function useCivilStatuses() {
 export function useReligions() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.religions,
-    (config) => GetIIRLookup('religions', config),
-    'GetIIRLookup',
-    'Fetch Religions',
+    (config) => GetIIRLookup("religions", config),
+    "GetIIRLookup",
+    "Fetch Religions",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
@@ -72,10 +72,9 @@ export function useReligions() {
 export function useParentalStatusTypes() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.parentalStatusTypes,
-    (config) =>
-      GetIIRLookup('parentalStatusTypes', config),
-    'GetIIRLookup',
-    'Fetch Parental Status Types',
+    (config) => GetIIRLookup("parentalStatusTypes", config),
+    "GetIIRLookup",
+    "Fetch Parental Status Types",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
@@ -87,10 +86,9 @@ export function useParentalStatusTypes() {
 export function useEnrollmentReasons() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.enrollmentReasons,
-    (config) =>
-      GetIIRLookup('enrollmentReasons', config),
-    'GetIIRLookup',
-    'Fetch Enrollment Reasons',
+    (config) => GetIIRLookup("enrollmentReasons", config),
+    "GetIIRLookup",
+    "Fetch Enrollment Reasons",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
@@ -102,9 +100,9 @@ export function useEnrollmentReasons() {
 export function useIncomeRanges() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.incomeRanges,
-    (config) => GetIIRLookup('incomeRanges', config),
-    'GetIIRLookup',
-    'Fetch Income Ranges',
+    (config) => GetIIRLookup("incomeRanges", config),
+    "GetIIRLookup",
+    "Fetch Income Ranges",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
@@ -116,10 +114,9 @@ export function useIncomeRanges() {
 export function useStudentSupportTypes() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.studentSupportTypes,
-    (config) =>
-      GetIIRLookup('studentSupportTypes', config),
-    'GetIIRLookup',
-    'Fetch Student Support Types',
+    (config) => GetIIRLookup("studentSupportTypes", config),
+    "GetIIRLookup",
+    "Fetch Student Support Types",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
@@ -131,10 +128,9 @@ export function useStudentSupportTypes() {
 export function useSiblingSupportTypes() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.siblingSupportTypes,
-    (config) =>
-      GetIIRLookup('siblingSupportTypes', config),
-    'GetIIRLookup',
-    'Fetch Sibling Support Types',
+    (config) => GetIIRLookup("siblingSupportTypes", config),
+    "GetIIRLookup",
+    "Fetch Sibling Support Types",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
@@ -146,10 +142,9 @@ export function useSiblingSupportTypes() {
 export function useStudentRelationshipTypes() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.studentRelationshipTypes,
-    (config) =>
-      GetIIRLookup('studentRelationshipTypes', config),
-    'GetIIRLookup',
-    'Fetch Student Relationship Types',
+    (config) => GetIIRLookup("studentRelationshipTypes", config),
+    "GetIIRLookup",
+    "Fetch Student Relationship Types",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
@@ -161,10 +156,9 @@ export function useStudentRelationshipTypes() {
 export function useNatureOfResidenceTypes() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.natureOfResidenceTypes,
-    (config) =>
-      GetIIRLookup('natureOfResidenceTypes', config),
-    'GetIIRLookup',
-    'Fetch Nature of Residence Types',
+    (config) => GetIIRLookup("natureOfResidenceTypes", config),
+    "GetIIRLookup",
+    "Fetch Nature of Residence Types",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
@@ -176,9 +170,23 @@ export function useNatureOfResidenceTypes() {
 export function useActivityOptions() {
   return useLookupWithMeta(
     QUERY_KEYS.iir.lookups.activityOptions,
-    (config) => GetIIRLookup('activityOptions', config),
-    'GetIIRLookup',
-    'Fetch Activity Options',
+    (config) => GetIIRLookup("activityOptions", config),
+    "GetIIRLookup",
+    "Fetch Activity Options",
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
+}
+
+/**
+ * Fetch student statuses lookup data
+ * @returns Query result with student statuses data
+ */
+export function useStudentStatuses() {
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.studentStatuses,
+    (config) => GetIIRLookup("studentStatuses", config),
+    "GetIIRLookup",
+    "Fetch Student Statuses",
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }

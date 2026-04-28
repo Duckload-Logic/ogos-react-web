@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useLocation } from "react-router-dom";
 import { ChevronRight, Home } from "lucide-react";
 import BackNav from "./BackNav";
+import { cn } from "@/lib/utils";
 
 const PATH_LABELS: Record<string, string> = {
   home: "Dashboard",
@@ -20,6 +21,7 @@ const PATH_LABELS: Record<string, string> = {
   form: "IIR Form",
   iir: "IIR Profile",
   profile: "Profile",
+  lifecycle: "Records Lifecycle",
 };
 
 export default function Breadcrumbs() {
@@ -53,20 +55,26 @@ export default function Breadcrumbs() {
   return (
     <nav
       aria-label="Breadcrumb"
-      className="w-full mb-4 flex flex-wrap items-center gap-2 sm:gap-3"
+      className="mb-4 flex w-full flex-wrap items-center gap-2 sm:gap-3"
     >
-      <BackNav to={parentPath} className="" />
+      <BackNav
+        to={parentPath}
+        className=""
+      />
 
-      <div className="h-4 w-[1px] bg-border mx-1" />
+      <div className="mx-1 h-4 w-[1px] bg-border" />
 
       <ol className="flex items-center gap-2 overflow-hidden text-sm font-medium">
         <li className="flex items-center">
           <Link
             to={pathnames[0] === "admin" ? "/admin" : "/student"}
-            className="flex items-center text-muted-foreground hover:text-primary transition-colors"
+            className="flex items-center text-muted-foreground transition-colors hover:text-primary"
           >
-            <Home size={14} className="mr-1.5" />
-            <span className="hidden xs:inline">Home</span>
+            <Home
+              size={14}
+              className="mr-1.5"
+            />
+            <span className="xs:inline hidden">Home</span>
           </Link>
         </li>
 
@@ -80,17 +88,23 @@ export default function Breadcrumbs() {
           return (
             <React.Fragment key={to}>
               <li className="flex items-center text-muted-foreground/50">
-                <ChevronRight size={14} strokeWidth={3} />
+                <ChevronRight
+                  size={14}
+                  strokeWidth={3}
+                />
               </li>
               <li className="flex items-center">
                 {last ? (
-                  <span className="text-foreground font-semibold truncate max-w-[150px] sm:max-w-[250px]">
+                  <span className="max-w-[150px] truncate font-semibold text-foreground sm:max-w-[250px]">
                     {getLabel(value)}
                   </span>
                 ) : (
                   <Link
                     to={to}
-                    className="text-muted-foreground hover:text-primary transition-colors truncate max-w-[100px] sm:max-w-[150px]"
+                    className={cn(
+                      "max-w-[100px] truncate text-muted-foreground",
+                      "transition-colors hover:text-primary sm:max-w-[150px]",
+                    )}
                   >
                     {getLabel(value)}
                   </Link>

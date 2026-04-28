@@ -17,9 +17,11 @@ import {
 import {
   useGetNotifications,
   useMarkNotificationRead,
+  useNotificationsStream,
 } from "../hooks/useNotifications";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/context/hooks";
+import { cn } from "@/lib/utils";
 
 // Simple relative time formatter
 function formatTimeAgo(dateString: string) {
@@ -62,6 +64,7 @@ export default function NotificationModal({
   setShowNotifications,
 }: Props) {
   const [filter, setFilter] = useState<"all" | "unread">("all");
+  useNotificationsStream();
   const { data, isLoading } = useGetNotifications();
   const markRead = useMarkNotificationRead();
   const { user } = useAuth();
@@ -90,11 +93,20 @@ export default function NotificationModal({
       open={showNotifications}
       onOpenChange={setShowNotifications}
     >
-      <ResponsiveModalContent className="flex flex-col w-full md:max-w-[60%] h-[85vh] sm:h-[75vh] p-0 overflow-hidden shadow-2xl border-border bg-card outline-none">
-        <div className="flex items-center justify-between p-5 border-b border-border">
+      <ResponsiveModalContent
+        className={cn(
+          "flex h-[85vh] w-full flex-col overflow-hidden border-border",
+          "bg-card p-0 shadow-2xl outline-none sm:h-[75vh]",
+          "md:max-w-[60%]",
+        )}
+      >
+        <div className="flex items-center justify-between border-b border-border p-5">
           <div>
-            <h2 className="text-lg font-semibold flex items-center gap-2">
-              <Bell size={16} className="text-primary" />
+            <h2 className="flex items-center gap-2 text-lg font-semibold">
+              <Bell
+                size={16}
+                className="text-primary"
+              />
               Notifications
             </h2>
 
@@ -108,7 +120,10 @@ export default function NotificationModal({
               <button
                 onClick={handleMarkAllRead}
                 disabled={markRead.isPending}
-                className="text-xs text-muted-foreground hover:text-primary transition disabled:opacity-50 mr-10"
+                className={cn(
+                  "mr-10 text-xs text-muted-foreground transition",
+                  "hover:text-primary disabled:opacity-50",
+                )}
               >
                 Mark all as read
               </button>
@@ -116,28 +131,33 @@ export default function NotificationModal({
           </div>
         </div>
 
-        <div className="flex gap-6 px-6 py-3 border-b border-border text-sm">
+        <div className="flex gap-6 border-b border-border px-6 py-3 text-sm">
           <button
             onClick={() => setFilter("all")}
-            className={`font-medium transition-colors ${filter === "all" ? "text-primary relative after:absolute after:-bottom-[13px] after:left-0 after:w-full after:h-[2px] after:bg-primary" : "text-muted-foreground hover:text-foreground"}`}
+            className={`font-medium transition-colors ${filter === "all" ? "relative text-primary after:absolute after:-bottom-[13px] after:left-0 after:h-[2px] after:w-full after:bg-primary" : "text-muted-foreground hover:text-foreground"}`}
           >
             All
           </button>
 
           <button
             onClick={() => setFilter("unread")}
-            className={`font-medium transition-colors flex items-center gap-2 ${filter === "unread" ? "text-primary relative after:absolute after:-bottom-[13px] after:left-0 after:w-full after:h-[2px] after:bg-primary" : "text-muted-foreground hover:text-foreground"}`}
+            className={`flex items-center gap-2 font-medium transition-colors ${filter === "unread" ? "relative text-primary after:absolute after:-bottom-[13px] after:left-0 after:h-[2px] after:w-full after:bg-primary" : "text-muted-foreground hover:text-foreground"}`}
           >
             Unread
             {unreadCount > 0 && filter === "all" && (
-              <span className="flex items-center justify-center min-w-[20px] h-5 px-1 text-[10px] text-white bg-red-500 rounded-full">
+              <span
+                className={cn(
+                  "flex h-5 min-w-[20px] items-center justify-center",
+                  "rounded-full bg-red-500 px-1 text-[10px] text-white",
+                )}
+              >
                 {unreadCount}
               </span>
             )}
           </button>
         </div>
 
-        <div className="flex-1 overflow-y-auto px-3 py-2 space-y-1 scroll-smooth">
+        <div className="flex-1 space-y-1 overflow-y-auto scroll-smooth px-3 py-2">
           {isLoading ? (
             <div className="p-4 text-center text-sm text-muted-foreground">
               Loading notifications...
@@ -167,9 +187,9 @@ export default function NotificationModal({
 
         <div className="border-t border-border p-4 text-center">
           <Link
-            to={`/${user?.role?.name?.toLowerCase().replace(" ", "") || "student"}/notifications`}
+            to={`/${user?.roles?.[0]?.name?.toLowerCase().replace(/\s+/g, "") || "student"}/notifications`}
             onClick={() => setShowNotifications(false)}
-            className="text-sm text-primary hover:underline transition inline-block w-full"
+            className="inline-block w-full text-sm text-primary transition hover:underline"
           >
             View All Notifications
           </Link>
@@ -210,26 +230,26 @@ function NotificationItem({
   return (
     <div
       onClick={onClick}
-      className={`group flex items-start gap-4 p-4 rounded-xl cursor-pointer transition-colors duration-200 hover:bg-muted/60 ${
+      className={`group flex cursor-pointer items-start gap-4 rounded-xl p-4 transition-colors duration-200 hover:bg-muted/60 ${
         unread ? "" : "opacity-70"
       }`}
     >
       <span
-        className={`w-2 h-2 rounded-full mt-2 shrink-0 transition-colors ${unread ? "bg-red-500 shadow-sm" : "bg-transparent"}`}
+        className={`mt-2 h-2 w-2 shrink-0 rounded-full transition-colors ${unread ? "bg-red-500 shadow-sm" : "bg-transparent"}`}
       />
 
-      <div className={`p-2 rounded-lg shrink-0 ${colorClass}`}>
+      <div className={`shrink-0 rounded-lg p-2 ${colorClass}`}>
         <Icon size={18} />
       </div>
 
-      <div className="flex-1 min-w-0">
-        <p className="text-sm font-medium truncate">{title}</p>
+      <div className="min-w-0 flex-1">
+        <p className="truncate text-sm font-medium">{title}</p>
 
-        <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
+        <p className="mt-0.5 line-clamp-2 text-xs text-muted-foreground">
           {description}
         </p>
 
-        <p className="text-[11px] text-muted-foreground mt-1.5 font-medium">
+        <p className="mt-1.5 text-[11px] font-medium text-muted-foreground">
           {time}
         </p>
       </div>
