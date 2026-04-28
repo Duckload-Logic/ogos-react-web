@@ -20,6 +20,8 @@ export const apiClient = axios.create({
   withCredentials: true,
 });
 
+export default apiClient;
+
 /**
  * Request Interceptor: Transform params from camelCase
  * to snake_case. Eliminates need for manual

@@ -245,13 +245,15 @@ export default function Navigation({
     );
   }
 
-  return (
-    <div className="h-full flex items-center justify-center">
+    return (
+    <div 
+      className={`relative h-full hidden md:flex items-center shrink-0 transition-all duration-300 z-[90] ${sidebarPinned ? "w-[16.25rem]" : "w-[4.5rem]"}`}
+    >
       <aside
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className={`relative flex flex-col bg-glass-bg border border-glass-border border-l-0 shadow-lg transition-all duration-300 z-30 h-[95%] rounded-3xl rounded-tl-none rounded-bl-none overflow-x-hidden
-        ${isExpanded ? "w-[16.25rem]" : "w-[4.5rem]"}`}
+         className={`absolute left-0 flex flex-col bg-background border border-border border-l-0 shadow-2xl transition-all duration-300 z-[100] h-full max-h-[85vh] overflow-hidden rounded-tr-2xl rounded-br-2xl 
+        ${isExpanded ? "w-64" : "w-[4.5rem]"}`}
       >
         <nav className="flex flex-col gap-2 p-3 mt-2">
           {navigationItems.map((item) => {

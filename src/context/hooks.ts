@@ -1,6 +1,6 @@
-import { useContext } from "react";
+import { useContext, useEffect } from "react";
 import { AuthContext } from "./AuthContext";
-import { UIContext } from "./UIContext";
+import { UIContext, PageMetadata } from "./UIContext";
 import { ToastContext } from "./ToastContext";
 
 export const useAuth = () => {
@@ -25,4 +25,21 @@ export const useToast = () => {
     throw new Error("useToast must be used within a ToastProvider");
   }
   return context;
+};
+
+export const usePageMetadata = (metadata: PageMetadata) => {
+  const context = useContext(UIContext);
+  
+  if (!context) {
+    throw new Error("usePageMetadata must be used within a UIProvider");
+  }
+
+  useEffect(() => {
+    context.setPageMetadata(metadata);
+  }, [
+    metadata.title, 
+    metadata.description, 
+    metadata.badgeText,
+    metadata.isLoading
+  ]); 
 };

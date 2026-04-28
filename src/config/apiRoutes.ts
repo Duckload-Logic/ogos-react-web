@@ -176,9 +176,37 @@ export const API_ROUTES = Object.freeze({
   /**
    * Superadmin related endpoints
    */
+/**
+   * Superadmin related endpoints
+   */
   superadmin: Object.freeze({
+    m2mClients: Object.freeze({
+      list: "/superadmin/m2m-clients",
+      create: "/superadmin/m2m-clients",
+      revoke: (id: number) => `/superadmin/m2m-clients/${id}`,
+      rotateSecret: (id: number) => `/superadmin/m2m-clients/${id}/rotate-secret`,
+      verify: (id: number) => `/superadmin/m2m-clients/${id}/verify`,
+    }),
+    users: Object.freeze({
+      list: "/superadmin/users",
+      distribution: "/superadmin/users/distribution",
+      toggleStatus: (id: string, action: "block" | "unblock") => 
+        `/superadmin/users/${id}/${action}`,
+      sessions: (id: string) => `/superadmin/users/${id}/sessions`,
+      revokeSession: (userId: string, sessionId: string) => 
+        `/superadmin/users/${userId}/sessions/${sessionId}`,
+      activity: (id: string) => `/superadmin/users/${id}/activity`,
+    }),
+    analytics: Object.freeze({
+      admin: "/superadmin/analytics",
+    }),
     logs: Object.freeze({
       myLogs: "/activity-meta/me",
+      security: "/superadmin/logs/security",
+      system: "/superadmin/logs/system",
+      audit: "/superadmin/logs/audit",
+      stats: "/superadmin/logs/stats",
+      activity: "/superadmin/logs/activity",
     }),
   }),
   /**
