@@ -133,4 +133,15 @@ export const QUERY_KEYS = {
     all: ["notifications"] as const,
     me: ["notifications", "me"] as const,
   },
+  superadmin: {
+    m2mClients: (includeRevoked?: boolean) => ["superadmin", "m2mClients", includeRevoked] as const,
+    users: (params?: unknown) => ["superadmin", "users", params] as const,
+    userDistribution: ["superadmin", "userDistribution"] as const,
+    analytics: ["superadmin", "analytics"] as const,
+    securityLogs: (params?: unknown) => ["superadmin", "securityLogs", params] as const,
+    systemLogs: (params?: unknown) => ["superadmin", "systemLogs", params] as const,
+    auditLogs: (params?: unknown) => ["superadmin", "auditLogs", params] as const,
+    logStats: (startDate?: string, endDate?: string) => ["superadmin", "logStats", startDate, endDate] as const,
+    logActivity: ["superadmin", "logActivity"] as const,
+  },
 } as const;

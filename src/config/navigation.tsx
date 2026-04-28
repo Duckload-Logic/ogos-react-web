@@ -1,17 +1,15 @@
 import React from "react";
 import {
   Home,
-  Users,
-  Calendar,
-  FileText,
-  BarChart3,
-  Timer,
-  TrendingUp,
   Key,
   Shield,
   Server,
   ClipboardList,
-  User,
+  Mail,
+  Fingerprint,
+  Users,
+  BarChart,
+  ShieldAlert,
 } from "lucide-react";
 
 export interface NavItem {
@@ -19,66 +17,47 @@ export interface NavItem {
   href: string;
   icon: React.ReactNode;
 }
-
 const ICON_SIZE = "1.25rem";
 
-export const NAV_CONFIG: Record<string, NavItem[]>[] = [
+export const NAV_CONFIG: NavItem[] = [
   {
-    admin: [
-      {
-        label: "Dashboard",
-        href: "/admin",
-        icon: <Home size={ICON_SIZE} />,
-      },
-      {
-        label: "Student Records",
-        href: "/admin/student-records",
-        icon: <Users size={ICON_SIZE} />,
-      },
-      {
-        label: "Appointments",
-        href: "/admin/appointments",
-        icon: <Calendar size={ICON_SIZE} />,
-      },
-      {
-        label: "Admission Slips",
-        href: "/admin/slips",
-        icon: <FileText size={ICON_SIZE} />,
-      },
-      {
-        label: "Reports",
-        href: "/admin/reports",
-        icon: <BarChart3 size={ICON_SIZE} />,
-      },
-      {
-        label: "Analytics",
-        href: "/admin/analytics",
-        icon: <TrendingUp size={ICON_SIZE} />,
-      },
-    ],
+    label: "Dashboard",
+    href: "/superadmin",
+    icon: <Home size={ICON_SIZE} />,
   },
   {
-    student: [
-      {
-        label: "Home",
-        href: "/student",
-        icon: <Home size={ICON_SIZE} />,
-      },
-      {
-        label: "Appointments",
-        href: "/student/appointments",
-        icon: <Timer size={ICON_SIZE} />,
-      },
-      {
-        label: "Admission Slips",
-        href: "/student/slips",
-        icon: <FileText size={ICON_SIZE} />,
-      },
-      {
-        label: "IIR Profile",
-        href: "/student/iir",
-        icon: <User size={ICON_SIZE} />,
-      },
-    ],
+    label: "M2M Management",
+    href: "/superadmin/m2m-management",
+    icon: <Fingerprint size={ICON_SIZE} />,
+  },
+  {
+    label: "User Management",
+    href: "/superadmin/users",
+    icon: <Users size={ICON_SIZE} />,
+  },
+  {
+    label: "Access Whitelist",
+    href: "/superadmin/whitelist",
+    icon: <ShieldAlert size={ICON_SIZE} />,
+  },
+  {
+    label: "Deep Analytics",
+    href: "/superadmin/analytics",
+    icon: <BarChart size={ICON_SIZE} />,
+  },
+  {
+    label: "Security Logs",
+    href: "/superadmin/security-logs",
+    icon: <Shield size={ICON_SIZE} />,
+  },
+  {
+    label: "System Logs",
+    href: "/superadmin/system-logs",
+    icon: <Server size={ICON_SIZE} />,
+  },
+  {
+    label: "Audit Logs",
+    href: "/superadmin/audit-logs",
+    icon: <ClipboardList size={ICON_SIZE} />,
   },
 ];
