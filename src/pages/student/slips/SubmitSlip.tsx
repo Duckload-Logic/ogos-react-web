@@ -235,7 +235,7 @@ export default function SubmitSlip() {
             navigate(`/student/slips/${id}`);
           },
           onError: (error: any) => {
-            triggerToast(error.message || "Failed to update slip");
+            triggerToast("Failed to update slip");
           },
         },
       );

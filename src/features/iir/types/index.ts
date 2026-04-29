@@ -273,6 +273,7 @@ export interface StudentSection {
   basicInfo: BasicInfo;
   personalInfo: PersonalInfo;
   addresses: StudentAddress[];
+  studentCorUrl?: string;
 }
 
 export interface EducationSection {
@@ -350,4 +351,5 @@ export interface IIRProfileView {
   };
   yearLevel: number;
   status: StudentStatus;
+  studentCorUrl?: string;
 }

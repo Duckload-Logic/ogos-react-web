@@ -41,9 +41,7 @@ import { getProfilePictureUrl } from "@/lib/profilePicture";
 export default function Profile() {
   const { user, logout, refresh } = useAuth();
   const { triggerToast } = useToast();
-  const [previewImage, setPreviewImage] = useState<string | null>(
-    user?.profilePicture || null,
-  );
+  const [previewImage, setPreviewImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [activities, setActivities] = useState<LogEntry[]>([]);
   const [isLoadingActivities, setIsLoadingActivities] = useState(true);
@@ -127,8 +125,8 @@ export default function Profile() {
     setIsUploadingPicture(true);
 
     try {
-      const updatedUser = await UploadProfilePicture(file);
-      setPreviewImage(getProfilePictureUrl(updatedUser.profilePicture) || localPreview);
+      const result = await UploadProfilePicture(file);
+      setPreviewImage(getProfilePictureUrl(result.url) || localPreview);
       await refresh();
       triggerToast("Profile picture updated successfully.");
     } catch (error) {
@@ -177,14 +175,15 @@ export default function Profile() {
           <div className="group/avatar relative shrink-0">
             <div
               className={cn(
-                "relative h-40 w-40 rounded-full bg-gradient-to-tr",
-                "from-primary via-primary/50 to-blue-400 p-1.5 shadow-2xl",
+                "relative h-40 w-40 rounded-full bg-primary",
+                "p-1.5 shadow-2xl",
               )}
             >
               <div className="absolute inset-x-0 bottom-0 h-1/2 rounded-b-full bg-black/40 blur-sm" />
               <Avatar className="relative z-10 h-full w-full rounded-full border-4 border-card">
                 <AvatarImage
                   src={previewImage || getProfilePictureUrl(user?.profilePicture)}
+
                   className="object-cover transition-transform duration-500 group-hover/avatar:scale-110"
                 />
                 <AvatarFallback className="bg-muted text-4xl font-extrabold uppercase text-muted-foreground">
@@ -202,7 +201,9 @@ export default function Profile() {
                 "transition-all duration-300 hover:rotate-12 hover:scale-110",
                 "active:scale-95",
               )}
-              title={isUploadingPicture ? "Uploading..." : "Change profile picture"}
+              title={
+                isUploadingPicture ? "Uploading..." : "Change profile picture"
+              }
               disabled={isUploadingPicture}
             >
               <Camera size={20} />
@@ -550,60 +551,30 @@ export default function Profile() {
               <CardDescription>Engagement and account metrics.</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6 p-8">
-              <div className="space-y-1">
-                <div className="flex items-end justify-between">
-                  <p className="text-[10px] font-bold uppercase text-muted-foreground/60">
-                    Profile Completeness
-                  </p>
-                  <span className="text-xs font-black">
-                    {profileCompleteness}%
-                  </span>
-                </div>
-                <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                  <div
-                    className={cn(
-                      "h-full rounded-full bg-primary",
-                      "shadow-[0_0_10px_rgba(var(--primary),0.3)] transition-all",
-                      "duration-1000",
-                    )}
-                    style={{ width: `${profileCompleteness}%` }}
-                  />
-                </div>
-              </div>
-
-              <Separator className="bg-border/20" />
-
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-3 gap-4">
                 <div className="rounded-2xl border border-border/10 bg-muted/30 p-4 text-center">
                   <p className="mb-1 text-[10px] font-bold text-muted-foreground/60">
                     LOGINS
                   </p>
                   <p className="text-xl font-black">{stats.logins}</p>
                 </div>
-                <div className="rounded-2xl border border-border/10 bg-muted/30 p-4 text-center">
-                  <p className="mb-1 text-[10px] font-bold text-muted-foreground/60">
-                    REPORTS
+                <div
+                  className={cn(
+                    "col-span-2 rounded-2xl border border-primary/20 bg-gradient-to-br",
+                    "from-primary/10 to-blue-500/10 p-6 shadow-inner",
+                  )}
+                >
+                  <div className="mb-2 flex items-center gap-3">
+                    <Calendar
+                      size={16}
+                      className="text-primary"
+                    />
+                    <p className="text-xs font-bold">Join Date</p>
+                  </div>
+                  <p className="text-xl font-black tracking-tight">
+                    {user.createdAt ? formatDate(user.createdAt) : "N/A"}
                   </p>
-                  <p className="text-xl font-black">{stats.reports}</p>
                 </div>
-              </div>
-
-              <div
-                className={cn(
-                  "rounded-2xl border border-primary/20 bg-gradient-to-br",
-                  "from-primary/10 to-blue-500/10 p-6 shadow-inner",
-                )}
-              >
-                <div className="mb-2 flex items-center gap-3">
-                  <Calendar
-                    size={16}
-                    className="text-primary"
-                  />
-                  <p className="text-xs font-bold">Join Date</p>
-                </div>
-                <p className="text-xl font-black tracking-tight">
-                  {user.createdAt ? formatDate(user.createdAt) : "N/A"}
-                </p>
               </div>
             </CardContent>
           </Card>

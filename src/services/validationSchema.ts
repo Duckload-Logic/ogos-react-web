@@ -75,6 +75,17 @@ export const commonRules = {
     message: `Cannot exceed ${max}`,
   }),
 
+  decimalPlaces: (places: number): ValidationRule => ({
+    validate: (value: any) => {
+      if (value === "" || value === null || value === undefined) return true;
+      const str = String(value);
+      if (!str.includes(".")) return true;
+      const decimalPart = str.split(".")[1];
+      return decimalPart.length <= places;
+    },
+    message: `Maximum of ${places} decimal places allowed`,
+  }),
+
   numeric: (): ValidationRule => ({
     validate: (value: any) => {
       if (value === "" || value === null || value === undefined) return true;
@@ -179,6 +190,48 @@ export const commonRules = {
     message: "Format must be YYYY-XXXXX-TG-0 or YYYY-XXXXX-TG-1",
   }),
 
+  suffixFormat: (): ValidationRule => ({
+    validate: (value: any) => {
+      if (value === undefined || value === null || value === "") return true;
+      return /^[a-zA-Z\.]+$/.test(String(value));
+    },
+    message: "Invalid suffix format (e.g. Jr., III)",
+  }),
+
+  complexionFormat: (): ValidationRule => ({
+    validate: (value: any) => {
+      if (value === undefined || value === null || value === "") return true;
+      return /^[a-zA-Z\s]+$/.test(String(value));
+    },
+    message: "Complexion must contain only letters and spaces",
+  }),
+
+  siblingCount: (brothersKey: string, sistersKey: string): ValidationRule => ({
+    validate: (value: any, rootData: any) => {
+      if (value === "" || value === null || value === undefined) return true;
+      const brothers = Number(getValueByPath(rootData, brothersKey)) || 0;
+      const sisters = Number(getValueByPath(rootData, sistersKey)) || 0;
+      const count = Number(value);
+      return count <= brothers + sisters;
+    },
+    message: "Number of employed siblings cannot exceed total siblings",
+  }),
+
+  ordinalPosition: (
+    brothersKey: string,
+    sistersKey: string,
+  ): ValidationRule => ({
+    validate: (value: any, rootData: any) => {
+      if (value === "" || value === null || value === undefined) return true;
+      const brothers = Number(getValueByPath(rootData, brothersKey)) || 0;
+      const sisters = Number(getValueByPath(rootData, sistersKey)) || 0;
+      const totalChildren = brothers + sisters + 1; // including the student
+      const pos = Number(value);
+      return pos <= totalChildren;
+    },
+    message: "Ordinal position cannot exceed total number of children",
+  }),
+
   pattern: (pattern: RegExp, message: string): ValidationRule => ({
     validate: (value: any) => {
       if (value === undefined || value === null || value === "") return true;
@@ -186,6 +239,15 @@ export const commonRules = {
     },
     message,
   }),
+
+  noSpecialChars: (fieldName: string): ValidationRule => ({
+    validate: (value: any) => {
+      if (value === undefined || value === null || value === "") return true;
+      return /^[a-zA-Z0-9\s,\.\-\/]+$/.test(String(value));
+    },
+    message: `${fieldName} contains invalid special characters`,
+  }),
+
 };
 
 /**

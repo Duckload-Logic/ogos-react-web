@@ -34,14 +34,19 @@ import {
   useLogActivity,
 } from "@/features/system-admin/hooks";
 import { SearchInput } from "@/components/form";
+import { toLowerCase } from "zod";
 
 export default function SuperAdminDashboard() {
-  const { data: logStats = [] } = useLogStats();
+  const { data: logStatsData } = useLogStats();
+  const logStats = logStatsData ?? [];
   const { data: analytics } = useAdminAnalytics();
-  const { data: m2mClients = [] } = useM2MClients();
+  const { data: m2mClientsData } = useM2MClients();
+  const m2mClients = m2mClientsData ?? [];
   const { data: usersData } = useUsers({ page_size: 1 });
-  const { data: userDist = [] } = useUserDistribution();
-  const { data: logActivity = [] } = useLogActivity();
+  const { data: userDistData } = useUserDistribution();
+  const userDist = userDistData ?? [];
+  const { data: logActivityData } = useLogActivity();
+  const logActivity = logActivityData ?? [];
 
   const totalLogs = useMemo(
     () => logStats.reduce((acc, curr) => acc + curr.count, 0),
@@ -64,11 +69,14 @@ export default function SuperAdminDashboard() {
       developer: "hsl(var(--notice-foreground) / 0.8)",
     };
 
-    return userDist.map((d) => ({
-      name: d.roleName.charAt(0).toUpperCase() + d.roleName.slice(1) + "s",
-      value: d.count,
-      color: colors[d.roleName.toLowerCase()] || "hsl(var(--muted))",
-    }));
+    return userDist.map((d) => {
+      const roleName = d.roleName || "Unknown";
+      return {
+        name: roleName.toLowerCase() + "s",
+        value: d.count,
+        color: colors[roleName.toLowerCase()] || "hsl(var(--muted))",
+      };
+    });
   }, [userDist]);
 
   usePageMetadata({
@@ -116,7 +124,6 @@ export default function SuperAdminDashboard() {
 
   return (
     <div className="mx-auto w-full max-w-[1700px] space-y-6">
-
       {/* KPI Section */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((stat) => {
@@ -128,13 +135,17 @@ export default function SuperAdminDashboard() {
               key={stat.label}
               className="group relative overflow-hidden"
             >
-              <div className={`absolute right-0 top-0 h-24 w-24 translate-x-10 -translate-y-10 rounded-full bg-${colorClass}/10 blur-3xl`} />
+              <div
+                className={`absolute right-0 top-0 h-24 w-24 -translate-y-10 translate-x-10 rounded-full bg-${colorClass}/10 blur-3xl`}
+              />
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">
-                  <div className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-${colorClass}/10 text-${colorClass}`}>
+                  <div
+                    className={`flex h-12 w-12 items-center justify-center rounded-2xl bg-${colorClass}/10 text-${colorClass}`}
+                  >
                     <Icon size={22} />
                   </div>
-                  <Badge className="rounded-lg font-medium bg-glass-bg bg-glass-border">
+                  <Badge className="rounded-lg bg-glass-bg bg-glass-border font-medium">
                     {stat.isPositive ? (
                       <ArrowUpRight className="mr-1 h-3 w-3 text-emerald-500" />
                     ) : (
@@ -144,8 +155,12 @@ export default function SuperAdminDashboard() {
                   </Badge>
                 </div>
                 <div className="mt-4 space-y-1">
-                  <p className="text-sm font-medium text-muted-foreground uppercase tracking-wider">{stat.label}</p>
-                  <p className="text-3xl font-bold tracking-tight text-foreground">{stat.value}</p>
+                  <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                    {stat.label}
+                  </p>
+                  <p className="text-3xl font-bold tracking-tight text-foreground">
+                    {stat.value}
+                  </p>
                 </div>
               </CardContent>
             </Card>
@@ -159,46 +174,96 @@ export default function SuperAdminDashboard() {
         <Card className="col-span-1 min-h-[420px] lg:col-span-2">
           <CardHeader className="flex flex-row items-center justify-between text-card-foreground">
             <div>
-              <CardTitle className="text-lg font-semibold">System Activity</CardTitle>
-              <p className="text-xs text-muted-foreground mt-1">Traffic and errors in the last 24 hours</p>
+              <CardTitle className="text-lg font-semibold">
+                System Activity
+              </CardTitle>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Traffic and errors in the last 24 hours
+              </p>
             </div>
             <div className="flex gap-2">
-              <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20">Requests</Badge>
-              <Badge variant="outline" className="bg-red-500/10 text-red-500 border-red-500/20">Errors</Badge>
+              <Badge
+                variant="outline"
+                className="border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
+              >
+                Requests
+              </Badge>
+              <Badge
+                variant="outline"
+                className="border-red-500/20 bg-red-500/10 text-red-500"
+              >
+                Errors
+              </Badge>
             </div>
           </CardHeader>
           <CardContent>
             <div className="h-[300px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
                 <AreaChart data={logActivity}>
                   <defs>
-                    <linearGradient id="colorRequests" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#059669" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#059669" stopOpacity={0} />
+                    <linearGradient
+                      id="colorRequests"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="#059669"
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="#059669"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
-                    <linearGradient id="colorErrors" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="#dc2626" stopOpacity={0.3} />
-                      <stop offset="95%" stopColor="#dc2626" stopOpacity={0} />
+                    <linearGradient
+                      id="colorErrors"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="#dc2626"
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="#dc2626"
+                        stopOpacity={0}
+                      />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="rgba(255,255,255,0.05)" />
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="rgba(255,255,255,0.05)"
+                  />
                   <XAxis
                     dataKey="time"
                     axisLine={false}
                     tickLine={false}
                     tick={{ fontSize: 10, fill: "#888888" }}
                     interval="preserveStartEnd"
-                    tickFormatter={(val) => val.split(' ')[1]} // Show only time HH:00
+                    tickFormatter={(val) => val.split(" ")[1]} // Show only time HH:00
                   />
                   <YAxis hide />
                   <Tooltip
                     contentStyle={{
-                      backgroundColor: "rgba(255, 255, 255, 0.1)",
+                      backgroundColor:
+                        "rgba(0, 0, 0, 0.5) dark:rgba(255, 255, 255, 0.2)",
                       backdropFilter: "blur(12px)",
                       border: "1px solid rgba(255,255,255,0.1)",
                       borderRadius: "16px",
                       boxShadow: "0 10px 40px rgba(0,0,0,0.1)",
-                      color: "#fff"
+                      color: "#fff",
                     }}
                     itemStyle={{ color: "#fff" }}
                   />
@@ -227,12 +292,19 @@ export default function SuperAdminDashboard() {
         {/* User Distribution */}
         <Card className="min-h-[420px]">
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">User Distribution</CardTitle>
-            <p className="text-xs text-muted-foreground mt-1">Breakdown by user roles</p>
+            <CardTitle className="text-lg font-semibold">
+              User Distribution
+            </CardTitle>
+            <p className="mt-1 text-xs text-muted-foreground">
+              Breakdown by user roles
+            </p>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center pt-2">
             <div className="h-[240px] w-full">
-              <ResponsiveContainer width="100%" height="100%">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
                 <PieChart>
                   <Pie
                     data={pieData}
@@ -244,7 +316,11 @@ export default function SuperAdminDashboard() {
                     dataKey="value"
                   >
                     {pieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} stroke="none" />
+                      <Cell
+                        key={`cell-${index}`}
+                        fill={entry.color}
+                        stroke="none"
+                      />
                     ))}
                   </Pie>
                   <Tooltip
@@ -253,7 +329,7 @@ export default function SuperAdminDashboard() {
                       backdropFilter: "blur(12px)",
                       borderRadius: "16px",
                       border: "1px solid rgba(255,255,255,0.1)",
-                      color: "#fff"
+                      color: "#fff",
                     }}
                   />
                 </PieChart>
@@ -261,12 +337,20 @@ export default function SuperAdminDashboard() {
             </div>
             <div className="mt-4 w-full space-y-2">
               {pieData.map((item) => (
-                <div key={item.name} className="flex items-center justify-between text-sm">
+                <div
+                  key={item.name}
+                  className="flex items-center justify-between text-sm"
+                >
                   <div className="flex items-center gap-2">
-                    <div className="h-2.5 w-2.5 rounded-full" style={{ backgroundColor: item.color }} />
+                    <div
+                      className="h-2.5 w-2.5 rounded-full"
+                      style={{ backgroundColor: item.color }}
+                    />
                     <span className="text-foreground">{item.name}</span>
                   </div>
-                  <span className="font-semibold text-foreground">{item.value}</span>
+                  <span className="font-semibold text-foreground">
+                    {item.value}
+                  </span>
                 </div>
               ))}
             </div>
@@ -274,21 +358,43 @@ export default function SuperAdminDashboard() {
         </Card>
       </div>
 
-      <section className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4 pt-2">
+      <section className="grid grid-cols-1 gap-4 pt-2 md:grid-cols-2 lg:grid-cols-4">
         {[
-          { label: "M2M Management", icon: Key, link: "/superadmin/m2m-management", color: "primary" },
-          { label: "User Accounts", icon: Users, link: "/superadmin/users", color: "secondary" },
-          { label: "Security Logs", icon: ShieldCheck, link: "/superadmin/security-logs", color: "primary" },
-          { label: "System Metrics", icon: Activity, link: "/superadmin/analytics", color: "secondary" }
+          {
+            label: "M2M Management",
+            icon: Key,
+            link: "/superadmin/m2m-management",
+            color: "primary",
+          },
+          {
+            label: "User Accounts",
+            icon: Users,
+            link: "/superadmin/users",
+            color: "secondary",
+          },
+          {
+            label: "Security Logs",
+            icon: ShieldCheck,
+            link: "/superadmin/security-logs",
+            color: "primary",
+          },
+          {
+            label: "System Metrics",
+            icon: Activity,
+            link: "/superadmin/analytics",
+            color: "secondary",
+          },
         ].map((item) => (
           <Button
             key={item.label}
             variant="ghost"
-            className="h-auto flex-col items-center justify-center py-6 px-4 hover:bg-muted/30 transition-all hover:shadow-2xl"
+            className="h-auto flex-col items-center justify-center px-4 py-6 transition-all hover:bg-muted/30 hover:shadow-2xl"
             asChild
           >
             <a href={item.link}>
-              <div className={`mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-${item.color === 'primary' ? 'primary' : 'secondary'}/10 text-${item.color === 'primary' ? 'primary' : 'secondary'}`}>
+              <div
+                className={`mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-${item.color === "primary" ? "primary" : "secondary"}/10 text-${item.color === "primary" ? "primary" : "secondary"}`}
+              >
                 <item.icon size={22} />
               </div>
               <span className="font-bold text-foreground">{item.label}</span>

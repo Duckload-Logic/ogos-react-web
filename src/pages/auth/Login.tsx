@@ -56,8 +56,10 @@ export default function Login() {
       } else {
         setLocalError("Failed to load user data.");
       }
-    } catch (err) {
-      setLocalError(err instanceof Error ? err.message : "Login failed");
+    } catch (err: any) {
+      setLocalError(
+        err.response?.data?.message || "Login failed. Please try again later.",
+      );
     }
   };
 

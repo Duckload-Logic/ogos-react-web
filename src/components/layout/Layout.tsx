@@ -144,9 +144,7 @@ export default function Layout({
     const roleKey = activeRole.name.toLowerCase().replace(/\s+/g, "");
     if (!roleKey) return [];
 
-    const roleData = NAV_CONFIG.find((config) => !!config[roleKey]);
-
-    return roleData ? roleData[roleKey] : [];
+    return NAV_CONFIG[roleKey] || [];
   }, [user, activeRole]);
 
   const getRoleLabel = () => {

@@ -19,7 +19,7 @@ import {
   useMarkNotificationRead,
   useNotificationsStream,
 } from "../hooks/useNotifications";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "@/context/hooks";
 import { cn } from "@/lib/utils";
 
@@ -68,6 +68,7 @@ export default function NotificationModal({
   const { data, isLoading } = useGetNotifications();
   const markRead = useMarkNotificationRead();
   const { user } = useAuth();
+  const navigate = useNavigate();
 
   if (!showNotifications) return null;
 
@@ -82,9 +83,30 @@ export default function NotificationModal({
     await Promise.allSettled(unreadIds.map((id) => markRead.mutateAsync(id)));
   };
 
-  const handleMarkRead = (id: string, isRead: boolean) => {
-    if (!isRead && !markRead.isPending) {
-      markRead.mutate(id);
+  const handleNotificationClick = (notif: any) => {
+    if (!notif.isRead && !markRead.isPending) {
+      markRead.mutate(notif.id);
+    }
+
+    const role = user?.roles?.[0]?.name?.toLowerCase() || "student";
+    let url = "";
+    const nType = (notif.type || "").toLowerCase();
+
+    if (nType.includes("appointment")) {
+      url = role === "admin" && notif.targetId 
+        ? `/admin/appointments/${notif.targetId}`
+        : `/${role}/appointments`;
+    } else if (nType.includes("slip")) {
+      url = role === "admin" && notif.targetId
+        ? `/admin/slips/${notif.targetId}`
+        : `/${role}/slips`;
+    } else if (nType.includes("user") && role === "admin" && notif.targetId) {
+      url = `/admin/student-records/${notif.targetId}`;
+    }
+
+    if (url) {
+      navigate(url);
+      setShowNotifications(false);
     }
   };
 
@@ -178,7 +200,7 @@ export default function NotificationModal({
                   description={notif.message}
                   time={formatTimeAgo(notif.createdAt)}
                   unread={!notif.isRead}
-                  onClick={() => handleMarkRead(notif.id, notif.isRead)}
+                  onClick={() => handleNotificationClick(notif)}
                 />
               );
             })

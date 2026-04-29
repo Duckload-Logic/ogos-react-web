@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { User, Mail, ArrowRight } from "lucide-react";
+import { User, Mail, ArrowRight, ExternalLink, FileText } from "lucide-react";
+import { formatDate } from "@/features/schedules/utils/formatters";
 
 interface StudentProfileCardProps {
   firstName?: string;
@@ -12,6 +13,7 @@ interface StudentProfileCardProps {
   suffixName?: string;
   middleName?: string;
   email?: string;
+  studentCorUrl?: string;
   isFormIncomplete: boolean;
   animationDelay?: string;
 }
@@ -22,6 +24,7 @@ export function StudentProfileCard({
   suffixName,
   middleName,
   email,
+  studentCorUrl,
   isFormIncomplete,
   animationDelay = "0.3s",
 }: StudentProfileCardProps) {
@@ -53,6 +56,20 @@ export function StudentProfileCard({
                     : ""}{" "}
                   {suffixName}
                 </p>
+                {studentCorUrl && (
+                  <div className="mt-2">
+                    <a
+                      href={`${import.meta.env.VITE_API_BASE_URL}${studentCorUrl}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="group flex w-fit items-center gap-1.5 rounded-md bg-primary/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-primary transition-colors hover:bg-primary/20"
+                    >
+                      <FileText className="h-3 w-3" />
+                      <span>Current COR</span>
+                      <ExternalLink className="h-2.5 w-2.5 opacity-0 transition-opacity group-hover:opacity-100" />
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>

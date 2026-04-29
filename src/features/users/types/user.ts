@@ -14,6 +14,7 @@ export interface User {
   type: string;
   studentNumber?: string;
   profilePicture?: string;
+  studentCorUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 }

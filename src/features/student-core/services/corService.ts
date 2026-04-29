@@ -1,0 +1,41 @@
+import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
+import { API_ROUTES } from "@/config/apiRoutes";
+
+/**
+ * Upload a new COR
+ */
+export async function UploadCOR(
+  file: File,
+  config?: AxiosConfigWithMeta
+): Promise<{ message: string; fileId: string }> {
+  const formData = new FormData();
+  formData.append("cor", file);
+
+  try {
+    const response = await apiClient.post(
+      "/students/inventory/cors",
+      formData,
+      {
+        ...config,
+        headers: { "Content-Type": "multipart/form-data" },
+      }
+    );
+    return response.data?.data ?? response.data;
+  } catch (error: any) {
+    console.error(`[UploadCOR]: ${error.message}`);
+    throw error;
+  }
+}
+
+/**
+ * Get all CORs for the current student
+ */
+export async function GetMyCORs(config?: AxiosConfigWithMeta): Promise<any[]> {
+  try {
+    const response = await apiClient.get("/students/inventory/cors", config);
+    return response.data?.data ?? response.data;
+  } catch (error: any) {
+    console.error(`[GetMyCORs]: ${error.message}`);
+    throw error;
+  }
+}

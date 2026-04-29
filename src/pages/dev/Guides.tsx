@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { usePageMetadata } from "@/context";
 import {
   Terminal,
   Server,
@@ -14,6 +15,13 @@ import { motion, AnimatePresence } from 'framer-motion';
 const Guides: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'laravel' | 'php' | 'curl'>('laravel');
   const [copied, setCopied] = useState(false);
+
+  usePageMetadata({
+    title: "Implementation Guides",
+    description: "Get up and running in minutes with our ready-to-use code snippets for popular frameworks and languages.",
+    badgeText: "Developer Tools",
+    badgeIcon: <Terminal className="h-3.5 w-3.5" />,
+  });
 
   const copyCode = (code: string) => {
     navigator.clipboard.writeText(code);
@@ -63,12 +71,6 @@ curl_close($ch);`
 
   return (
     <div className="max-w-5xl mx-auto space-y-12 animate-in fade-in duration-500 pb-20">
-      <div className="space-y-4">
-        <h1 className="text-3xl font-bold tracking-tight">Implementation Guides</h1>
-        <p className="text-muted-foreground text-lg max-w-2xl">
-          Get up and running in minutes with our ready-to-use code snippets for popular frameworks and languages.
-        </p>
-      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Navigation Sidebar */}

@@ -65,8 +65,8 @@ import {
 import { SectionProgress } from "@/features/iir/components/form/SectionProgress";
 import ConsentDialog from "@/features/iir/components/form/ConsentDialog";
 import { cn } from "@/lib/utils";
-import { PatchIIRSubmit } from "@/features/iir/services/service";
 import { PatchIIRSubmit, UploadIIRCor } from "@/features/iir/services/service";
+import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 
 const FORM_SECTIONS = [
   { title: "Basic Info", id: 1, key: "personal_basic", main: 1 },
@@ -167,7 +167,14 @@ export default function IIRForm() {
     };
 
     initializeForm();
-  }, [isLoadingDraft, isLoadingEditProfile, isEditMode, editProfileData, draft, me]);
+  }, [
+    isLoadingDraft,
+    isLoadingEditProfile,
+    isEditMode,
+    editProfileData,
+    draft,
+    me,
+  ]);
 
   useEffect(() => {
     if (isInitializing || !localFormData) return;
@@ -435,7 +442,11 @@ export default function IIRForm() {
 
       // Success
       setShowConsentDialog(false);
-      triggerToast(isEditMode ? "✓ IIR profile updated successfully!" : "✓ Form submitted successfully!");
+      triggerToast(
+        isEditMode
+          ? "✓ IIR profile updated successfully!"
+          : "✓ Form submitted successfully!",
+      );
       setShowSuccessPopup(true);
 
       setTimeout(() => {
@@ -470,7 +481,9 @@ export default function IIRForm() {
 
   const currentSectionDef = FORM_SECTIONS.find((s) => s.id === currentSection);
   usePageMetadata({
-    title: isEditMode ? "Edit Individual Inventory Record" : "Individual Inventory Record",
+    title: isEditMode
+      ? "Edit Individual Inventory Record"
+      : "Individual Inventory Record",
     description: isEditMode
       ? "Review and update your student profile information, including your current COR."
       : "Fill out your student information with confidence. Your data is protected and used solely for academic and guidance purposes.",
@@ -813,7 +826,11 @@ export default function IIRForm() {
                           ) : (
                             <>
                               <Save className="h-5 w-5" />
-                              <span>{isEditMode ? "Save Changes" : "Complete Profile"}</span>
+                              <span>
+                                {isEditMode
+                                  ? "Save Changes"
+                                  : "Complete Profile"}
+                              </span>
                             </>
                           )}
                         </Button>
