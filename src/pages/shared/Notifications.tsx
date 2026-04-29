@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { usePageMetadata } from "@/context";
+import { useNavigate } from "react-router-dom";
+import { usePageMetadata, useAuth } from "@/context";
 import {
   Card,
   CardContent,
@@ -67,6 +68,8 @@ export default function NotificationsPage() {
   useNotificationsStream();
   const { data, isLoading } = useGetNotifications();
   const markRead = useMarkNotificationRead();
+  const { user } = useAuth();
+  const navigate = useNavigate();
 
   const notifications = data?.notifications || [];
   const displayList = notifications.filter((n) =>
@@ -79,9 +82,29 @@ export default function NotificationsPage() {
     await Promise.allSettled(unreadIds.map((id) => markRead.mutateAsync(id)));
   };
 
-  const handleMarkRead = (id: string, isRead: boolean) => {
-    if (!isRead && !markRead.isPending) {
-      markRead.mutate(id);
+  const handleNotificationClick = (notif: any) => {
+    if (!notif.isRead && !markRead.isPending) {
+      markRead.mutate(notif.id);
+    }
+
+    const role = user?.roles?.[0]?.name?.toLowerCase() || "student";
+    let url = "";
+    const nType = (notif.type || "").toLowerCase();
+
+    if (nType.includes("appointment")) {
+      url = role === "admin" && notif.targetId 
+        ? `/admin/appointments/${notif.targetId}`
+        : `/${role}/appointments`;
+    } else if (nType.includes("slip")) {
+      url = role === "admin" && notif.targetId
+        ? `/admin/slips/${notif.targetId}`
+        : `/${role}/slips`;
+    } else if (nType.includes("user") && role === "admin" && notif.targetId) {
+      url = `/admin/student-records/${notif.targetId}`;
+    }
+
+    if (url) {
+      navigate(url);
     }
   };
 
@@ -167,7 +190,7 @@ export default function NotificationsPage() {
                 return (
                   <div
                     key={notif.id}
-                    onClick={() => handleMarkRead(notif.id, notif.isRead)}
+                    onClick={() => handleNotificationClick(notif)}
                     className={cn(
                       "group flex cursor-pointer items-start gap-4 p-5 transition-colors duration-200 hover:bg-muted/40 sm:px-6",
                       !notif.isRead ? "bg-muted/10" : "opacity-75"
