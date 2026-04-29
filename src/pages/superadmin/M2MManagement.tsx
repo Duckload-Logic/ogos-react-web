@@ -47,6 +47,7 @@ import {
   useVerifyM2MClient,
 } from "@/features/system-admin/hooks";
 import type { M2MClient } from "@/features/system-admin/types";
+import { Checkbox } from "@/components/form";
 
 export default function M2MManagement() {
   const [includeRevoked, setIncludeRevoked] = useState(false);
@@ -76,8 +77,8 @@ export default function M2MManagement() {
     rotateMutation.isPending ||
     verifyMutation.isPending;
 
-  const activeClients = clients.filter((c) => c.isActive);
-  const revokedClients = clients.filter((c) => !c.isActive);
+  const activeClients = clients?.filter((c) => c.isActive) || [];
+  const revokedClients = clients?.filter((c) => !c.isActive) || [];
 
   const handleCreate = async () => {
     if (!newClientName.trim() || !newClientDesc.trim()) return;
@@ -157,7 +158,7 @@ export default function M2MManagement() {
     },
     {
       label: "Total Clients",
-      value: clients.length,
+      value: clients?.length,
       icon: Fingerprint,
       iconClass: "bg-primary/10 text-primary border-primary/20",
     },
@@ -168,7 +169,8 @@ export default function M2MManagement() {
     isLoading: isPageLoading,
     badgeText: "Infrastructure Access Control",
     badgeIcon: <Sparkles className="h-3.5 w-3.5" />,
-    description: "Manage Machine-to-Machine clients for integration, automation, and infrastructure services.",
+    description:
+      "Manage Machine-to-Machine clients for integration, automation, and infrastructure services.",
     headerActions: (
       <Button
         onClick={() => setIsCreateOpen(true)}
@@ -197,7 +199,7 @@ export default function M2MManagement() {
                       <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
                         {card.label}
                       </p>
-                      <p className="text-4xl font-bold tracking-tight tabular-nums text-foreground">
+                      <p className="text-4xl font-bold tabular-nums tracking-tight text-foreground">
                         {card.value}
                       </p>
                     </div>
@@ -229,20 +231,18 @@ export default function M2MManagement() {
                 </p>
               </div>
 
-              <label className="inline-flex cursor-pointer items-center gap-3 rounded-xl border border-white/30 bg-white/60 px-4 py-2 text-sm backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-                <input
-                  type="checkbox"
-                  checked={includeRevoked}
-                  onChange={(e) => setIncludeRevoked(e.target.checked)}
-                  className="rounded border-border"
-                />
-                Show revoked clients
-              </label>
+              <Checkbox
+                id={"show-revoked"}
+                label="Show revoked clients"
+                name={"show-revoked"}
+                checked={includeRevoked}
+                onCheckedChange={() => setIncludeRevoked((prev) => !prev)}
+              />
             </div>
           </CardHeader>
 
           <CardContent className="p-0">
-            {clients.length === 0 ? (
+            {clients?.length === 0 ? (
               <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
                 <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
                   <Fingerprint className="h-6 w-6 text-muted-foreground" />
@@ -251,7 +251,8 @@ export default function M2MManagement() {
                   No M2M clients registered
                 </p>
                 <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                  Register your first machine client to allow external system integrations.
+                  Register your first machine client to allow external system
+                  integrations.
                 </p>
                 <Button
                   onClick={() => setIsCreateOpen(true)}
@@ -291,7 +292,7 @@ export default function M2MManagement() {
                   </thead>
 
                   <tbody>
-                    {clients.map((client) => (
+                    {clients?.map((client) => (
                       <tr
                         key={client.id}
                         className="border-b border-white/10 transition-colors duration-150 hover:bg-white/35 dark:hover:bg-white/[0.03]"
@@ -301,7 +302,7 @@ export default function M2MManagement() {
                             <div className="font-medium text-foreground">
                               {client.clientName}
                             </div>
-                            <div className="text-[11px] text-muted-foreground max-w-[200px] truncate">
+                            <div className="max-w-[200px] truncate text-[11px] text-muted-foreground">
                               {client.clientDescription}
                             </div>
                           </div>
@@ -309,7 +310,7 @@ export default function M2MManagement() {
 
                         <td className="px-5 py-4">
                           <div className="flex items-center gap-2">
-                            <code className="rounded-lg border border-white/20 bg-white/55 px-2.5 py-1 text-[11px] font-mono text-foreground dark:border-white/10 dark:bg-white/[0.04]">
+                            <code className="rounded-lg border border-white/20 bg-white/55 px-2.5 py-1 font-mono text-[11px] text-foreground dark:border-white/10 dark:bg-white/[0.04]">
                               {client.clientId}
                             </code>
                             <Button
@@ -351,14 +352,14 @@ export default function M2MManagement() {
                                 <Badge
                                   key={scope}
                                   variant="outline"
-                                  className="rounded-full border-muted-foreground/20 text-[10px] py-0 px-2"
+                                  className="rounded-full border-muted-foreground/20 px-2 py-0 text-[10px]"
                                 >
                                   {scope}
                                 </Badge>
                               ))}
                             </div>
                           ) : (
-                            <span className="text-xs text-muted-foreground italic">
+                            <span className="text-xs italic text-muted-foreground">
                               admin:full
                             </span>
                           )}
@@ -383,27 +384,33 @@ export default function M2MManagement() {
                                     variant="ghost"
                                     size="sm"
                                     onClick={() => handleVerify(client.id)}
-                                    className="h-8 w-8 p-0 rounded-xl text-blue-600 hover:bg-blue-600/10 hover:text-blue-600"
+                                    className="h-8 w-8 rounded-xl p-0 text-blue-600 hover:bg-blue-600/10 hover:text-blue-600"
                                     title="Verify Client"
                                     disabled={verifyMutation.isPending}
                                   >
-                                    <Check size={14} strokeWidth={3} />
+                                    <Check
+                                      size={14}
+                                      strokeWidth={3}
+                                    />
                                   </Button>
                                 )}
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => setRotateTarget(client)}
-                                  className="h-8 w-8 p-0 rounded-xl"
+                                  className="h-8 w-8 rounded-xl p-0"
                                   title="Rotate Client Secret"
                                 >
-                                  <RefreshCw size={14} className="text-muted-foreground" />
+                                  <RefreshCw
+                                    size={14}
+                                    className="text-muted-foreground"
+                                  />
                                 </Button>
                                 <Button
                                   variant="ghost"
                                   size="sm"
                                   onClick={() => setRevokeTarget(client)}
-                                  className="h-8 w-8 p-0 rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
+                                  className="h-8 w-8 rounded-xl p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
                                   title="Revoke Client"
                                 >
                                   <Trash2 size={14} />
@@ -450,14 +457,16 @@ export default function M2MManagement() {
                   <div className="flex items-start gap-2">
                     <AlertTriangle className="mt-0.5 h-5 w-5 flex-shrink-0 text-amber-600 dark:text-amber-400" />
                     <p className="text-sm text-amber-800 dark:text-amber-200">
-                      Copy this secret now. You will not be able to retrieve it later.
-                      If you lose it, you must rotate the secret.
+                      Copy this secret now. You will not be able to retrieve it
+                      later. If you lose it, you must rotate the secret.
                     </p>
                   </div>
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Client Secret</Label>
+                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                    Client Secret
+                  </Label>
                   <div className="flex min-w-0 items-center gap-2">
                     <code className="flex min-w-0 flex-1 break-all rounded-xl border border-white/20 bg-white/60 p-3 font-mono text-xs dark:border-white/10 dark:bg-white/[0.04]">
                       {showSecret ? createdSecret : "•".repeat(48)}
@@ -479,7 +488,10 @@ export default function M2MManagement() {
                       className="rounded-xl"
                     >
                       {copied ? (
-                        <Check size={14} className="text-emerald-500" />
+                        <Check
+                          size={14}
+                          className="text-emerald-500"
+                        />
                       ) : (
                         <Copy size={14} />
                       )}
@@ -514,7 +526,7 @@ export default function M2MManagement() {
                 <div className="space-y-2">
                   <Label htmlFor="clientScopes">
                     Scopes{" "}
-                    <span className="text-[10px] text-muted-foreground font-normal">
+                    <span className="text-[10px] font-normal text-muted-foreground">
                       (comma-separated, optional)
                     </span>
                   </Label>
@@ -530,7 +542,9 @@ export default function M2MManagement() {
                 <div className="space-y-2">
                   <Label htmlFor="clientExpiry">
                     Expiration Date{" "}
-                    <span className="text-[10px] text-muted-foreground font-normal">(optional)</span>
+                    <span className="text-[10px] font-normal text-muted-foreground">
+                      (optional)
+                    </span>
                   </Label>
                   <Input
                     id="clientExpiry"
@@ -558,10 +572,16 @@ export default function M2MManagement() {
               ) : (
                 <Button
                   onClick={handleCreate}
-                  disabled={!newClientName.trim() || !newClientDesc.trim() || createMutation.isPending}
+                  disabled={
+                    !newClientName.trim() ||
+                    !newClientDesc.trim() ||
+                    createMutation.isPending
+                  }
                   className="rounded-xl"
                 >
-                  {createMutation.isPending ? "Registering..." : "Register Client"}
+                  {createMutation.isPending
+                    ? "Registering..."
+                    : "Register Client"}
                 </Button>
               )}
             </DialogFooter>
@@ -573,17 +593,20 @@ export default function M2MManagement() {
           open={!!revokeTarget}
           onOpenChange={(open) => !open && setRevokeTarget(null)}
         >
-          <AlertDialogContent className="border-white/20 bg-white/85 backdrop-blur-2xl dark:border-white/10 dark:bg-neutral-900/92">
+          <AlertDialogContent className="dark:bg-neutral-900/92 border-white/20 bg-white/85 backdrop-blur-2xl dark:border-white/10">
             <AlertDialogHeader>
               <AlertDialogTitle>Revoke M2M Client</AlertDialogTitle>
               <AlertDialogDescription>
                 Are you sure you want to revoke the client &quot;
-                {revokeTarget?.clientName}&quot;? This action cannot be undone. Any
-                services using this Client ID and Secret will lose access immediately.
+                {revokeTarget?.clientName}&quot;? This action cannot be undone.
+                Any services using this Client ID and Secret will lose access
+                immediately.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="rounded-xl">
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleRevoke}
                 className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
@@ -599,20 +622,26 @@ export default function M2MManagement() {
           open={!!rotateTarget}
           onOpenChange={(open) => !open && setRotateTarget(null)}
         >
-          <AlertDialogContent className="border-white/20 bg-white/85 backdrop-blur-2xl dark:border-white/10 dark:bg-neutral-900/92 sm:max-w-md">
+          <AlertDialogContent className="dark:bg-neutral-900/92 border-white/20 bg-white/85 backdrop-blur-2xl dark:border-white/10 sm:max-w-md">
             <AlertDialogHeader>
               <AlertDialogTitle className="flex items-center gap-2">
-                 <RefreshCw size={18} className="text-amber-500" />
-                 Rotate Client Secret
+                <RefreshCw
+                  size={18}
+                  className="text-amber-500"
+                />
+                Rotate Client Secret
               </AlertDialogTitle>
               <AlertDialogDescription>
-                Rotating the secret for &quot;{rotateTarget?.clientName}&quot; will 
-                generate a new secret and **immediately invalidate** the old one.
-                Applications will need to be updated with the new secret.
+                Rotating the secret for &quot;{rotateTarget?.clientName}&quot;
+                will generate a new secret and **immediately invalidate** the
+                old one. Applications will need to be updated with the new
+                secret.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+              <AlertDialogCancel className="rounded-xl">
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={handleRotate}
                 className="rounded-xl bg-amber-500 text-white hover:bg-amber-600"
