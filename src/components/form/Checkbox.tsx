@@ -41,7 +41,14 @@ export default function Checkbox({
             className={`peer absolute z-10 h-full w-full cursor-pointer opacity-0 ${className}`}
           />
           <div
-            className={`h-full w-full ${square ? "rounded-md" : "rounded-full"} border border-white/30 bg-white/40 transition-all duration-200 peer-checked:border-primary peer-checked:bg-primary peer-hover:border-primary dark:border-white/10 dark:bg-white/[0.04]`}
+            className={cn(
+              `h-full w-full ${
+                square ? "rounded-md" : "rounded-full"
+              } border border-border bg-muted transition-all duration-200`,
+              "peer-checked:border-primary peer-checked:bg-primary",
+              "peer-hover:border-primary",
+              "dark:border-white/10 dark:border-white/30 dark:bg-white/[0.04]",
+            )}
           />
           <Check
             className={cn(

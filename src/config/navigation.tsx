@@ -46,8 +46,8 @@ export const NAV_CONFIG: Record<string, NavItem[]> = {
       icon: <User size={ICON_SIZE} />,
     },
     {
-      label: "COR Upload",
-      href: "/student/cor-upload",
+      label: "COR Management",
+      href: "/student/cor-management",
       icon: <ClipboardList size={ICON_SIZE} />,
     },
   ],

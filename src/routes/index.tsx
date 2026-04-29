@@ -15,7 +15,7 @@ import { StudentSlips, SubmitSlip } from "@/pages/student/slips";
 import StudentSlipDetails from "@/pages/student/slips/SlipDetails";
 import IIRProfile from "@/pages/student/iir/IIRProfile";
 import IIRForm from "@/pages/student/iir/IIRForm";
-import CorUpload from "@/pages/student/cor/CorUpload";
+import CORManagement from "@/pages/student/CORManagement";
 
 // Admin Feature
 import Dashboard from "@/pages/admin/Dashboard";
@@ -52,28 +52,6 @@ import UserSessions from "@/pages/superadmin/UserSessions";
 import DevM2M from "@/pages/dev/M2MManagement";
 import Documentation from "@/pages/dev/Documentation";
 import Guides from "@/pages/dev/Guides";
-
-const TermsContent = () => {
-  usePageMetadata({
-    title: "Terms and Conditions",
-    description:
-      "Please read our terms and conditions carefully before using our services",
-    badgeText: "Legal",
-    isLoading: false,
-  });
-  return <StatementPage statementType="terms" />;
-};
-
-const PrivacyContent = () => {
-  usePageMetadata({
-    title: "Privacy Policy",
-    description:
-      "We value your privacy and are committed to protecting your personal data",
-    badgeText: "Legal",
-    isLoading: false,
-  });
-  return <StatementPage statementType="privacy" />;
-};
 
 export const routes: RouteObject[] = [
   // Root route - redirect to login
@@ -179,10 +157,10 @@ export const routes: RouteObject[] = [
         element: <IIRForm />,
       },
       {
-        path: "cor-upload",
+        path: "cor-management",
         element: (
           <IIRGate>
-            <CorUpload />
+            <CORManagement />
           </IIRGate>
         ),
       },
