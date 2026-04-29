@@ -29,9 +29,7 @@ export function useAnalyticsDashboard() {
           setError("Failed to fetch dashboard data");
         }
       } catch (err: any) {
-        setError(
-          err.response?.data?.message || err.message || "An error occurred",
-        );
+        setError(err.response?.data?.message || "An error occurred");
       } finally {
         setLoading(false);
       }

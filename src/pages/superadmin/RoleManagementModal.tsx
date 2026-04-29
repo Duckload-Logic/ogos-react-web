@@ -17,7 +17,11 @@ interface RoleManagementModalProps {
   user: UserAccount | null;
   isOpen: boolean;
   onClose: () => void;
-  onUpdate: (roleIds: number[], reason: string, referenceId: string) => Promise<void>;
+  onUpdate: (
+    roleIds: number[],
+    reason: string,
+    referenceId: string,
+  ) => Promise<void>;
   isUpdating: boolean;
 }
 
@@ -51,7 +55,7 @@ export function RoleManagementModal({
     setSelectedRoles((prev) =>
       prev.includes(roleId)
         ? prev.filter((id) => id !== roleId)
-        : [...prev, roleId]
+        : [...prev, roleId],
     );
   };
 
@@ -63,8 +67,11 @@ export function RoleManagementModal({
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px] border-white/20 bg-white/85 backdrop-blur-2xl dark:border-white/10 dark:bg-neutral-900/92">
+    <Dialog
+      open={isOpen}
+      onOpenChange={(open) => !open && onClose()}
+    >
+      <DialogContent className="dark:bg-neutral-900/92 border-white/20 bg-glass-bg backdrop-blur-2xl dark:border-white/10 sm:max-w-[425px]">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>Manage User Roles</DialogTitle>
@@ -76,10 +83,15 @@ export function RoleManagementModal({
 
           <div className="grid gap-6 py-6">
             <div className="space-y-3">
-              <Label className="text-sm font-semibold text-foreground/80">Available Roles</Label>
+              <Label className="text-sm font-semibold text-foreground/80">
+                Available Roles
+              </Label>
               <div className="grid grid-cols-2 gap-4">
                 {AVAILABLE_ROLES.map((role) => (
-                  <div key={role.id} className="flex items-center space-x-2">
+                  <div
+                    key={role.id}
+                    className="flex items-center space-x-2"
+                  >
                     <Checkbox
                       id={`role-${role.id}`}
                       name={`role-${role.id}`}
@@ -93,7 +105,10 @@ export function RoleManagementModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="reason" className="text-sm font-semibold text-primary">
+              <Label
+                htmlFor="reason"
+                className="text-sm font-semibold text-primary"
+              >
                 Justification / Reason *
               </Label>
               <Input
@@ -107,7 +122,10 @@ export function RoleManagementModal({
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="ref" className="text-sm font-semibold text-muted-foreground">
+              <Label
+                htmlFor="ref"
+                className="text-sm font-semibold text-muted-foreground"
+              >
                 Reference ID (Optional)
               </Label>
               <Input

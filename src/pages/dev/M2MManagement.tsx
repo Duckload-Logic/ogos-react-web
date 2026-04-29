@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePageMetadata } from "@/context";
 import { m2mService } from "@/features/dev-tools/m2m/services/api";
 import {
   Plus,
@@ -41,6 +42,32 @@ const M2MManagement: React.FC = () => {
   useEffect(() => {
     fetchClients();
   }, []);
+
+  usePageMetadata({
+    title: "Client Manager",
+    description: "Manage machine-to-machine authentication for your capstone system.",
+    badgeText: "Dev Portal",
+    badgeIcon: <Lock className="h-3.5 w-3.5" />,
+    headerActions: (
+      <div className="group relative">
+        <button
+          onClick={() => setShowCreateModal(true)}
+          disabled={clients.some((c) => c.isActive)}
+          className="btn-primary flex items-center gap-2 px-6 py-3 transition-all disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Plus size={20} strokeWidth={3} />
+          <span>Create New Client</span>
+        </button>
+        {clients.some((c) => c.isActive) && (
+          <div className="pointer-events-none absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-border bg-card p-3 opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+            <p className="text-[10px] font-bold leading-relaxed tracking-widest text-amber-500">
+              Restriction: You already have an active client. Revoke it to create a new one.
+            </p>
+          </div>
+        )}
+      </div>
+    ),
+  });
 
   const fetchClients = async () => {
     try {
@@ -100,33 +127,6 @@ const M2MManagement: React.FC = () => {
 
   return (
     <div className="space-y-10 animate-in fade-in duration-500 relative">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="space-y-1">
-          <h1 className="text-3xl font-bold tracking-tight">Client Manager</h1>
-          <p className="text-sm text-muted-foreground font-medium flex items-center gap-2">
-            <Lock size={14} className="text-primary" />
-            Manage machine-to-machine authentication for your capstone system.
-          </p>
-        </div>
-        <div className="group relative">
-          <button
-            onClick={() => setShowCreateModal(true)}
-            disabled={clients.some(c => c.isActive)}
-            className="btn-primary flex items-center gap-2 px-6 py-3 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-          >
-            <Plus size={20} strokeWidth={3} />
-            <span>Create New Client</span>
-          </button>
-          {clients.some(c => c.isActive) && (
-            <div className="absolute top-full right-0 mt-2 w-64 p-3 bg-card border border-border rounded-xl shadow-xl opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50">
-              <p className="text-[10px] font-bold text-amber-500 tracking-widest leading-relaxed">
-                Restriction: You already have an active client. Revoke it to create a new one.
-              </p>
-            </div>
-          )}
-        </div>
-      </div>
-
       {clients.some(c => c.isActive) && (
         <motion.div
           initial={{ opacity: 0, y: -10 }}

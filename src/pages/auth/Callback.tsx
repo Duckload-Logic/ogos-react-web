@@ -79,16 +79,21 @@ export default function Callback() {
 
           // Exchange code for tokens (OAuth only)
           await PostIDPTokenExchange({ code });
-          user = await GetCurrentUser();
+          
+          // Set session flag to enable auth queries
+          localStorage.setItem("session_active", "true");
 
           // Synchronize AuthContext state before proceeding
           await refresh();
+
+          user = await GetCurrentUser();
 
           roleKey =
             user.roles?.[0]?.name?.toLowerCase().replace(/\s+/g, "") || "student";
         } else {
           // Synchronize AuthContext state (Native already refetched in Login.tsx
           // but we call it anyway for robustness)
+          localStorage.setItem("session_active", "true");
           await refresh();
 
           user = await GetCurrentUser();

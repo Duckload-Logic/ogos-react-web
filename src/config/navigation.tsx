@@ -1,14 +1,14 @@
 import React from "react";
 import {
   Home,
+  Shield,
+  Server,
   Users,
   Calendar,
   FileText,
   TrendingUp,
   User,
   GraduationCap,
-  Shield,
-  Server,
   Activity,
   Code,
   BookOpen,
@@ -20,7 +20,6 @@ export interface NavItem {
   href: string;
   icon: React.ReactNode;
 }
-
 const ICON_SIZE = "1.25rem";
 
 export const NAV_CONFIG: Record<string, NavItem[]> = {
@@ -46,8 +45,9 @@ export const NAV_CONFIG: Record<string, NavItem[]> = {
       icon: <User size={ICON_SIZE} />,
     },
     {
-      label: "COR Upload",
-      href: "/student/cor-upload",
+      label: "COR Management",
+      href: "/student/cor-management",
+
       icon: <ClipboardList size={ICON_SIZE} />,
     },
   ],

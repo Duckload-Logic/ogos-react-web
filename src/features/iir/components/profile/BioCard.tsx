@@ -1,4 +1,13 @@
-import { AlertCircle, IdCard, Mail, Phone, School, ExternalLink, FileText } from "lucide-react";
+import {
+  AlertCircle,
+  IdCard,
+  Mail,
+  Phone,
+  School,
+  ExternalLink,
+  FileText,
+} from "lucide-react";
+
 import { ProfileFemale, ProfileMale } from "@/assets/icons";
 import { asText, renderAddress } from "@/features/iir/utils";
 import { StudentSection } from "../../types";

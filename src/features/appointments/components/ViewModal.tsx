@@ -31,6 +31,7 @@ import { set } from "zod";
 import { format12HourTime } from "../utils";
 import { formatDate } from "@/features/schedules/utils/formatters";
 import { cn } from "@/lib/utils";
+import { CORPreviewDialog } from "@/components/shared/CORPreviewDialog";
 
 interface ViewModalProps {
   appointment: Appointment | null;
@@ -64,6 +65,7 @@ export default function ViewModal({
     requiresMessage: boolean;
   } | null>(null);
   const [showReschedule, setShowReschedule] = useState(false);
+  const [showCorPreview, setShowCorPreview] = useState(false);
 
   if (!appointment) return null;
 
@@ -228,16 +230,15 @@ export default function ViewModal({
                   )}
                   {appointment.studentCorUrl && (
                     <div className="mt-2 border-t border-border/50 pt-2">
-                      <a
-                        href={`${import.meta.env.VITE_API_URL}${appointment.studentCorUrl}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
+                      <button
+                        onClick={() => setShowCorPreview(true)}
                         className="group flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary/80"
                       >
                         <FileText className="h-4 w-4" />
                         <span>View Student COR</span>
                         <ExternalLink className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
-                      </a>
+                      </button>
+
                     </div>
                   )}
                 </div>
@@ -374,6 +375,14 @@ export default function ViewModal({
           currentTimeSlotId={appointment.timeSlot.id}
         />
       )}
+
+      {/* COR Preview Modal */}
+      <CORPreviewDialog
+        isOpen={showCorPreview}
+        onClose={() => setShowCorPreview(false)}
+        fileUrl={appointment.studentCorUrl}
+        studentName={fullName}
+      />
     </>
   );
 }
