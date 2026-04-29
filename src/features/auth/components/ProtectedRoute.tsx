@@ -41,6 +41,7 @@ export const ProtectedRoute = ({
    * Only redirect if loading is complete and user
    * is not authenticated
    */
+
   if (!isAuthenticated || !user) {
     console.error("[ProtectedRoute] Unauthorized access attempt");
     return (
@@ -50,6 +51,8 @@ export const ProtectedRoute = ({
       />
     );
   }
+
+  console.log("Current User Role:", user.role); 
 
   /**
    * Check role-based access if required

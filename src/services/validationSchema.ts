@@ -75,19 +75,6 @@ export const commonRules = {
     message: `Cannot exceed ${max}`,
   }),
 
-  decimalPlaces: (maxDecimalPlaces: number): ValidationRule => ({
-    validate: (value: any) => {
-      if (value === "" || value === null || value === undefined) return true;
-
-      const stringValue = String(value);
-      if (!stringValue.includes(".")) return true;
-
-      const parts = stringValue.split(".");
-      return parts[1] ? parts[1].length <= maxDecimalPlaces : true;
-    },
-    message: `Must have at most ${maxDecimalPlaces} decimal places`,
-  }),
-
   numeric: (): ValidationRule => ({
     validate: (value: any) => {
       if (value === "" || value === null || value === undefined) return true;
@@ -163,7 +150,7 @@ export const commonRules = {
       if (value === undefined || value === null || value === "") return true;
       return /^(09|\+639)\d{9}$/.test(String(value));
     },
-    message: "Must be a valid Philippine mobile number (e.g. 09XXXXXXXXX)",
+    message: "Must be a valid Philippine mobile number (e.g. 09XXXXXXXXX or +639XXXXXXXXX)",
   }),
 
   telephone: (): ValidationRule => ({
@@ -192,69 +179,12 @@ export const commonRules = {
     message: "Format must be YYYY-XXXXX-TG-0 or YYYY-XXXXX-TG-1",
   }),
 
-  suffixFormat: (): ValidationRule => ({
-    validate: (value: any) => {
-      if (value === undefined || value === null || value === "") return true;
-      return /^(Jr\.|Sr\.|I|II|III|IV|V|VI|VII|VIII|IX|X)$/i.test(
-        String(value).trim(),
-      );
-    },
-    message:
-      "Invalid suffix. Allowed: Jr., Sr., or Roman Numerals (I, II, III, etc.)",
-  }),
-
-  complexionFormat: (): ValidationRule => ({
-    validate: (value: any) => {
-      if (value === undefined || value === null || value === "") return true;
-      return /^(Very Fair|Fair|Medium|Olive|Brown|Black)$/i.test(
-        String(value).trim(),
-      );
-    },
-    message:
-      "Invalid complexion. Allowed: Very Fair, Fair, Medium, Olive, Brown, or Black",
-  }),
-
-  siblingCount: (
-    brothersField: string,
-    sistersField: string,
-  ): ValidationRule => ({
-    validate: (value: any, rootData: any) => {
-      if (value === "" || value === null || value === undefined) return true;
-      const brothers = Number(getValueByPath(rootData, brothersField)) || 0;
-      const sisters = Number(getValueByPath(rootData, sistersField)) || 0;
-      return Number(value) <= brothers + sisters;
-    },
-    message: "Employed siblings cannot exceed total number of siblings",
-  }),
-
-  ordinalPosition: (
-    brothersField: string,
-    sistersField: string,
-  ): ValidationRule => ({
-    validate: (value: any, rootData: any) => {
-      if (value === "" || value === null || value === undefined) return true;
-      const brothers = Number(getValueByPath(rootData, brothersField)) || 0;
-      const sisters = Number(getValueByPath(rootData, sistersField)) || 0;
-      return Number(value) <= brothers + sisters + 1;
-    },
-    message: "Ordinal position cannot exceed total children (siblings + 1)",
-  }),
-
   pattern: (pattern: RegExp, message: string): ValidationRule => ({
     validate: (value: any) => {
       if (value === undefined || value === null || value === "") return true;
       return pattern.test(String(value));
     },
     message,
-  }),
-
-  noSpecialChars: (fieldName: string = "This field"): ValidationRule => ({
-    validate: (value: any) => {
-      if (value === undefined || value === null || value === "") return true;
-      // Reusing the logic: false if it HAS special characters
-      return !/[^a-zA-Z0-9\s.,-]/.test(String(value));
-    },
-    message: `${fieldName} cannot contain special characters`,
   }),
 };
 

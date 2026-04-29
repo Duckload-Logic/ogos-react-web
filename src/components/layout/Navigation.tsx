@@ -283,13 +283,16 @@ export default function Navigation({
     );
   }
 
-  return (
-    <div className="flex h-full items-center justify-center">
-      <aside
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
-        className={`relative z-30 flex h-[95%] flex-col overflow-x-hidden rounded-3xl rounded-bl-none rounded-tl-none border border-l-0 border-glass-border bg-glass-bg shadow-lg transition-all duration-300 ${isExpanded ? "w-[16.25rem]" : "w-[4.5rem]"}`}
-      >
+return (
+  <div 
+    className={`relative h-full hidden md:flex items-center shrink-0 transition-all duration-300 z-[90] ${sidebarPinned ? "w-[16.25rem]" : "w-[4.5rem]"}`}
+  >
+    <aside
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+      className={`relative z-30 flex h-[95%] flex-col overflow-x-hidden rounded-3xl rounded-bl-none rounded-tl-none border border-l-0 border-glass-border shadow-2xl transition-all duration-300 ${isExpanded ? "w-64" : "w-[4.5rem]"}`}
+    >
+      
         <nav className="mt-2 flex flex-col gap-2 p-3">
           {navigationItems.map((item) => {
             return (
