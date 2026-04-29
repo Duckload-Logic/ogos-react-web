@@ -184,37 +184,40 @@ export const API_ROUTES = Object.freeze({
   /**
    * Superadmin related endpoints
    */
-  superadmin: Object.freeze({
-    m2mClients: Object.freeze({
-      list: "/m2m-clients",
-      create: "/m2m-clients",
-      revoke: (id: number) => `/m2m-clients/${id}`,
-      rotateSecret: (id: number) => `/m2m-clients/${id}/secret`,
-      verify: (id: number) => `/m2m-clients/${id}/verify`,
+/**
+     * Superadmin related endpoints
+     */
+    superadmin: Object.freeze({
+      m2mClients: Object.freeze({
+        list: "/superadmin/m2m-clients",
+        create: "/superadmin/m2m-clients",
+        revoke: (id: string | number) => `/superadmin/m2m-clients/${id}`,
+        rotateSecret: (id: string | number) => `/superadmin/m2m-clients/${id}/rotate-secret`,
+        verify: (id: string | number) => `/superadmin/m2m-clients/${id}/verify`,
+      }),
+      users: Object.freeze({
+        list: "/superadmin/users",
+        distribution: "/superadmin/users/distribution",
+        toggleStatus: (id: string, action: "block" | "unblock") =>
+          `/superadmin/users/${id}/${action}`,
+        sessions: (id: string) => `/superadmin/users/${id}/sessions`,
+        revokeSession: (userId: string, sessionId: string) =>
+          `/superadmin/users/${userId}/sessions/${sessionId}`,
+        activity: (id: string) => `/superadmin/users/${id}/activity`,
+        updateRoles: "/superadmin/users/update-roles",
+      }),
+      analytics: Object.freeze({
+        admin: "/superadmin/analytics",
+      }),
+      logs: Object.freeze({
+        myLogs: "/activity-meta/me",
+        security: "/superadmin/logs/security",
+        system: "/superadmin/logs/system",
+        audit: "/superadmin/logs/audit",
+        stats: "/superadmin/logs/stats",
+        activity: "/superadmin/logs/activity",
+      }),
     }),
-    users: Object.freeze({
-      list: "/users/all",
-      distribution: "/users/distribution",
-      toggleStatus: (id: string, action: "block" | "unblock") =>
-        `/users/${id}/${action}`,
-      sessions: (id: string) => `/users/${id}/sessions`,
-      revokeSession: (id: string, sessionId: string) =>
-        `/users/${id}/sessions/${sessionId}`,
-      activity: (id: string) => `/users/${id}/activity`,
-      updateRoles: "/users/update-roles",
-    }),
-    analytics: Object.freeze({
-      admin: "/analytics/admin-dashboard",
-    }),
-    logs: Object.freeze({
-      security: "/activity-meta/security",
-      system: "/activity-meta/system",
-      audit: "/activity-meta/audit",
-      stats: "/activity-meta/stats",
-      activity: "/activity-meta/activity-stats",
-      myLogs: "/activity-meta/me",
-    }),
-  }),
   /**
    * Developer portal related endpoints
    */

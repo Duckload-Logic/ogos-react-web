@@ -161,7 +161,7 @@ export const commonRules = {
       if (value === undefined || value === null || value === "") return true;
       return /^(09|\+639)\d{9}$/.test(String(value));
     },
-    message: "Must be a valid Philippine mobile number (e.g. 09XXXXXXXXX)",
+    message: "Must be a valid Philippine mobile number (e.g. 09XXXXXXXXX or +639XXXXXXXXX)",
   }),
 
   telephone: (): ValidationRule => ({
@@ -247,6 +247,7 @@ export const commonRules = {
     },
     message: `${fieldName} contains invalid special characters`,
   }),
+
 };
 
 /**

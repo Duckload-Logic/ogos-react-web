@@ -1,14 +1,14 @@
 import React from "react";
 import {
   Home,
+  Shield,
+  Server,
   Users,
   Calendar,
   FileText,
   TrendingUp,
   User,
   GraduationCap,
-  Shield,
-  Server,
   Activity,
   Code,
   BookOpen,
@@ -20,7 +20,6 @@ export interface NavItem {
   href: string;
   icon: React.ReactNode;
 }
-
 const ICON_SIZE = "1.25rem";
 
 export const NAV_CONFIG: Record<string, NavItem[]> = {

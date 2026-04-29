@@ -77,6 +77,7 @@ export async function UploadProfilePicture(
   }
 }
 
+
 /**
  * Legacy service object for backward compatibility
  * Gradually migrate to direct function imports

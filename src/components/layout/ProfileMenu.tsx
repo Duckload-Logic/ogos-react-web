@@ -94,9 +94,7 @@ export default function ProfileMenu({
             >
               <div className="flex items-center gap-3">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage
-                    src={getProfilePictureUrl(user?.profilePicture)}
-                  />
+                  <AvatarImage src={getProfilePictureUrl(user?.profilePicture)} />
                   <AvatarFallback className="font-semibold">
                     {firstName?.charAt(0)}
                     {lastName?.charAt(0)}
@@ -122,7 +120,7 @@ export default function ProfileMenu({
             {isStudent && (
               <button
                 onClick={() => {
-                  navigate("/student/cor-upload");
+                  navigate("/student/cor-management");
                   setOpen(false);
                 }}
                 className={cn(
@@ -131,9 +129,10 @@ export default function ProfileMenu({
                 )}
               >
                 <FileText size={16} />
-                <span>Upload COR</span>
+                <span>COR Management</span>
               </button>
             )}
+
 
             <button
               onClick={() => {
