@@ -36,6 +36,7 @@ import {
 import { format12HourTime, formatDate } from "@/utils";
 import { cn } from "@/lib/utils";
 import { UploadProfilePicture } from "@/features/users/services/service";
+import { getProfilePictureUrl } from "@/lib/profilePicture";
 
 export default function Profile() {
   const { user, logout, refresh } = useAuth();
@@ -127,12 +128,12 @@ export default function Profile() {
 
     try {
       const updatedUser = await UploadProfilePicture(file);
-      setPreviewImage(updatedUser.profilePicture || localPreview);
+      setPreviewImage(getProfilePictureUrl(updatedUser.profilePicture) || localPreview);
       await refresh();
       triggerToast("Profile picture updated successfully.");
     } catch (error) {
       console.error("Profile picture upload failed:", error);
-      setPreviewImage(user?.profilePicture || null);
+      setPreviewImage(getProfilePictureUrl(user?.profilePicture) || null);
       triggerToast("Unable to upload profile picture. Please try again.");
     } finally {
       setIsUploadingPicture(false);
@@ -183,7 +184,7 @@ export default function Profile() {
               <div className="absolute inset-x-0 bottom-0 h-1/2 rounded-b-full bg-black/40 blur-sm" />
               <Avatar className="relative z-10 h-full w-full rounded-full border-4 border-card">
                 <AvatarImage
-                  src={previewImage || ""}
+                  src={previewImage || getProfilePictureUrl(user?.profilePicture)}
                   className="object-cover transition-transform duration-500 group-hover/avatar:scale-110"
                 />
                 <AvatarFallback className="bg-muted text-4xl font-extrabold uppercase text-muted-foreground">

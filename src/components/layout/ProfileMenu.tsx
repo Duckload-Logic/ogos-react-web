@@ -5,6 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { UISettingsModal } from "@/components/shared/UISettingsModal";
 import { cn } from "@/lib/utils";
 import { useAuth } from "@/context";
+import { getProfilePictureUrl } from "@/lib/profilePicture";
 
 interface ProfileMenuProps {
   firstName?: string;
@@ -64,7 +65,7 @@ export default function ProfileMenu({
           )}
         >
           <Avatar className="h-7 w-7">
-            <AvatarImage src={user?.profilePicture || ""} />
+            <AvatarImage src={getProfilePictureUrl(user?.profilePicture)} />
             <AvatarFallback className="text-xs font-semibold text-foreground">
               {firstName?.charAt(0)}
               {lastName?.charAt(0)}
@@ -93,7 +94,7 @@ export default function ProfileMenu({
             >
               <div className="flex items-center gap-3">
                 <Avatar className="h-9 w-9">
-                  <AvatarImage src={user?.profilePicture || ""} />
+                  <AvatarImage src={getProfilePictureUrl(user?.profilePicture)} />
                   <AvatarFallback className="font-semibold">
                     {firstName?.charAt(0)}
                     {lastName?.charAt(0)}
