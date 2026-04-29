@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { usePageMetadata } from "@/context";
 import { docsService } from "@/features/dev-tools/docs/services/api";
 import {
   Search,
@@ -33,6 +34,13 @@ const Documentation: React.FC = () => {
   const [selectedSchema, setSelectedSchema] = useState<{ name: string, schema: any } | null>(null);
   const [isSchemaModalOpen, setIsSchemaModalOpen] = useState(false);
   const [copiedId, setCopiedId] = useState<string | null>(null);
+
+  usePageMetadata({
+    title: "API Reference",
+    description: "Everything you need to integrate student data into your capstone system. Use your M2M Client ID and Secret to authenticate.",
+    badgeText: "Developer Tools",
+    badgeIcon: <Book className="h-3.5 w-3.5" />,
+  });
 
   useEffect(() => {
     const fetchDocs = async () => {
@@ -182,16 +190,6 @@ const Documentation: React.FC = () => {
 
   return (
     <div className="max-w-5xl mx-auto space-y-12 pb-20">
-      <div className="space-y-4">
-        <div className="flex items-center gap-3 text-primary">
-          <Book size={24} />
-          <h1 className="text-4xl font-extrabold tracking-tight">API Reference</h1>
-        </div>
-        <p className="text-xl text-muted-foreground max-w-3xl">
-          Everything you need to integrate student data into your capstone system. <br />
-          Use your M2M Client ID and Secret to authenticate.
-        </p>
-      </div>
 
       <div className="top-20 z-30 py-4 bg-background/80 backdrop-blur-md">
         <div className="relative">
