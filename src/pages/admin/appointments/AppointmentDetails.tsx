@@ -32,6 +32,7 @@ import { formatDate } from "@/features/schedules/utils/formatters";
 import { usePageMetadata } from "@/context";
 import ActionConfirmModal from "@/features/appointments/components/ConfirmModal";
 import RescheduleModal from "@/features/appointments/components/RescheduleModal";
+import { CORPreviewDialog } from "@/components/shared/CORPreviewDialog";
 import { cn } from "@/lib/utils";
 
 export default function AppointmentDetails() {
@@ -46,6 +47,7 @@ export default function AppointmentDetails() {
     requiresMessage: boolean;
   } | null>(null);
   const [showReschedule, setShowReschedule] = useState(false);
+  const [showCorPreview, setShowCorPreview] = useState(false);
 
   const fullName = appointment
     ? [
@@ -317,6 +319,21 @@ export default function AppointmentDetails() {
               <User className="h-3.5 w-3.5" />
               Access Record
             </Button>
+            {appointment.studentCorUrl && (
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "group/btn w-full gap-2 rounded-xl border-primary/20",
+                  "bg-primary/5 font-bold text-primary shadow-sm transition-all",
+                  "duration-300 hover:bg-primary hover:text-white",
+                )}
+                onClick={() => setShowCorPreview(true)}
+              >
+                <FileText className="h-3.5 w-3.5" />
+                View Student COR
+              </Button>
+            )}
           </CardContent>
         </Card>
 
@@ -666,6 +683,14 @@ export default function AppointmentDetails() {
           currentTimeSlotId={appointment.timeSlot.id}
         />
       )}
+
+      {/* COR Preview Modal */}
+      <CORPreviewDialog
+        isOpen={showCorPreview}
+        onClose={() => setShowCorPreview(false)}
+        fileUrl={appointment.studentCorUrl}
+        studentName={fullName}
+      />
     </div>
   );
 }

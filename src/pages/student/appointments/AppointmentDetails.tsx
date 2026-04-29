@@ -72,7 +72,7 @@ export default function AppointmentDetails() {
           navigate("/student/appointments");
         },
         onError: (error: any) => {
-          triggerToast(error.message || "Failed to cancel appointment");
+          triggerToast("Failed to cancel appointment");
         },
       },
     );
