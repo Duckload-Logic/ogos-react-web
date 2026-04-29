@@ -43,6 +43,7 @@ export interface Slip {
   adminNotes?: string;
   category?: SlipCategory;
   status?: SlipStatus;
+  studentCorUrl?: string;
   createdAt?: string;
   updatedAt?: string;
 }

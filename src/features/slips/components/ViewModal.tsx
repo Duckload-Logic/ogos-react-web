@@ -24,6 +24,8 @@ import {
   Download,
   Eye,
   Clock,
+  ExternalLink,
+  FileText,
 } from "lucide-react";
 import type { Slip } from "../types";
 import { AttachmentsGrid } from "./AttachmentsGrid";
@@ -211,6 +213,20 @@ export function ViewModal({
                       </p>
                     </div>
                   </div>
+                  {slip.studentCorUrl && (
+                    <div className="mt-6 border-t border-border/50 pt-4">
+                      <a
+                        href={`${import.meta.env.VITE_API_URL}${slip.studentCorUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex w-fit items-center gap-2 rounded-lg bg-primary/5 px-3 py-2 text-sm font-semibold text-primary transition-all hover:bg-primary/10"
+                      >
+                        <FileText className="h-4 w-4" />
+                        <span>View Verified Student COR</span>
+                        <ExternalLink className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </a>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
 

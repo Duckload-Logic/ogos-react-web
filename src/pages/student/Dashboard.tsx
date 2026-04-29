@@ -247,6 +247,7 @@ export default function Dashboard() {
           suffixName={me?.suffixName}
           middleName={me?.middleName}
           email={me?.email}
+          studentCorUrl={me?.studentCorUrl}
           isFormIncomplete={!iir || !iir.isSubmitted}
         />
       </section>

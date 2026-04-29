@@ -127,8 +127,8 @@ export default function Profile() {
     setIsUploadingPicture(true);
 
     try {
-      const updatedUser = await UploadProfilePicture(file);
-      setPreviewImage(getProfilePictureUrl(updatedUser.profilePicture) || localPreview);
+      const result = await UploadProfilePicture(file);
+      setPreviewImage(getProfilePictureUrl(result.url) || localPreview);
       await refresh();
       triggerToast("Profile picture updated successfully.");
     } catch (error) {
@@ -184,7 +184,9 @@ export default function Profile() {
               <div className="absolute inset-x-0 bottom-0 h-1/2 rounded-b-full bg-black/40 blur-sm" />
               <Avatar className="relative z-10 h-full w-full rounded-full border-4 border-card">
                 <AvatarImage
-                  src={previewImage || getProfilePictureUrl(user?.profilePicture)}
+                  src={
+                    previewImage || getProfilePictureUrl(user.profilePicture)
+                  }
                   className="object-cover transition-transform duration-500 group-hover/avatar:scale-110"
                 />
                 <AvatarFallback className="bg-muted text-4xl font-extrabold uppercase text-muted-foreground">
@@ -202,7 +204,9 @@ export default function Profile() {
                 "transition-all duration-300 hover:rotate-12 hover:scale-110",
                 "active:scale-95",
               )}
-              title={isUploadingPicture ? "Uploading..." : "Change profile picture"}
+              title={
+                isUploadingPicture ? "Uploading..." : "Change profile picture"
+              }
               disabled={isUploadingPicture}
             >
               <Camera size={20} />

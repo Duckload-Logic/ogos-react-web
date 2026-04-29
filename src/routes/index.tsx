@@ -18,7 +18,6 @@ import IIRForm from "@/pages/student/iir/IIRForm";
 import CorUpload from "@/pages/student/cor/CorUpload";
 
 // Admin Feature
-// Admin Feature
 import Dashboard from "@/pages/admin/Dashboard";
 import StudentRecords from "@/pages/admin/StudentRecords";
 import AppointmentsManagement from "@/pages/admin/appointments/AppointmentsManagement";
@@ -38,7 +37,7 @@ import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
 import RoleSelection from "@/pages/auth/RoleSelection";
 
-// Super Admin Pages
+// Super Admin Pages (Reverted to stable paths)
 import SuperAdminDashboard from "@/pages/superadmin/SuperAdminDashboard";
 import SAM2M from "@/pages/superadmin/M2MManagement";
 import UserManagement from "@/pages/superadmin/UserManagement";

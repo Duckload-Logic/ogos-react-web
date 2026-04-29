@@ -1,7 +1,6 @@
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/context";
 import { Spinner } from "@/components/shared";
-import { useMe } from "@/features/users/hooks/useMe";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;

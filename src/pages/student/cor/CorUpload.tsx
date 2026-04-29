@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { FileText, Upload } from "lucide-react";
+import { FileText, Upload, ExternalLink } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { useToast, useAuth } from "@/context";
@@ -117,6 +117,35 @@ export default function CorUpload() {
             {isUploading ? "Uploading..." : "Upload COR"}
           </Button>
         </div>
+
+        {(studentIIR as any)?.student?.studentCorUrl && (
+          <div className="mt-8 border-t border-border/50 pt-6">
+            <div className="flex items-center justify-between rounded-2xl bg-muted/40 p-4 transition-colors hover:bg-muted/60">
+              <div className="flex items-center gap-3">
+                <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                  <FileText size={20} />
+                </div>
+                <div>
+                  <p className="text-sm font-bold text-foreground">
+                    Current Certificate of Registration
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Verified COR is already on file
+                  </p>
+                </div>
+              </div>
+              <a
+                href={`${import.meta.env.VITE_API_URL}${(studentIIR as any).student.studentCorUrl}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center gap-2 text-sm font-semibold text-primary transition-colors hover:text-primary/80"
+              >
+                <span>View Current COR</span>
+                <ExternalLink className="h-4 w-4 opacity-70 transition-opacity group-hover:opacity-100" />
+              </a>
+            </div>
+          </div>
+        )}
       </CardContent>
     </Card>
   );

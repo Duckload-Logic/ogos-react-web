@@ -75,17 +75,15 @@ export const commonRules = {
     message: `Cannot exceed ${max}`,
   }),
 
-  decimalPlaces: (maxDecimalPlaces: number): ValidationRule => ({
+  decimalPlaces: (places: number): ValidationRule => ({
     validate: (value: any) => {
       if (value === "" || value === null || value === undefined) return true;
-
-      const stringValue = String(value);
-      if (!stringValue.includes(".")) return true;
-
-      const parts = stringValue.split(".");
-      return parts[1] ? parts[1].length <= maxDecimalPlaces : true;
+      const str = String(value);
+      if (!str.includes(".")) return true;
+      const decimalPart = str.split(".")[1];
+      return decimalPart.length <= places;
     },
-    message: `Must have at most ${maxDecimalPlaces} decimal places`,
+    message: `Maximum of ${places} decimal places allowed`,
   }),
 
   numeric: (): ValidationRule => ({
@@ -195,49 +193,43 @@ export const commonRules = {
   suffixFormat: (): ValidationRule => ({
     validate: (value: any) => {
       if (value === undefined || value === null || value === "") return true;
-      return /^(Jr\.|Sr\.|I|II|III|IV|V|VI|VII|VIII|IX|X)$/i.test(
-        String(value).trim(),
-      );
+      return /^[a-zA-Z\.]+$/.test(String(value));
     },
-    message:
-      "Invalid suffix. Allowed: Jr., Sr., or Roman Numerals (I, II, III, etc.)",
+    message: "Invalid suffix format (e.g. Jr., III)",
   }),
 
   complexionFormat: (): ValidationRule => ({
     validate: (value: any) => {
       if (value === undefined || value === null || value === "") return true;
-      return /^(Very Fair|Fair|Medium|Olive|Brown|Black)$/i.test(
-        String(value).trim(),
-      );
+      return /^[a-zA-Z\s]+$/.test(String(value));
     },
-    message:
-      "Invalid complexion. Allowed: Very Fair, Fair, Medium, Olive, Brown, or Black",
+    message: "Complexion must contain only letters and spaces",
   }),
 
-  siblingCount: (
-    brothersField: string,
-    sistersField: string,
-  ): ValidationRule => ({
+  siblingCount: (brothersKey: string, sistersKey: string): ValidationRule => ({
     validate: (value: any, rootData: any) => {
       if (value === "" || value === null || value === undefined) return true;
-      const brothers = Number(getValueByPath(rootData, brothersField)) || 0;
-      const sisters = Number(getValueByPath(rootData, sistersField)) || 0;
-      return Number(value) <= brothers + sisters;
+      const brothers = Number(getValueByPath(rootData, brothersKey)) || 0;
+      const sisters = Number(getValueByPath(rootData, sistersKey)) || 0;
+      const count = Number(value);
+      return count <= brothers + sisters;
     },
-    message: "Employed siblings cannot exceed total number of siblings",
+    message: "Number of employed siblings cannot exceed total siblings",
   }),
 
   ordinalPosition: (
-    brothersField: string,
-    sistersField: string,
+    brothersKey: string,
+    sistersKey: string,
   ): ValidationRule => ({
     validate: (value: any, rootData: any) => {
       if (value === "" || value === null || value === undefined) return true;
-      const brothers = Number(getValueByPath(rootData, brothersField)) || 0;
-      const sisters = Number(getValueByPath(rootData, sistersField)) || 0;
-      return Number(value) <= brothers + sisters + 1;
+      const brothers = Number(getValueByPath(rootData, brothersKey)) || 0;
+      const sisters = Number(getValueByPath(rootData, sistersKey)) || 0;
+      const totalChildren = brothers + sisters + 1; // including the student
+      const pos = Number(value);
+      return pos <= totalChildren;
     },
-    message: "Ordinal position cannot exceed total children (siblings + 1)",
+    message: "Ordinal position cannot exceed total number of children",
   }),
 
   pattern: (pattern: RegExp, message: string): ValidationRule => ({
@@ -248,13 +240,12 @@ export const commonRules = {
     message,
   }),
 
-  noSpecialChars: (fieldName: string = "This field"): ValidationRule => ({
+  noSpecialChars: (fieldName: string): ValidationRule => ({
     validate: (value: any) => {
       if (value === undefined || value === null || value === "") return true;
-      // Reusing the logic: false if it HAS special characters
-      return !/[^a-zA-Z0-9\s.,-]/.test(String(value));
+      return /^[a-zA-Z0-9\s,\.\-\/]+$/.test(String(value));
     },
-    message: `${fieldName} cannot contain special characters`,
+    message: `${fieldName} contains invalid special characters`,
   }),
 };
 

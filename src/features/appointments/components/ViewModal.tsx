@@ -22,6 +22,7 @@ import {
   Clock3,
   CalendarRange,
   ShieldUser,
+  ExternalLink,
 } from "lucide-react";
 import { STATUS_COLORS } from "@/config/constants";
 import ActionConfirmModal from "./ConfirmModal";
@@ -223,6 +224,20 @@ export default function ViewModal({
                     <div className="flex items-center gap-2 text-foreground">
                       <Mail className="h-4 w-4 text-muted-foreground" />
                       <span>{appointment.user.email}</span>
+                    </div>
+                  )}
+                  {appointment.studentCorUrl && (
+                    <div className="mt-2 border-t border-border/50 pt-2">
+                      <a
+                        href={`${import.meta.env.VITE_API_URL}${appointment.studentCorUrl}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="group flex items-center gap-2 text-sm font-medium text-primary transition-colors hover:text-primary/80"
+                      >
+                        <FileText className="h-4 w-4" />
+                        <span>View Student COR</span>
+                        <ExternalLink className="h-3 w-3 opacity-0 transition-opacity group-hover:opacity-100" />
+                      </a>
                     </div>
                   )}
                 </div>

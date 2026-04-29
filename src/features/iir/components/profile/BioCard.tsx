@@ -1,4 +1,4 @@
-import { AlertCircle, IdCard, Mail, Phone, School } from "lucide-react";
+import { AlertCircle, IdCard, Mail, Phone, School, ExternalLink, FileText } from "lucide-react";
 import { ProfileFemale, ProfileMale } from "@/assets/icons";
 import { asText, renderAddress } from "@/features/iir/utils";
 import { StudentSection } from "../../types";
@@ -76,6 +76,23 @@ export default function BioCard({
               asText(data?.personalInfo?.section),
             )}
           />
+          {data?.studentCorUrl && (
+            <div className="mt-2 border-t border-glass-border pt-4">
+              <a
+                href={`${import.meta.env.VITE_API_URL}${data.studentCorUrl}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-3 text-xs font-black uppercase tracking-[0.2em] text-primary transition-all hover:bg-primary/20"
+              >
+                <FileText size={18} />
+                <span>View Student COR</span>
+                <ExternalLink
+                  size={14}
+                  className="opacity-0 transition-opacity group-hover:opacity-100"
+                />
+              </a>
+            </div>
+          )}
         </div>
       </div>
       <div

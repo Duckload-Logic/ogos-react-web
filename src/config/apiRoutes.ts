@@ -14,7 +14,8 @@ export const API_ROUTES = Object.freeze({
    */
   users: Object.freeze({
     byId: (id: string) => `/users/${id}`,
-    profilePicture: "/users/me/profile-picture",
+    profilePicture: (id: string) => `/users/profile-picture/${id}`,
+    profilePictureUpload: "/users/profile-picture/upload",
   }),
 
   /**

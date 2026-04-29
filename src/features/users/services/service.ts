@@ -50,21 +50,17 @@ export async function GetUserById(
 
 /**
  * Upload current user's profile picture.
- * Assumption: backend accepts multipart/form-data at /users/me/profile-picture
- * and returns the updated User or { profilePicture }.
  */
 export async function UploadProfilePicture(
   file: File,
   config?: AxiosConfigWithMeta,
-): Promise<User> {
-  const uploadWithField = async (
-    fieldName: "profilePicture" | "file",
-  ): Promise<User> => {
+): Promise<{ message: string; url: string }> {
+  try {
     const formData = new FormData();
-    formData.append(fieldName, file);
+    formData.append("file", file);
 
     const response = await apiClient.post(
-      API_ROUTES.users.profilePicture,
+      API_ROUTES.users.profilePictureUpload,
       formData,
       {
         ...config,
@@ -73,23 +69,11 @@ export async function UploadProfilePicture(
     );
 
     return response.data?.data ?? response.data;
-  };
-
-  try {
-    return await uploadWithField("profilePicture");
-  } catch {
-    try {
-      return await uploadWithField("file");
-    } catch (fallbackError: any) {
-      const handlerName = config?.handlerName || "UploadProfilePicture";
-      const stepName = config?.stepName || "Upload Profile Picture";
-
-      console.error(
-        `[${handlerName}] {${stepName}}: ${fallbackError.message}`,
-      );
-
-      throw fallbackError;
-    }
+  } catch (error: any) {
+    const handlerName = config?.handlerName || "UploadProfilePicture";
+    const stepName = config?.stepName || "Upload Profile Picture";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
+    throw error;
   }
 }
 
