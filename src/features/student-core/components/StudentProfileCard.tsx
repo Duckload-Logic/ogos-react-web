@@ -59,7 +59,7 @@ export function StudentProfileCard({
                 {studentCorUrl && (
                   <div className="mt-2">
                     <a
-                      href={`${import.meta.env.VITE_API_URL}${studentCorUrl}`}
+                      href={`${import.meta.env.VITE_API_BASE_URL}${studentCorUrl}`}
                       target="_blank"
                       rel="noopener noreferrer"
                       className="group flex w-fit items-center gap-1.5 rounded-md bg-primary/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-primary transition-colors hover:bg-primary/20"
