@@ -38,6 +38,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { STATUS_COLORS } from "@/config/constants";
 import { AttachmentsGrid } from "@/features/slips/components/AttachmentsGrid";
 import { usePageMetadata } from "@/context";
+import { CORPreviewDialog } from "@/components/shared/CORPreviewDialog";
 import { cn } from "@/lib/utils";
 
 type ActionType = "approve" | "reject" | "revision" | null;
@@ -49,10 +50,10 @@ export default function SlipDetails() {
   const { data: attachments } = useGetSlipAttachments(id || "");
   const { mutate: updateSlipStatus, isPending: isUpdatingStatus } =
     useUpdateSlipStatus();
-
   const [actionType, setActionType] = useState<ActionType>(null);
   const [reason, setReason] = useState("");
   const [isConfirming, setIsConfirming] = useState(false);
+  const [showCorPreview, setShowCorPreview] = useState(false);
 
   const fullName = slip
     ? [
@@ -203,6 +204,21 @@ export default function SlipDetails() {
               <User className="h-3.5 w-3.5" />
               Access Record
             </Button>
+            {slip.studentCorUrl && (
+              <Button
+                variant="outline"
+                size="sm"
+                className={cn(
+                  "group/btn w-full gap-2 rounded-xl border-primary/20",
+                  "bg-primary/5 font-bold text-primary shadow-sm transition-all",
+                  "duration-300 hover:bg-primary hover:text-white",
+                )}
+                onClick={() => setShowCorPreview(true)}
+              >
+                <FileText className="h-3.5 w-3.5" />
+                View Verified Student COR
+              </Button>
+            )}
           </CardContent>
         </Card>
 
@@ -668,6 +684,14 @@ export default function SlipDetails() {
           </div>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* COR Preview Modal */}
+      <CORPreviewDialog
+        isOpen={showCorPreview}
+        onClose={() => setShowCorPreview(false)}
+        fileUrl={slip.studentCorUrl}
+        studentName={fullName}
+      />
     </div>
   );
 }
