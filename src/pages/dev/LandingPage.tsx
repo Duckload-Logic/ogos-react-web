@@ -34,7 +34,10 @@ const LandingPage: React.FC = () => {
             </span>
           </div>
           <div className="flex items-center gap-4">
-            <ThemeToggle darkMode={darkMode} setDarkMode={setDarkMode} />
+            <ThemeToggle
+              darkMode={darkMode}
+              setDarkMode={setDarkMode}
+            />
             <div className="hidden h-4 w-px bg-border sm:block" />
             <button
               onClick={() => navigate("/login")}
@@ -70,7 +73,7 @@ const LandingPage: React.FC = () => {
                 API v1.0 Production Ready
               </div>
               <h1 className="text-5xl font-bold leading-[1.1] tracking-tight md:text-7xl">
-                PUPT OGOS <br />
+                GuiSIS <br />
                 <span className="text-gradient decoration-primary/10 decoration-4 underline-offset-4">
                   Developer Service
                 </span>

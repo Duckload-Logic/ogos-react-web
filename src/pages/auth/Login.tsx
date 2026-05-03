@@ -111,7 +111,7 @@ export default function Login() {
           </div>
 
           <AuthHeader
-            title="PUPT OGOS"
+            title="Guidance Services Information System"
             subtitle={cn(
               "Secure access to guidance services,",
               "student support, and account tools.",

@@ -56,7 +56,7 @@ export default function AuthHeader({ title, subtitle }: AuthHeaderProps) {
             "shadow-sm backdrop-blur",
           )}
         >
-          Guidance Portal
+          User Portal
         </div>
 
         <h1 className="max-w-sm text-4xl font-bold tracking-tight text-foreground">

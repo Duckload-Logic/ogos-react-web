@@ -55,7 +55,9 @@ export default function Header({
           <p className="font-semibold">
             Polytechnic University of the Philippines – Taguig
           </p>
-          <p className="text-foreground/50">Online Guidance Office Services</p>
+          <p className="text-foreground/50">
+            Guidance Services Information System
+          </p>
         </div>
       </div>
 
