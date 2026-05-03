@@ -123,8 +123,9 @@ export function SectionProgress({
             >
               {sections.map((section) => {
                 const active = currentSection === section.id;
-                const finished = isSectionFinished(section.id);
+                const isCompleted = isSectionFinished(section.id);
                 const navigable = isNavigable(section.id);
+                const finished = isCompleted && (navigable || active);
                 return (
                   <button
                     key={section.id}
@@ -188,9 +189,10 @@ export function SectionProgress({
             <nav className="flex flex-col gap-1">
               {sections.map((section, index) => {
                 const active = currentSection === section.id;
-                const finished = isSectionFinished(section.id);
-                const hasError = sectionsWithErrors.includes(section.id);
+                const isCompleted = isSectionFinished(section.id);
                 const navigable = isNavigable(section.id);
+                const finished = isCompleted && (navigable || active);
+                const hasError = sectionsWithErrors.includes(section.id);
                 const isShaking = shakingSection === section.id;
                 const sectionTitle =
                   section.title.split(". ")[1] || section.title;
