@@ -132,7 +132,7 @@ export default function Dashboard() {
   usePageMetadata({
     title: "Guidance Dashboard",
     description:
-      "PUP-T Online Guidance Office Services — Supporting student success",
+      "Polytechnic University of the Philippines – Guidance Services Information System",
     badgeText: "Admin Overview",
     badgeIcon: <Sparkles className="h-3.5 w-3.5" />,
     showDate: true,

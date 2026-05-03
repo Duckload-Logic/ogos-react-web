@@ -79,7 +79,7 @@ export default function Callback() {
 
           // Exchange code for tokens (OAuth only)
           await PostIDPTokenExchange({ code });
-          
+
           // Set session flag to enable auth queries
           localStorage.setItem("session_active", "true");
 
@@ -89,7 +89,8 @@ export default function Callback() {
           user = await GetCurrentUser();
 
           roleKey =
-            user.roles?.[0]?.name?.toLowerCase().replace(/\s+/g, "") || "student";
+            user.roles?.[0]?.name?.toLowerCase().replace(/\s+/g, "") ||
+            "student";
         } else {
           // Synchronize AuthContext state (Native already refetched in Login.tsx
           // but we call it anyway for robustness)
@@ -101,7 +102,8 @@ export default function Callback() {
             throw new Error("User has no roles assigned");
           }
           roleKey =
-            user.roles?.[0]?.name?.toLowerCase().replace(/\s+/g, "") || "student";
+            user.roles?.[0]?.name?.toLowerCase().replace(/\s+/g, "") ||
+            "student";
         }
 
         // If multi-role, go to selection gateway
@@ -257,7 +259,7 @@ export default function Callback() {
               "tracking-[0.2em] text-muted-foreground/40",
             )}
           >
-            PUPT OGOS • Secure Gateway
+            GuiSIS • Secure Gateway
           </p>
         </div>
       </div>

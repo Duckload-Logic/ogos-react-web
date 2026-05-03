@@ -103,7 +103,7 @@ export default function Register() {
           </div>
 
           <AuthHeader
-            title="PUPT OGOS"
+            title="GuiSIS"
             subtitle="Create your account and get started with a cleaner, more focused onboarding flow."
           />
 
