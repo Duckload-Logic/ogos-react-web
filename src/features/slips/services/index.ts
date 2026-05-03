@@ -96,7 +96,7 @@ export async function GetMySlips(
   } catch (error: any) {
     const handlerName = config?.handlerName || "GetMySlips";
 
-    if (error.response?.status === 403) {
+    if (error.response?.status === 403 && error.response.data?.error?.includes("IIR")) {
       const stepName = config?.stepName || "Check IIR Profile";
       console.error(
         `[${handlerName}] {${stepName}}: ${error.response.data?.error}`,

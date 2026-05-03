@@ -245,7 +245,7 @@ export async function PostAppointment(
     const handlerName = config?.handlerName || "PostAppointment";
 
     // Handle Day One student (403 Forbidden)
-    if (error.response?.status === 403 && error.response.data?.error?.includes("IIR record")) {
+    if (error.response?.status === 403 && error.response.data?.error?.includes("IIR")) {
       const stepName = config?.stepName || "Check IIR Profile";
       console.error(
         `[${handlerName}] {${stepName}}: ` + `${error.response.data?.error}`,
