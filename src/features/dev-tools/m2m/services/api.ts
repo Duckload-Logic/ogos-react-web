@@ -1,7 +1,10 @@
 import { apiClient } from "@/lib/api";
 
 export const m2mService = {
-  getClients: () => apiClient.get('/m2m-clients'),
+  getClients: async () => {
+    const resp = await apiClient.get('/m2m-clients/me');
+    return { ...resp, data: resp.data ? [resp.data] : [] };
+  },
   createClient: (data: { clientName: string; clientDescription: string }) => 
     apiClient.post('/m2m-clients', data),
   deleteClient: (id: string) => apiClient.delete(`/m2m-clients/${id}`),
