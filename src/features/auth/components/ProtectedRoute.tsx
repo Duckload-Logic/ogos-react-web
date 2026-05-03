@@ -50,13 +50,11 @@ export const ProtectedRoute = ({
       />
     );
   }
-
-  console.log("Current User Role:", user.role); 
-
   /**
    * Check role-based access if required
    */
-  const userRoles = user.roles?.map(r => r.name.toLowerCase().replace(/\s+/g, "")) || [];
+  const userRoles =
+    user.roles?.map((r) => r.name.toLowerCase().replace(/\s+/g, "")) || [];
   const normRequiredRole = requiredRole?.toLowerCase().replace(/\s+/g, "");
 
   if (
