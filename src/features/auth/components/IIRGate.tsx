@@ -31,10 +31,9 @@ export const IIRGate = ({
     isFetching: isIIRFetching,
   } = useIIRStatus();
 
-  // Non-students (Admin, SuperAdmin, Dev) bypass the gate
-  const roles = user?.roles?.map(r => r.name.toLowerCase()) || [];
-  const isStudent = roles.includes("student") && 
-    !roles.some(r => ["admin", "superadmin", "developer", "counselor"].includes(r));
+  // Multi-role users with 'student' role must still pass the gate
+  const roles = user?.roles?.map((r) => r.name.toLowerCase()) || [];
+  const isStudent = roles.includes("student");
 
   // While auth or IIR status is being determined, show loading
   // For students, we MUST wait for the IIR check to complete
