@@ -4,6 +4,19 @@ import { API_ROUTES } from "@/config/apiRoutes";
 import { PostSlip, PatchSlip, PatchSlipStatus } from "../services";
 import type { CreateSlipRequest } from "../types";
 import { QUERY_KEYS } from "@/config/queryKeys";
+import { validateCorFile } from "@/utils/corValidation";
+
+const validateCorFiles = async (files: File[] = []) => {
+  for (const file of files) {
+    const validation = await validateCorFile(file, {
+      maxSizeBytes: 5 * 1024 * 1024,
+    });
+
+    if (!validation.isValid) {
+      throw new Error(validation.error || "Invalid COR file.");
+    }
+  }
+};
 
 /**
  * Hook to submit a new admission slip
@@ -19,6 +32,8 @@ export function useSubmitSlip() {
       formData.append("dateOfAbsence", data.dateOfAbsence);
       formData.append("dateNeeded", data.dateNeeded);
       formData.append("categoryId", String(data.categoryId));
+
+      await validateCorFiles(data.files?.cor);
 
       data.files?.cor?.forEach((file) => {
         formData.append("cor", file);
@@ -78,6 +93,8 @@ export function useUpdateSlip() {
       formData.append("dateOfAbsence", data.dateOfAbsence);
       formData.append("dateNeeded", data.dateNeeded);
       formData.append("categoryId", String(data.categoryId));
+
+      await validateCorFiles(data.files?.cor);
 
       data.files?.cor?.forEach((file) => {
         formData.append("cor", file);
@@ -151,3 +168,4 @@ export function useUpdateSlipStatus() {
     },
   });
 }
+

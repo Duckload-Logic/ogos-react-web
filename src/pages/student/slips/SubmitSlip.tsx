@@ -35,6 +35,7 @@ import { usePageMetadata } from "@/context";
 import FormInput from "@/components/form/FormInput";
 import { useToast } from "@/context";
 import { cn } from "@/lib/utils";
+import { validateCorFile } from "@/utils/corValidation";
 
 interface SubmitSlipFormState {
   dateOfAbsence: string;
@@ -161,7 +162,7 @@ export default function SubmitSlip() {
     }));
   };
 
-  const handleFileAdd = (
+  const handleFileAdd = async (
     documentType: "cor" | "excuseLetter" | "parentId" | "medicalCert",
     files: FileList | null,
   ) => {
@@ -169,20 +170,38 @@ export default function SubmitSlip() {
 
     const MAX_SIZE = 5 * 1024 * 1024; // 5MB
     const ALLOWED_TYPES = ["application/pdf", "image/jpeg", "image/png"];
+    const ALLOWED_EXTENSIONS = ["pdf", "jpg", "jpeg", "png"];
     const allFiles = Array.from(files);
+    const validFiles: File[] = [];
 
-    const validFiles = allFiles.filter((file) => {
+    for (const file of allFiles) {
+      if (documentType === "cor") {
+        const validation = await validateCorFile(file, {
+          maxSizeBytes: MAX_SIZE,
+        });
+
+        if (!validation.isValid) {
+          triggerToast(validation.error || `File "${file.name}" is not a valid COR.`);
+          continue;
+        }
+
+        validFiles.push(file);
+        continue;
+      }
+
+      const extension = file.name.split(".").pop()?.toLowerCase() || "";
       const isValidSize = file.size <= MAX_SIZE;
-      const isValidType = ALLOWED_TYPES.includes(file.type);
+      const isValidType =
+        ALLOWED_TYPES.includes(file.type) || ALLOWED_EXTENSIONS.includes(extension);
 
       if (!isValidSize) {
         triggerToast(`File "${file.name}" exceeds the 5MB limit.`);
       } else if (!isValidType) {
         triggerToast(`File "${file.name}" has an unsupported format.`);
+      } else {
+        validFiles.push(file);
       }
-
-      return isValidSize && isValidType;
-    });
+    }
 
     if (validFiles.length === 0) return;
 
@@ -235,7 +254,7 @@ export default function SubmitSlip() {
             navigate(`/student/slips/${id}`);
           },
           onError: (error: any) => {
-            triggerToast("Failed to update slip");
+            triggerToast(error.message || "Failed to update slip");
           },
         },
       );
@@ -526,7 +545,7 @@ export default function SubmitSlip() {
                       <div className="flex items-start gap-2.5">
                         <AlertCircle className="mt-0.5 h-4 w-4 shrink-0 text-amber-600 dark:text-amber-400" />
                         <p className="text-xs text-amber-700 dark:text-amber-200">
-                          Accepted: PDF, JPG, PNG (Max 5MB per file)
+                          Accepted: PDF, JPG, PNG (Max 5MB per file). COR files must include COR, Certificate of Registration, or Registration in the filename or PDF metadata.
                         </p>
                       </div>
                     </CardContent>
@@ -567,7 +586,7 @@ export default function SubmitSlip() {
                                 </div>
                                 <p className="mt-0.5 text-xs text-muted-foreground">
                                   Upload your current COR as a separate
-                                  requirement
+                                  requirement. The file must pass COR verification.
                                 </p>
                               </div>
                             </div>
@@ -600,7 +619,7 @@ export default function SubmitSlip() {
                                       Click to upload or drag and drop
                                     </p>
                                     <p className="mt-1 text-xs text-muted-foreground">
-                                      PDF, JPG, PNG up to 5MB
+                                      PDF, JPG, PNG up to 5MB. Filename should include COR or Certificate of Registration.
                                     </p>
                                   </div>
                                 </div>
@@ -708,7 +727,7 @@ export default function SubmitSlip() {
                                       Click to upload or drag and drop
                                     </p>
                                     <p className="mt-1 text-xs text-muted-foreground">
-                                      PDF, JPG, PNG up to 5MB
+                                      PDF, JPG, PNG up to 5MB. Filename should include COR or Certificate of Registration.
                                     </p>
                                   </div>
                                 </div>
@@ -818,7 +837,7 @@ export default function SubmitSlip() {
                                       Click to upload or drag and drop
                                     </p>
                                     <p className="mt-1 text-xs text-muted-foreground">
-                                      PDF, JPG, PNG up to 5MB
+                                      PDF, JPG, PNG up to 5MB. Filename should include COR or Certificate of Registration.
                                     </p>
                                   </div>
                                 </div>
@@ -929,7 +948,7 @@ export default function SubmitSlip() {
                                         Click to upload or drag and drop
                                       </p>
                                       <p className="mt-1 text-xs text-muted-foreground">
-                                        PDF, JPG, PNG up to 5MB
+                                        PDF, JPG, PNG up to 5MB. Filename should include COR or Certificate of Registration.
                                       </p>
                                     </div>
                                   </div>
@@ -1073,8 +1092,8 @@ export default function SubmitSlip() {
                           Certificate of Registration (COR)
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          required as a separate field for admission slip
-                          requests
+                          required as a separate field and verified before
+                          admission slip submission
                         </p>
                       </div>
                     </li>
@@ -1166,3 +1185,4 @@ export default function SubmitSlip() {
     </>
   );
 }
+
