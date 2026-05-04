@@ -23,6 +23,7 @@ import {
 } from "lucide-react";
 import { UploadCOR } from "@/features/student-core/services/corService";
 import { cn } from "@/lib/utils";
+import { validateCorFile } from "@/utils/corValidation";
 import { motion, AnimatePresence } from "framer-motion";
 
 export default function CORManagement() {
@@ -49,27 +50,42 @@ export default function CORManagement() {
     }
   }, []);
 
-  const handleDrop = useCallback(
-    (e: React.DragEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      setDragActive(false);
-      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-        const file = e.dataTransfer.files[0];
-        if (file.type === "application/pdf" || file.type.startsWith("image/")) {
-          setSelectedFile(file);
-        } else {
-          triggerToast("Only PDF and image files are allowed.");
-        }
+  const validateAndSelectCorFile = useCallback(
+    async (file: File) => {
+      const validation = await validateCorFile(file);
+
+      if (!validation.isValid) {
+        triggerToast(validation.error || "Please upload a valid COR file.");
+        return false;
       }
+
+      setSelectedFile(file);
+      triggerToast("COR file verified. You may now confirm the upload.");
+      return true;
     },
     [triggerToast],
   );
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleDrop = useCallback(
+    async (e: React.DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setDragActive(false);
+
+      if (e.dataTransfer.files && e.dataTransfer.files[0]) {
+        await validateAndSelectCorFile(e.dataTransfer.files[0]);
+      }
+    },
+    [validateAndSelectCorFile],
+  );
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setSelectedFile(file);
+      const isValid = await validateAndSelectCorFile(e.target.files[0]);
+
+      if (!isValid) {
+        e.target.value = "";
+      }
     }
   };
 
@@ -78,12 +94,19 @@ export default function CORManagement() {
 
     setIsUploading(true);
     try {
+      const validation = await validateCorFile(selectedFile);
+
+      if (!validation.isValid) {
+        triggerToast(validation.error || "Please upload a valid COR file.");
+        return;
+      }
+
       await UploadCOR(selectedFile);
       await refresh();
       setSelectedFile(null);
       triggerToast("COR uploaded successfully! OCR processing started.");
     } catch (error: any) {
-      triggerToast("Failed to upload COR.");
+      triggerToast(error.message || "Failed to upload COR.");
     } finally {
       setIsUploading(false);
     }
@@ -214,7 +237,7 @@ export default function CORManagement() {
                   type="file"
                   className="hidden"
                   onChange={handleFileChange}
-                  accept="application/pdf,image/*"
+                  accept=".pdf,.png,.jpg,.jpeg,application/pdf,image/png,image/jpeg"
                 />
 
                 <AnimatePresence mode="wait">
@@ -249,7 +272,7 @@ export default function CORManagement() {
                       <div className="space-y-1">
                         <p className="font-bold">Click or drag file here</p>
                         <p className="text-xs text-muted-foreground">
-                          PDF, JPG, or PNG (Max 10MB)
+                          PDF, JPG, or PNG (Max 10MB). Filename should include COR or Certificate of Registration.
                         </p>
                       </div>
                     </motion.div>
@@ -316,6 +339,13 @@ export default function CORManagement() {
                 <li className="flex items-start gap-3">
                   <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                   <span>
+                    Uploads are verified by extension, file signature, and COR
+                    keywords in the filename or PDF metadata.
+                  </span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <span>
                     For PDF files, please ensure they are not password
                     protected.
                   </span>
@@ -328,3 +358,4 @@ export default function CORManagement() {
     </div>
   );
 }
+

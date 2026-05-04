@@ -1,4 +1,5 @@
 import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
+import { validateCorFile } from "@/utils/corValidation";
 import { API_ROUTES } from "@/config/apiRoutes";
 import { QueryParam, IIRForm } from "../types";
 import { decamelizeKeys } from "humps";
@@ -410,6 +411,12 @@ export const UploadIIRCor = async (
   config?: AxiosConfigWithMeta,
 ): Promise<void> => {
   try {
+    const validation = await validateCorFile(file);
+
+    if (!validation.isValid) {
+      throw new Error(validation.error || "Invalid COR file.");
+    }
+
     const formData = new FormData();
     formData.append("cor", file);
 
@@ -534,3 +541,4 @@ export const iirService = {
     await apiClient.patch(API_ROUTES.iir.bulkStatus, payload);
   },
 };
+
