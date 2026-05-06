@@ -1,4 +1,5 @@
 import { AuthContext } from "@/context/AuthContext";
+import { UI_STORAGE_KEYS } from "@/utils/uiPreferences";
 import React, {
   createContext,
   useContext,
@@ -49,16 +50,7 @@ interface UIContextType {
 
 export const UIContext = createContext<UIContextType | undefined>(undefined);
 
-const STORAGE_KEYS = {
-  SIDEBAR_EXPANDED: "sidebar_expanded",
-  DARK_MODE: "theme",
-  GRAYSCALE: "grayscale",
-  DYSLEXIA: "dyslexia",
-  FONT_SCALE: "fontScale",
-  SPEECH_RATE: "speech_rate",
-  SPEECH_VOICE: "speech_voice",
-  PERFORMANCE: "performance_mode",
-};
+const STORAGE_KEYS = UI_STORAGE_KEYS;
 
 export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   children,

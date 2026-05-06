@@ -9,6 +9,7 @@ import React, { createContext, useContext, useEffect, useState } from "react";
 import { useMe } from "@/features/users/hooks/useMe";
 import { useLogout as useLogoutMutation } from "@/features/auth/hooks";
 import { User, UserRole } from "@/features/users/types/user";
+import { resetSessionUIPreferences } from "@/utils/uiPreferences";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -134,7 +135,8 @@ export const AuthProvider: React.FC<{
   }, [isError]);
 
   const logout = () => {
-    logoutMutation();
+  resetSessionUIPreferences();
+  logoutMutation();
   };
 
   /**
