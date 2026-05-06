@@ -35,6 +35,9 @@ export default function CORManagement() {
 
   usePageMetadata({
     title: "COR Management",
+    showSubHeader: true,
+    description:
+      "Manage your current academic credentials and verification documents.",
     isLoading: false,
     badgeText: "Verified Student",
     badgeIcon: <ShieldCheck size={16} />,
@@ -117,16 +120,6 @@ export default function CORManagement() {
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 mx-auto w-full max-w-[1400px] space-y-8 pb-12 duration-700">
-      {/* Header Section */}
-      <div className="flex flex-col gap-2">
-        <h1 className="bg-gradient-to-r from-foreground to-foreground/60 bg-clip-text text-4xl font-black tracking-tight text-transparent">
-          Certificate of Registration
-        </h1>
-        <p className="font-medium text-muted-foreground">
-          Manage your current academic credentials and verification documents.
-        </p>
-      </div>
-
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Left: Preview Section */}
         <div className="space-y-6 lg:col-span-2">
@@ -272,7 +265,8 @@ export default function CORManagement() {
                       <div className="space-y-1">
                         <p className="font-bold">Click or drag file here</p>
                         <p className="text-xs text-muted-foreground">
-                          PDF, JPG, or PNG (Max 10MB). Filename should include COR or Certificate of Registration.
+                          PDF, JPG, or PNG (Max 10MB). Filename should include
+                          COR or Certificate of Registration.
                         </p>
                       </div>
                     </motion.div>
@@ -358,4 +352,3 @@ export default function CORManagement() {
     </div>
   );
 }
-
