@@ -81,6 +81,7 @@ export const FAMILY_SUBSTEP_FIELDS: Record<number, string[]> = {
     "family.relatedPersons.1.occupation",
   ],
   4: [
+    "family.relatedPersons.2.relationship",
     "family.relatedPersons.2.isLiving",
     "family.relatedPersons.2.firstName",
     "family.relatedPersons.2.middleName",

@@ -23,6 +23,7 @@ import {
   useParentalStatusTypes,
   useSiblingSupportTypes,
   useStudentSupportTypes,
+  useStudentRelationshipTypes,
 } from "../../hooks";
 import { cn } from "@/lib/utils";
 import { FAMILY_SUBSTEP_FIELDS } from "@/features/iir/config/subStepFields";
@@ -282,6 +283,7 @@ export const FamilySection = forwardRef<
   const { data: monthlyFamilyIncomeRanges } = useIncomeRanges();
   const { data: siblingSupportTypesOptions } = useSiblingSupportTypes();
   const { data: studentSupportTypesOptions } = useStudentSupportTypes();
+  const { data: relationshipOptions } = useStudentRelationshipTypes();
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [otherTouched, setOtherTouched] = useState(false);
@@ -619,6 +621,32 @@ export const FamilySection = forwardRef<
             icon={User}
           >
             <div className="flex flex-col gap-8">
+              <div className="max-w-xs">
+                <Dropdown
+                  name={`family.relatedPersons.${GUARDIAN_IDX}.relationship`}
+                  label="Relationship to Student"
+                  options={relationshipOptions || []}
+                  required
+                  value={
+                    family?.relatedPersons?.[GUARDIAN_IDX]?.relationship?.id ||
+                    ""
+                  }
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${GUARDIAN_IDX}.relationship`,
+                      { id: Number(val) },
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(
+                      `family.relatedPersons.${GUARDIAN_IDX}.relationship`,
+                    )
+                  }
+                  error={getFieldError(
+                    `family.relatedPersons.${GUARDIAN_IDX}.relationship`,
+                  )}
+                />
+              </div>
               <div className="grid grid-cols-1 gap-5 sm:gap-8 md:grid-cols-3">
                 <FormInput
                   name={`family.relatedPersons.${GUARDIAN_IDX}.firstName`}

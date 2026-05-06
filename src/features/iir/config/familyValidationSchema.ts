@@ -200,4 +200,15 @@ RELATIONS.forEach(({ prefix, label }, idx) => {
       commonRules.required(`${label} status (Living/Deceased)`),
     ];
   }
+
+  familyValidationSchema[`${prefix}.relationship`] = [
+    {
+      type: "required",
+      validate: (value: any) => {
+        const id = value?.id || value;
+        return !!id && Number(id) > 0;
+      },
+      message: `${label} relationship is required`,
+    },
+  ];
 });
