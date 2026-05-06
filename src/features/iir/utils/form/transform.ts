@@ -215,7 +215,7 @@ export function transformFormToPayload(formData: IIRForm): any {
                 : { id: index + 1 },
             isParent: index < 2 ? true : person.isParent,
             isGuardian: index === 2 ? true : person.isGuardian,
-            isLiving: person.isLiving,
+            isLiving: index === 2 ? true : person.isLiving,
           };
         },
       ),

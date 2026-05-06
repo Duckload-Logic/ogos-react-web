@@ -130,108 +130,74 @@ const RELATIONS = [
 ];
 
 RELATIONS.forEach(({ prefix, label }, idx) => {
-  const isRequired = label !== "Guardian";
-
-  if (isRequired) {
-    familyValidationSchema[`${prefix}.firstName`] = [
-      commonRules.required(`${label} first name`),
-      commonRules.minLength(2),
-      commonRules.nameFormat(),
-      commonRules.noSpecialChars(`${label} first name`),
-    ];
-    familyValidationSchema[`${prefix}.lastName`] = [
-      commonRules.required(`${label} last name`),
-      commonRules.minLength(2),
-      commonRules.nameFormat(),
-      commonRules.noSpecialChars(`${label} last name`),
-    ];
-    familyValidationSchema[`${prefix}.middleName`] = [
-      commonRules.nameFormat(),
-      commonRules.noSpecialChars(`${label} middle name`),
-    ];
-    familyValidationSchema[`${prefix}.dateOfBirth`] = [
-      {
-        type: "required",
-        validate: (value: any, rootData: any) => {
-          const person = rootData?.family?.relatedPersons?.[idx];
-          if (person?.isLiving !== false) {
-            return !!value && String(value).trim().length > 0;
-          }
-          return true;
-        },
-        message: `${label} date of birth is required`,
+  familyValidationSchema[`${prefix}.firstName`] = [
+    commonRules.required(`${label} first name`),
+    commonRules.minLength(2),
+    commonRules.nameFormat(),
+    commonRules.noSpecialChars(`${label} first name`),
+  ];
+  familyValidationSchema[`${prefix}.lastName`] = [
+    commonRules.required(`${label} last name`),
+    commonRules.minLength(2),
+    commonRules.nameFormat(),
+    commonRules.noSpecialChars(`${label} last name`),
+  ];
+  familyValidationSchema[`${prefix}.middleName`] = [
+    commonRules.nameFormat(),
+    commonRules.noSpecialChars(`${label} middle name`),
+  ];
+  familyValidationSchema[`${prefix}.dateOfBirth`] = [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        const person = rootData?.family?.relatedPersons?.[idx];
+        // For Father (idx 0) and Guardian (idx 2), it's always required. For Mother, depends on isLiving.
+        if (idx === 0 || idx === 2 || person?.isLiving !== false) {
+          return !!value && String(value).trim().length > 0;
+        }
+        return true;
       },
-    ];
-    familyValidationSchema[`${prefix}.educationalLevel`] = [
-      {
-        type: "required",
-        validate: (value: any, rootData: any) => {
-          const person = rootData?.family?.relatedPersons?.[idx];
-          if (person?.isLiving !== false) {
-            return !!value && String(value).trim().length > 0;
-          }
-          return true;
-        },
-        message: `${label} educational attainment is required`,
+      message: `${label} date of birth is required`,
+    },
+    commonRules.validDate(),
+  ];
+  familyValidationSchema[`${prefix}.educationalLevel`] = [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        const person = rootData?.family?.relatedPersons?.[idx];
+        if (idx === 0 || idx === 2 || person?.isLiving !== false) {
+          return !!value && String(value).trim().length > 0;
+        }
+        return true;
       },
-      commonRules.noSpecialChars(`${label} educational attainment`),
-    ];
-    familyValidationSchema[`${prefix}.occupation`] = [
-      {
-        type: "required",
-        validate: (value: any, rootData: any) => {
-          const person = rootData?.family?.relatedPersons?.[idx];
-          if (person?.isLiving !== false) {
-            return !!value && String(value).trim().length > 0;
-          }
-          return true;
-        },
-        message: `${label} occupation is required`,
+      message: `${label} educational attainment is required`,
+    },
+    commonRules.noSpecialChars(`${label} educational attainment`),
+  ];
+  familyValidationSchema[`${prefix}.occupation`] = [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        const person = rootData?.family?.relatedPersons?.[idx];
+        if (idx === 0 || idx === 2 || person?.isLiving !== false) {
+          return !!value && String(value).trim().length > 0;
+        }
+        return true;
       },
-      commonRules.noSpecialChars(`${label} occupation`),
-    ];
-    familyValidationSchema[`${prefix}.employerName`] = [
-      commonRules.noSpecialChars(`${label} employer name`),
-    ];
-    familyValidationSchema[`${prefix}.employerAddress`] = [
-      commonRules.noSpecialChars(`${label} employer address`),
-    ];
+      message: `${label} occupation is required`,
+    },
+    commonRules.noSpecialChars(`${label} occupation`),
+  ];
+  familyValidationSchema[`${prefix}.employerName`] = [
+    commonRules.noSpecialChars(`${label} employer name`),
+  ];
+  familyValidationSchema[`${prefix}.employerAddress`] = [
+    commonRules.noSpecialChars(`${label} employer address`),
+  ];
+  if (idx !== 2) {
     familyValidationSchema[`${prefix}.isLiving`] = [
       commonRules.required(`${label} status (Living/Deceased)`),
     ];
-  } else {
-    const guardianFields = [
-      "firstName",
-      "middleName",
-      "lastName",
-      "occupation",
-      "educationalLevel",
-      "employerName",
-      "employerAddress",
-    ];
-    guardianFields.forEach((field) => {
-      familyValidationSchema[`${prefix}.${field}`] = [
-        {
-          type: "required",
-          validate: (value: any, rootData: any) => {
-            const guardian = rootData?.family?.relatedPersons?.[2];
-            const isAnyFilled =
-              guardian &&
-              (guardian.firstName || guardian.lastName || guardian.occupation);
-            if (
-              isAnyFilled &&
-              (field === "firstName" ||
-                field === "lastName" ||
-                field === "occupation")
-            ) {
-              return !!value && String(value).trim().length > 0;
-            }
-            return true;
-          },
-          message: `${label} ${field} is required if guardian info is being provided`,
-        },
-        commonRules.noSpecialChars(`${label} ${field}`),
-      ];
-    });
   }
 });

@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { 
-  ShieldAlert, 
-  Plus, 
-  Trash2, 
-  Mail, 
-  ShieldCheck, 
+import {
+  ShieldAlert,
+  Plus,
+  Trash2,
+  Mail,
+  ShieldCheck,
   Sparkles,
-  Info
+  Info,
 } from "lucide-react";
 import { usePageMetadata } from "@/context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -33,10 +33,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-import { 
-  useWhitelist, 
-  useAddWhitelist, 
-  useRemoveWhitelist 
+import {
+  useWhitelist,
+  useAddWhitelist,
+  useRemoveWhitelist,
 } from "../hooks/useWhitelist";
 
 export interface WhitelistEntry {
@@ -59,10 +59,10 @@ export default function AdminWhitelist() {
 
   const handleAdd = async () => {
     if (!newEmail.trim()) return;
-    
-    await addMutation.mutateAsync({ 
-      email: newEmail, 
-      roleId: Number(selectedRoleId) 
+
+    await addMutation.mutateAsync({
+      email: newEmail,
+      roleId: Number(selectedRoleId),
     });
 
     setIsAddOpen(false);
@@ -72,13 +72,16 @@ export default function AdminWhitelist() {
 
   const handleRevoke = async () => {
     if (!revokeTarget) return;
-    console.log("Revoking:", revokeTarget.email);
     setRevokeTarget(null);
   };
 
   const formatDate = (dateStr: string) => {
     return new Date(dateStr).toLocaleDateString("en-US", {
-      month: "short", day: "numeric", year: "numeric", hour: "2-digit", minute: "2-digit",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     });
   };
 
@@ -87,9 +90,13 @@ export default function AdminWhitelist() {
     isLoading: isLoading,
     badgeText: "IDP Intercept Control",
     badgeIcon: <Sparkles className="h-3.5 w-3.5" />,
-    description: "Manage pre-approved administrative access for IDP (Google) logins.",
+    description:
+      "Manage pre-approved administrative access for IDP (Google) logins.",
     headerActions: (
-      <Button onClick={() => setIsAddOpen(true)} className="h-10 gap-2 rounded-xl px-4 shadow-sm">
+      <Button
+        onClick={() => setIsAddOpen(true)}
+        className="h-10 gap-2 rounded-xl px-4 shadow-sm"
+      >
         <Plus size={16} /> Add to Whitelist
       </Button>
     ),
@@ -97,15 +104,15 @@ export default function AdminWhitelist() {
 
   return (
     <div className="mx-auto w-full max-w-[1700px] space-y-5">
-      
       {/* Information Banner */}
       <div className="rounded-[18px] border border-blue-500/20 bg-blue-500/10 p-4 backdrop-blur-md">
         <div className="flex items-start gap-3">
           <Info className="mt-0.5 h-5 w-5 flex-shrink-0 text-blue-600 dark:text-blue-400" />
           <div>
-            <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200">How the Whitelist Works</h4>
-            <p className="mt-1 text-xs text-blue-700 dark:text-blue-300 leading-relaxed max-w-4xl">
-            </p>
+            <h4 className="text-sm font-semibold text-blue-800 dark:text-blue-200">
+              How the Whitelist Works
+            </h4>
+            <p className="mt-1 max-w-4xl text-xs leading-relaxed text-blue-700 dark:text-blue-300"></p>
           </div>
         </div>
       </div>
@@ -126,11 +133,17 @@ export default function AdminWhitelist() {
               <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
                 <Mail className="h-6 w-6 text-muted-foreground" />
               </div>
-              <p className="text-lg font-semibold text-foreground">No whitelisted accounts</p>
-              <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                Add an email address to pre-approve them for administrative access.
+              <p className="text-lg font-semibold text-foreground">
+                No whitelisted accounts
               </p>
-              <Button onClick={() => setIsAddOpen(true)} className="mt-5 h-10 rounded-xl px-4">
+              <p className="mt-2 max-w-md text-sm text-muted-foreground">
+                Add an email address to pre-approve them for administrative
+                access.
+              </p>
+              <Button
+                onClick={() => setIsAddOpen(true)}
+                className="mt-5 h-10 rounded-xl px-4"
+              >
                 <Plus className="mr-2 h-4 w-4" /> Add to Whitelist
               </Button>
             </div>
@@ -139,25 +152,39 @@ export default function AdminWhitelist() {
               <table className="w-full min-w-[800px] text-sm">
                 <thead>
                   <tr className="border-b border-white/20 bg-white/55 text-left backdrop-blur-md dark:border-white/10 dark:bg-white/[0.03]">
-                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Email Address</th>
-                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Target Role</th>
-                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Added On</th>
-                    <th className="px-5 py-4 text-right text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">Actions</th>
+                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Email Address
+                    </th>
+                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Target Role
+                    </th>
+                    <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Added On
+                    </th>
+                    <th className="px-5 py-4 text-right text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
+                      Actions
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
                   {whitelist.map((entry) => (
-                    <tr key={entry.email} className="border-b border-white/10 transition-colors duration-150 hover:bg-white/35 dark:hover:bg-white/[0.03]">
+                    <tr
+                      key={entry.email}
+                      className="border-b border-white/10 transition-colors duration-150 hover:bg-white/35 dark:hover:bg-white/[0.03]"
+                    >
                       <td className="px-5 py-4 font-medium text-foreground">
                         {entry.email}
                       </td>
                       <td className="px-5 py-4">
-                        <Badge className={
-                          entry.roleId === 1 
-                            ? "border-purple-500/20 bg-purple-500/10 text-purple-700 dark:text-purple-400" 
-                            : "border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400"
-                        }>
-                          <ShieldCheck className="w-3 h-3 mr-1" /> {entry.roleName}
+                        <Badge
+                          className={
+                            entry.roleId === 1
+                              ? "border-purple-500/20 bg-purple-500/10 text-purple-700 dark:text-purple-400"
+                              : "border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400"
+                          }
+                        >
+                          <ShieldCheck className="mr-1 h-3 w-3" />{" "}
+                          {entry.roleName}
                         </Badge>
                       </td>
                       <td className="px-5 py-4 text-xs text-muted-foreground">
@@ -165,9 +192,13 @@ export default function AdminWhitelist() {
                       </td>
                       <td className="px-5 py-4 text-right">
                         <Button
-                          variant="ghost" size="sm"
-                          onClick={(e) => { e.stopPropagation(); setRevokeTarget(entry); }}
-                          className="h-8 w-8 p-0 rounded-xl text-destructive hover:bg-destructive/10 hover:text-destructive"
+                          variant="ghost"
+                          size="sm"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setRevokeTarget(entry);
+                          }}
+                          className="h-8 w-8 rounded-xl p-0 text-destructive hover:bg-destructive/10 hover:text-destructive"
                           title="Remove from Whitelist"
                         >
                           <Trash2 size={14} />
@@ -183,12 +214,16 @@ export default function AdminWhitelist() {
       </Card>
 
       {/* Add Whitelist Modal */}
-      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
+      <Dialog
+        open={isAddOpen}
+        onOpenChange={setIsAddOpen}
+      >
         <DialogContent className="border-white/20 bg-white/80 backdrop-blur-2xl dark:border-white/10 dark:bg-neutral-900/90 sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Add to Whitelist</DialogTitle>
             <DialogDescription>
-              Grant administrative privileges to an email address upon their next IDP login.
+              Grant administrative privileges to an email address upon their
+              next IDP login.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
@@ -207,7 +242,7 @@ export default function AdminWhitelist() {
               <select
                 value={selectedRoleId}
                 onChange={(e) => setSelectedRoleId(e.target.value)}
-                className="flex h-10 w-full rounded-xl border border-white/30 bg-white/60 px-3 py-2 text-sm backdrop-blur-md outline-none focus:border-primary/50 dark:border-white/10 dark:bg-white/[0.05]"
+                className="flex h-10 w-full rounded-xl border border-white/30 bg-white/60 px-3 py-2 text-sm outline-none backdrop-blur-md focus:border-primary/50 dark:border-white/10 dark:bg-white/[0.05]"
               >
                 <option value="1">Superadmin (Role ID: 1)</option>
                 <option value="2">Admin (Role ID: 2)</option>
@@ -216,25 +251,30 @@ export default function AdminWhitelist() {
             </div>
           </div>
           <DialogFooter>
-            <Button 
-            onClick={handleAdd} 
-            disabled={!newEmail || addMutation.isPending} 
-            className="rounded-xl"
+            <Button
+              onClick={handleAdd}
+              disabled={!newEmail || addMutation.isPending}
+              className="rounded-xl"
             >
-         {addMutation.isPending ? "Adding..." : "Add to Whitelist"}
+              {addMutation.isPending ? "Adding..." : "Add to Whitelist"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
 
       {/* Revoke Confirmation */}
-      <AlertDialog open={!!revokeTarget} onOpenChange={(open) => !open && setRevokeTarget(null)}>
-        <AlertDialogContent className="border-white/20 bg-white/85 backdrop-blur-2xl dark:border-white/10 dark:bg-neutral-900/92">
+      <AlertDialog
+        open={!!revokeTarget}
+        onOpenChange={(open) => !open && setRevokeTarget(null)}
+      >
+        <AlertDialogContent className="dark:bg-neutral-900/92 border-white/20 bg-white/85 backdrop-blur-2xl dark:border-white/10">
           <AlertDialogHeader>
             <AlertDialogTitle>Remove from Whitelist</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you want to remove <strong>{revokeTarget?.email}</strong> from the whitelist? 
-              This will NOT delete their account, but if they log out and log back in, they may lose their elevated privileges.
+              Are you sure you want to remove{" "}
+              <strong>{revokeTarget?.email}</strong> from the whitelist? This
+              will NOT delete their account, but if they log out and log back
+              in, they may lose their elevated privileges.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
