@@ -25,7 +25,7 @@ export default function PersonalView({
     { label: "Gender", value: asText(personalInfo?.gender?.name) },
     { label: "Civil Status", value: asText(personalInfo?.civilStatus?.name) },
     { label: "Religion", value: asText(personalInfo?.religion?.name) },
-    { label: "Height (ft)", value: asText(personalInfo?.heightFt) },
+    { label: "Height (m)", value: asText(personalInfo?.heightM) },
     { label: "Weight (kg)", value: asText(personalInfo?.weightKg) },
     { label: "Complexion", value: asText(personalInfo?.complexion) },
     { label: "High School GWA", value: asText(personalInfo?.highSchoolGWA) },

@@ -77,6 +77,10 @@ export default function CreateAppointment() {
     isLoading: isLoading || isSubmitting,
   });
 
+  // Calculate max date (2 weeks from now)
+  const maxDate = new Date();
+  maxDate.setDate(maxDate.getDate() + 14);
+
   return (
     <>
       <div className="min-h-full bg-background">
@@ -229,6 +233,8 @@ export default function CreateAppointment() {
                   hasHeader
                   className="mx-auto max-w-md"
                   allowCurrentDate={false}
+                  allowPastDates={false}
+                  maxDate={maxDate}
                 />
               </div>
             )}

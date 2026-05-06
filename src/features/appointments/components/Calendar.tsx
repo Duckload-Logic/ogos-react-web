@@ -40,6 +40,8 @@ interface CalendarProps {
   allowCurrentDate?: boolean;
   /** Allow selecting weekends */
   allowWeekends?: boolean;
+  /** Maximum date allowed for selection */
+  maxDate?: Date;
   /** Show header with month navigation */
   hasHeader?: boolean;
   /** Additional CSS classes for the card container */
@@ -60,6 +62,7 @@ export default function Calendar({
   allowPastDates = true,
   allowCurrentDate = true,
   allowWeekends = false,
+  maxDate,
   hasHeader = false,
   className,
   isAdmin = false,
@@ -130,6 +133,7 @@ export default function Calendar({
       if (!allowWeekends && isWeekend) return true;
       if (!allowPastDates && isPast) return true;
       if (!allowCurrentDate && isToday) return true;
+      if (maxDate && date > maxDate) return true;
       return false;
     },
     [
@@ -142,6 +146,7 @@ export default function Calendar({
       allowWeekends,
       allowPastDates,
       allowCurrentDate,
+      maxDate,
     ],
   );
 

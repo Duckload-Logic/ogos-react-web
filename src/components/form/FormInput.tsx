@@ -36,6 +36,7 @@ const FormInput = forwardRef<
     info?: string;
     prefix?: string;
     noSpecialCharacters?: boolean;
+    list?: string;
   }
 >(
   (
@@ -59,6 +60,7 @@ const FormInput = forwardRef<
       info = "",
       prefix,
       noSpecialCharacters = true,
+      list,
     },
     ref,
   ) => {
@@ -194,6 +196,7 @@ const FormInput = forwardRef<
                 className={inputClasses}
                 min={min}
                 max={max}
+                list={list}
               />
             )}
 

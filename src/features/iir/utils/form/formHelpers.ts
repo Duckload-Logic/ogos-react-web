@@ -149,11 +149,27 @@ export function initializeFormData(
       addresses: baseData.student?.addresses || {},
     },
     education: baseData.education || { schools: [] },
-    family: baseData.family || {
-      background: {},
-      relatedPersons: [],
-      finance: {},
-    },
+    family: baseData.family
+      ? {
+          ...baseData.family,
+          relatedPersons: [0, 1, 2].map((idx) => {
+            const existing = baseData.family?.relatedPersons?.[idx] || {};
+            const template = emptyForm.family.relatedPersons[idx];
+
+            return {
+              ...template,
+              ...existing,
+              relationship:
+                existing.relationship?.id && existing.relationship.id > 0
+                  ? existing.relationship
+                  : template.relationship,
+              // Ensure correct flags for Father/Mother/Guardian
+              isParent: idx < 2 ? true : false,
+              isGuardian: idx === 2 ? true : false,
+            };
+          }),
+        }
+      : emptyForm.family,
     health: baseData.health || { healthRecord: {}, consultations: [] },
     interests: baseData.interests || {},
   };

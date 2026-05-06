@@ -21,6 +21,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { AnimationStyles } from "@/components/ui/animations";
 import { STATUS_COLORS } from "@/config/constants";
 import {
@@ -30,7 +32,7 @@ import {
 } from "@/features/slips/hooks";
 import { Slip, SlipStatus } from "@/features/slips/types";
 import { Pagination, Spinner } from "@/components/shared";
-import { usePageMetadata } from "@/context";
+import { useAuth, usePageMetadata } from "@/context";
 import { cn } from "@/lib/utils";
 
 interface StatusCount {
@@ -44,6 +46,7 @@ const GLASS_CARD =
   "overflow-hidden rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]";
 
 export default function StudentSlips() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { data: slipStatuses = [] } = useGetSlipStatuses();
   const filterStatuses = [
@@ -124,13 +127,27 @@ export default function StudentSlips() {
     isLoading,
     headerActions: (
       <Button
-        asChild
+        asChild={!!user?.studentCorUrl}
+        disabled={!user?.studentCorUrl}
         className="gap-2 rounded-xl shadow-lg shadow-primary/20"
+        title={!user?.studentCorUrl ? "Please upload your COR in your profile to submit a slip" : ""}
+        onClick={(e) => {
+          if (!user?.studentCorUrl) {
+            e.preventDefault();
+          }
+        }}
       >
-        <Link to="/student/slips/submit">
-          <Plus className="h-4 w-4" />
-          Submit Slip
-        </Link>
+        {user?.studentCorUrl ? (
+          <Link to="/student/slips/submit">
+            <Plus className="h-4 w-4" />
+            Submit Slip
+          </Link>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Plus className="h-4 w-4 opacity-50" />
+            Submit Slip
+          </div>
+        )}
       </Button>
     ),
   });
@@ -140,6 +157,20 @@ export default function StudentSlips() {
       <AnimationStyles />
 
       <div className="space-y-6">
+        {/* Missing COR Alert */}
+        {!user?.studentCorUrl && (
+          <Alert variant="destructive" className="animate-fade-in-up border-rose-500/50 bg-rose-500/10 text-rose-600 dark:border-rose-500/30 dark:text-rose-400">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Action Required: Missing Certificate of Registration</AlertTitle>
+            <AlertDescription>
+              You need to upload your COR before you can submit admission slips.{" "}
+              <Link to="/student/cor-management" className="font-semibold underline hover:text-rose-700 dark:hover:text-rose-300">
+                Go to COR Management
+              </Link>
+            </AlertDescription>
+          </Alert>
+        )}
+
         {/* Stats Cards */}
         <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
           {slipStatuses.map((stat: SlipStatus, index: number) => {
@@ -152,7 +183,7 @@ export default function StudentSlips() {
                 key={stat.id}
                 className={cn(
                   GLASS_CARD,
-                  "animate-fade-in-up group transition-all duration-200 hover:-translate-y-0.5"
+                  "animate-fade-in-up group transition-all duration-200 hover:-translate-y-0.5",
                 )}
                 style={{
                   animationDelay: `${0.08 * (index + 1)}s`,
@@ -163,7 +194,7 @@ export default function StudentSlips() {
                   <div
                     className={cn(
                       "pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-br opacity-90",
-                      getStatAccent(stat.colorKey)
+                      getStatAccent(stat.colorKey),
                     )}
                   />
                   <div className="relative flex items-start justify-between gap-4">
@@ -181,7 +212,7 @@ export default function StudentSlips() {
                     <div
                       className={cn(
                         "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-white/70 backdrop-blur-md transition-transform duration-200 group-hover:scale-105 dark:bg-white/[0.06]",
-                        getStatAccent(stat.colorKey).split(" ").pop()
+                        getStatAccent(stat.colorKey).split(" ").pop(),
                       )}
                     >
                       <FileUp className="h-5 w-5" />
@@ -215,7 +246,7 @@ export default function StudentSlips() {
                       "flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-xs font-medium transition-all duration-200",
                       isActive
                         ? "shadow-md shadow-primary/20"
-                        : "hover:bg-white/60 dark:hover:bg-white/[0.06]"
+                        : "hover:bg-white/60 dark:hover:bg-white/[0.06]",
                     )}
                   >
                     <span>{filter.name}</span>
@@ -224,7 +255,7 @@ export default function StudentSlips() {
                         "flex h-5 min-w-[20px] items-center justify-center px-1.5 text-[10px] font-bold",
                         isActive
                           ? "bg-primary-foreground/40 text-primary-foreground"
-                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100"
+                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100",
                       )}
                     >
                       {filter?.count}
@@ -250,12 +281,15 @@ export default function StudentSlips() {
                     key={slip.id}
                     className={cn(
                       "animate-fade-in-up p-4 transition-colors duration-200",
-                      "hover:bg-white/35 dark:hover:bg-white/[0.03] sm:p-5",
+                      "cursor-pointer hover:bg-black/5 dark:hover:bg-white/[0.03] sm:p-5",
                     )}
                     style={{
                       animationDelay: `${0.05 * (index + 1)}s`,
                       animationFillMode: "both",
                     }}
+                    onClick={() =>
+                      navigate(`/student/slips/${slip.id}`)
+                    }
                   >
                     <div className="flex items-start gap-4">
                       {/* Category Icon Card */}
@@ -301,7 +335,7 @@ export default function StudentSlips() {
                               <Badge
                                 className={cn(
                                   "text-xs hover:opacity-90",
-                                  getStatusColor(slip.status?.colorKey || "")
+                                  getStatusColor(slip.status?.colorKey || ""),
                                 )}
                               >
                                 {slip.status?.name}
@@ -312,42 +346,6 @@ export default function StudentSlips() {
                               {slip.reason}
                             </p>
                           </div>
-
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 shrink-0 rounded-xl hover:bg-white/60 dark:hover:bg-white/[0.06]"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              className={cn(
-                                "rounded-xl border-white/20 bg-white/85 backdrop-blur-xl",
-                                "dark:border-white/10 dark:bg-[#111]/80",
-                              )}
-                            >
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  navigate(`/student/slips/${slip.id}`)
-                                }
-                              >
-                                <Eye className="mr-2 h-4 w-4" />
-                                View Details
-                              </DropdownMenuItem>
-                              <DropdownMenuItem
-                                onClick={() =>
-                                  navigate(`/student/slips/${slip.id}`)
-                                }
-                              >
-                                <Download className="mr-2 h-4 w-4" />
-                                Download Attachments
-                              </DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
                         </div>
 
                         {/* Date Info */}
@@ -394,13 +392,27 @@ export default function StudentSlips() {
 
                   {String(selectedStatus?.id) === "0" && (
                     <Button
-                      asChild
+                      asChild={!!user?.studentCorUrl}
+                      disabled={!user?.studentCorUrl}
                       className="rounded-xl shadow-lg shadow-primary/20"
+                      title={!user?.studentCorUrl ? "Please upload your COR in your profile to submit a slip" : ""}
+                      onClick={(e) => {
+                        if (!user?.studentCorUrl) {
+                          e.preventDefault();
+                        }
+                      }}
                     >
-                      <Link to="/student/slips/submit">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Submit Admission Slip
-                      </Link>
+                      {user?.studentCorUrl ? (
+                        <Link to="/student/slips/submit">
+                          <Plus className="mr-2 h-4 w-4" />
+                          Submit Admission Slip
+                        </Link>
+                      ) : (
+                        <div className="flex items-center">
+                          <Plus className="mr-2 h-4 w-4 opacity-50" />
+                          Submit Admission Slip
+                        </div>
+                      )}
                     </Button>
                   )}
                 </div>

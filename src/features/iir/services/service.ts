@@ -2,97 +2,8 @@ import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
 import { API_ROUTES } from "@/config/apiRoutes";
 import { QueryParam, IIRForm } from "../types";
 import { decamelizeKeys } from "humps";
+import { transformFormToPayload } from "../utils/form/transform";
 
-const toNumber = (value: unknown): number => {
-  if (typeof value === "number") {
-    return Number.isFinite(value) ? value : 0;
-  }
-
-  if (typeof value === "string") {
-    const parsed = Number(value.trim());
-    return Number.isFinite(parsed) ? parsed : 0;
-  }
-
-  return 0;
-};
-
-const normalizeIIRPayload = (iir: IIRForm) => {
-  const activities = Array.isArray(iir.interests?.activities)
-    ? iir.interests.activities.map((activity) => ({
-        id: activity.id,
-        activityOption: activity.activityOption,
-        otherSpecification: activity.otherSpecification,
-        role: activity.role,
-        roleSpecification: activity.roleSpecification,
-      }))
-    : [];
-
-  const schools = Array.isArray(iir.education?.schools)
-    ? iir.education.schools.map((school) => ({
-        ...school,
-        yearStarted: toNumber(school.yearStarted),
-        yearCompleted: toNumber(school.yearCompleted),
-      }))
-    : [];
-
-  const addresses = Array.isArray(iir.student?.addresses)
-    ? iir.student.addresses.map((addr) => ({
-        ...addr,
-        addressType:
-          addr.addressType?.toLowerCase() === "residential"
-            ? "residential"
-            : addr.addressType,
-      }))
-    : [];
-
-  return {
-    iirId: iir.id ?? "",
-    student: {
-      basicInfo: iir.student.basicInfo,
-      personalInfo: {
-        ...iir.student.personalInfo,
-        heightFt: toNumber(iir.student.personalInfo.heightFt),
-        weightKg: toNumber(iir.student.personalInfo.weightKg),
-        highSchoolGWA: toNumber(iir.student.personalInfo.highSchoolGWA),
-        section: toNumber(iir.student.personalInfo.section),
-      },
-      addresses,
-    },
-    education: {
-      ...iir.education,
-      schools,
-    },
-    family: {
-      ...iir.family,
-      relatedPersons: Array.isArray(iir.family?.relatedPersons)
-        ? iir.family.relatedPersons
-        : [],
-      finance: {
-        ...iir.family.finance,
-        weeklyAllowance: toNumber(iir.family.finance.weeklyAllowance),
-      },
-    },
-    health: {
-      ...iir.health,
-      consultations: Array.isArray(iir.health?.consultations)
-        ? iir.health.consultations
-        : [],
-    },
-    interests: {
-      activities,
-      subjectPreferences: Array.isArray(iir.interests?.subjectPreferences)
-        ? iir.interests.subjectPreferences
-        : [],
-      hobbies: Array.isArray(iir.interests?.hobbies)
-        ? iir.interests.hobbies.map((hobby) => ({
-            ...hobby,
-            priorityRank: toNumber(hobby.priorityRank),
-          }))
-        : [],
-    },
-    // testResults: Array.isArray(iir.testResults) ? iir.testResults : []
-  };
-};
 
 /**
  * Check if student has completed onboarding
@@ -347,7 +258,7 @@ export const PostIIRDraft = async (
   config?: AxiosConfigWithMeta,
 ): Promise<void> => {
   try {
-    const payload = normalizeIIRPayload(data);
+    const payload = transformFormToPayload(data);
     await apiClient.post(DRAFT_ROUTES.saveSection, payload, config);
   } catch (error) {
     const handlerName = config?.handlerName || "PostIIRDraft";
@@ -368,7 +279,7 @@ export const PostIIRSubmit = async (
   config?: AxiosConfigWithMeta,
 ): Promise<void> => {
   try {
-    const payload = normalizeIIRPayload(iir);
+    const payload = transformFormToPayload(iir);
     await apiClient.post(POST_ROUTES.submit, payload, config);
   } catch (error) {
     const handlerName = config?.handlerName || "PostIIRSubmit";
@@ -390,7 +301,7 @@ export const PatchIIRSubmit = async (
   config?: AxiosConfigWithMeta,
 ): Promise<void> => {
   try {
-    const payload = normalizeIIRPayload({ ...iir, id: iirID });
+    const payload = transformFormToPayload({ ...iir, id: iirID });
     await apiClient.patch(POST_ROUTES.update(iirID), payload, config);
   } catch (error) {
     const handlerName = config?.handlerName || "PatchIIRSubmit";

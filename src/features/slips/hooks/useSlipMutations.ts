@@ -20,10 +20,6 @@ export function useSubmitSlip() {
       formData.append("dateNeeded", data.dateNeeded);
       formData.append("categoryId", String(data.categoryId));
 
-      data.files?.cor?.forEach((file) => {
-        formData.append("cor", file);
-      });
-
       data.files?.excuseLetter?.forEach((file) => {
         formData.append("excuseLetter", file);
       });
@@ -79,9 +75,6 @@ export function useUpdateSlip() {
       formData.append("dateNeeded", data.dateNeeded);
       formData.append("categoryId", String(data.categoryId));
 
-      data.files?.cor?.forEach((file) => {
-        formData.append("cor", file);
-      });
       data.files?.excuseLetter?.forEach((file) => {
         formData.append("excuseLetter", file);
       });

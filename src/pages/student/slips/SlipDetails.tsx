@@ -1,166 +1,31 @@
-import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   useGetSlipById,
   useGetSlipAttachments,
-  useDownloadAttachment,
-  useGetAttachmentPreview,
 } from "@/features/slips/hooks";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   Calendar,
   FileText,
-  Download,
-  ArrowLeft,
   AlertCircle,
   MessageSquare,
   FileCheck,
   Edit2,
   Clock,
-  ExternalLink,
-  Eye,
-  LoaderCircle,
 } from "lucide-react";
 import { usePageMetadata } from "@/context";
 import { AnimationStyles } from "@/components/ui/animations";
-import { useToast } from "@/context";
 import { format } from "date-fns";
-import { cn } from "@/lib/utils";
-
-function PreviewModal({
-  slipId,
-  file,
-  isOpen,
-  onOpenChange,
-  isImage,
-  isPdf,
-  onDownload,
-}: {
-  slipId: string;
-  file: any;
-  isOpen: boolean;
-  onOpenChange: (open: boolean) => void;
-  isImage: boolean;
-  isPdf: boolean;
-  onDownload: () => void;
-}) {
-  const { previewUrl, isLoading } = useGetAttachmentPreview(slipId, file?.id);
-
-  return (
-    <Dialog
-      open={isOpen}
-      onOpenChange={onOpenChange}
-    >
-      <DialogContent className="max-w-2xl border-border/40 bg-background/95 shadow-2xl backdrop-blur-xl">
-        <DialogHeader>
-          <DialogTitle className="text-lg font-semibold">
-            {file?.fileName}
-          </DialogTitle>
-          <DialogDescription className="text-xs">
-            Authorized Preview - Use download for full file
-          </DialogDescription>
-        </DialogHeader>
-
-        <div className="flex min-h-[300px] flex-col items-center justify-center py-4">
-          {isLoading ? (
-            <div className="flex flex-col items-center gap-3">
-              <LoaderCircle className="h-8 w-8 animate-spin text-primary" />
-              <p className="text-xs text-muted-foreground">
-                Fetching file secure link...
-              </p>
-            </div>
-          ) : isImage && previewUrl ? (
-            <div className="group relative">
-              <img
-                src={previewUrl}
-                alt="Preview"
-                className={cn(
-                  "max-h-[60vh] max-w-full rounded-lg border border-border/40",
-                  "object-contain shadow-md transition-transform duration-300",
-                  "group-hover:scale-[1.01]",
-                )}
-              />
-            </div>
-          ) : isPdf ? (
-            <div
-              className={cn(
-                "flex w-full flex-col items-center gap-4 rounded-2xl border",
-                "border-dashed border-border/60 bg-muted/30 p-8 text-center",
-              )}
-            >
-              <div className="rounded-full bg-red-100 p-4 dark:bg-red-900/30">
-                <FileText className="h-10 w-10 text-red-600 dark:text-red-400" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium">PDF Preview Not Available</p>
-                <p className="text-xs text-muted-foreground">
-                  Highly secure PDF files must be downloaded to be viewed
-                  correctly.
-                </p>
-              </div>
-              <Button
-                onClick={onDownload}
-                variant="secondary"
-                size="sm"
-                className="gap-2"
-              >
-                <Download className="h-4 w-4" />
-                Download PDF
-              </Button>
-            </div>
-          ) : (
-            <div
-              className={cn(
-                "flex w-full flex-col items-center gap-4 rounded-2xl border",
-                "border-dashed border-border/60 bg-muted/30 p-8 text-center",
-              )}
-            >
-              <div className="rounded-full bg-primary/10 p-4">
-                <FileText className="h-10 w-10 text-primary" />
-              </div>
-              <div className="space-y-1">
-                <p className="text-sm font-medium">Preview Unavailable</p>
-                <p className="text-xs text-muted-foreground">
-                  This file type cannot be previewed in the browser.
-                </p>
-              </div>
-              <Button
-                onClick={onDownload}
-                variant="secondary"
-                size="sm"
-                className="gap-2"
-              >
-                <Download className="h-4 w-4" />
-                Download File
-              </Button>
-            </div>
-          )}
-        </div>
-      </DialogContent>
-    </Dialog>
-  );
-}
+import { AttachmentsGrid } from "@/features/slips/components/AttachmentsGrid";
 
 export default function SlipDetails() {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { triggerToast } = useToast();
 
   const { data: slip, isLoading, isError } = useGetSlipById(id || "");
   const { data: attachments = [] } = useGetSlipAttachments(id || "");
-  const { downloadAttachment } = useDownloadAttachment();
-
-  const [previewFile, setPreviewFile] = useState<any>(null);
-  const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
   usePageMetadata({
     title: "Admission Slip Details",
@@ -171,32 +36,9 @@ export default function SlipDetails() {
     isLoading: isLoading,
   });
 
-  const handleDownload = (attachmentId: string, fileName: string) => {
-    if (!id) return;
-    downloadAttachment(id, attachmentId, fileName);
-  };
-
   const handleEdit = () => {
     if (!id) return;
     navigate(`/student/slips/edit/${id}`);
-  };
-
-  const handlePreview = (file: any) => {
-    setPreviewFile(file);
-    setIsPreviewOpen(true);
-  };
-
-  const getFileExtension = (filename: string) => {
-    return filename.split(".").pop()?.toLowerCase() || "";
-  };
-
-  const isImageFile = (filename: string) => {
-    const imageExtensions = ["jpg", "jpeg", "png", "gif", "webp"];
-    return imageExtensions.includes(getFileExtension(filename));
-  };
-
-  const isPdfFile = (filename: string) => {
-    return getFileExtension(filename) === "pdf";
   };
 
   if (isError) {
@@ -332,51 +174,10 @@ export default function SlipDetails() {
                   </div>
                 </CardHeader>
                 <CardContent className="pt-4">
-                  <div className="space-y-2">
-                    {attachments.map((file: any) => (
-                      <div
-                        key={file.id}
-                        className={cn(
-                          "flex items-center justify-between rounded-lg border",
-                          "border-border/60 bg-background/50 p-3 transition-colors",
-                          "hover:bg-muted/40",
-                        )}
-                      >
-                        <div className="flex items-center gap-3">
-                          <FileText className="h-4 w-4 text-muted-foreground" />
-                          <span className="max-w-[200px] truncate text-sm font-medium">
-                            {file.fileName}
-                          </span>
-                        </div>
-                        <div className="flex items-center gap-1">
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 w-8 p-0"
-                            onClick={() => handlePreview(file)}
-                          >
-                            <Eye className="h-3.5 w-3.5 text-muted-foreground" />
-                          </Button>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="h-8 gap-2"
-                            onClick={() =>
-                              handleDownload(file.id, file.fileName)
-                            }
-                          >
-                            <Download className="h-3.5 w-3.5" />
-                            <span className="text-xs">Download</span>
-                          </Button>
-                        </div>
-                      </div>
-                    ))}
-                    {attachments.length === 0 && (
-                      <p className="py-4 text-center text-sm italic text-muted-foreground">
-                        No attachments found.
-                      </p>
-                    )}
-                  </div>
+                  <AttachmentsGrid
+                    slipId={id || ""}
+                    files={attachments}
+                  />
                 </CardContent>
               </Card>
             </div>
@@ -463,18 +264,6 @@ export default function SlipDetails() {
           </div>
         </div>
       </div>
-
-      <PreviewModal
-        slipId={id || ""}
-        file={previewFile}
-        isOpen={isPreviewOpen}
-        onOpenChange={setIsPreviewOpen}
-        isImage={previewFile ? isImageFile(previewFile.fileName) : false}
-        isPdf={previewFile ? isPdfFile(previewFile.fileName) : false}
-        onDownload={() =>
-          previewFile && handleDownload(previewFile.id, previewFile.fileName)
-        }
-      />
     </>
   );
 }

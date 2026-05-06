@@ -21,6 +21,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AlertCircle } from "lucide-react";
 import { STATUS_COLORS } from "@/config/constants";
 import {
   Appointment,
@@ -30,15 +32,16 @@ import {
 import { useStatuses } from "@/features/appointments/hooks/useLookups";
 import type { StatusCount } from "@/features/appointments/types";
 import { useAppointmentsStats } from "@/features/appointments/hooks/useAppointments";
-import { Pagination } from "@/components/shared";
+import { Pagination, Spinner } from "@/components/shared";
 import { format12HourTime } from "@/features/appointments/utils";
-import { usePageMetadata } from "@/context";
+import { useAuth, usePageMetadata } from "@/context";
 import { cn } from "@/lib/utils";
 
 const GLASS_CARD =
   "overflow-hidden rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]";
 
 export default function StudentAppointments() {
+  const { user } = useAuth();
   const navigate = useNavigate();
   const { data: appointmentStatuses = [] } = useStatuses();
   const filterStatuses = [
@@ -62,23 +65,39 @@ export default function StudentAppointments() {
   const { data: appointmentStats, isLoading: isStatsLoading } =
     useAppointmentsStats({});
 
-  const isLoading = isAppointmentsLoading || isStatsLoading;
+  // Only pass initial structural loads to the global loader to prevent
+  // full page flashes when changing filters
+  const isGlobalLoading = isStatsLoading;
 
   usePageMetadata({
     title: "My Appointments",
     description: "View and manage your counseling appointments",
     badgeText: "Appointments",
     badgeIcon: <Calendar className="h-4 w-4" />,
-    isLoading,
+    isLoading: isGlobalLoading,
     headerActions: (
       <Button
-        asChild
+        asChild={!!user?.studentCorUrl}
+        disabled={!user?.studentCorUrl}
         className="h-10 gap-2 rounded-xl shadow-lg shadow-primary/20"
+        title={!user?.studentCorUrl ? "Please upload your COR in your profile to book an appointment" : ""}
+        onClick={(e) => {
+          if (!user?.studentCorUrl) {
+            e.preventDefault();
+          }
+        }}
       >
-        <Link to="/student/appointments/schedule">
-          <Plus className="h-4 w-4" />
-          New Appointment
-        </Link>
+        {user?.studentCorUrl ? (
+          <Link to="/student/appointments/schedule">
+            <Plus className="h-4 w-4" />
+            New Appointment
+          </Link>
+        ) : (
+          <div className="flex items-center gap-2">
+            <Plus className="h-4 w-4 opacity-50" />
+            New Appointment
+          </div>
+        )}
       </Button>
     ),
   });
@@ -124,6 +143,20 @@ export default function StudentAppointments() {
 
   return (
     <div className="space-y-6">
+      {/* Missing COR Alert */}
+      {!user?.studentCorUrl && (
+        <Alert variant="destructive" className="animate-fade-in-up border-rose-500/50 bg-rose-500/10 text-rose-600 dark:border-rose-500/30 dark:text-rose-400">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Action Required: Missing Certificate of Registration</AlertTitle>
+          <AlertDescription>
+            You need to upload your COR before you can book appointments.{" "}
+            <Link to="/student/cor-management" className="font-semibold underline hover:text-rose-700 dark:hover:text-rose-300">
+              Go to COR Management
+            </Link>
+          </AlertDescription>
+        </Alert>
+      )}
+
       {/* Stats Cards */}
       <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-7">
         {appointmentStatuses.map((stat: AppointmentStatus, index: number) => {
@@ -222,7 +255,11 @@ export default function StudentAppointments() {
         </CardHeader>
 
         <CardContent className="p-0">
-          {appointments.length > 0 ? (
+          {isAppointmentsLoading ? (
+            <div className="flex items-center justify-center py-16">
+              <Spinner size="md" message="Loading your appointments..." />
+            </div>
+          ) : appointments.length > 0 ? (
             <>
               {/* Appointments List */}
               <div className="divide-y divide-white/20 dark:divide-white/10">
@@ -230,13 +267,17 @@ export default function StudentAppointments() {
                   <div
                     key={appointment.id}
                     className={cn(
-                      "animate-fade-in-up p-4 transition-colors duration-200",
-                      "hover:bg-white/35 dark:hover:bg-white/[0.03] sm:p-5",
+                      "animate-fade-in-up cursor-pointer p-4 transition-colors duration-200",
+                      "hover:bg-black/5 dark:hover:bg-white/[0.03] sm:p-5",
                     )}
                     style={{
                       animationDelay: `${0.04 * (index + 1)}s`,
                       animationFillMode: "both",
                     }}
+
+                    onClick={() =>
+                      navigate(`/student/appointments/${appointment.id}`)
+                    }
                   >
                     <div className="flex items-start gap-4">
                       {/* Date Badge */}
@@ -291,37 +332,6 @@ export default function StudentAppointments() {
                               {appointment.reason}
                             </p>
                           </div>
-
-                          {/* Actions Dropdown */}
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button
-                                variant="ghost"
-                                size="icon"
-                                className="h-8 w-8 shrink-0 rounded-xl hover:bg-white/60 dark:hover:bg-white/[0.06]"
-                              >
-                                <MoreHorizontal className="h-4 w-4" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent
-                              align="end"
-                              className={cn(
-                                "rounded-xl border-white/20 bg-white/85 backdrop-blur-xl",
-                                "dark:border-white/10 dark:bg-[#111]/80",
-                              )}
-                            >
-                              <DropdownMenuItem>
-                                <Eye className="mr-2 h-4 w-4" />
-                                View Details
-                              </DropdownMenuItem>
-                              {appointment.status?.name === "Pending" && (
-                                <DropdownMenuItem className="text-destructive">
-                                  <X className="mr-2 h-4 w-4" />
-                                  Cancel
-                                </DropdownMenuItem>
-                              )}
-                            </DropdownMenuContent>
-                          </DropdownMenu>
                         </div>
 
                         {/* Date & Time Info */}
@@ -389,13 +399,27 @@ export default function StudentAppointments() {
 
                   {selectedStatus.id === 0 && (
                     <Button
-                      asChild
+                      asChild={!!user?.studentCorUrl}
+                      disabled={!user?.studentCorUrl}
                       className="rounded-xl shadow-lg shadow-primary/20"
+                      title={!user?.studentCorUrl ? "Please upload your COR in your profile to book an appointment" : ""}
+                      onClick={(e) => {
+                        if (!user?.studentCorUrl) {
+                          e.preventDefault();
+                        }
+                      }}
                     >
-                      <Link to="/student/appointments/schedule">
-                        <Plus className="mr-2 h-4 w-4" />
-                        Schedule Appointment
-                      </Link>
+                      {user?.studentCorUrl ? (
+                        <Link to="/student/appointments/schedule">
+                          <Plus className="mr-2 h-4 w-4" />
+                          Schedule Appointment
+                        </Link>
+                      ) : (
+                        <div className="flex items-center">
+                          <Plus className="mr-2 h-4 w-4 opacity-50" />
+                          Schedule Appointment
+                        </div>
+                      )}
                     </Button>
                   )}
                 </div>

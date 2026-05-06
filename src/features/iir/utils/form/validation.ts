@@ -4,6 +4,7 @@
  */
 
 import { z } from "zod";
+import { COMPLEXIONS } from "../../constants";
 
 /**
  * Helper validator for numeric string fields
@@ -59,7 +60,7 @@ const addressSchema = z.object({
     name: z.string().optional(),
     cityId: z.number().optional(),
   }),
-  streetDetail: z.string().min(1, "Street detail is required"),
+  streetDetail: z.string().optional().nullable(),
 });
 
 /**
@@ -106,9 +107,12 @@ const personalInfoSchema = z.object({
     id: z.number(),
     name: z.string().optional(),
   }),
-  heightFt: numericString,
+  heightM: numericString,
   weightKg: numericString,
-  complexion: z.string().min(1, "Complexion is required"),
+  complexion: z.string().refine(
+    (val) => COMPLEXIONS.some((c) => c.toLowerCase() === val.toLowerCase()),
+    { message: `Must be one of: ${COMPLEXIONS.join(", ")}` },
+  ),
   highSchoolGWA: numericString,
   course: z.object({
     id: z.number(),

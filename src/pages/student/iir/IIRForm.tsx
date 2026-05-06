@@ -955,7 +955,7 @@ function SuccessPopup({
         </div>
         <h3
           className={cn(
-            "mb-3 text-3xl font-[900] tracking-tight",
+            "mb-3 text-3xl font-[900]",
             "text-neutral-900 dark:text-white",
           )}
         >
@@ -963,7 +963,7 @@ function SuccessPopup({
         </h3>
         <p
           className={cn(
-            "mb-10 px-4 font-medium leading-relaxed",
+            "mb-10 px-4 font-medium",
             "text-neutral-500 dark:text-neutral-400",
           )}
         >
@@ -973,8 +973,8 @@ function SuccessPopup({
         <Button
           onClick={onReturn}
           className={cn(
-            "h-14 w-full rounded-2xl bg-neutral-900 text-lg font-black",
-            "tracking-tight text-white shadow-xl transition-all",
+            "h-14 w-full rounded-2xl bg-neutral-900 text-lg font-bold",
+            "text-white shadow-xl transition-all",
             "duration-300 hover:bg-neutral-800 active:scale-95",
             "dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200",
           )}

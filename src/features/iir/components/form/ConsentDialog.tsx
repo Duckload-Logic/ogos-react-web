@@ -36,11 +36,11 @@ export default function ConsentDialog({
         <DialogHeader>
           <DialogTitle className="text-2xl">Confirm Submission</DialogTitle>
           <DialogDescription className="pt-4 text-base">
-            I confirm that the information given is legitimate and accurate,
-            and that this information will be processed in our system under
-            the terms of use and privacy policy of the{" "}
+            I confirm that the information given is legitimate and accurate, and
+            that this information will be processed in our system under the
+            terms of use and privacy policy of the{" "}
             <a
-              href="https://www.pup.edu.ph"
+              href="https://www.pup.edu.ph/privacy"
               target="_blank"
               rel="noopener noreferrer"
               className="font-medium text-primary underline hover:text-primary/80"

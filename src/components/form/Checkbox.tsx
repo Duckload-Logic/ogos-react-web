@@ -26,7 +26,7 @@ export default function Checkbox({
 }) {
   return (
     <div className={className}>
-      <div className="group flex items-center gap-3">
+      <div className="group/checkbox flex items-center gap-3">
         <div className="relative flex h-4 w-4 shrink-0 items-center justify-center">
           <input
             type="checkbox"
@@ -43,7 +43,7 @@ export default function Checkbox({
           <div
             className={cn(
               `h-full w-full ${
-                square ? "rounded-md" : "rounded-full"
+                square ? "rounded-md" : "rounded-sm"
               } border border-border bg-muted transition-all duration-200`,
               "peer-checked:border-primary peer-checked:bg-primary",
               "peer-hover:border-primary",
@@ -63,7 +63,7 @@ export default function Checkbox({
           className={cn(
             "cursor-pointer select-none text-sm font-medium",
             "text-foreground transition-colors duration-200",
-            "disabled:opacity-50 group-hover:text-primary",
+            "disabled:opacity-50 group-hover/checkbox:text-primary",
           )}
         >
           {label}

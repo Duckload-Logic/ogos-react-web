@@ -9,7 +9,10 @@ export function useIIRDownload() {
   const [isDownloading, setIsDownloading] = useState(false);
   const { triggerToast } = useToast();
 
-  const downloadPDF = async (iirID: string) => {
+  const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  const [currentFileName, setCurrentFileName] = useState<string>("");
+
+  const generatePreview = async (iirID: string) => {
     if (!iirID) {
       triggerToast("Invalid IIR ID");
       return;
@@ -19,32 +22,45 @@ export function useIIRDownload() {
     try {
       const { blob, fileName } = await DownloadIIRPDF(iirID, {
         handlerName: "useIIRDownload",
-        stepName: "Download PDF",
+        stepName: "Generate PDF Preview",
       });
 
-      // Create a blob URL and trigger download
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.setAttribute("download", fileName);
-      document.body.appendChild(link);
-      link.click();
-
-      // Cleanup
-      link.parentNode?.removeChild(link);
-      window.URL.revokeObjectURL(url);
-
-      triggerToast("IIR PDF downloaded successfully");
+      const pdfBlob = new Blob([blob], { type: "application/pdf" });
+      const url = window.URL.createObjectURL(pdfBlob);
+      setPdfUrl(url);
+      setCurrentFileName(fileName);
     } catch (error) {
-      console.error("Failed to download IIR PDF:", error);
-      triggerToast("Failed to download IIR PDF. Please try again.");
+      console.error("Failed to generate IIR PDF preview:", error);
+      triggerToast("Failed to generate IIR PDF preview. Please try again.");
     } finally {
       setIsDownloading(false);
     }
   };
 
+  const downloadFromPreview = () => {
+    if (!pdfUrl) return;
+    const link = document.createElement("a");
+    link.href = pdfUrl;
+    link.setAttribute("download", currentFileName || "iir_record.pdf");
+    document.body.appendChild(link);
+    link.click();
+    link.parentNode?.removeChild(link);
+    triggerToast("IIR PDF downloaded successfully");
+  };
+
+  const clearPreview = () => {
+    if (pdfUrl) {
+      window.URL.revokeObjectURL(pdfUrl);
+      setPdfUrl(null);
+      setCurrentFileName("");
+    }
+  };
+
   return {
-    downloadPDF,
+    generatePreview,
+    downloadFromPreview,
+    clearPreview,
+    pdfUrl,
     isDownloading,
   };
 }
