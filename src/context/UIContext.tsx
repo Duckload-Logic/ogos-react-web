@@ -74,7 +74,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
   const [grayscale, setGrayscaleInternal] = useState(false);
   const [dyslexiaMode, setDyslexiaModeInternal] = useState(false);
   const [fontScale, setFontScaleInternal] = useState(100);
-  const [performanceMode, setPerformanceModeInternal] = useState(false);
+  const [performanceMode, setPerformanceModeInternal] = useState(true);
   const [speechRate, setSpeechRateState] = useState(1);
   const [speechVoice, setSpeechVoiceState] = useState("");
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
@@ -123,7 +123,7 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
         parseInt(getPref(STORAGE_KEYS.FONT_SCALE, "100"), 10),
       );
       setPerformanceModeInternal(
-        getPref(STORAGE_KEYS.PERFORMANCE, "false") === "true",
+         getPref(STORAGE_KEYS.PERFORMANCE, "true") === "true",
       );
       setSpeechRateState(parseFloat(getPref(STORAGE_KEYS.SPEECH_RATE, "1")));
       setSpeechVoiceState(getPref(STORAGE_KEYS.SPEECH_VOICE, ""));

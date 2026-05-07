@@ -141,7 +141,7 @@ export default function StudentSlips() {
 
       <div className="space-y-6">
         {/* Stats Cards */}
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5">
           {slipStatuses.map((stat: SlipStatus, index: number) => {
             const count =
               statusCounts?.find((s) => String(s.id) === String(stat.id))
@@ -152,25 +152,25 @@ export default function StudentSlips() {
                 key={stat.id}
                 className={cn(
                   GLASS_CARD,
-                  "animate-fade-in-up group transition-all duration-200 hover:-translate-y-0.5"
+                  "animate-fade-in-up group min-w-0 transition-all duration-200 hover:-translate-y-0.5"
                 )}
                 style={{
                   animationDelay: `${0.08 * (index + 1)}s`,
                   animationFillMode: "both",
                 }}
               >
-                <CardContent className="relative p-5">
+                <CardContent className="relative p-5 sm:p-6">
                   <div
                     className={cn(
                       "pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-br opacity-90",
                       getStatAccent(stat.colorKey)
                     )}
                   />
-                  <div className="relative flex items-start justify-between gap-4">
-                    <div className="space-y-2.5">
-                      <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-muted-foreground">
-                        {stat.name}
-                      </p>
+                  <div className="relative flex min-w-0 items-start justify-between gap-3 sm:gap-4">
+                    <div className="min-w-0 space-y-2.5">
+                      <p className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:text-[11px]">
+                      {stat.name}
+                    </p>
                       <div className="space-y-1">
                         <p className="text-4xl font-bold tabular-nums tracking-tight text-foreground">
                           {count}

@@ -35,8 +35,6 @@ import {
   ChevronRight,
   Check,
   User,
-  FileText,
-  Upload,
 } from "lucide-react";
 import {
   PersonalSection,
@@ -65,8 +63,8 @@ import {
 import { SectionProgress } from "@/features/iir/components/form/SectionProgress";
 import ConsentDialog from "@/features/iir/components/form/ConsentDialog";
 import { cn } from "@/lib/utils";
-import { PatchIIRSubmit, UploadIIRCor } from "@/features/iir/services/service";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { PatchIIRSubmit } from "@/features/iir/services/service";
+
 
 const FORM_SECTIONS = [
   { title: "Basic Info", id: 1, key: "personal_basic", main: 1 },
@@ -126,8 +124,6 @@ export default function IIRForm() {
   const [sectionsWithErrors, setSectionsWithErrors] = useState<number[]>([]);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [draftData, setDraftData] = useState<IIRFormType | null>(null);
-  const [corFile, setCorFile] = useState<File | null>(null);
-  const [isUploadingCor, setIsUploadingCor] = useState(false);
   const { triggerToast } = useToast();
 
   // Modal error state
@@ -240,12 +236,10 @@ export default function IIRForm() {
   };
 
   const isLoading =
-    isInitializing ||
-    isLoadingDraft ||
-    isLoadingEditProfile ||
-    isSubmitting ||
-    isSaving ||
-    isUploadingCor;
+  isLoadingDraft ||
+  isLoadingEditProfile ||
+  isSubmitting ||
+  isSaving;
 
   if (draftError) {
     return (
@@ -301,40 +295,6 @@ export default function IIRForm() {
   const handlePreviousSection = () => {
     if (currentSection > 1) {
       setCurrentSection(currentSection - 1);
-    }
-  };
-
-  const handleCorFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    const allowedTypes = ["application/pdf", "image/jpeg", "image/png"];
-    if (!allowedTypes.includes(file.type)) {
-      triggerToast("Please upload COR as PDF, JPG, or PNG.");
-      return;
-    }
-
-    if (file.size > 10 * 1024 * 1024) {
-      triggerToast("COR file must be 10MB or smaller.");
-      return;
-    }
-
-    setCorFile(file);
-  };
-
-  const handleUploadCor = async () => {
-    if (!editIirId || !corFile) return;
-
-    setIsUploadingCor(true);
-    try {
-      await UploadIIRCor(editIirId, corFile);
-      triggerToast("COR uploaded successfully.");
-      setCorFile(null);
-    } catch (err) {
-      console.error("Error uploading COR:", err);
-      triggerToast("Unable to upload COR. Please try again.");
-    } finally {
-      setIsUploadingCor(false);
     }
   };
 
@@ -433,10 +393,6 @@ export default function IIRForm() {
         await submitFormAsync(localFormData);
       }
 
-      if (corFile && editIirId) {
-        await UploadIIRCor(editIirId, corFile);
-      }
-
       // Cleanup local draft on successful final submission
       clearDraft();
 
@@ -485,8 +441,8 @@ export default function IIRForm() {
       ? "Edit Individual Inventory Record"
       : "Individual Inventory Record",
     description: isEditMode
-      ? "Review and update your student profile information, including your current COR."
-      : "Fill out your student information with confidence. Your data is protected and used solely for academic and guidance purposes.",
+    ? "Review and update your student profile information."
+    : "Fill out your student information with confidence. Your data is protected and used solely for academic and guidance purposes.",
     badgeText: "Student Profile Portal",
     badgeIcon: <User className="h-4 w-4" />,
     isLoading,
@@ -635,45 +591,7 @@ export default function IIRForm() {
                         </span>
                       </div>
                     </div>
-
-                    {isEditMode && (
-                      <Card className="mb-5 rounded-3xl border-primary/15 bg-primary/5 shadow-sm">
-                        <CardHeader className="pb-3">
-                          <CardTitle className="flex items-center gap-2 text-base">
-                            <FileText className="h-5 w-5 text-primary" />
-                            Certificate of Registration (COR)
-                          </CardTitle>
-                        </CardHeader>
-                        <CardContent>
-                          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                            <label className="flex cursor-pointer flex-col rounded-2xl border border-dashed border-primary/30 bg-background/70 px-4 py-3 text-sm transition hover:bg-primary/5 sm:flex-1">
-                              <span className="font-semibold text-foreground">
-                                {corFile ? corFile.name : "Upload current COR"}
-                              </span>
-                              <span className="text-xs text-muted-foreground">
-                                PDF, JPG, or PNG up to 10MB
-                              </span>
-                              <input
-                                type="file"
-                                className="hidden"
-                                accept="application/pdf,image/jpeg,image/png"
-                                onChange={handleCorFileChange}
-                              />
-                            </label>
-                            <Button
-                              type="button"
-                              onClick={handleUploadCor}
-                              disabled={!corFile || isUploadingCor}
-                              className="h-11 rounded-2xl font-bold"
-                            >
-                              <Upload className="mr-2 h-4 w-4" />
-                              {isUploadingCor ? "Uploading..." : "Save COR"}
-                            </Button>
-                          </div>
-                        </CardContent>
-                      </Card>
-                    )}
-
+                    
                     {/* Individual Form Sections */}
                     <div
                       className={cn(
