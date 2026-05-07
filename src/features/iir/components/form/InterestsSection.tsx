@@ -235,16 +235,16 @@ export const InterestsSection = forwardRef<
     if (index > -1) {
       newRoles.splice(index, 1);
     } else {
-      // Logic for mutual exclusivity: Officer and Member and Others cannot both be selected
+      // Logic for mutual exclusivity: Officer and Member and Other cannot both be selected
       if (role === "Officer") {
         newRoles = newRoles.filter(
-          (r) => !namesMatch(r, "Member") && !namesMatch(r, "Others"),
+          (r) => !namesMatch(r, "Member") && !namesMatch(r, "Other"),
         );
       } else if (role === "Member") {
         newRoles = newRoles.filter(
-          (r) => !namesMatch(r, "Officer") && !namesMatch(r, "Others"),
+          (r) => !namesMatch(r, "Officer") && !namesMatch(r, "Other"),
         );
-      } else if (role === "Others") {
+      } else if (role === "Other") {
         newRoles = newRoles.filter(
           (r) => !namesMatch(r, "Officer") && !namesMatch(r, "Member"),
         );
@@ -670,11 +670,11 @@ export const InterestsSection = forwardRef<
                     <Checkbox
                       id="role-others-check"
                       name="occupational_role"
-                      label="Others (Specify)"
-                      checked={isRoleChecked("Others")}
-                      onCheckedChange={() => toggleRole("Others")}
+                      label="Other (Specify)"
+                      checked={isRoleChecked("Other")}
+                      onCheckedChange={() => toggleRole("Other")}
                     />
-                    {isRoleChecked("Others") && (
+                    {isRoleChecked("Other") && (
                       <div
                         className={cn(
                           "animate-in fade-in slide-in-from-top-2",
