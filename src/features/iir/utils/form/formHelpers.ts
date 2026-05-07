@@ -148,7 +148,22 @@ export function initializeFormData(
       },
       addresses: baseData.student?.addresses || {},
     },
-    education: baseData.education || { schools: [] },
+    education: {
+      ...baseData.education,
+      schools: [1, 2, 3, 4].map((id, idx) => {
+        const existing = baseData.education?.schools?.[idx] || {};
+        const levelNames = [
+          "Pre-Elementary",
+          "Elementary",
+          "High School",
+          "Vocational",
+        ];
+        return {
+          ...existing,
+          educationalLevel: { id, name: levelNames[idx] },
+        };
+      }),
+    },
     family: baseData.family
       ? {
           ...baseData.family,
