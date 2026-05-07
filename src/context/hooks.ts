@@ -35,10 +35,7 @@ export function usePageMetadata(metadata: Partial<PageMetadata>) {
 
   useEffect(() => {
     setPageMetadata((prev) => {
-      // Shallow comparison of primitive metadata fields only
-      // React nodes (like badgeIcon) should be skipped to prevent infinite loops
       const hasChanged = Object.entries(metadata).some(([key, value]) => {
-        if (typeof value === "object" && value !== null) return false;
         return prev[key as keyof PageMetadata] !== value;
       });
 
@@ -46,8 +43,6 @@ export function usePageMetadata(metadata: Partial<PageMetadata>) {
       return { ...prev, ...metadata };
     });
 
-    // Clean up metadata when the component unmounts to prevent stale data
-    // on the next page (e.g., persistent stats or actions)
     return () => {
       setPageMetadata({
         title: "",
@@ -64,6 +59,9 @@ export function usePageMetadata(metadata: Partial<PageMetadata>) {
     metadata.title,
     metadata.description,
     metadata.badgeText,
+    metadata.badgeIcon,
+    metadata.headerActions,
+    metadata.headerStats,
     metadata.showDate,
     metadata.isLoading,
     setPageMetadata,
