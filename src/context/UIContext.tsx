@@ -5,6 +5,7 @@ import React, {
   useState,
   useCallback,
   useEffect,
+  useMemo,
 } from "react";
 
 export interface PageMetadata {
@@ -250,33 +251,59 @@ export const UIProvider: React.FC<{ children: React.ReactNode }> = ({
     else root.classList.remove("perf-mode");
   }, [darkMode, grayscale, dyslexiaMode, fontScale, performanceMode]);
 
+  const contextValue = useMemo(
+    () => ({
+      sidebarPinned,
+      setSidebarPinned,
+      toggleSidebarPinned,
+      sidebarHovered,
+      setSidebarHovered,
+      darkMode,
+      setDarkMode,
+      grayscale,
+      setGrayscale,
+      dyslexiaMode,
+      setDyslexiaMode,
+      fontScale,
+      setFontScale,
+      performanceMode,
+      setPerformanceMode,
+      pageMetadata,
+      setPageMetadata,
+      voices,
+      speechRate,
+      setSpeechRate,
+      speechVoice,
+      setSpeechVoice,
+    }),
+    [
+      sidebarPinned,
+      setSidebarPinned,
+      toggleSidebarPinned,
+      sidebarHovered,
+      setSidebarHovered,
+      darkMode,
+      setDarkMode,
+      grayscale,
+      setGrayscale,
+      dyslexiaMode,
+      setDyslexiaMode,
+      fontScale,
+      setFontScale,
+      performanceMode,
+      setPerformanceMode,
+      pageMetadata,
+      setPageMetadata,
+      voices,
+      speechRate,
+      setSpeechRate,
+      speechVoice,
+      setSpeechVoice,
+    ],
+  );
+
   return (
-    <UIContext.Provider
-      value={{
-        sidebarPinned,
-        setSidebarPinned,
-        toggleSidebarPinned,
-        sidebarHovered,
-        setSidebarHovered,
-        darkMode,
-        setDarkMode,
-        grayscale,
-        setGrayscale,
-        dyslexiaMode,
-        setDyslexiaMode,
-        fontScale,
-        setFontScale,
-        performanceMode,
-        setPerformanceMode,
-        pageMetadata,
-        setPageMetadata,
-        voices,
-        speechRate,
-        setSpeechRate,
-        speechVoice,
-        setSpeechVoice,
-      }}
-    >
+    <UIContext.Provider value={contextValue}>
       {children}
     </UIContext.Provider>
   );

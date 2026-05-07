@@ -115,7 +115,7 @@ export default function ReviewSlips() {
     description:
       "Review submissions, filter the queue, and process student requests.",
     badgeText: "Slip Management",
-    badgeIcon: <FileText className="h-4 w-4" />,
+    badgeIcon: useMemo(() => <FileText className="h-4 w-4" />, []),
     isLoading: isPageLoading,
     headerActions,
   });

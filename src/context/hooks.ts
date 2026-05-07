@@ -42,7 +42,20 @@ export function usePageMetadata(metadata: Partial<PageMetadata>) {
       if (!hasChanged) return prev;
       return { ...prev, ...metadata };
     });
+  }, [
+    metadata.title,
+    metadata.description,
+    metadata.badgeText,
+    metadata.badgeIcon,
+    metadata.headerActions,
+    metadata.headerStats,
+    metadata.showDate,
+    metadata.isLoading,
+    setPageMetadata,
+  ]);
 
+  // Handle cleanup separately to avoid resetting on every property change
+  useEffect(() => {
     return () => {
       setPageMetadata({
         title: "",
@@ -55,15 +68,5 @@ export function usePageMetadata(metadata: Partial<PageMetadata>) {
         isLoading: false,
       });
     };
-  }, [
-    metadata.title,
-    metadata.description,
-    metadata.badgeText,
-    metadata.badgeIcon,
-    metadata.headerActions,
-    metadata.headerStats,
-    metadata.showDate,
-    metadata.isLoading,
-    setPageMetadata,
-  ]);
+  }, [setPageMetadata]);
 }
