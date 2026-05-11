@@ -109,7 +109,7 @@ export default function AppointmentList({
 
   return (
     <Card
-      className={`bg-glass-bg/40 hover:bg-glass-bg/50 flex flex-col overflow-hidden border-glass-border shadow-2xl backdrop-blur-2xl transition-all duration-500 lg:col-span-3 ${className || ""}`}
+      className={`bg-glass-bg/40 hover:bg-glass-bg/50 flex flex-col overflow-hidden border-glass-border shadow-2xl backdrop-blur-2xl transition-all duration-500 dark:bg-glass-bg/20 lg:col-span-3 ${className || ""}`}
     >
       <CardHeader className="border-glass-border/30 space-y-6 border-b bg-muted/10 px-8 py-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -245,7 +245,7 @@ export default function AppointmentList({
 
                       <td className="px-4 py-4">
                         <span
-                          className={`inline-block rounded-full border px-2.5 py-1 text-xs font-medium ${
+                          className={`inline-flex min-w-max whitespace-nowrap rounded-full border px-3 py-1 text-[11px] font-semibold tracking-wide ${
                             STATUS_COLORS[apt.status?.colorKey || "info"]
                           }`}
                         >
@@ -298,7 +298,7 @@ export default function AppointmentList({
                     <div className="flex flex-col items-end gap-2">
                       <Badge
                         className={cn(
-                          "rounded-full border px-3 py-1 text-[9px] font-bold tracking-wide shadow-sm",
+                          "rounded-full border px-3 py-1 text-[9px] font-bold tracking-wide shadow-sm whitespace-nowrap",
                           STATUS_COLORS[apt.status?.colorKey || "info"],
                         )}
                       >

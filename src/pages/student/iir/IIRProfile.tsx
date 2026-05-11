@@ -50,6 +50,20 @@ export default function IIRProfile() {
   const [searchParams] = useSearchParams();
 
   const [activeTab, setActiveTab] = useState<TabId>("personal");
+  const [isPreparingPrint, setIsPreparingPrint] = useState(false);
+
+  useEffect(() => {
+  const handleBeforePrint = () => setIsPreparingPrint(true);
+  const handleAfterPrint = () => setIsPreparingPrint(false);
+
+  window.addEventListener("beforeprint", handleBeforePrint);
+  window.addEventListener("afterprint", handleAfterPrint);
+
+  return () => {
+    window.removeEventListener("beforeprint", handleBeforePrint);
+    window.removeEventListener("afterprint", handleAfterPrint);
+  };
+  }, []);
 
   // Switch to significantNotes tab if prompted by URL
   useEffect(() => {
@@ -198,6 +212,44 @@ export default function IIRProfile() {
 
   return (
     <>
+    <style>{`
+    .iir-print-indicator {
+      display: none;
+    }
+
+    @media print {
+      .iir-print-indicator {
+        display: flex !important;
+        position: fixed;
+        top: 12px;
+        right: 12px;
+        z-index: 9999;
+        align-items: center;
+        gap: 6px;
+        border: 1px solid #111827;
+        border-radius: 9999px;
+        background: #ffffff;
+        color: #111827;
+        padding: 6px 10px;
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+    }
+  `}</style>
+
+  <div
+    className={cn(
+      "iir-print-indicator",
+      isPreparingPrint &&
+        "fixed right-4 top-4 z-50 items-center gap-2 rounded-full border border-emerald-500/30 bg-white/90 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-emerald-700 shadow-lg backdrop-blur-md dark:bg-neutral-900/90 dark:text-emerald-300",
+    )}
+    style={{ display: isPreparingPrint ? "flex" : undefined }}
+  >
+    <Printer className="h-3.5 w-3.5" />
+    IIR Print Copy
+  </div>
       <div className="mt-4 flex w-full flex-col gap-8">
         <div className="grid h-full grid-cols-1 gap-4 xl:grid-cols-4">
           <BioCard data={studentData?.student} />

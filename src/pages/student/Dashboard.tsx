@@ -1,6 +1,5 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { StudentProfileCard } from "@/features/student-core/components/StudentProfileCard";
 import { useEffect, useState } from "react";
 import {
   CalendarPlus,
@@ -237,19 +236,6 @@ export default function Dashboard() {
             </Link>
           ))}
         </div>
-      </section>
-
-      {/* 3. Personal Profile Area */}
-      <section className="pt-2">
-        <StudentProfileCard
-          firstName={me?.firstName}
-          lastName={me?.lastName}
-          suffixName={me?.suffixName}
-          middleName={me?.middleName}
-          email={me?.email}
-          studentCorUrl={me?.studentCorUrl}
-          isFormIncomplete={!iir || !iir.isSubmitted}
-        />
       </section>
     </div>
   );
