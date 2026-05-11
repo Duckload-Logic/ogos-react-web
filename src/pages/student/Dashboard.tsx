@@ -40,10 +40,11 @@ export default function Dashboard() {
   useEffect(() => setIsPageLoaded(true), []);
 
   const isLoading = isUserLoading || isIIRLoading || !isPageLoaded;
+  const iirProfileStatus = iir?.isSubmitted ? "Complete" : "Pending";
   const studentQuickActions = [
     {
       title: "Schedule Appointment",
-      description: "Book a counseling session",
+      description: "Choose an available counseling session",
       icon: CalendarPlus,
       href: "/student/appointments/schedule",
       accent:
@@ -51,7 +52,7 @@ export default function Dashboard() {
     },
     {
       title: "Submit Admission Slip",
-      description: "File an excuse slip",
+      description: "Upload and track your excuse slip",
       icon: FileText,
       href: "/student/slips/submit",
       accent:
@@ -68,23 +69,34 @@ export default function Dashboard() {
   ];
 
   const statCards = [
-    {
-      title: "My Appointments",
-      value: totalAppointments,
-      subtitle: "scheduled sessions",
-      icon: Clock,
-      iconWrap:
-        "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-    },
-    {
-      title: "Admission Slips",
-      value: totalSlips,
-      subtitle: "submitted excuses",
-      icon: ClipboardCheck,
-      iconWrap:
-        "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-    },
-  ];
+  {
+    title: "My Appointments",
+    value: totalAppointments,
+    subtitle: "scheduled sessions",
+    icon: Clock,
+    iconWrap:
+      "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+  },
+  {
+    title: "Admission Slips",
+    value: totalSlips,
+    subtitle: "submitted excuses",
+    icon: ClipboardCheck,
+    iconWrap:
+      "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+  },
+  {
+    title: "IIR Profile",
+    value: iirProfileStatus,
+    subtitle: iir?.isSubmitted
+      ? "student record completed"
+      : "complete your student record",
+    icon: ClipboardList,
+    iconWrap: iir?.isSubmitted
+      ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+      : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+  },
+];
 
   usePageMetadata({
     title: me ? `Welcome back, ${me.firstName}!` : "Welcome back",
@@ -142,7 +154,7 @@ export default function Dashboard() {
       <AnimationStyles />
 
       {/* 1. Stats Grid */}
-      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+      <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
         {statCards.map((item) => (
           <Card
             key={item.title}

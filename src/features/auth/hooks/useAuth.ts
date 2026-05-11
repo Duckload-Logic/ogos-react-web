@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router-dom";
 import { PostLogin, LoginPayload, GetLogoutURL } from "../services/index";
 import { QUERY_KEYS } from "@/config/queryKeys";
+import { resetSessionUIPreferences } from "@/utils/uiPreferences";
 
 /**
  * Login mutation hook
@@ -51,10 +52,11 @@ export function useLogin() {
  */
 export function useLogout() {
   const logout = () => {
-    // Clear local session state
-    localStorage.removeItem("session_active");
-    window.location.href = GetLogoutURL();
-  };
+  // Clear local session state and reset session-scoped UI preferences.
+  resetSessionUIPreferences();
+  localStorage.removeItem("session_active");
+  window.location.href = GetLogoutURL();
+};
 
   return {
     logout,
