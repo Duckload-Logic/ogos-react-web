@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useAppointment, useStatuses, useUpdateAppointment } from "@/features/appointments/hooks";
+import {
+  useAppointment,
+  useStatuses,
+  useUpdateAppointment,
+} from "@/features/appointments/hooks";
 import {
   CalendarDays,
   Clock,
@@ -304,22 +308,7 @@ export default function AppointmentDetails() {
               </p>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              className={cn(
-                "group/btn w-full gap-2 rounded-xl border-primary/20",
-                "bg-primary/5 font-bold text-primary shadow-sm transition-all",
-                "duration-300 hover:bg-primary hover:text-white",
-              )}
-              onClick={() =>
-                navigate(`/admin/student-records/${appointment.iirId}`)
-              }
-            >
-              <User className="h-3.5 w-3.5" />
-              Access Record
-            </Button>
-            {appointment.studentCorUrl && (
+            <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
@@ -328,12 +317,29 @@ export default function AppointmentDetails() {
                   "bg-primary/5 font-bold text-primary shadow-sm transition-all",
                   "duration-300 hover:bg-primary hover:text-white",
                 )}
-                onClick={() => setShowCorPreview(true)}
+                onClick={() =>
+                  navigate(`/admin/student-records/${appointment.iirId}`)
+                }
               >
-                <FileText className="h-3.5 w-3.5" />
-                View Student COR
+                <User className="h-3.5 w-3.5" />
+                Access Record
               </Button>
-            )}
+              {appointment.studentCorUrl && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "group/btn w-full gap-2 rounded-xl border-primary/20",
+                    "bg-primary/5 font-bold text-primary shadow-sm transition-all",
+                    "duration-300 hover:bg-primary hover:text-white",
+                  )}
+                  onClick={() => setShowCorPreview(true)}
+                >
+                  <FileText className="h-3.5 w-3.5" />
+                  Certificate of Registration
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
 

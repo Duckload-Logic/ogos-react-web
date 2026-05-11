@@ -119,18 +119,7 @@ export const familyValidationSchema: FieldValidationSchema = {
       message: "Please select at least one financing source",
     },
   ],
-  "family.background.siblingSupportTypes": [
-    {
-      type: "required",
-      validate: (value: any, rootData: any) => {
-        if (Number(rootData?.family?.background?.employedSiblings) > 0) {
-          return Array.isArray(value) && value.length > 0;
-        }
-        return true;
-      },
-      message: "Please indicate how employed siblings are providing support",
-    },
-  ],
+  "family.background.siblingSupportTypes": [],
 };
 
 // Add related persons (Father, Mother, Guardian)
@@ -140,75 +129,86 @@ const RELATIONS = [
   { prefix: "family.relatedPersons.2", label: "Guardian" },
 ];
 
-RELATIONS.forEach(({ prefix, label }) => {
-  const isRequired = label !== "Guardian";
-
-  if (isRequired) {
-    familyValidationSchema[`${prefix}.firstName`] = [
-      commonRules.required(`${label} first name`),
-      commonRules.minLength(2),
-      commonRules.nameFormat(),
-      commonRules.noSpecialChars(`${label} first name`),
-    ];
-    familyValidationSchema[`${prefix}.lastName`] = [
-      commonRules.required(`${label} last name`),
-      commonRules.minLength(2),
-      commonRules.nameFormat(),
-      commonRules.noSpecialChars(`${label} last name`),
-    ];
-    familyValidationSchema[`${prefix}.dateOfBirth`] = [
-      commonRules.required(`${label} date of birth`),
-    ];
-    familyValidationSchema[`${prefix}.educationalLevel`] = [
-      commonRules.required(`${label} educational attainment`),
-      commonRules.noSpecialChars(`${label} educational attainment`),
-    ];
-    familyValidationSchema[`${prefix}.occupation`] = [
-      commonRules.required(`${label} occupation`),
-      commonRules.noSpecialChars(`${label} occupation`),
-    ];
-    familyValidationSchema[`${prefix}.employerName`] = [
-      commonRules.required(`${label} employer name`),
-      commonRules.noSpecialChars(`${label} employer name`),
-    ];
-    familyValidationSchema[`${prefix}.employerAddress`] = [
-      commonRules.noSpecialChars(`${label} employer address`),
-    ];
+RELATIONS.forEach(({ prefix, label }, idx) => {
+  familyValidationSchema[`${prefix}.firstName`] = [
+    commonRules.required(`${label} first name`),
+    commonRules.minLength(2),
+    commonRules.nameFormat(),
+    commonRules.noSpecialChars(`${label} first name`),
+  ];
+  familyValidationSchema[`${prefix}.lastName`] = [
+    commonRules.required(`${label} last name`),
+    commonRules.minLength(2),
+    commonRules.nameFormat(),
+    commonRules.noSpecialChars(`${label} last name`),
+  ];
+  familyValidationSchema[`${prefix}.middleName`] = [
+    commonRules.nameFormat(),
+    commonRules.noSpecialChars(`${label} middle name`),
+  ];
+  familyValidationSchema[`${prefix}.dateOfBirth`] = [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        const person = rootData?.family?.relatedPersons?.[idx];
+        // For Father (idx 0) and Guardian (idx 2), it's always required. For Mother, depends on isLiving.
+        if (idx === 0 || idx === 2 || person?.isLiving !== false) {
+          return !!value && String(value).trim().length > 0;
+        }
+        return true;
+      },
+      message: `${label} date of birth is required`,
+    },
+    commonRules.validDate(),
+  ];
+  familyValidationSchema[`${prefix}.educationalLevel`] = [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        const person = rootData?.family?.relatedPersons?.[idx];
+        if (idx === 0 || idx === 2 || person?.isLiving !== false) {
+          return !!value && String(value).trim().length > 0;
+        }
+        return true;
+      },
+      message: `${label} educational attainment is required`,
+    },
+    commonRules.noSpecialChars(`${label} educational attainment`),
+  ];
+  familyValidationSchema[`${prefix}.occupation`] = [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        const person = rootData?.family?.relatedPersons?.[idx];
+        if (idx === 0 || idx === 2 || person?.isLiving !== false) {
+          return !!value && String(value).trim().length > 0;
+        }
+        return true;
+      },
+      message: `${label} occupation is required`,
+    },
+    commonRules.noSpecialChars(`${label} occupation`),
+  ];
+  familyValidationSchema[`${prefix}.employerName`] = [
+    commonRules.noSpecialChars(`${label} employer name`),
+  ];
+  familyValidationSchema[`${prefix}.employerAddress`] = [
+    commonRules.noSpecialChars(`${label} employer address`),
+  ];
+  if (idx !== 2) {
     familyValidationSchema[`${prefix}.isLiving`] = [
       commonRules.required(`${label} status (Living/Deceased)`),
     ];
-  } else {
-    const guardianFields = [
-      "firstName",
-      "lastName",
-      "occupation",
-      "educationalLevel",
-      "employerName",
-      "employerAddress",
-    ];
-    guardianFields.forEach((field) => {
-      familyValidationSchema[`${prefix}.${field}`] = [
-        {
-          type: "required",
-          validate: (value: any, rootData: any) => {
-            const guardian = rootData?.family?.relatedPersons?.[2];
-            const isAnyFilled =
-              guardian &&
-              (guardian.firstName || guardian.lastName || guardian.occupation);
-            if (
-              isAnyFilled &&
-              (field === "firstName" ||
-                field === "lastName" ||
-                field === "occupation")
-            ) {
-              return !!value && String(value).trim().length > 0;
-            }
-            return true;
-          },
-          message: `${label} ${field} is required if guardian info is being provided`,
-        },
-        commonRules.noSpecialChars(`${label} ${field}`),
-      ];
-    });
   }
+
+  familyValidationSchema[`${prefix}.relationship`] = [
+    {
+      type: "required",
+      validate: (value: any) => {
+        const id = value?.id || value;
+        return !!id && Number(id) > 0;
+      },
+      message: `${label} relationship is required`,
+    },
+  ];
 });

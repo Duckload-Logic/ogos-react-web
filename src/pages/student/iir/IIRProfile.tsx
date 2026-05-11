@@ -14,6 +14,13 @@ import { BioCard, InfoContent, InfoNavigation } from "@/features/iir/components/
 import Layout from "@/components/layout/Layout";
 import { usePageMetadata } from "@/context";
 import { cn } from "@/lib/utils";
+import {
+  ResponsiveModal,
+  ResponsiveModalContent,
+  ResponsiveModalHeader,
+  ResponsiveModalTitle,
+} from "@/components/ui/responsive-modal";
+import { Download } from "lucide-react";
 
 const ICON_SIZE = 20;
 
@@ -39,7 +46,7 @@ export default function IIRProfile() {
     error,
   } = useIIRProfile(finalIirId || "");
 
-  const { downloadPDF, isDownloading } = useIIRDownload();
+  const { generatePreview, downloadFromPreview, clearPreview, pdfUrl, isDownloading } = useIIRDownload();
   const [searchParams] = useSearchParams();
 
   const [activeTab, setActiveTab] = useState<TabId>("personal");
@@ -74,7 +81,7 @@ export default function IIRProfile() {
     headerActions: (
       <div className="flex items-center gap-2">
         <button
-          onClick={() => finalIirId && downloadPDF(finalIirId)}
+          onClick={() => finalIirId && generatePreview(finalIirId)}
           disabled={isDownloading || !finalIirId}
           className={cn(
             "group flex h-10 w-10 items-center justify-center rounded-xl",
@@ -210,6 +217,38 @@ export default function IIRProfile() {
           </div>
         </div>
       </div>
+
+      <ResponsiveModal
+        open={!!pdfUrl}
+        onOpenChange={(open) => !open && clearPreview()}
+      >
+        <ResponsiveModalContent className="flex h-[90vh] max-h-[90vh] flex-col p-0 sm:max-w-4xl">
+          <ResponsiveModalHeader className="px-4 py-3 sm:px-6">
+            <div className="flex items-center justify-between">
+              <ResponsiveModalTitle>IIR PDF Preview</ResponsiveModalTitle>
+              <button
+                onClick={downloadFromPreview}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2",
+                  "text-sm font-semibold text-white transition-colors hover:bg-emerald-600",
+                )}
+              >
+                <Download size={16} />
+                Download PDF
+              </button>
+            </div>
+          </ResponsiveModalHeader>
+          <div className="flex-1 overflow-hidden bg-muted/20">
+            {pdfUrl && (
+              <iframe
+                src={`${pdfUrl}#toolbar=0`}
+                className="h-full w-full rounded-b-lg border-0"
+                title="PDF Preview"
+              />
+            )}
+          </div>
+        </ResponsiveModalContent>
+      </ResponsiveModal>
     </>
   );
 }

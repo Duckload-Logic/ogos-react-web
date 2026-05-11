@@ -86,36 +86,36 @@ export default function Dashboard() {
   const metrics = [
     {
       title: "Students",
-      value: adminAnalytics?.totalStudents.toString() || "0",
-      trend: "+0",
+      value: adminAnalytics?.totalStudents?.toString() || "0",
+      trend: `+${adminAnalytics?.studentsTrend?.toString() || "0"}`,
       icon: Users,
       iconColor: "text-blue-500",
     },
     {
-      title: "Reports",
-      value: adminAnalytics?.totalReports.toString() || "0",
-      trend: "+0",
+      title: "Significant Notes",
+      value: adminAnalytics?.totalReports?.toString() || "0",
+      trend: `+${adminAnalytics?.reportsTrend?.toString() || "0"}`,
       icon: FileText,
       iconColor: "text-emerald-500",
     },
     {
       title: "Consultations",
-      value: adminAnalytics?.totalAppointments.toString() || "0",
-      trend: "+0",
+      value: adminAnalytics?.totalAppointments?.toString() || "0",
+      trend: `+${adminAnalytics?.appointmentsTrend?.toString() || "0"}`,
       icon: Calendar,
       iconColor: "text-purple-500",
     },
     {
       title: "Slips",
-      value: adminAnalytics?.totalSlips.toString() || "0",
-      trend: "+0",
+      value: adminAnalytics?.totalSlips?.toString() || "0",
+      trend: `+${adminAnalytics?.slipsTrend?.toString() || "0"}`,
       icon: FileText,
       iconColor: "text-amber-500",
     },
   ];
 
   const visitorData =
-    adminAnalytics?.monthlyVisitors.map(
+    adminAnalytics?.monthlyVisitors?.map(
       (v: { month: string; count: number }) => ({
         name: v.month,
         visitors: v.count,

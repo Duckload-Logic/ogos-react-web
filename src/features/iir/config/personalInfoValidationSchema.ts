@@ -7,6 +7,7 @@ import {
   FieldValidationSchema,
   commonRules,
 } from "@/services/validationSchema";
+import { COMPLEXIONS } from "../constants";
 
 export const personalInformationValidationSchema: FieldValidationSchema = {
   // Basic Information
@@ -61,6 +62,7 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
     commonRules.required("Complexion"),
     commonRules.noSpecialChars("Complexion"),
     commonRules.minLength(2),
+    commonRules.inList(COMPLEXIONS, "Complexion"),
     commonRules.complexionFormat(),
   ],
   "student.personalInfo.highSchoolGWA": [
@@ -69,7 +71,7 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
     commonRules.minValue(60),
     commonRules.maxValue(100),
   ],
-  "student.personalInfo.heightFt": [
+  "student.personalInfo.heightM": [
     commonRules.required("Height"),
     commonRules.positiveNumber(),
     commonRules.maxValue(8),
@@ -137,6 +139,33 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
   "student.personalInfo.emergencyContact.relationship": [
     commonRules.required("Relationship"),
   ],
+  "student.personalInfo.emergencyContact.address.region": [
+    commonRules.required("Region (Emergency)"),
+  ],
+  "student.personalInfo.emergencyContact.address.province": [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        const regionCode =
+          rootData?.student?.personalInfo?.emergencyContact?.address?.region
+            ?.code;
+        if (regionCode && String(regionCode) !== "1300000000") {
+          return (
+            (value?.id !== undefined && value?.id !== "") ||
+            (value?.code !== undefined && value?.code !== "")
+          );
+        }
+        return true;
+      },
+      message: "Province (Emergency) is required",
+    },
+  ],
+  "student.personalInfo.emergencyContact.address.city": [
+    commonRules.required("City/Municipality (Emergency)"),
+  ],
+  "student.personalInfo.emergencyContact.address.barangay": [
+    commonRules.required("Barangay (Emergency)"),
+  ],
 
   // Addresses – Provincial
   "student.addresses.0.address.region": [
@@ -148,7 +177,7 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
       validate: (value: any, rootData: any) => {
         const regionCode =
           rootData?.student?.addresses?.[0]?.address?.region?.code;
-        if (regionCode && regionCode !== "1300000000") {
+        if (regionCode && String(regionCode) !== "1300000000") {
           return (
             (value?.id !== undefined && value?.id !== "") ||
             (value?.code !== undefined && value?.code !== "")
@@ -166,7 +195,6 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
     commonRules.required("Barangay (Provincial)"),
   ],
   "student.addresses.0.address.streetDetail": [
-    commonRules.required("Street (Provincial)"),
     commonRules.noSpecialChars("Street (Provincial)"),
   ],
 
@@ -180,7 +208,7 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
       validate: (value: any, rootData: any) => {
         const regionCode =
           rootData?.student?.addresses?.[1]?.address?.region?.code;
-        if (regionCode && regionCode !== "1300000000") {
+        if (regionCode && String(regionCode) !== "1300000000") {
           return (
             (value?.id !== undefined && value?.id !== "") ||
             (value?.code !== undefined && value?.code !== "")
@@ -198,7 +226,6 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
     commonRules.required("Barangay (Residential)"),
   ],
   "student.addresses.1.address.streetDetail": [
-    commonRules.required("Street (Residential)"),
     commonRules.noSpecialChars("Street (Residential)"),
   ],
 };

@@ -248,6 +248,13 @@ export const commonRules = {
     message: `${fieldName} contains invalid special characters`,
   }),
 
+  inList: (list: string[], fieldName: string): ValidationRule => ({
+    validate: (value: any) => {
+      if (value === undefined || value === null || value === "") return true;
+      return list.some(item => item.toLowerCase() === String(value).toLowerCase());
+    },
+    message: `${fieldName} must be one of: ${list.join(", ")}`,
+  }),
 };
 
 /**
@@ -310,8 +317,17 @@ export const getValueByPath = (obj: any, path: string): any => {
 export const isFieldRequired = (
   schema: FieldValidationSchema,
   fieldPath: string,
+  rootData?: any,
 ): boolean => {
   const rules = schema[fieldPath];
   if (!rules) return false;
-  return rules.some((rule) => rule.type === "required");
+  return rules.some((rule) => {
+    if (rule.type === "required") {
+      if (typeof rule.validate === "function") {
+        return rule.validate(undefined, rootData) === false;
+      }
+      return true;
+    }
+    return false;
+  });
 };

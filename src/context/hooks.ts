@@ -35,19 +35,27 @@ export function usePageMetadata(metadata: Partial<PageMetadata>) {
 
   useEffect(() => {
     setPageMetadata((prev) => {
-      // Shallow comparison of primitive metadata fields only
-      // React nodes (like badgeIcon) should be skipped to prevent infinite loops
       const hasChanged = Object.entries(metadata).some(([key, value]) => {
-        if (typeof value === "object" && value !== null) return false;
         return prev[key as keyof PageMetadata] !== value;
       });
 
       if (!hasChanged) return prev;
       return { ...prev, ...metadata };
     });
+  }, [
+    metadata.title,
+    metadata.description,
+    metadata.badgeText,
+    metadata.badgeIcon,
+    metadata.headerActions,
+    metadata.headerStats,
+    metadata.showDate,
+    metadata.isLoading,
+    setPageMetadata,
+  ]);
 
-    // Clean up metadata when the component unmounts to prevent stale data
-    // on the next page (e.g., persistent stats or actions)
+  // Handle cleanup separately to avoid resetting on every property change
+  useEffect(() => {
     return () => {
       setPageMetadata({
         title: "",
@@ -60,12 +68,5 @@ export function usePageMetadata(metadata: Partial<PageMetadata>) {
         isLoading: false,
       });
     };
-  }, [
-    metadata.title,
-    metadata.description,
-    metadata.badgeText,
-    metadata.showDate,
-    metadata.isLoading,
-    setPageMetadata,
-  ]);
+  }, [setPageMetadata]);
 }

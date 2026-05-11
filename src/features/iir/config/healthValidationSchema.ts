@@ -107,8 +107,8 @@ export const healthValidationSchema: FieldValidationSchema = {
         message: `Please specify when`,
       },
       commonRules.pattern(
-        /^(0[1-9]|1[0-2])\/\d{2}\/\d{4}$/,
-        "Must be in MM/DD/YYYY format",
+        /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01])$/,
+        "Must be a valid date (YYYY-MM-DD)",
       ),
     ];
     acc[`_consultations.${type}.forWhat`] = [

@@ -21,10 +21,10 @@ import {
 export function validateNumericFields(formData: IIRForm): string[] {
   const errors: string[] = [];
 
-  const { heightFt, weightKg, highSchoolGWA, section } =
+  const { heightM, weightKg, highSchoolGWA, section } =
     formData.student.personalInfo;
 
-  if (isNaN(parseFloat(heightFt)) || parseFloat(heightFt) <= 0) {
+  if (isNaN(parseFloat(heightM)) || parseFloat(heightM) <= 0) {
     errors.push("Height must be a valid positive number");
   }
   if (isNaN(parseFloat(weightKg)) || parseFloat(weightKg) <= 0) {
@@ -64,7 +64,7 @@ export function validateNumericFields(formData: IIRForm): string[] {
 /**
  * Transforms frontend IIR form data to backend payload format
  * Handles type conversions:
- * - String numbers to actual numbers (heightFt, weightKg, etc.)
+ * - String numbers to actual numbers (heightM, weightKg, etc.)
  * - Empty strings to null for nullable fields
  * - Date formatting to ISO 8601
  * - Activity structure (single activityOption, not array)
@@ -72,7 +72,7 @@ export function validateNumericFields(formData: IIRForm): string[] {
  */
 export function transformFormToPayload(formData: IIRForm): any {
   return {
-    iirId: "",
+    iirId: formData.id ?? "",
     student: {
       basicInfo: {
         email: formData.student.basicInfo.email,
@@ -87,7 +87,7 @@ export function transformFormToPayload(formData: IIRForm): any {
         gender: formData.student.personalInfo.gender,
         civilStatus: formData.student.personalInfo.civilStatus,
         religion: formData.student.personalInfo.religion,
-        heightFt: parseNumberSafely(formData.student.personalInfo.heightFt),
+        heightM: parseNumberSafely(formData.student.personalInfo.heightM),
         weightKg: parseNumberSafely(formData.student.personalInfo.weightKg),
         complexion: formData.student.personalInfo.complexion,
         highSchoolGWA: parseNumberSafely(
@@ -142,9 +142,10 @@ export function transformFormToPayload(formData: IIRForm): any {
           },
         },
       },
-      addresses: formData.student.addresses.map((addr: StudentAddress) => ({
-        id: addr.id,
-        addressType: addr.addressType,
+      addresses: formData.student.addresses.map(
+        (addr: StudentAddress, index: number) => ({
+          id: addr.id,
+          addressType: index === 0 ? "Provincial" : "Residential",
         address: {
           ...addr.address,
           regionCode: parseNullSafely(addr.address.region?.code),
@@ -195,23 +196,28 @@ export function transformFormToPayload(formData: IIRForm): any {
         natureOfResidence: formData.family.background.natureOfResidence,
       },
       relatedPersons: formData.family.relatedPersons.map(
-        (person: RelatedPerson) => ({
-          id: person.id,
-          lastName: person.lastName,
-          firstName: person.firstName,
-          middleName: handleNullableString(person.middleName),
-          dateOfBirth: person.dateOfBirth
-            ? formatDateForBackend(person.dateOfBirth)
-            : undefined,
-          educationalLevel: person.educationalLevel,
-          occupation: handleNullableString(person.occupation),
-          employerName: handleNullableString(person.employerName),
-          employerAddress: handleNullableString(person.employerAddress),
-          relationship: person.relationship,
-          isParent: person.isParent,
-          isGuardian: person.isGuardian,
-          isLiving: person.isLiving,
-        }),
+        (person: RelatedPerson, index: number) => {
+          return {
+            id: person.id,
+            lastName: person.lastName,
+            firstName: person.firstName,
+            middleName: handleNullableString(person.middleName),
+            dateOfBirth: person.dateOfBirth
+              ? formatDateForBackend(person.dateOfBirth)
+              : undefined,
+            educationalLevel: person.educationalLevel,
+            occupation: handleNullableString(person.occupation),
+            employerName: handleNullableString(person.employerName),
+            employerAddress: handleNullableString(person.employerAddress),
+            relationship:
+              person.relationship?.id && person.relationship.id > 0
+                ? person.relationship
+                : { id: index + 1 },
+            isParent: index < 2 ? true : person.isParent,
+            isGuardian: index === 2 ? true : person.isGuardian,
+            isLiving: index === 2 ? true : person.isLiving,
+          };
+        },
       ),
       finance: {
         id: formData.family.finance.id,
@@ -313,11 +319,9 @@ function parseNullSafely(val: string | null | undefined): string | null {
  * Formats a date for backend submission (ISO 8601)
  */
 function formatDateForBackend(date: Date | string): string {
-  if (typeof date === "string") {
-    // If already a string, ensure it's in ISO format
-    return new Date(date).toISOString();
-  }
-  return date.toISOString();
+  const d = typeof date === "string" ? new Date(date) : date;
+  if (isNaN(d.getTime())) return "";
+  return d.toISOString().split("T")[0];
 }
 
 // Export legacy function name for backward compatibility

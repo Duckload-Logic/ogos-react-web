@@ -8,9 +8,13 @@ export interface MonthlyVisitorStat {
 
 export interface AdminDashboardResponse {
   totalStudents: number;
+  studentsTrend: number;
   totalReports: number;
+  reportsTrend: number;
   totalAppointments: number;
+  appointmentsTrend: number;
   totalSlips: number;
+  slipsTrend: number;
   monthlyVisitors: MonthlyVisitorStat[];
 }
 

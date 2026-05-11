@@ -52,7 +52,7 @@ function PreviewModal({
       open={isOpen}
       onOpenChange={onOpenChange}
     >
-      <DialogContent className="max-w-xl">
+      <DialogContent className="max-w-4xl border-border/40 bg-background/95 shadow-2xl backdrop-blur-xl">
         <DialogHeader>
           <DialogTitle>File Preview</DialogTitle>
           <DialogDescription>
@@ -82,18 +82,12 @@ function PreviewModal({
               alt="Preview"
               className="max-h-96 max-w-full rounded-lg"
             />
-          ) : isPdfFile(file.fileName) ? (
-            <div className="flex h-96 w-full items-center justify-center rounded-lg bg-muted">
-              <div className="text-center">
-                <FileText className="mx-auto mb-2 h-12 w-12 text-red-500" />
-                <p className="text-muted-foreground">
-                  PDF Preview not available in browser
-                </p>
-                <span className="text-xs text-muted-foreground/85">
-                  Please download the file to view its contents.
-                </span>
-              </div>
-            </div>
+          ) : isPdfFile(file.fileName) && previewUrl ? (
+            <iframe
+              src={previewUrl}
+              className="h-[60vh] w-full rounded-lg border border-border/40"
+              title="PDF Preview"
+            />
           ) : (
             <div className="flex h-96 w-full items-center justify-center rounded-lg bg-muted">
               <div className="text-center">
@@ -118,15 +112,6 @@ function PreviewModal({
               </div>
             </div>
           )}
-
-          <Button
-            onClick={onDownload}
-            className="w-full gap-2"
-            disabled={isDownloading}
-          >
-            <Download className="h-4 w-4" />
-            {isDownloading ? "Downloading..." : "Download File"}
-          </Button>
         </div>
       </DialogContent>
     </Dialog>
@@ -156,17 +141,20 @@ function AttachmentItem({
   return (
     <div
       key={index}
+      onClick={() => onPreview(file)}
       className={cn(
-        "group relative overflow-hidden rounded-lg border",
-        "border-border bg-card transition-colors hover:bg-accent",
+        "group relative flex cursor-pointer flex-col overflow-hidden",
+        "rounded-xl border border-border/60 bg-card transition-all",
+        "duration-300 hover:border-primary/40 hover:shadow-lg",
+        "hover:shadow-primary/5",
       )}
     >
+      {/* Thumbnail Area */}
       <div
         className={cn(
-          "flex aspect-square items-center justify-center bg-muted p-2",
-          "hover:cursor-pointer hover:brightness-50",
+          "relative aspect-[4/3] overflow-hidden bg-muted/30",
+          "flex items-center justify-center",
         )}
-        onClick={() => onPreview(file)}
       >
         {isLoading ? (
           <div className="flex h-full w-full items-center justify-center">
@@ -175,41 +163,69 @@ function AttachmentItem({
         ) : isImageFile(file.fileName) && previewUrl ? (
           <img
             src={previewUrl}
-            alt={`Attachment ${index + 1}`}
-            className="h-full w-full object-cover"
+            alt={file.fileName}
+            className={cn(
+              "h-full w-full object-cover transition-transform",
+              "duration-500 group-hover:scale-110",
+            )}
           />
-        ) : isImageFile(file.fileName) ? (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2">
-            <ImageIcon className="h-10 w-10 text-muted-foreground" />
-            <span className="text-center text-xs font-medium">
-              Failed to load image
-            </span>
-          </div>
         ) : file.fileName.toLowerCase().endsWith(".pdf") ? (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2">
-            <FileText className="h-10 w-10 text-red-500" />
-            <span className="text-center text-xs font-medium">PDF</span>
+          <div className="flex flex-col items-center gap-3">
+            <div
+              className={cn(
+                "rounded-lg bg-red-100 p-4 shadow-sm",
+                "dark:bg-red-900/30",
+              )}
+            >
+              <FileText className="h-10 w-10 text-red-600 dark:text-red-400" />
+            </div>
+            <span
+              className={cn(
+                "rounded-full bg-red-100/50 px-2.5 py-0.5",
+                "text-[10px] font-bold text-red-700 dark:bg-red-900/40",
+                "dark:text-red-300",
+              )}
+            >
+              PDF DOCUMENT
+            </span>
           </div>
         ) : (
-          <div className="flex h-full w-full flex-col items-center justify-center gap-2">
-            <FileText className="h-10 w-10 text-blue-500" />
-            <span className="text-center text-xs font-medium">
-              {getFileExtension(file.fileName).toUpperCase()}
+          <div className="flex flex-col items-center gap-3">
+            <div className="rounded-lg bg-blue-100 p-4 shadow-sm dark:bg-blue-900/30">
+              <FileText className="h-10 w-10 text-blue-600 dark:text-blue-400" />
+            </div>
+            <span className="rounded-full bg-blue-100/50 px-2.5 py-0.5 text-[10px] font-bold text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">
+              {getFileExtension(file.fileName).toUpperCase()} FILE
             </span>
           </div>
         )}
+
+        {/* Hover Overlay */}
+        <div
+          className={cn(
+            "absolute inset-0 flex items-center justify-center",
+            "bg-primary/10 opacity-0 transition-opacity duration-300",
+            "group-hover:opacity-100 backdrop-blur-[2px]",
+          )}
+        >
+          <div className="rounded-full bg-white/90 p-3 shadow-lg dark:bg-black/90">
+            <Eye className="h-5 w-5 text-primary" />
+          </div>
+        </div>
       </div>
 
-      {/* File name tooltip */}
-      <div
-        className={cn(
-          "absolute bottom-0 left-0 right-0 hidden bg-gradient-to-t",
-          "from-black/80 to-transparent p-2 group-hover:block",
-        )}
-      >
-        <p className="truncate text-xs text-white">
-          {getFileName(file.fileName)}
-        </p>
+      {/* Info Area */}
+      <div className="border-t border-border/40 p-3">
+        <div className="flex items-center gap-2">
+          {isImageFile(file.fileName) ? (
+            <ImageIcon className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          ) : (
+            <FileText className="h-3.5 w-3.5 shrink-0 text-muted-foreground" />
+          )}
+          <p className="truncate text-xs font-medium text-foreground/80">
+            {getFileName(file.fileName)}
+          </p>
+        </div>
       </div>
     </div>
   );

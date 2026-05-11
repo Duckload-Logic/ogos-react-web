@@ -44,7 +44,9 @@ export const InterestsSection = forwardRef<
   const [errors, setErrors] = useState<FormErrors>({});
   const { data: activityOptions = [] } = useActivityOptions();
 
-  const validate = (step?: number): { isValid: boolean; errors: FormErrors } => {
+  const validate = (
+    step?: number,
+  ): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors = validateObject(
       { interests },
       interestsValidationSchema,
@@ -233,16 +235,16 @@ export const InterestsSection = forwardRef<
     if (index > -1) {
       newRoles.splice(index, 1);
     } else {
-      // Logic for mutual exclusivity: Officer and Member and Others cannot both be selected
+      // Logic for mutual exclusivity: Officer and Member and Other cannot both be selected
       if (role === "Officer") {
         newRoles = newRoles.filter(
-          (r) => !namesMatch(r, "Member") && !namesMatch(r, "Others"),
+          (r) => !namesMatch(r, "Member") && !namesMatch(r, "Other"),
         );
       } else if (role === "Member") {
         newRoles = newRoles.filter(
-          (r) => !namesMatch(r, "Officer") && !namesMatch(r, "Others"),
+          (r) => !namesMatch(r, "Officer") && !namesMatch(r, "Other"),
         );
-      } else if (role === "Others") {
+      } else if (role === "Other") {
         newRoles = newRoles.filter(
           (r) => !namesMatch(r, "Officer") && !namesMatch(r, "Member"),
         );
@@ -453,9 +455,7 @@ export const InterestsSection = forwardRef<
                     value={getSubject(true, slot)}
                     onChange={(val: string) => updateSubject(true, slot, val)}
                     noSpecialCharacters={true}
-                    placeholder={
-                      slot === 0 ? "e.g. Mathematics" : `Subject #${slot + 1}`
-                    }
+                    placeholder={`Subject #${slot + 1}`}
                     error={getSubjectFieldError(true, slot)}
                     prefix={(slot + 1).toString()}
                   />
@@ -489,9 +489,7 @@ export const InterestsSection = forwardRef<
                     value={getSubject(false, slot)}
                     onChange={(val: string) => updateSubject(false, slot, val)}
                     noSpecialCharacters={true}
-                    placeholder={
-                      slot === 0 ? "e.g. History" : `Subject #${slot + 1}`
-                    }
+                    placeholder={`Subject #${slot + 1}`}
                     error={getSubjectFieldError(false, slot)}
                     prefix={(slot + 1).toString()}
                   />
@@ -554,19 +552,6 @@ export const InterestsSection = forwardRef<
                     key={rank}
                     className="group relative"
                   >
-                    <div
-                      className={cn(
-                        "absolute -left-3 top-1/2 -translate-y-1/2 scale-0",
-                        "transition-transform duration-300",
-                        "group-focus-within:scale-100",
-                      )}
-                    >
-                      <ChevronRight
-                        size={16}
-                        className="text-primary"
-                        strokeWidth={3}
-                      />
-                    </div>
                     <div className="flex items-center gap-4">
                       <div
                         className={cn(
@@ -685,11 +670,11 @@ export const InterestsSection = forwardRef<
                     <Checkbox
                       id="role-others-check"
                       name="occupational_role"
-                      label="Others (Specify)"
-                      checked={isRoleChecked("Others")}
-                      onCheckedChange={() => toggleRole("Others")}
+                      label="Other (Specify)"
+                      checked={isRoleChecked("Other")}
+                      onCheckedChange={() => toggleRole("Other")}
                     />
-                    {isRoleChecked("Others") && (
+                    {isRoleChecked("Other") && (
                       <div
                         className={cn(
                           "animate-in fade-in slide-in-from-top-2",

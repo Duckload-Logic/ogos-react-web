@@ -57,7 +57,6 @@ export interface CreateSlipRequest {
   dateNeeded: string;
   categoryId: number;
   files?: {
-    cor?: File[];
     excuseLetter?: File[];
     parentId?: File[];
     medicalCert?: File[];

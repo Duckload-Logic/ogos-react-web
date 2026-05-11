@@ -191,34 +191,36 @@ export default function SlipDetails() {
               </p>
             </div>
 
-            <Button
-              variant="outline"
-              size="sm"
-              className={cn(
-                "group/btn w-full gap-2 rounded-xl border-primary/20",
-                "bg-primary/5 font-bold text-primary shadow-sm transition-all",
-                "duration-300 hover:bg-primary hover:text-white",
-              )}
-              onClick={() => navigate(`/admin/student-records/${slip.iirId}`)}
-            >
-              <User className="h-3.5 w-3.5" />
-              Access Record
-            </Button>
-            {slip.studentCorUrl && (
+            <div className="flex gap-2">
               <Button
                 variant="outline"
                 size="sm"
                 className={cn(
                   "group/btn w-full gap-2 rounded-xl border-primary/20",
-                  "bg-primary/5 font-bold text-primary shadow-sm transition-all",
-                  "duration-300 hover:bg-primary hover:text-white",
-                )}
-                onClick={() => setShowCorPreview(true)}
+                "bg-primary/5 font-bold text-primary shadow-sm transition-all",
+                "duration-300 hover:bg-primary hover:text-white",
+              )}
+                onClick={() => navigate(`/admin/student-records/${slip.iirId}`)}
               >
-                <FileText className="h-3.5 w-3.5" />
-                View Verified Student COR
+                <User className="h-3.5 w-3.5" />
+                Access Record
               </Button>
-            )}
+              {slip.studentCorUrl && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className={cn(
+                    "group/btn w-full gap-2 rounded-xl border-primary/20",
+                    "bg-primary/5 font-bold text-primary shadow-sm transition-all",
+                    "duration-300 hover:bg-primary hover:text-white",
+                  )}
+                  onClick={() => setShowCorPreview(true)}
+                >
+                  <FileText className="h-3.5 w-3.5" />
+                  Certificate of Registration
+                </Button>
+              )}
+            </div>
           </CardContent>
         </Card>
 
