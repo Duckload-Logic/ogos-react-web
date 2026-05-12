@@ -88,7 +88,7 @@ export default function BioCard({
           {data?.studentCorUrl && (
             <div className="mt-2 border-t border-glass-border pt-4">
               <a
-                href={`${import.meta.env.VITE_API_URL}${data.studentCorUrl}`}
+                href={`${import.meta.env.VITE_API_BASE_URL}${data.studentCorUrl}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex w-full items-center justify-center gap-2 rounded-xl bg-primary/10 py-3 text-xs font-black uppercase tracking-[0.2em] text-primary transition-all hover:bg-primary/20"
@@ -182,3 +182,4 @@ export default function BioCard({
     </div>
   );
 }
+

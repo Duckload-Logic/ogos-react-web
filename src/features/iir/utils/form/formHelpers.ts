@@ -5,6 +5,15 @@
 
 import { IIRForm } from "../../types";
 
+type InitializeFormOptions = {
+  preserveBasicInfoFromSource?: boolean;
+};
+
+function cloneValue<T>(value: T): T {
+  if (value === null || value === undefined) return value;
+  return JSON.parse(JSON.stringify(value));
+}
+
 /**
  * Updates a nested field in the form data immutably
  * @param formData - Current form data
@@ -17,28 +26,19 @@ export function updateNestedField(
   path: string[],
   value: any,
 ): IIRForm | null {
-  if (!formData) return formData;
+  if (!formData || path.length === 0) return formData;
 
-  let current = formData as any;
-  for (let i = 0; i < path.length - 1; i++) {
-    const key = path[i];
-    const nextKey = path[i + 1];
+  const updateAtPath = (current: any, index: number): any => {
+    const key = path[index];
+    const isLast = index === path.length - 1;
+    const currentValue = current ?? (Number.isInteger(Number(key)) ? [] : {});
+    const copy = Array.isArray(currentValue) ? [...currentValue] : { ...currentValue };
 
-    // Check if next key is a numeric string (array index)
-    if (!isNaN(Number(nextKey))) {
-      // Keep arrays as arrays
-      current[key] = Array.isArray(current[key])
-        ? [...current[key]]
-        : current[key];
-    } else {
-      // Next key is a string property — always spread as object
-      // Using [...array] would lose non-numeric string properties (e.g. relatedPersons.father)
-      current[key] = { ...current[key] };
-    }
-    current = current[key];
-  }
-  current[path[path.length - 1]] = value;
-  return { ...formData };
+    copy[key] = isLast ? value : updateAtPath(copy[key], index + 1);
+    return copy;
+  };
+
+  return updateAtPath(formData, 0) as IIRForm;
 }
 
 /**
@@ -98,10 +98,12 @@ export function getSectionStatus(
  * @returns Reset form data with preserved basic info
  */
 export function createResetFormData(emptyForm: IIRForm, me: any): IIRForm {
+  const empty = cloneValue(emptyForm);
+
   return {
-    ...emptyForm,
+    ...empty,
     student: {
-      ...emptyForm.student,
+      ...empty.student,
       basicInfo: {
         firstName: me?.firstName || "",
         middleName:
@@ -116,39 +118,55 @@ export function createResetFormData(emptyForm: IIRForm, me: any): IIRForm {
 }
 
 /**
- * Initializes form data from draft or empty template
- * @param draft - Draft data from API
+ * Initializes form data from draft, profile data, or empty template
+ * @param source - Draft/profile data from API
  * @param emptyForm - Empty form template
  * @param me - Current user data
+ * @param options - Set preserveBasicInfoFromSource=true for edit mode
  * @returns Initialized form data
  */
 export function initializeFormData(
-  draft: IIRForm | null,
+  source: IIRForm | null,
   emptyForm: IIRForm,
   me: any,
+  options: InitializeFormOptions = {},
 ): IIRForm {
-  const baseData = draft || emptyForm;
+  const baseData = cloneValue(source || emptyForm);
+  const emptyData = cloneValue(emptyForm);
+  const preserveBasicInfo = options.preserveBasicInfoFromSource === true;
+
+  const existingBasicInfo = baseData.student?.basicInfo || {};
 
   return {
     ...baseData,
     student: {
+      ...emptyData.student,
       ...baseData.student,
-      basicInfo: {
-        ...baseData.student?.basicInfo,
-        firstName: me?.firstName || "",
-        middleName:
-          me?.middleName && typeof me?.middleName === "string"
-            ? me?.middleName
-            : "",
-        lastName: me?.lastName || "",
-        email: me?.email || "",
-      },
+      basicInfo: preserveBasicInfo
+        ? {
+            ...emptyData.student.basicInfo,
+            ...existingBasicInfo,
+          }
+        : {
+            ...existingBasicInfo,
+            firstName: me?.firstName || "",
+            middleName:
+              me?.middleName && typeof me?.middleName === "string"
+                ? me?.middleName
+                : "",
+            lastName: me?.lastName || "",
+            email: me?.email || "",
+          },
       personalInfo: {
+        ...emptyData.student?.personalInfo,
         ...baseData.student?.personalInfo,
       },
-      addresses: baseData.student?.addresses || {},
+      addresses: Array.isArray(baseData.student?.addresses)
+        ? baseData.student.addresses
+        : emptyData.student.addresses,
     },
     education: {
+      ...emptyData.education,
       ...baseData.education,
       schools: [1, 2, 3, 4].map((id, idx) => {
         const existing = baseData.education?.schools?.[idx] || {};
@@ -166,10 +184,19 @@ export function initializeFormData(
     },
     family: baseData.family
       ? {
+          ...emptyData.family,
           ...baseData.family,
+          background: {
+            ...emptyData.family.background,
+            ...baseData.family.background,
+          },
+          finance: {
+            ...emptyData.family.finance,
+            ...baseData.family.finance,
+          },
           relatedPersons: [0, 1, 2].map((idx) => {
             const existing = baseData.family?.relatedPersons?.[idx] || {};
-            const template = emptyForm.family.relatedPersons[idx];
+            const template = emptyData.family.relatedPersons[idx];
 
             return {
               ...template,
@@ -179,13 +206,36 @@ export function initializeFormData(
                   ? existing.relationship
                   : template.relationship,
               // Ensure correct flags for Father/Mother/Guardian
-              isParent: idx < 2 ? true : false,
-              isGuardian: idx === 2 ? true : false,
+              isParent: idx < 2,
+              isGuardian: idx === 2,
             };
           }),
         }
-      : emptyForm.family,
-    health: baseData.health || { healthRecord: {}, consultations: [] },
-    interests: baseData.interests || {},
+      : emptyData.family,
+    health: {
+      ...emptyData.health,
+      ...baseData.health,
+      healthRecord: {
+        ...emptyData.health.healthRecord,
+        ...baseData.health?.healthRecord,
+      },
+      consultations: Array.isArray(baseData.health?.consultations)
+        ? baseData.health.consultations
+        : emptyData.health.consultations,
+    },
+    interests: {
+      ...emptyData.interests,
+      ...baseData.interests,
+      activities: Array.isArray(baseData.interests?.activities)
+        ? baseData.interests.activities
+        : emptyData.interests.activities,
+      subjectPreferences: Array.isArray(baseData.interests?.subjectPreferences)
+        ? baseData.interests.subjectPreferences
+        : emptyData.interests.subjectPreferences,
+      hobbies: Array.isArray(baseData.interests?.hobbies)
+        ? baseData.interests.hobbies
+        : emptyData.interests.hobbies,
+    },
   };
 }
+
