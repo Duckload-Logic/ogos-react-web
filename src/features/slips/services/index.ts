@@ -7,7 +7,6 @@ import { apiClient, AxiosConfigWithMeta } from "@/lib/api";
 import { API_ROUTES } from "@/config/apiRoutes";
 import type {
   Slip,
-  CreateSlipRequest,
   PaginatedSlipsResponse,
   QueryParams,
 } from "../types";
@@ -212,9 +211,6 @@ export async function PostSlip(
   config?: AxiosConfigWithMeta,
 ): Promise<Slip> {
   try {
-    const { ["Content-Type"]: _contentType, ...headers } =
-      config?.headers || {};
-
     const response = await apiClient.post(API_ROUTES.slips.all, data, {
       ...config,
       headers: {
@@ -307,6 +303,55 @@ export async function PatchSlipStatus(
 }
 
 /**
+ * Claim/Verify a ticket on-site
+ * @param ticketCode - The ticket code to verify
+ * @param config - Axios config with logging metadata
+ * @returns Success message
+ */
+export async function ClaimTicket(
+  ticketCode: string,
+  config?: AxiosConfigWithMeta,
+) {
+  try {
+    const response = await apiClient.post(
+      API_ROUTES.slips.claimTicket,
+      { ticketCode },
+      config,
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || "ClaimTicket";
+    const stepName = config?.stepName || "Verify Ticket";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
+    throw error;
+  }
+}
+
+/**
+ * Get slip details by ticket code (Admin only)
+ * @param code - Ticket code
+ * @param config - Axios config
+ * @returns Slip details
+ */
+export async function GetTicketDetails(
+  code: string,
+  config?: AxiosConfigWithMeta,
+): Promise<Slip> {
+  try {
+    const response = await apiClient.get(
+      API_ROUTES.slips.ticketByCode(code),
+      config,
+    );
+    return response.data;
+  } catch (error: any) {
+    const handlerName = config?.handlerName || "GetTicketDetails";
+    const stepName = config?.stepName || "Fetch Ticket Details";
+    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
+    throw error;
+  }
+}
+
+/**
  * Download slip attachment
  * @param slipId - Slip ID
  * @param attachmentId - Attachment ID
@@ -335,10 +380,6 @@ export async function GetSlipAttachmentDownload(
   }
 }
 
-/**
- * Legacy service object for backward compatibility
- * Gradually migrate to direct function imports
- */
 export const slipService = {
   GetSlipStats,
   GetSlipStatuses,
@@ -349,6 +390,9 @@ export const slipService = {
   GetSlipById,
   GetSlipAttachments,
   PostSlip,
+  PatchSlip,
   PatchSlipStatus,
+  ClaimTicket,
+  GetTicketDetails,
   GetSlipAttachmentDownload,
 };

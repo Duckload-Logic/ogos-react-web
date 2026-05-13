@@ -30,6 +30,12 @@ export interface SlipStats {
   count: number;
 }
 
+export interface Ticket {
+  ticketCode: string;
+  isVerified: boolean;
+  verifiedAt?: string;
+}
+
 /**
  * Slip response from API
  */
@@ -44,6 +50,7 @@ export interface Slip {
   category?: SlipCategory;
   status?: SlipStatus;
   studentCorUrl?: string;
+  ticket?: Ticket;
   createdAt?: string;
   updatedAt?: string;
 }
