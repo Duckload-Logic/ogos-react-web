@@ -20,6 +20,7 @@ import {
   Building2,
   MessageSquare,
   Clock3,
+  Ticket,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -197,9 +198,9 @@ export default function SlipDetails() {
                 size="sm"
                 className={cn(
                   "group/btn w-full gap-2 rounded-xl border-primary/20",
-                "bg-primary/5 font-bold text-primary shadow-sm transition-all",
-                "duration-300 hover:bg-primary hover:text-white",
-              )}
+                  "bg-primary/5 font-bold text-primary shadow-sm transition-all",
+                  "duration-300 hover:bg-primary hover:text-white",
+                )}
                 onClick={() => navigate(`/admin/student-records/${slip.iirId}`)}
               >
                 <User className="h-3.5 w-3.5" />
@@ -455,6 +456,54 @@ export default function SlipDetails() {
               </CardTitle>
             </CardHeader>
             <CardContent className="p-8">
+              {slip.ticket && (
+                <div
+                  className={cn(
+                    "mb-6 rounded-2xl border-2 border-dashed p-6 transition-all duration-300",
+                    slip.ticket.isVerified
+                      ? "border-green-500/50 bg-green-500/5"
+                      : "border-primary/50 bg-primary/5",
+                  )}
+                >
+                  <div className="flex items-center gap-4">
+                    <div
+                      className={cn(
+                        "rounded-xl p-3",
+                        slip.ticket.isVerified
+                          ? "bg-green-500 text-white"
+                          : "bg-primary text-white",
+                      )}
+                    >
+                      <Ticket className="h-6 w-6" />
+                    </div>
+                    <div>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                        Admission Slip Ticket
+                      </p>
+                      <p className="font-mono text-xl font-bold tracking-tighter text-foreground">
+                        {slip.ticket.ticketCode}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="mt-4 flex items-center justify-between border-t border-border/20 pt-4">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground">
+                      Status
+                    </span>
+                    <Badge
+                      variant={slip.ticket.isVerified ? "default" : "outline"}
+                      className={cn(
+                        "rounded-full px-3 py-0.5 text-[9px] font-bold uppercase",
+                        slip.ticket.isVerified &&
+                          "bg-green-600 hover:bg-green-700",
+                      )}
+                    >
+                      {slip.ticket.isVerified ? "Claimed" : "Pending Claim"}
+                    </Badge>
+                  </div>
+                </div>
+              )}
+
               {isPending ? (
                 <div className="flex flex-col gap-4">
                   <Button
