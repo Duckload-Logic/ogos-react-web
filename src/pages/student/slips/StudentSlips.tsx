@@ -1,28 +1,23 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import {
+  AlertCircle,
   Calendar,
+  FileCheck2,
+  FileClock,
+  FilePenLine,
   FileText,
+  FileX,
+  FileX2,
   Plus,
   Tag,
-  MoreHorizontal,
-  Eye,
-  FileX,
-  Download,
-  FileUp,
 } from "lucide-react";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import type { LucideIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { AlertCircle } from "lucide-react";
 import { AnimationStyles } from "@/components/ui/animations";
 import { STATUS_COLORS } from "@/config/constants";
 import {
@@ -42,22 +37,125 @@ interface StatusCount {
   count: number;
 }
 
+type SlipFilterStatus = SlipStatus & {
+  count?: number;
+};
+
 const GLASS_CARD =
-  "overflow-hidden rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]";
+  "overflow-hidden rounded-[18px] border border-white/60 bg-white/40 shadow-[0_12px_30px_rgba(15,23,42,0.055)] backdrop-blur-2xl backdrop-saturate-150 dark:border-white/10 dark:bg-white/[0.045] dark:shadow-[0_12px_30px_rgba(0,0,0,0.25)]";
+
+const GLASS_INNER =
+  "border border-white/55 bg-white/45 shadow-sm backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.055]";
+
+const ALL_SLIP_STATUS: SlipFilterStatus = {
+  id: "0",
+  name: "All",
+  colorKey: "stale",
+};
+
+type SlipStatusMeta = {
+  icon: LucideIcon;
+  label: string;
+  card: string;
+  glow: string;
+  iconBox: string;
+};
+
+const SLIP_STATUS_META: Record<string, SlipStatusMeta> = {
+  pending: {
+    icon: FileClock,
+    label: "text-amber-700/85 dark:text-amber-200",
+    card: "border-amber-300/25 bg-gradient-to-br from-amber-50/35 via-white/40 to-white/30 shadow-amber-100/10 dark:border-amber-400/12 dark:from-amber-400/5 dark:via-white/[0.035] dark:to-white/[0.02]",
+    glow: "bg-amber-200/14 dark:bg-amber-400/6",
+    iconBox:
+      "border-amber-300/25 bg-amber-50/35 text-amber-700 dark:border-amber-400/12 dark:bg-amber-400/7 dark:text-amber-200",
+  },
+  rejected: {
+    icon: FileX2,
+    label: "text-rose-700/85 dark:text-rose-200",
+    card: "border-rose-300/25 bg-gradient-to-br from-rose-50/35 via-white/40 to-white/30 shadow-rose-100/10 dark:border-rose-400/12 dark:from-rose-400/5 dark:via-white/[0.035] dark:to-white/[0.02]",
+    glow: "bg-rose-200/14 dark:bg-rose-400/6",
+    iconBox:
+      "border-rose-300/25 bg-rose-50/35 text-rose-700 dark:border-rose-400/12 dark:bg-rose-400/7 dark:text-rose-200",
+  },
+  approved: {
+    icon: FileCheck2,
+    label: "text-emerald-700/85 dark:text-emerald-200",
+    card: "border-emerald-300/25 bg-gradient-to-br from-emerald-50/35 via-white/40 to-white/30 shadow-emerald-100/10 dark:border-emerald-400/12 dark:from-emerald-400/5 dark:via-white/[0.035] dark:to-white/[0.02]",
+    glow: "bg-emerald-200/14 dark:bg-emerald-400/6",
+    iconBox:
+      "border-emerald-300/25 bg-emerald-50/35 text-emerald-700 dark:border-emerald-400/12 dark:bg-emerald-400/7 dark:text-emerald-200",
+  },
+  "for-revision": {
+    icon: FilePenLine,
+    label: "text-slate-700/85 dark:text-slate-200",
+    card: "border-slate-300/30 bg-gradient-to-br from-slate-50/50 via-white/40 to-white/30 shadow-slate-100/10 dark:border-slate-400/12 dark:from-slate-400/5 dark:via-white/[0.035] dark:to-white/[0.02]",
+    glow: "bg-slate-200/14 dark:bg-slate-400/6",
+    iconBox:
+      "border-slate-300/30 bg-slate-50/45 text-slate-700 dark:border-slate-400/12 dark:bg-slate-400/7 dark:text-slate-200",
+  },
+  default: {
+    icon: FileText,
+    label: "text-primary/85 dark:text-white",
+    card: "border-primary/15 bg-gradient-to-br from-primary/5 via-white/40 to-white/30 shadow-primary/5 dark:border-white/10 dark:from-white/[0.045] dark:via-white/[0.035] dark:to-white/[0.02]",
+    glow: "bg-primary/10 dark:bg-white/6",
+    iconBox:
+      "border-primary/15 bg-primary/6 text-primary dark:border-white/10 dark:bg-white/[0.05] dark:text-white",
+  },
+};
+
+const getSlipStatusCardMeta = (
+  status?: Pick<SlipStatus, "name" | "colorKey">,
+) => {
+  const normalizedName = (status?.name || "")
+    .toLowerCase()
+    .trim()
+    .replace(/_/g, "-")
+    .replace(/\s+/g, "-");
+
+  const normalizedColor = (status?.colorKey || "").toLowerCase();
+
+  if (normalizedName.includes("revision")) {
+    return SLIP_STATUS_META["for-revision"];
+  }
+
+  if (normalizedName.includes("approve")) {
+    return SLIP_STATUS_META.approved;
+  }
+
+  if (normalizedName.includes("reject")) {
+    return SLIP_STATUS_META.rejected;
+  }
+
+  if (normalizedName.includes("pending")) {
+    return SLIP_STATUS_META.pending;
+  }
+
+  if (normalizedColor.includes("success") || normalizedColor.includes("green")) {
+    return SLIP_STATUS_META.approved;
+  }
+
+  if (normalizedColor.includes("danger") || normalizedColor.includes("red")) {
+    return SLIP_STATUS_META.rejected;
+  }
+
+  if (normalizedColor.includes("warning") || normalizedColor.includes("yellow")) {
+    return SLIP_STATUS_META.pending;
+  }
+
+  return SLIP_STATUS_META.default;
+};
 
 export default function StudentSlips() {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const { data: slipStatuses = [] } = useGetSlipStatuses();
-  const filterStatuses = [
-    { id: "0", name: "All", colorKey: "stale" },
-    ...slipStatuses,
-  ];
+
+  const { data: slipStatuses = [], isLoading: isStatusesLoading } =
+    useGetSlipStatuses();
 
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedStatus, setSelectedStatus] = useState<SlipStatus | any>(
-    filterStatuses[0],
-  );
+  const [selectedStatus, setSelectedStatus] =
+    useState<SlipFilterStatus>(ALL_SLIP_STATUS);
 
   const { data, isLoading: isSlipsLoading } = useGetMySlips({
     page: currentPage,
@@ -65,72 +163,42 @@ export default function StudentSlips() {
   });
 
   const { data: slipStats, isLoading: isStatsLoading } = useGetSlipStats({});
-  const { isLoading: isStatusesLoading } = useGetSlipStatuses();
 
   const isLoading = isStatsLoading || isStatusesLoading;
 
-  const statsWithAll = [
-    {
-      id: "0",
-      name: "All",
-      colorKey: "stale",
-      count:
-        slipStats?.reduce(
-          (sum: number, stat: any) => sum + (stat.count || 0),
-          0,
-        ) || 0,
-    },
-    ...(slipStats || []),
-  ];
+  const statsWithAll = useMemo<SlipFilterStatus[]>(
+    () => [
+      {
+        id: "0",
+        name: "All",
+        colorKey: "stale",
+        count:
+          slipStats?.reduce(
+            (sum: number, stat: StatusCount) => sum + (stat.count || 0),
+            0,
+          ) || 0,
+      },
+      ...((slipStats || []) as SlipFilterStatus[]),
+    ],
+    [slipStats],
+  );
 
   const slips = data?.slips || [];
   const statusCounts = (slipStats || []) as StatusCount[];
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString("en-US", {
-      weekday: "short",
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-    });
-  };
+  const pageBadgeIcon = useMemo(() => <FileText className="h-4 w-4" />, []);
 
-  const getStatusColor = (colorKey: string) => {
-    const key = colorKey as keyof typeof STATUS_COLORS;
-    return STATUS_COLORS[key] || STATUS_COLORS.secondary;
-  };
-
-  const getStatAccent = (colorKey: string) => {
-    switch (colorKey) {
-      case "warning":
-      case "yellow":
-        return "from-amber-500/15 to-yellow-500/5 text-amber-700 dark:text-amber-300 border-amber-500/20";
-      case "danger":
-      case "red":
-        return "from-rose-500/15 to-red-500/5 text-rose-700 dark:text-rose-300 border-rose-500/20";
-      case "success":
-      case "green":
-        return "from-emerald-500/15 to-green-500/5 text-emerald-700 dark:text-emerald-300 border-emerald-500/20";
-      case "purple":
-      case "violet":
-        return "from-violet-500/15 to-fuchsia-500/5 text-violet-700 dark:text-violet-300 border-violet-500/20";
-      default:
-        return "from-slate-500/15 to-slate-500/5 text-slate-700 dark:text-slate-300 border-slate-500/20";
-    }
-  };
-
-  usePageMetadata({
-    title: "My Admission Slips",
-    description: "Manage your admission slip requests and track their status",
-    badgeText: "My Requests",
-    badgeIcon: <FileText className="h-4 w-4" />,
-    isLoading,
-    headerActions: (
+  const pageHeaderActions = useMemo(
+    () => (
       <Button
         asChild={!!user?.studentCorUrl}
         disabled={!user?.studentCorUrl}
-        className="gap-2 rounded-xl shadow-lg shadow-primary/20"
-        title={!user?.studentCorUrl ? "Please upload your COR in your profile to submit a slip" : ""}
+        className="gap-2 rounded-xl shadow-lg shadow-primary/15"
+        title={
+          !user?.studentCorUrl
+            ? "Please upload your COR in your profile to submit a slip"
+            : ""
+        }
         onClick={(e) => {
           if (!user?.studentCorUrl) {
             e.preventDefault();
@@ -150,285 +218,341 @@ export default function StudentSlips() {
         )}
       </Button>
     ),
+    [user?.studentCorUrl],
+  );
+
+  usePageMetadata({
+    title: "My Admission Slips",
+    description: "Manage your admission slip requests and track their status",
+    badgeText: "My Requests",
+    badgeIcon: pageBadgeIcon,
+    isLoading,
+    headerActions: pageHeaderActions,
   });
+
+  const formatDate = (dateStr: string) => {
+    return new Date(dateStr).toLocaleDateString("en-US", {
+      weekday: "short",
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
+
+  const getStatusColor = (colorKey: string) => {
+    const key = colorKey as keyof typeof STATUS_COLORS;
+    return STATUS_COLORS[key] || STATUS_COLORS.secondary;
+  };
 
   return (
     <>
       <AnimationStyles />
 
-      <div className="space-y-6">
-        {/* Missing COR Alert */}
-        {!user?.studentCorUrl && (
-          <Alert variant="destructive" className="animate-fade-in-up border-rose-500/50 bg-rose-500/10 text-rose-600 dark:border-rose-500/30 dark:text-rose-400">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Action Required: Missing Certificate of Registration</AlertTitle>
-            <AlertDescription>
-              You need to upload your COR before you can submit admission slips.{" "}
-              <Link to="/student/cor-management" className="font-semibold underline hover:text-rose-700 dark:hover:text-rose-300">
-                Go to COR Management
-              </Link>
-            </AlertDescription>
-          </Alert>
-        )}
+      <div className="relative isolate overflow-hidden rounded-[28px]">
+        <div className="pointer-events-none absolute -left-24 -top-24 h-72 w-72 rounded-full bg-slate-300/8 blur-3xl dark:bg-slate-500/8" />
+        <div className="pointer-events-none absolute right-0 top-10 h-80 w-80 rounded-full bg-primary/6 blur-3xl dark:bg-primary/8" />
+        <div className="pointer-events-none absolute bottom-0 left-1/3 h-72 w-72 rounded-full bg-emerald-200/6 blur-3xl dark:bg-emerald-400/6" />
 
-        {/* Stats Cards */}
-        <section className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 2xl:grid-cols-5">
-          {slipStatuses.map((stat: SlipStatus, index: number) => {
-            const count =
-              statusCounts?.find((s) => String(s.id) === String(stat.id))
-                ?.count || 0;
+        <div className="relative space-y-6">
+          {!user?.studentCorUrl && (
+            <Alert
+              variant="destructive"
+              className="animate-fade-in-up border-rose-500/35 bg-rose-500/8 text-rose-600 backdrop-blur-xl dark:border-rose-500/25 dark:text-rose-400"
+            >
+              <AlertCircle className="h-4 w-4" />
+              <AlertTitle>
+                Action Required: Missing Certificate of Registration
+              </AlertTitle>
+              <AlertDescription>
+                You need to upload your COR before you can submit admission
+                slips.{" "}
+                <Link
+                  to="/student/cor-management"
+                  className="font-semibold underline hover:text-rose-700 dark:hover:text-rose-300"
+                >
+                  Go to COR Management
+                </Link>
+              </AlertDescription>
+            </Alert>
+          )}
 
-            return (
-              <Card
-                key={stat.id}
-                className={cn(
-                  GLASS_CARD,
-                  "animate-fade-in-up group min-w-0 transition-all duration-200 hover:-translate-y-0.5",
-                )}
-                style={{
-                  animationDelay: `${0.08 * (index + 1)}s`,
-                  animationFillMode: "both",
-                }}
-              >
-                <CardContent className="relative p-5 sm:p-6">
+          <section
+            className="grid gap-4"
+            style={{
+              gridTemplateColumns:
+                "repeat(auto-fit, minmax(min(100%, 260px), 1fr))",
+            }}
+          >
+            {slipStatuses.map((stat: SlipStatus, index: number) => {
+              const count =
+                statusCounts?.find((s) => String(s.id) === String(stat.id))
+                  ?.count || 0;
+
+              const statusMeta = getSlipStatusCardMeta(stat);
+              const StatusIcon = statusMeta.icon;
+
+              return (
+                <Card
+                  key={stat.id}
+                  className={cn(
+                    GLASS_CARD,
+                    "animate-fade-in-up group relative min-h-[124px] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(15,23,42,0.075)]",
+                    statusMeta.card,
+                  )}
+                  style={{
+                    animationDelay: `${0.06 * (index + 1)}s`,
+                    animationFillMode: "both",
+                  }}
+                >
                   <div
                     className={cn(
-                      "pointer-events-none absolute inset-x-0 top-0 h-20 bg-gradient-to-br opacity-90",
-                      getStatAccent(stat.colorKey),
+                      "pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full blur-2xl",
+                      statusMeta.glow,
                     )}
                   />
-                  <div className="relative flex min-w-0 items-start justify-between gap-3 sm:gap-4">
-                    <div className="min-w-0 space-y-2.5">
-                      <p className="whitespace-nowrap text-[10px] font-semibold uppercase tracking-[0.12em] text-muted-foreground sm:text-[11px]">
-                      {stat.name}
-                    </p>
-                      <div className="space-y-1">
-                        <p className="text-4xl font-bold tabular-nums tracking-tight text-foreground">
-                          {count}
-                        </p>
-                      </div>
-                    </div>
 
-                    <div
-                      className={cn(
-                        "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border bg-white/70 backdrop-blur-md transition-transform duration-200 group-hover:scale-105 dark:bg-white/[0.06]",
-                        getStatAccent(stat.colorKey).split(" ").pop(),
-                      )}
-                    >
-                      <FileUp className="h-5 w-5" />
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
-        </section>
+                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/70 dark:bg-white/15" />
+                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-white/28 to-transparent dark:from-black/15" />
 
-        {/* Main Content */}
-        <Card className={cn(GLASS_CARD, "animate-fade-in-up overflow-hidden")}>
-          {/* Filter Tabs */}
-          <CardHeader className="border-b border-white/20 px-4 py-3 dark:border-white/10">
-            <div className="scrollbar-hide flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-              {statsWithAll?.map((filter: any) => {
-                const isActive =
-                  String(selectedStatus.id) === String(filter.id);
-
-                return (
-                  <Button
-                    key={filter.id}
-                    onClick={() => {
-                      setSelectedStatus(filter);
-                      setCurrentPage(1);
-                    }}
-                    variant={isActive ? "default" : "ghost"}
-                    size="sm"
-                    className={cn(
-                      "flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-xs font-medium transition-all duration-200",
-                      isActive
-                        ? "shadow-md shadow-primary/20"
-                        : "hover:bg-white/60 dark:hover:bg-white/[0.06]",
-                    )}
-                  >
-                    <span>{filter.name}</span>
-                    <Badge
-                      className={cn(
-                        "flex h-5 min-w-[20px] items-center justify-center px-1.5 text-[10px] font-bold",
-                        isActive
-                          ? "bg-primary-foreground/40 text-primary-foreground"
-                          : "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-100",
-                      )}
-                    >
-                      {filter?.count}
-                    </Badge>
-                  </Button>
-                );
-              })}
-            </div>
-          </CardHeader>
-
-          <CardContent className="p-0">
-            {isSlipsLoading ? (
-              <div className="flex items-center justify-center py-16">
-                <Spinner
-                  size="md"
-                  message="Loading your slips..."
-                />
-              </div>
-            ) : slips.length > 0 ? (
-              <div className="divide-y divide-white/20 dark:divide-white/10">
-                {slips.map((slip: Slip, index: number) => (
-                  <div
-                    key={slip.id}
-                    className={cn(
-                      "animate-fade-in-up p-4 transition-colors duration-200",
-                      "cursor-pointer hover:bg-black/5 dark:hover:bg-white/[0.03] sm:p-5",
-                    )}
-                    style={{
-                      animationDelay: `${0.05 * (index + 1)}s`,
-                      animationFillMode: "both",
-                    }}
-                    onClick={() =>
-                      navigate(`/student/slips/${slip.id}`)
-                    }
-                  >
-                    <div className="flex items-start gap-4">
-                      {/* Category Icon Card */}
-                      <div
-                        className={cn(
-                          "hidden h-20 w-20 shrink-0 flex-col items-center",
-                          "justify-center rounded-[18px] border border-white/20",
-                          "bg-white/50 shadow-[0_8px_22px_rgba(15,23,42,0.05)]",
-                          "backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]",
-                          "sm:flex",
-                        )}
-                      >
-                        <div
+                  <CardContent className="relative flex min-h-[124px] flex-col justify-between p-5">
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="min-w-0">
+                        <p
+                          title={stat.name}
                           className={cn(
-                            "mb-2 flex h-10 w-10 items-center justify-center rounded-xl",
-                            "border border-primary/20 bg-primary/10 text-primary",
-                            "backdrop-blur-md",
+                            "truncate text-[11px] font-extrabold uppercase tracking-[0.18em]",
+                            statusMeta.label,
                           )}
                         >
-                          <FileUp className="h-5 w-5" />
-                        </div>
-                        <span className="line-clamp-2 px-2 text-center text-[10px] font-bold text-primary">
-                          {slip.category?.name || "N/A"}
-                        </span>
+                          {stat.name}
+                        </p>
+
+                        <p className="mt-1 text-[11px] font-medium text-muted-foreground/75">
+                          Admission slip status
+                        </p>
                       </div>
 
-                      {/* Content */}
-                      <div className="min-w-0 flex-1">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1 space-y-1.5">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <Badge
-                                variant="outline"
-                                className={cn(
-                                  "border-white/30 bg-white/60 text-xs font-medium",
-                                  "backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]",
-                                )}
-                              >
-                                <Tag className="mr-1 h-3 w-3" />
-                                {slip.category?.name}
-                              </Badge>
+                      <div
+                        className={cn(
+                          "flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] transition-transform duration-300 group-hover:scale-105",
+                          statusMeta.iconBox,
+                        )}
+                      >
+                        <StatusIcon className="h-5 w-5" strokeWidth={2} />
+                      </div>
+                    </div>
 
-                              <Badge
-                                className={cn(
-                                  "text-xs hover:opacity-90",
-                                  getStatusColor(slip.status?.colorKey || ""),
-                                )}
-                              >
-                                {slip.status?.name}
-                              </Badge>
-                            </div>
+                    <div className="mt-5 flex items-end justify-between gap-3">
+                      <p className="text-[34px] font-black leading-none tracking-tight text-foreground tabular-nums">
+                        {count}
+                      </p>
 
-                            <p className="line-clamp-2 text-sm font-medium text-foreground">
-                              {slip.reason}
-                            </p>
+                      <span
+                        className={cn(
+                          "rounded-full px-3 py-1",
+                          "text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground/85",
+                          GLASS_INNER,
+                        )}
+                      >
+                        Total
+                      </span>
+                    </div>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </section>
+
+          <Card className={cn(GLASS_CARD, "animate-fade-in-up")}>
+            <CardHeader className="border-b border-white/30 px-4 py-3 dark:border-white/10">
+              <div className="scrollbar-hide flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
+                {statsWithAll?.map((filter) => {
+                  const isActive =
+                    String(selectedStatus.id) === String(filter.id);
+
+                  return (
+                    <Button
+                      key={filter.id}
+                      onClick={() => {
+                        setSelectedStatus(filter);
+                        setCurrentPage(1);
+                      }}
+                      variant={isActive ? "default" : "ghost"}
+                      size="sm"
+                      className={cn(
+                        "flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-xs font-medium transition-all duration-200",
+                        isActive
+                          ? "shadow-md shadow-primary/15"
+                          : "hover:bg-white/40 dark:hover:bg-white/[0.06]",
+                      )}
+                    >
+                      <span>{filter.name}</span>
+                      <Badge
+                        className={cn(
+                          "flex h-5 min-w-[20px] items-center justify-center px-1.5 text-[10px] font-bold",
+                          isActive
+                            ? "bg-primary-foreground/35 text-primary-foreground"
+                            : "bg-white/45 text-muted-foreground backdrop-blur-xl dark:bg-white/[0.07]",
+                        )}
+                      >
+                        {filter?.count}
+                      </Badge>
+                    </Button>
+                  );
+                })}
+              </div>
+            </CardHeader>
+
+            <CardContent className="p-0">
+              {isSlipsLoading ? (
+                <div className="flex items-center justify-center py-16">
+                  <Spinner size="md" message="Loading your slips..." />
+                </div>
+              ) : slips.length > 0 ? (
+                <div className="divide-y divide-white/25 dark:divide-white/10">
+                  {slips.map((slip: Slip, index: number) => (
+                    <div
+                      key={slip.id}
+                      className={cn(
+                        "animate-fade-in-up cursor-pointer p-4 transition-colors duration-200",
+                        "hover:bg-white/30 dark:hover:bg-white/[0.035] sm:p-5",
+                      )}
+                      style={{
+                        animationDelay: `${0.05 * (index + 1)}s`,
+                        animationFillMode: "both",
+                      }}
+                      onClick={() => navigate(`/student/slips/${slip.id}`)}
+                    >
+                      <div className="flex items-start gap-4">
+                        <div
+                          className={cn(
+                            "hidden h-20 w-20 shrink-0 flex-col items-center justify-center rounded-[18px] sm:flex",
+                            GLASS_INNER,
+                          )}
+                        >
+                          <div className="mb-2 flex h-10 w-10 items-center justify-center rounded-xl border border-primary/15 bg-primary/6 text-primary backdrop-blur-md">
+                            <FileText className="h-5 w-5" />
                           </div>
+
+                          <span className="line-clamp-2 px-2 text-center text-[10px] font-bold text-primary">
+                            {slip.category?.name || "N/A"}
+                          </span>
                         </div>
 
-                        {/* Date Info */}
-                        <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
-                          <div className="flex items-center gap-1.5">
-                            <Calendar className="h-3.5 w-3.5" />
-                            <span>{formatDate(slip.dateOfAbsence)}</span>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 space-y-1.5">
+                              <div className="flex flex-wrap items-center gap-2">
+                                <Badge
+                                  variant="outline"
+                                  className="border-white/45 bg-white/40 text-xs font-medium backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.05]"
+                                >
+                                  <Tag className="mr-1 h-3 w-3" />
+                                  {slip.category?.name}
+                                </Badge>
+
+                                <Badge
+                                  className={cn(
+                                    "text-xs hover:opacity-90",
+                                    getStatusColor(slip.status?.colorKey || ""),
+                                  )}
+                                >
+                                  {slip.status?.name}
+                                </Badge>
+                              </div>
+
+                              <p className="line-clamp-2 text-sm font-medium text-foreground">
+                                {slip.reason}
+                              </p>
+                            </div>
                           </div>
-                          <span className="text-muted-foreground/40">•</span>
-                          <div className="flex items-center gap-1.5">
-                            <Calendar className="h-3.5 w-3.5" />
-                            <span>
-                              Needed by: {formatDate(slip.dateNeeded)}
-                            </span>
+
+                          <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
+                            <div className="flex items-center gap-1.5">
+                              <Calendar className="h-3.5 w-3.5" />
+                              <span>{formatDate(slip.dateOfAbsence)}</span>
+                            </div>
+
+                            <span className="text-muted-foreground/40">•</span>
+
+                            <div className="flex items-center gap-1.5">
+                              <Calendar className="h-3.5 w-3.5" />
+                              <span>
+                                Needed by: {formatDate(slip.dateNeeded)}
+                              </span>
+                            </div>
                           </div>
                         </div>
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <div className="px-4 py-10 sm:px-6 sm:py-12">
-                <div className="mx-auto flex max-w-md flex-col items-center text-center">
-                  <div
-                    className={cn(
-                      "mb-4 flex h-20 w-20 items-center justify-center rounded-full",
-                      "border border-white/20 bg-white/60 backdrop-blur-md",
-                      "dark:border-white/10 dark:bg-white/[0.05]",
-                    )}
-                  >
-                    <FileX className="h-9 w-9 text-muted-foreground" />
-                  </div>
-
-                  <h3 className="mb-2 text-xl font-semibold text-foreground">
-                    No slips found
-                  </h3>
-
-                  <p className="mb-6 text-sm text-muted-foreground">
-                    {String(selectedStatus?.id) === "0"
-                      ? "You haven't submitted any admission slips yet. Submit your first slip now."
-                      : `No ${selectedStatus.name.toLowerCase()} slips found.`}
-                  </p>
-
-                  {String(selectedStatus?.id) === "0" && (
-                    <Button
-                      asChild={!!user?.studentCorUrl}
-                      disabled={!user?.studentCorUrl}
-                      className="rounded-xl shadow-lg shadow-primary/20"
-                      title={!user?.studentCorUrl ? "Please upload your COR in your profile to submit a slip" : ""}
-                      onClick={(e) => {
-                        if (!user?.studentCorUrl) {
-                          e.preventDefault();
-                        }
-                      }}
-                    >
-                      {user?.studentCorUrl ? (
-                        <Link to="/student/slips/submit">
-                          <Plus className="mr-2 h-4 w-4" />
-                          Submit Admission Slip
-                        </Link>
-                      ) : (
-                        <div className="flex items-center">
-                          <Plus className="mr-2 h-4 w-4 opacity-50" />
-                          Submit Admission Slip
-                        </div>
-                      )}
-                    </Button>
-                  )}
+                  ))}
                 </div>
-              </div>
-            )}
+              ) : (
+                <div className="px-4 py-10 sm:px-6 sm:py-12">
+                  <div className="mx-auto flex max-w-md flex-col items-center text-center">
+                    <div
+                      className={cn(
+                        "mb-4 flex h-20 w-20 items-center justify-center rounded-full",
+                        GLASS_INNER,
+                      )}
+                    >
+                      <FileX className="h-9 w-9 text-muted-foreground" />
+                    </div>
 
-            <Separator className="bg-white/20 dark:bg-white/10" />
+                    <h3 className="mb-2 text-xl font-semibold text-foreground">
+                      No slips found
+                    </h3>
 
-            <Pagination
-              currentPage={currentPage}
-              totalPages={data?.totalPages || 1}
-              onPageChange={(page) => setCurrentPage(page)}
-              className="mt-0 border-t-0 px-4 py-3"
-            />
-          </CardContent>
-        </Card>
+                    <p className="mb-6 text-sm text-muted-foreground">
+                      {String(selectedStatus?.id) === "0"
+                        ? "You haven't submitted any admission slips yet. Submit your first slip now."
+                        : `No ${selectedStatus.name.toLowerCase()} slips found.`}
+                    </p>
+
+                    {String(selectedStatus?.id) === "0" && (
+                      <Button
+                        asChild={!!user?.studentCorUrl}
+                        disabled={!user?.studentCorUrl}
+                        className="rounded-xl shadow-lg shadow-primary/15"
+                        title={
+                          !user?.studentCorUrl
+                            ? "Please upload your COR in your profile to submit a slip"
+                            : ""
+                        }
+                        onClick={(e) => {
+                          if (!user?.studentCorUrl) {
+                            e.preventDefault();
+                          }
+                        }}
+                      >
+                        {user?.studentCorUrl ? (
+                          <Link to="/student/slips/submit">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Submit Admission Slip
+                          </Link>
+                        ) : (
+                          <div className="flex items-center">
+                            <Plus className="mr-2 h-4 w-4 opacity-50" />
+                            Submit Admission Slip
+                          </div>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              )}
+
+              <Separator className="bg-white/25 dark:bg-white/10" />
+
+              <Pagination
+                currentPage={currentPage}
+                totalPages={data?.totalPages || 1}
+                onPageChange={(page) => setCurrentPage(page)}
+                className="mt-0 border-t-0 px-4 py-3"
+              />
+            </CardContent>
+          </Card>
+        </div>
       </div>
     </>
   );
