@@ -374,7 +374,7 @@ export default function StudentSlips() {
                     <span>{filter.name}</span>
                     <Badge
                       className={cn(
-                        "flex h-5 min-w-[20px] items-center justify-center px-1.5 text-[10px] font-bold",
+                        "flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-xs font-medium transition-all duration-200",
                         isActive
                           ? "bg-primary-foreground/35 text-primary-foreground"
                           : "bg-white/45 text-muted-foreground backdrop-blur-xl dark:bg-white/[0.07]",
@@ -443,11 +443,15 @@ export default function StudentSlips() {
                               </Badge>
                             </div>
 
-                            <p className="line-clamp-2 text-sm font-medium text-foreground">
-                              {slip.reason}
-                            </p>
-                          </div>
-                        </div>
+                                <Badge
+                                  className={cn(
+                                    "text-xs hover:opacity-90",
+                                    getStatusColor(slip.status?.colorKey || ""),
+                                  )}
+                                >
+                                  {slip.status?.name}
+                                </Badge>
+                              </div>
 
                         <div className="mt-2 flex flex-wrap items-center gap-3 text-xs text-muted-foreground">
                           <div className="flex items-center gap-1.5">
@@ -479,15 +483,15 @@ export default function StudentSlips() {
                     <FileX className="h-9 w-9 text-muted-foreground" />
                   </div>
 
-                  <h3 className="mb-2 text-xl font-semibold text-foreground">
-                    No slips found
-                  </h3>
+                    <h3 className="mb-2 text-xl font-semibold text-foreground">
+                      No slips found
+                    </h3>
 
-                  <p className="mb-6 text-sm text-muted-foreground">
-                    {String(selectedStatus?.id) === "0"
-                      ? "You haven't submitted any admission slips yet. Submit your first slip now."
-                      : `No ${selectedStatus.name.toLowerCase()} slips found.`}
-                  </p>
+                    <p className="mb-6 text-sm text-muted-foreground">
+                      {String(selectedStatus?.id) === "0"
+                        ? "You haven't submitted any admission slips yet. Submit your first slip now."
+                        : `No ${selectedStatus.name.toLowerCase()} slips found.`}
+                    </p>
 
                   {String(selectedStatus?.id) === "0" && (
                     <Button
@@ -503,21 +507,26 @@ export default function StudentSlips() {
                         if (!user?.studentCorUrl) {
                           e.preventDefault();
                         }
-                      }}
-                    >
-                      {user?.studentCorUrl ? (
-                        <Link to="/student/slips/submit">
-                          <Plus className="mr-2 h-4 w-4" />
-                          Submit Admission Slip
-                        </Link>
-                      ) : (
-                        <div className="flex items-center">
-                          <Plus className="mr-2 h-4 w-4 opacity-50" />
-                          Submit Admission Slip
-                        </div>
-                      )}
-                    </Button>
-                  )}
+                        onClick={(e) => {
+                          if (!user?.studentCorUrl) {
+                            e.preventDefault();
+                          }
+                        }}
+                      >
+                        {user?.studentCorUrl ? (
+                          <Link to="/student/slips/submit">
+                            <Plus className="mr-2 h-4 w-4" />
+                            Submit Admission Slip
+                          </Link>
+                        ) : (
+                          <div className="flex items-center">
+                            <Plus className="mr-2 h-4 w-4 opacity-50" />
+                            Submit Admission Slip
+                          </div>
+                        )}
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </div>
             )}
