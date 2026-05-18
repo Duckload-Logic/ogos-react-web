@@ -142,8 +142,8 @@ export default function FamilyView({
                 </div>
                 <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
                   <InfoItem
-                    label="Educational Level"
-                    value={asText(person?.educationalLevel)}
+                    label="Educational Attainment"
+                    value={asText(person?.educationalAttainment?.name)}
                   />
                   <InfoItem
                     label="Birth Date"
