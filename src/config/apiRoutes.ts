@@ -97,6 +97,8 @@ export const API_ROUTES = Object.freeze({
   analytics: Object.freeze({
     all: "/analytics",
     reports: "/analytics/reports",
+    iirReport: "/analytics/reports/iir",
+    iirReportExport: "/analytics/reports/iir/export",
     adminDashboard: "/analytics/admin-dashboard",
   }),
 
@@ -131,6 +133,8 @@ export const API_ROUTES = Object.freeze({
       studentRelationshipTypes: "/students/lookups/student-relationship-types",
       activityOptions: "/students/lookups/activity-options",
       studentStatuses: "/students/lookups/student-statuses",
+      educationalLevels: "/students/lookups/educational-levels",
+      educationalAttainments: "/students/lookups/educational-attainments",
     }),
     inventory: Object.freeze({
       all: "/students/inventory/records",

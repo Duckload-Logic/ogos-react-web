@@ -18,6 +18,8 @@ import {
   Home,
   DollarSign,
   Network,
+  FileDown,
+  Download,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -43,6 +45,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useCourses, useStudentStatuses } from "@/features/iir/hooks";
 import { cn } from "@/lib/utils";
 import { usePageMetadata } from "@/context";
+import { FullScreenLoader } from "@/components/shared";
+import {
+  ResponsiveModal,
+  ResponsiveModalContent,
+  ResponsiveModalHeader,
+  ResponsiveModalTitle,
+} from "@/components/ui/responsive-modal";
 
 // --- THEME COLORS ---
 const COLORS = [
@@ -88,7 +97,17 @@ export default function AnalyticsPage() {
   const [selectedCourse, setSelectedCourse] = useState<string>("0");
   const [selectedStatus, setSelectedStatus] = useState<string>("0");
 
-  const { data, loading, error, refresh } = useAnalyticsDashboard();
+  const {
+    data,
+    loading,
+    error,
+    refresh,
+    generatePreview,
+    downloadFromPreview,
+    clearPreview,
+    pdfUrl,
+    isDownloading,
+  } = useAnalyticsDashboard();
   const { data: courses } = useCourses();
 
   // Update filters and refresh
@@ -143,6 +162,15 @@ export default function AnalyticsPage() {
           options={courses}
           formStyle={false}
         />
+        <Button
+          variant="outline"
+          disabled={isDownloading}
+          onClick={() => generatePreview(parseInt(selectedYear), parseInt(selectedCourse))}
+          className="flex items-center gap-2 border-primary/20 hover:bg-primary/5"
+        >
+          <FileDown className="h-4 w-4" />
+          <span>Download Report</span>
+        </Button>
       </div>
     ),
   });
@@ -183,7 +211,9 @@ export default function AnalyticsPage() {
   if (!data) return null;
 
   return (
-    <div className="animate-in fade-in space-y-8 duration-700">
+    <>
+      <FullScreenLoader isLoading={isDownloading} message="Generating Document..." />
+      <div className="animate-in fade-in space-y-8 duration-700">
       <Tabs
         defaultValue="overview"
         className="space-y-8"
@@ -598,6 +628,31 @@ export default function AnalyticsPage() {
               </ChartContainer>
             </ChartCard>
 
+            <ChartCard
+              title="Educational Background"
+              description="School types by education level with gender split"
+              className="lg:col-span-3"
+            >
+              <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
+                <MiniBarChart
+                  title="Elementary"
+                  data={data?.elementary ?? []}
+                />
+                <MiniBarChart
+                  title="High School"
+                  data={data?.highSchool ?? []}
+                />
+                <MiniBarChart
+                  title="Vocational"
+                  data={data?.vocational ?? []}
+                />
+                <MiniBarChart
+                  title="College"
+                  data={data?.college ?? []}
+                />
+              </div>
+            </ChartCard>
+
             <CityDistributionCard data={data?.cityAddress ?? []} />
           </div>
         </TabsContent>
@@ -803,10 +858,98 @@ export default function AnalyticsPage() {
                 </BarChart>
               </ChartContainer>
             </ChartCard>
+
+            <ChartCard
+              title="Ordinal Position"
+              description="Rank in the family by gender distribution"
+            >
+              <ChartContainer
+                config={genderSplitConfig}
+                className="aspect-auto h-[300px] w-full"
+              >
+                <BarChart
+                  data={data?.ordinalPosition ?? []}
+                  margin={{ top: 20, right: 30, left: 0, bottom: 0 }}
+                >
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="hsl(var(--border))"
+                  />
+                  <XAxis
+                    dataKey="category"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fontSize: 10,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
+                  />
+                  <YAxis
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{
+                      fontSize: 10,
+                      fill: "hsl(var(--muted-foreground))",
+                    }}
+                  />
+                  <ChartTooltip content={<ChartTooltipContent />} />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Male"
+                    dataKey="maleCount"
+                    fill="var(--color-maleCount)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={20}
+                  />
+                  <Bar
+                    isAnimationActive={false}
+                    name="Female"
+                    dataKey="femaleCount"
+                    fill="var(--color-femaleCount)"
+                    radius={[4, 4, 0, 0]}
+                    barSize={20}
+                  />
+                </BarChart>
+              </ChartContainer>
+            </ChartCard>
           </div>
         </TabsContent>
       </Tabs>
+
+      <ResponsiveModal
+        open={!!pdfUrl}
+        onOpenChange={(open) => !open && clearPreview()}
+      >
+        <ResponsiveModalContent className="flex h-[90vh] max-h-[90vh] flex-col p-0 sm:max-w-4xl">
+          <ResponsiveModalHeader className="px-4 py-3 sm:px-6">
+            <div className="flex items-center justify-between">
+              <ResponsiveModalTitle>Student Profiles PDF Preview</ResponsiveModalTitle>
+              <button
+                onClick={downloadFromPreview}
+                className={cn(
+                  "flex items-center gap-2 rounded-lg bg-emerald-500 px-4 py-2",
+                  "text-sm font-semibold text-white transition-colors hover:bg-emerald-600",
+                )}
+              >
+                <Download size={16} />
+                Download PDF
+              </button>
+            </div>
+          </ResponsiveModalHeader>
+          <div className="flex-1 overflow-hidden bg-muted/20">
+            {pdfUrl && (
+              <iframe
+                src={`${pdfUrl}#toolbar=0`}
+                className="h-full w-full rounded-b-lg border-0"
+                title="PDF Preview"
+              />
+            )}
+          </div>
+        </ResponsiveModalContent>
+      </ResponsiveModal>
     </div>
+    </>
   );
 }
 
@@ -980,7 +1123,7 @@ function StatSummaryCard({ title, data, className }: any) {
         />
         <InsightItem
           label="Family Position"
-          value={`${topOrdinal} Child`}
+          value={topOrdinal}
           icon={<Network className="h-4 w-4" />}
         />
       </div>
@@ -1034,3 +1177,46 @@ function AnalyticsSkeleton() {
     </div>
   );
 }
+
+const MiniBarChart = React.memo(({ title, data }: { title: string; data: any[] }) => {
+  return (
+    <div className="space-y-2">
+      <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+        {title}
+      </p>
+      <ChartContainer
+        config={genderSplitConfig}
+        className="aspect-auto h-[120px] w-full"
+      >
+        <BarChart
+          data={data}
+          margin={{ top: 5, right: 5, left: 0, bottom: 5 }}
+        >
+          <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--border))" />
+          <XAxis 
+            dataKey="category" 
+            axisLine={false} 
+            tickLine={false} 
+            tick={{ fontSize: 8, fill: "hsl(var(--muted-foreground))" }}
+          />
+          <YAxis hide />
+          <ChartTooltip content={<ChartTooltipContent />} />
+          <Bar
+            isAnimationActive={false}
+            name="Male"
+            dataKey="maleCount"
+            fill="var(--color-maleCount)"
+            radius={[2, 2, 0, 0]}
+          />
+          <Bar
+            isAnimationActive={false}
+            name="Female"
+            dataKey="femaleCount"
+            fill="var(--color-femaleCount)"
+            radius={[2, 2, 0, 0]}
+          />
+        </BarChart>
+      </ChartContainer>
+    </div>
+  );
+});

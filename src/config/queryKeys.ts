@@ -108,6 +108,12 @@ export const QUERY_KEYS = {
       ] as const,
       activityOptions: ["iir", "lookups", "activity-options"] as const,
       studentStatuses: ["iir", "lookups", "student-statuses"] as const,
+      educationalAttainments: [
+        "iir",
+        "lookups",
+        "educational-attainments",
+      ] as const,
+      educationalLevels: ["iir", "lookups", "educational-levels"] as const,
     },
     inventory: {
       all: ["iir", "inventory", "all"] as const,

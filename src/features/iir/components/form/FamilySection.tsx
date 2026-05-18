@@ -24,6 +24,7 @@ import {
   useSiblingSupportTypes,
   useStudentSupportTypes,
   useStudentRelationshipTypes,
+  useEducationalAttainments,
 } from "../../hooks";
 import { cn } from "@/lib/utils";
 import { FAMILY_SUBSTEP_FIELDS } from "@/features/iir/config/subStepFields";
@@ -47,6 +48,8 @@ interface ParentInformationCardProps {
   handleInputChange: (path: string, value: any) => void;
   handleFieldBlur: (path: string) => void;
   getFieldError: (path: string) => string | undefined;
+  attainmentOptions: any[];
+  isEditMode?: boolean;
 }
 
 const ParentInformationCard = memo(
@@ -57,8 +60,21 @@ const ParentInformationCard = memo(
     handleInputChange,
     handleFieldBlur,
     getFieldError,
+    attainmentOptions,
+    isEditMode = false,
   }: ParentInformationCardProps) => {
     const person = family?.relatedPersons?.[idx] || {};
+
+    const calculateAge = (dobString: string) => {
+      if (!dobString) return "";
+      const dob = new Date(dobString);
+      if (isNaN(dob.getTime())) return "";
+      const diffMs = Date.now() - dob.getTime();
+      const ageDate = new Date(diffMs);
+      return Math.abs(ageDate.getUTCFullYear() - 1970);
+    };
+    const calculatedAge = calculateAge(person.dateOfBirth);
+
     return (
       <SectionContainer
         title={title}
@@ -151,49 +167,67 @@ const ParentInformationCard = memo(
             />
           </div>
 
-          <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-            <DatePicker
-              label="Date of Birth"
-              required={isFieldRequired(
-                familyValidationSchema,
-                `family.relatedPersons.${idx}.dateOfBirth`,
-                { family },
-              )}
-              value={person.dateOfBirth || ""}
-              onChange={(val) =>
-                handleInputChange(
-                  `family.relatedPersons.${idx}.dateOfBirth`,
-                  val,
-                )
-              }
-              onBlur={() =>
-                handleFieldBlur(`family.relatedPersons.${idx}.dateOfBirth`)
-              }
-              error={getFieldError(`family.relatedPersons.${idx}.dateOfBirth`)}
-            />
-            <FormInput
-              name={`family.relatedPersons.${idx}.educationalLevel`}
-              label="Educational Attainment"
-              required={isFieldRequired(
-                familyValidationSchema,
-                `family.relatedPersons.${idx}.educationalLevel`,
-                { family },
-              )}
-              value={person.educationalLevel || ""}
-              onChange={(val) =>
-                handleInputChange(
-                  `family.relatedPersons.${idx}.educationalLevel`,
-                  val,
-                )
-              }
-              onBlur={() =>
-                handleFieldBlur(`family.relatedPersons.${idx}.educationalLevel`)
-              }
-              placeholder="e.g. College Graduate"
-              error={getFieldError(
-                `family.relatedPersons.${idx}.educationalLevel`,
-              )}
-            />
+          <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+            <div className="md:col-span-2 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="sm:col-span-2">
+                <DatePicker
+                  label="Date of Birth"
+                  required={isFieldRequired(
+                    familyValidationSchema,
+                    `family.relatedPersons.${idx}.dateOfBirth`,
+                    { family },
+                  )}
+                  value={person.dateOfBirth || ""}
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${idx}.dateOfBirth`,
+                      val,
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(`family.relatedPersons.${idx}.dateOfBirth`)
+                  }
+                  error={getFieldError(
+                    `family.relatedPersons.${idx}.dateOfBirth`,
+                  )}
+                  disabled={isEditMode}
+                />
+              </div>
+              <FormInput
+                label="Age"
+                value={calculatedAge !== "" ? String(calculatedAge) : ""}
+                onChange={() => {}}
+                placeholder="Age"
+                disabled
+              />
+            </div>
+            {!isEditMode && (
+              <Dropdown
+                name={`family.relatedPersons.${idx}.educationalAttainment`}
+                label="Educational Attainment"
+                required={isFieldRequired(
+                  familyValidationSchema,
+                  `family.relatedPersons.${idx}.educationalAttainment`,
+                  { family },
+                )}
+                value={person.educationalAttainment?.id || ""}
+                onChange={(val) =>
+                  handleInputChange(
+                    `family.relatedPersons.${idx}.educationalAttainment`,
+                    { id: Number(val) },
+                  )
+                }
+                onBlur={() =>
+                  handleFieldBlur(
+                    `family.relatedPersons.${idx}.educationalAttainment`,
+                  )
+                }
+                options={attainmentOptions}
+                error={getFieldError(
+                  `family.relatedPersons.${idx}.educationalAttainment`,
+                )}
+              />
+            )}
             <FormInput
               name={`family.relatedPersons.${idx}.occupation`}
               label="Occupation"
@@ -215,49 +249,55 @@ const ParentInformationCard = memo(
               placeholder="e.g. Engineer"
               error={getFieldError(`family.relatedPersons.${idx}.occupation`)}
             />
-            <FormInput
-              name={`family.relatedPersons.${idx}.employerName`}
-              label="Name of Employer"
-              required={isFieldRequired(
-                familyValidationSchema,
-                `family.relatedPersons.${idx}.employerName`,
-                { family },
-              )}
-              value={person.employerName || ""}
-              onChange={(val) =>
-                handleInputChange(
-                  `family.relatedPersons.${idx}.employerName`,
-                  val,
-                )
-              }
-              onBlur={() =>
-                handleFieldBlur(`family.relatedPersons.${idx}.employerName`)
-              }
-              placeholder="Company name"
-              error={getFieldError(`family.relatedPersons.${idx}.employerName`)}
-            />
-            <div className="md:col-span-2">
-              <FormInput
-                name={`family.relatedPersons.${idx}.employerAddress`}
-                label="Address of Employer"
-                value={person.employerAddress || ""}
-                onChange={(val) =>
-                  handleInputChange(
-                    `family.relatedPersons.${idx}.employerAddress`,
-                    val,
-                  )
-                }
-                onBlur={() =>
-                  handleFieldBlur(
-                    `family.relatedPersons.${idx}.employerAddress`,
-                  )
-                }
-                placeholder="Company address"
-                error={getFieldError(
-                  `family.relatedPersons.${idx}.employerAddress`,
-                )}
-              />
-            </div>
+            {!isEditMode && (
+              <>
+                <FormInput
+                  name={`family.relatedPersons.${idx}.employerName`}
+                  label="Name of Employer"
+                  required={isFieldRequired(
+                    familyValidationSchema,
+                    `family.relatedPersons.${idx}.employerName`,
+                    { family },
+                  )}
+                  value={person.employerName || ""}
+                  onChange={(val) =>
+                    handleInputChange(
+                      `family.relatedPersons.${idx}.employerName`,
+                      val,
+                    )
+                  }
+                  onBlur={() =>
+                    handleFieldBlur(`family.relatedPersons.${idx}.employerName`)
+                  }
+                  placeholder="Company name"
+                  error={getFieldError(
+                    `family.relatedPersons.${idx}.employerName`,
+                  )}
+                />
+                <div className="md:col-span-2">
+                  <FormInput
+                    name={`family.relatedPersons.${idx}.employerAddress`}
+                    label="Address of Employer"
+                    value={person.employerAddress || ""}
+                    onChange={(val) =>
+                      handleInputChange(
+                        `family.relatedPersons.${idx}.employerAddress`,
+                        val,
+                      )
+                    }
+                    onBlur={() =>
+                      handleFieldBlur(
+                        `family.relatedPersons.${idx}.employerAddress`,
+                      )
+                    }
+                    placeholder="Company address"
+                    error={getFieldError(
+                      `family.relatedPersons.${idx}.employerAddress`,
+                    )}
+                  />
+                </div>
+              </>
+            )}
           </div>
         </div>
       </SectionContainer>
@@ -273,9 +313,17 @@ export const FamilySection = forwardRef<
     onFieldBlur?: (fieldPath: string) => void;
     shouldShowError?: (fieldPath: string) => boolean;
     subStep?: number;
+    isEditMode?: boolean;
   }
 >(function FamilySection(
-  { family, onChange, onFieldBlur, shouldShowError, subStep = 1 },
+  {
+    family,
+    onChange,
+    onFieldBlur,
+    shouldShowError,
+    subStep = 1,
+    isEditMode = false,
+  },
   ref,
 ) {
   const { data: parentalStatusOptions } = useParentalStatusTypes();
@@ -284,6 +332,7 @@ export const FamilySection = forwardRef<
   const { data: siblingSupportTypesOptions } = useSiblingSupportTypes();
   const { data: studentSupportTypesOptions } = useStudentSupportTypes();
   const { data: relationshipOptions } = useStudentRelationshipTypes();
+  const { data: attainmentOptions } = useEducationalAttainments();
 
   const [errors, setErrors] = useState<FormErrors>({});
   const [otherTouched, setOtherTouched] = useState(false);
@@ -600,6 +649,8 @@ export const FamilySection = forwardRef<
           handleInputChange={handleInputChange}
           handleFieldBlur={handleFieldBlur}
           getFieldError={getFieldError}
+          attainmentOptions={attainmentOptions || []}
+          isEditMode={isEditMode}
         />
       )}
       {subStep === 3 && (
@@ -610,6 +661,8 @@ export const FamilySection = forwardRef<
           handleInputChange={handleInputChange}
           handleFieldBlur={handleFieldBlur}
           getFieldError={getFieldError}
+          attainmentOptions={attainmentOptions || []}
+          isEditMode={isEditMode}
         />
       )}
 
@@ -724,58 +777,80 @@ export const FamilySection = forwardRef<
                 />
               </div>
 
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-2">
-                <DatePicker
-                  label="Date of Birth"
-                  required={isFieldRequired(
-                    familyValidationSchema,
-                    `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
-                    { family },
-                  )}
-                  value={
-                    family?.relatedPersons?.[GUARDIAN_IDX]?.dateOfBirth || ""
-                  }
-                  onChange={(val) =>
-                    handleInputChange(
-                      `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
-                      val,
-                    )
-                  }
-                  onBlur={() =>
-                    handleFieldBlur(
-                      `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
-                    )
-                  }
-                  error={getFieldError(
-                    `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
-                  )}
-                />
-                <FormInput
-                  name={`family.relatedPersons.${GUARDIAN_IDX}.educationalLevel`}
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
+                <div className="md:col-span-2 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                  <div className="sm:col-span-2">
+                    <DatePicker
+                      label="Date of Birth"
+                      required={isFieldRequired(
+                        familyValidationSchema,
+                        `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
+                        { family },
+                      )}
+                      value={
+                        family?.relatedPersons?.[GUARDIAN_IDX]?.dateOfBirth || ""
+                      }
+                      onChange={(val) =>
+                        handleInputChange(
+                          `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
+                          val,
+                        )
+                      }
+                      onBlur={() =>
+                        handleFieldBlur(
+                          `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
+                        )
+                      }
+                      error={getFieldError(
+                        `family.relatedPersons.${GUARDIAN_IDX}.dateOfBirth`,
+                      )}
+                      disabled={isEditMode}
+                    />
+                  </div>
+                  <FormInput
+                    label="Age"
+                    value={
+                      (() => {
+                        const dob = family?.relatedPersons?.[GUARDIAN_IDX]?.dateOfBirth;
+                        if (!dob) return "";
+                        const d = new Date(dob);
+                        if (isNaN(d.getTime())) return "";
+                        const diff = Date.now() - d.getTime();
+                        const ageDate = new Date(diff);
+                        return String(Math.abs(ageDate.getUTCFullYear() - 1970));
+                      })()
+                    }
+                    onChange={() => {}}
+                    placeholder="Age"
+                    disabled
+                  />
+                </div>
+                <Dropdown
+                  name={`family.relatedPersons.${GUARDIAN_IDX}.educationalAttainment`}
                   label="Educational Attainment"
                   required={isFieldRequired(
                     familyValidationSchema,
-                    `family.relatedPersons.${GUARDIAN_IDX}.educationalLevel`,
+                    `family.relatedPersons.${GUARDIAN_IDX}.educationalAttainment`,
                     { family },
                   )}
                   value={
-                    family?.relatedPersons?.[GUARDIAN_IDX]?.educationalLevel ||
-                    ""
+                    family?.relatedPersons?.[GUARDIAN_IDX]
+                      ?.educationalAttainment?.id || ""
                   }
                   onChange={(val) =>
                     handleInputChange(
-                      `family.relatedPersons.${GUARDIAN_IDX}.educationalLevel`,
-                      val,
+                      `family.relatedPersons.${GUARDIAN_IDX}.educationalAttainment`,
+                      { id: Number(val) },
                     )
                   }
                   onBlur={() =>
                     handleFieldBlur(
-                      `family.relatedPersons.${GUARDIAN_IDX}.educationalLevel`,
+                      `family.relatedPersons.${GUARDIAN_IDX}.educationalAttainment`,
                     )
                   }
-                  placeholder="e.g. College Graduate"
+                  options={attainmentOptions || []}
                   error={getFieldError(
-                    `family.relatedPersons.${GUARDIAN_IDX}.educationalLevel`,
+                    `family.relatedPersons.${GUARDIAN_IDX}.educationalAttainment`,
                   )}
                 />
                 <FormInput

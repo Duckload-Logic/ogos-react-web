@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useMe } from "@/features/users/hooks/useMe";
 import {
@@ -64,7 +64,7 @@ import { SectionProgress } from "@/features/iir/components/form/SectionProgress"
 import ConsentDialog from "@/features/iir/components/form/ConsentDialog";
 import { cn } from "@/lib/utils";
 import { PatchIIRSubmit } from "@/features/iir/services/service";
-
+import { completeIIRForm } from "@/features/iir/tests/test";
 
 const FORM_SECTIONS = [
   { title: "Basic Info", id: 1, key: "personal_basic", main: 1 },
@@ -85,6 +85,15 @@ export default function IIRForm() {
   const [searchParams] = useSearchParams();
   const editIirId = searchParams.get("iirId") || undefined;
   const isEditMode = searchParams.get("edit") === "true" && !!editIirId;
+  const activeSections = useMemo(() => {
+    if (isEditMode) {
+      return FORM_SECTIONS.filter((s) =>
+        [1, 2, 3, 4, 7, 8].includes(s.id),
+      );
+    }
+    return FORM_SECTIONS;
+  }, [isEditMode]);
+
   const { data: me } = useMe({});
 
   const { saveDraft, clearDraft, lastSaved } = useSaveIIRDraft();
@@ -107,12 +116,25 @@ export default function IIRForm() {
 
   const [currentSection, setCurrentSection] = useState<number>(() => {
     const saved = localStorage.getItem("iir_current_section");
-    return saved ? parseInt(saved, 10) : 1;
+    const parsed = saved ? parseInt(saved, 10) : 1;
+    if (isEditMode) {
+      const ids = [1, 2, 3, 4, 7, 8];
+      return ids.includes(parsed) ? parsed : 1;
+    }
+    return parsed;
   });
   const [visitedSections, setVisitedSections] = useState<number[]>(() => {
     const saved = localStorage.getItem("iir_visited_sections");
-    return saved ? JSON.parse(saved) : [1];
+    const parsed = saved ? JSON.parse(saved) : [1];
+    if (isEditMode) {
+      const ids = [1, 2, 3, 4, 7, 8];
+      return parsed.filter((id: number) => ids.includes(id));
+    }
+    return parsed;
   });
+  const currentIndex = activeSections.findIndex(
+    (s) => s.id === currentSection,
+  );
   const [localFormData, setLocalFormData] = useState<IIRFormType | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -153,7 +175,8 @@ export default function IIRForm() {
 
       const sourceData = isEditMode ? editProfileData || draft : draft;
       const initializedData = initializeFormData(
-        sourceData ?? null,
+        completeIIRForm,
+        // sourceData ?? null,
         EMPTY_IIR_FORM,
         me,
       );
@@ -183,15 +206,16 @@ export default function IIRForm() {
   }, [localFormData, lastChangeTimestamp]);
 
   useEffect(() => {
-    if (!visitedSections.includes(currentSection)) {
-      setVisitedSections((prev) => {
+    setVisitedSections((prev) => {
+      if (!prev.includes(currentSection)) {
         const next = [...prev, currentSection];
         localStorage.setItem("iir_visited_sections", JSON.stringify(next));
         return next;
-      });
-    }
+      }
+      return prev;
+    });
     localStorage.setItem("iir_current_section", currentSection.toString());
-  }, [currentSection, visitedSections]);
+  }, [currentSection]);
 
   useEffect(() => {
     const localDraftStr = localStorage.getItem(`iir_draft-student_${me?.id}`);
@@ -236,10 +260,7 @@ export default function IIRForm() {
   };
 
   const isLoading =
-  isLoadingDraft ||
-  isLoadingEditProfile ||
-  isSubmitting ||
-  isSaving;
+    isLoadingDraft || isLoadingEditProfile || isSubmitting || isSaving;
 
   if (draftError) {
     return (
@@ -282,8 +303,8 @@ export default function IIRForm() {
       if (localFormData) {
         await saveDraft(localFormData);
       }
-      if (currentSection < FORM_SECTIONS.length) {
-        setCurrentSection(currentSection + 1);
+      if (currentIndex < activeSections.length - 1) {
+        setCurrentSection(activeSections[currentIndex + 1].id);
       }
     } catch (err: any) {
       console.error("Error saving section:", err);
@@ -293,8 +314,8 @@ export default function IIRForm() {
   };
 
   const handlePreviousSection = () => {
-    if (currentSection > 1) {
-      setCurrentSection(currentSection - 1);
+    if (currentIndex > 0) {
+      setCurrentSection(activeSections[currentIndex - 1].id);
     }
   };
 
@@ -335,7 +356,7 @@ export default function IIRForm() {
 
     const validationResult = validateAllSections(
       sectionRefs,
-      FORM_SECTIONS,
+      activeSections,
       (sectionIndex) =>
         calculateSectionCompletion(sectionIndex, localFormData ?? null),
       currentSection,
@@ -435,16 +456,22 @@ export default function IIRForm() {
     triggerToast("Form has been reset.");
   };
 
-  const currentSectionDef = FORM_SECTIONS.find((s) => s.id === currentSection);
+  const currentSectionDef = activeSections.find(
+    (s) => s.id === currentSection,
+  );
+  const badgeIcon = useMemo(() => <User className="h-4 w-4" />, []);
+
   usePageMetadata({
     title: isEditMode
       ? "Edit Individual Inventory Record"
       : "Individual Inventory Record",
     description: isEditMode
-    ? "Review and update your student profile information."
-    : "Fill out your student information with confidence. Your data is protected and used solely for academic and guidance purposes.",
+      ? "Review and update your student profile information."
+      : "Fill out your student information with confidence. " +
+        "Your data is protected and used solely for " +
+        "academic and guidance purposes.",
     badgeText: "Student Profile Portal",
-    badgeIcon: <User className="h-4 w-4" />,
+    badgeIcon,
     isLoading,
   });
 
@@ -459,7 +486,7 @@ export default function IIRForm() {
             {/* Sidebar Progress Tracker (Desktop) */}
             <aside className="hidden w-[300px] shrink-0 lg:sticky lg:top-24 lg:block">
               <SectionProgress
-                sections={FORM_SECTIONS}
+                sections={activeSections}
                 currentSection={currentSection}
                 sectionsWithErrors={sectionsWithErrors}
                 visitedSections={visitedSections}
@@ -484,7 +511,7 @@ export default function IIRForm() {
                 {/* Mobile/Tablet Progress Tracker */}
                 <div className="lg:hidden">
                   <SectionProgress
-                    sections={FORM_SECTIONS}
+                    sections={activeSections}
                     currentSection={currentSection}
                     sectionsWithErrors={sectionsWithErrors}
                     visitedSections={visitedSections}
@@ -591,7 +618,7 @@ export default function IIRForm() {
                         </span>
                       </div>
                     </div>
-                    
+
                     {/* Individual Form Sections */}
                     <div
                       className={cn(
@@ -608,6 +635,7 @@ export default function IIRForm() {
                             onFieldBlur={markFieldTouched}
                             shouldShowError={shouldShowError}
                             subStep={currentSection}
+                            isEditMode={isEditMode}
                           />
                         )}
                       {currentSection === 5 && localFormData?.education && (
@@ -628,6 +656,7 @@ export default function IIRForm() {
                             onFieldBlur={markFieldTouched}
                             shouldShowError={shouldShowError}
                             subStep={currentSection - 5}
+                            isEditMode={isEditMode}
                           />
                         )}
                       {currentSection === 10 && localFormData?.health && (
@@ -691,7 +720,7 @@ export default function IIRForm() {
                         <span className="hidden sm:inline">Back</span>
                       </Button>
 
-                      {currentSection < FORM_SECTIONS.length ? (
+                      {currentIndex < activeSections.length - 1 ? (
                         <Button
                           onClick={handleNextSection}
                           disabled={isSaving}
@@ -771,7 +800,10 @@ export default function IIRForm() {
 
         <SuccessPopup
           isOpen={showSuccessPopup}
-          onReturn={() => navigate("/student")}
+          onReturn={() =>
+            navigate(isEditMode ? "/student/iir" : "/student")
+          }
+          isEditMode={isEditMode}
         />
 
         <AlertDialog
@@ -833,9 +865,11 @@ export default function IIRForm() {
 function SuccessPopup({
   isOpen,
   onReturn,
+  isEditMode = false,
 }: {
   isOpen: boolean;
   onReturn: () => void;
+  isEditMode?: boolean;
 }) {
   if (!isOpen) return null;
 
@@ -885,8 +919,11 @@ function SuccessPopup({
             "text-neutral-500 dark:text-neutral-400",
           )}
         >
-          Your Individual Inventory Record has been successfully submitted and
-          saved to our secure database.
+          {isEditMode
+            ? "Your Individual Inventory Record has been successfully " +
+              "updated and saved."
+            : "Your Individual Inventory Record has been successfully " +
+              "submitted and saved to our secure database."}
         </p>
         <Button
           onClick={onReturn}

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
-import { Spinner } from "@/components/shared";
+import { Spinner, FullScreenLoader } from "@/components/shared";
 import {
   useIIRProfile,
   useUserIIR,
@@ -81,22 +81,19 @@ export default function IIRProfile() {
 
   const isLoading = isWaitingForMe || isWaitingForIirId || isWaitingForProfile;
 
-  const isAdmin = me?.roles?.some(r => r.name.toLowerCase() === "admin") || false;
+  const isAdmin =
+    me?.roles?.some(r => r.name.toLowerCase() === "admin") || false;
   const showSignificantNotes = isAdmin;
 
-  usePageMetadata({
-    title: isAdmin ? "Individual Inventory Record" : "My IIR Profile",
-    description: isAdmin
-      ? "Comprehensive student record review for guidance purposes"
-      : "Manage your personal guidance information and student record",
-    badgeText: isAdmin ? "Admin Audit" : "Student Profile",
-    badgeIcon: <User size={16} />,
-    isLoading,
-    headerActions: (
+  const badgeIcon = useMemo(() => <User size={16} />, []);
+
+  const headerActions = useMemo(() => {
+    if (!finalIirId) return null;
+    return (
       <div className="flex items-center gap-2">
         <button
-          onClick={() => finalIirId && generatePreview(finalIirId)}
-          disabled={isDownloading || !finalIirId}
+          onClick={() => generatePreview(finalIirId)}
+          disabled={isDownloading}
           className={cn(
             "group flex h-10 w-10 items-center justify-center rounded-xl",
             "border border-emerald-500/20 p-0 transition-colors",
@@ -105,20 +102,13 @@ export default function IIRProfile() {
           )}
           title="Download PDF"
         >
-          {isDownloading ? (
-            <Loader2
-              size={ICON_SIZE}
-              className="animate-spin text-emerald-500"
-            />
-          ) : (
-            <Printer
-              size={ICON_SIZE}
-              className={cn(
-                "text-emerald-500 transition-transform",
-                "group-hover:scale-110",
-              )}
-            />
-          )}
+          <Printer
+            size={ICON_SIZE}
+            className={cn(
+              "text-emerald-500 transition-transform",
+              "group-hover:scale-110",
+            )}
+          />
         </button>
 
         {isAdmin ? (
@@ -131,13 +121,18 @@ export default function IIRProfile() {
           >
             <Trash
               size={ICON_SIZE}
-              className="text-red-500 transition-transform group-hover:scale-110"
+              className={cn(
+                "text-red-500 transition-transform",
+                "group-hover:scale-110",
+              )}
             />
           </button>
         ) : (
           <button
             onClick={() =>
-              finalIirId && navigate(`/student/iir/form?edit=true&iirId=${finalIirId}`)
+              navigate(
+                `/student/iir/form?edit=true&iirId=${finalIirId}`
+              )
             }
             className={cn(
               "group flex h-10 w-10 items-center justify-center rounded-xl",
@@ -156,7 +151,18 @@ export default function IIRProfile() {
           </button>
         )}
       </div>
-    ),
+    );
+  }, [finalIirId, isDownloading, isAdmin, navigate]);
+
+  usePageMetadata({
+    title: isAdmin ? "Individual Inventory Record" : "My IIR Profile",
+    description: isAdmin
+      ? "Comprehensive student record review for guidance purposes"
+      : "Manage your personal guidance information and student record",
+    badgeText: isAdmin ? "Admin Audit" : "Student Profile",
+    badgeIcon,
+    isLoading,
+    headerActions: headerActions || undefined,
   });
 
   if (isLoading || isMeLoading) {
@@ -250,6 +256,9 @@ export default function IIRProfile() {
     <Printer className="h-3.5 w-3.5" />
     IIR Print Copy
   </div>
+
+  <FullScreenLoader isLoading={isDownloading} message="Generating Document..." />
+  
       <div className="mt-4 flex w-full flex-col gap-8">
         <div className="grid h-full grid-cols-1 gap-4 xl:grid-cols-4">
           <BioCard data={studentData?.student} />

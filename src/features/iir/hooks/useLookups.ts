@@ -190,3 +190,17 @@ export function useStudentStatuses() {
     { ...CACHE_TIMING.IIR_LOOKUPS },
   );
 }
+
+/**
+ * Fetch educational attainments lookup data
+ * @returns Query result with educational attainments data
+ */
+export function useEducationalAttainments() {
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.educationalAttainments,
+    (config) => GetIIRLookup("educationalAttainments", config),
+    "GetIIRLookup",
+    "Fetch Educational Attainments",
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
+}

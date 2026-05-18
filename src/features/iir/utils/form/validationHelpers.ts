@@ -42,7 +42,8 @@ export function validateAllSections(
     rawErrors: {},
   };
 
-  for (let i = 1; i <= 11; i++) {
+  for (const sec of formSections) {
+    const i = sec.id;
     const sectionRef = sectionRefs[i];
 
     // Validate fields strictly to pull out raw field errors
@@ -66,7 +67,7 @@ export function validateAllSections(
     if (completion < 100) {
       result.incompleteCompletionSections.push(i);
       result.incompleteCompletionMessages.push(
-        `${formSections[i - 1].title} — ${completion}% complete (required 100%)`,
+        `${sec.title} — ${completion}% complete (required 100%)`,
       );
 
       if (!result.hasErrors) {

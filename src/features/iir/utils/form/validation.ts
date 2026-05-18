@@ -128,9 +128,39 @@ const personalInfoSchema = z.object({
   isEmployed: z.boolean(),
   employerName: z.string().nullable(),
   employerAddress: z.string().nullable(),
-  employerContact: z.string().nullable(),
+  employerContactNumber: z.string().nullable(),
+  livingInDorm: z.boolean(),
+  dormAddress: z.string().nullable(),
+  landlordName: z.string().nullable(),
+  landlordContactNumber: z.string().nullable(),
   emergencyContact: emergencyContactSchema,
-});
+}).refine(
+  (data) => {
+    if (data.livingInDorm) {
+      return (
+        !!data.dormAddress &&
+        !!data.landlordName &&
+        !!data.landlordContactNumber
+      );
+    }
+    return true;
+  },
+  {
+    message: "Dorm info is required when living in a dorm",
+    path: ["dormAddress"],
+  },
+).refine(
+  (data) => {
+    if (data.livingInDorm && data.landlordName) {
+      return /^[a-zA-Z\s.'-]+$/.test(data.landlordName);
+    }
+    return true;
+  },
+  {
+    message: "Invalid landlord name format",
+    path: ["landlordName"],
+  },
+);
 
 /**
  * Student address validation schema
@@ -208,7 +238,10 @@ const relatedPersonSchema = z.object({
   middleName: z.string().nullable(),
   lastName: z.string().min(1, "Last name is required"),
   dateOfBirth: z.string(),
-  educationalLevel: z.string().min(1, "Educational level is required"),
+  educationalAttainment: z.object({
+    id: z.number().min(1, "Educational attainment is required"),
+    name: z.string().optional(),
+  }),
   occupation: z.string().nullable(),
   employerName: z.string().nullable(),
   employerAddress: z.string().nullable(),
@@ -253,6 +286,8 @@ const healthRecordSchema = z.object({
   speechDetails: z.string().nullable(),
   generalHealthHasProblem: z.boolean(),
   generalHealthDetails: z.string().nullable(),
+  mentalEmotionalHasProblem: z.boolean(),
+  mentalEmotionalDetails: z.string().nullable(),
 });
 
 /**
