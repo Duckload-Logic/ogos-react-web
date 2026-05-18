@@ -161,6 +161,11 @@ export interface PersonalInfo {
   isEmployed: boolean;
   employerName: string | null;
   employerAddress: string | null;
+  employerContactNumber: string | null;
+  livingInDorm: boolean;
+  dormAddress: string | null;
+  landlordName: string | null;
+  landlordContactNumber: string | null;
   emergencyContact: EmergencyContact;
 }
 
@@ -196,7 +201,7 @@ export interface RelatedPerson {
   middleName: string | null;
   lastName: string;
   dateOfBirth: string;
-  educationalLevel: string;
+  educationalAttainment: EducationalLevel;
   occupation: string | null;
   employerName: string | null;
   employerAddress: string | null;
@@ -224,6 +229,8 @@ export interface HealthRecord {
   speechDetails: string | null;
   generalHealthHasProblem: boolean;
   generalHealthDetails: string | null;
+  mentalEmotionalHasProblem: boolean;
+  mentalEmotionalDetails: string | null;
 }
 
 export interface ConsultationRecord {

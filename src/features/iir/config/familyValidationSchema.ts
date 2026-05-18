@@ -161,19 +161,19 @@ RELATIONS.forEach(({ prefix, label }, idx) => {
     },
     commonRules.validDate(),
   ];
-  familyValidationSchema[`${prefix}.educationalLevel`] = [
+  familyValidationSchema[`${prefix}.educationalAttainment`] = [
     {
       type: "required",
       validate: (value: any, rootData: any) => {
         const person = rootData?.family?.relatedPersons?.[idx];
+        const id = value?.id || value;
         if (idx === 0 || idx === 2 || person?.isLiving !== false) {
-          return !!value && String(value).trim().length > 0;
+          return !!id && Number(id) > 0;
         }
         return true;
       },
       message: `${label} educational attainment is required`,
     },
-    commonRules.noSpecialChars(`${label} educational attainment`),
   ];
   familyValidationSchema[`${prefix}.occupation`] = [
     {

@@ -120,6 +120,65 @@ export const personalInformationValidationSchema: FieldValidationSchema = {
       message: "Employer address is required if employed",
     },
   ],
+  "student.personalInfo.employerContactNumber": [
+    commonRules.phone(),
+  ],
+  "student.personalInfo.livingInDorm": [
+    {
+      type: "required",
+      validate: (value: any) => value !== undefined && value !== null,
+      message: "Please indicate if you are living in a dorm",
+    },
+  ],
+  "student.personalInfo.dormAddress": [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        if (rootData?.student?.personalInfo?.livingInDorm === true) {
+          return value && String(value).trim().length > 0;
+        }
+        return true;
+      },
+      message: "Dorm address is required if living in a dorm",
+    },
+  ],
+  "student.personalInfo.landlordName": [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        if (rootData?.student?.personalInfo?.livingInDorm === true) {
+          return value && String(value).trim().length > 0;
+        }
+        return true;
+      },
+      message: "Landlord name is required if living in a dorm",
+    },
+    {
+      type: "nameFormat",
+      validate: (value: any, rootData: any) => {
+        if (
+          rootData?.student?.personalInfo?.livingInDorm === true &&
+          value
+        ) {
+          return /^[a-zA-Z\s.'-]+$/.test(value);
+        }
+        return true;
+      },
+      message: "Landlord name contains invalid characters",
+    },
+  ],
+  "student.personalInfo.landlordContactNumber": [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        if (rootData?.student?.personalInfo?.livingInDorm === true) {
+          return value && String(value).trim().length > 0;
+        }
+        return true;
+      },
+      message: "Landlord contact number is required if living in a dorm",
+    },
+  ],
 
   // Emergency Contact
   "student.personalInfo.emergencyContact.firstName": [
