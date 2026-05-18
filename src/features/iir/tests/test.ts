@@ -32,6 +32,11 @@ export const completeIIRForm: IIRForm = {
       isEmployed: false,
       employerName: null,
       employerAddress: null,
+      employerContactNumber: null,
+      livingInDorm: false,
+      dormAddress: null,
+      landlordName: null,
+      landlordContactNumber: null,
       emergencyContact: {
         firstName: "Maria",
         middleName: "Dela",
@@ -141,7 +146,7 @@ export const completeIIRForm: IIRForm = {
         middleName: "Dela", // If there's a suffix, append it to the firstName or lastName since there's no suffix field
         lastName: "Cruz Jr.",
         dateOfBirth: "1970-05-15",
-        educationalLevel: "College Graduate",
+        educationalAttainment: { id: 3, name: "College Graduate" },
         occupation: "Engineer",
         employerName: "Tech Corp",
         employerAddress: "Makati City",
@@ -155,7 +160,7 @@ export const completeIIRForm: IIRForm = {
         middleName: "Santos",
         lastName: "Cruz",
         dateOfBirth: "1972-08-20",
-        educationalLevel: "High School Graduate",
+        educationalAttainment: { id: 2, name: "High School Graduate" },
         occupation: "Housewife",
         employerName: null,
         employerAddress: null,
@@ -169,7 +174,7 @@ export const completeIIRForm: IIRForm = {
         middleName: "Ramos",
         lastName: "Cruz",
         dateOfBirth: "1965-11-02",
-        educationalLevel: "College Graduate",
+        educationalAttainment: { id: 3, name: "College Graduate" },
         occupation: "Business Owner",
         employerName: "Cruz Enterprises",
         employerAddress: "Quezon City",
@@ -196,6 +201,8 @@ export const completeIIRForm: IIRForm = {
       speechDetails: null,
       generalHealthHasProblem: false,
       generalHealthDetails: null,
+      mentalEmotionalHasProblem: false,
+      mentalEmotionalDetails: null,
     },
     consultations: [
       {
@@ -274,6 +281,11 @@ export const incompleteIIRForm: IIRForm = {
       isEmployed: false,
       employerName: null,
       employerAddress: null,
+      employerContactNumber: null,
+      livingInDorm: false,
+      dormAddress: null,
+      landlordName: null,
+      landlordContactNumber: null,
       emergencyContact: {} as any, // Incomplete
     },
     addresses: [],
@@ -334,6 +346,8 @@ export const healthConcernIIRForm: IIRForm = {
       speechDetails: null,
       generalHealthHasProblem: true,
       generalHealthDetails: "Asthma triggered by cold weather",
+      mentalEmotionalHasProblem: false,
+      mentalEmotionalDetails: null,
     },
     consultations: [
       {

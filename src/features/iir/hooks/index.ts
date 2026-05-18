@@ -27,6 +27,7 @@ export {
   useStudentSupportTypes,
   useActivityOptions,
   useStudentStatuses,
+  useEducationalAttainments,
 } from "./useLookups";
 export { useTouchedState } from "./useTouchedState";
 export { useIIRDownload } from "./useIIRDownload";

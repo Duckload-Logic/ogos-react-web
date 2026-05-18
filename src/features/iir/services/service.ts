@@ -44,6 +44,8 @@ const LOOKUP_GET_ROUTES = {
   studentRelationshipTypes: API_ROUTES.iir.lookups.studentRelationshipTypes,
   activityOptions: API_ROUTES.iir.lookups.activityOptions,
   studentStatuses: API_ROUTES.iir.lookups.studentStatuses,
+  educationalLevels: API_ROUTES.iir.lookups.educationalLevels,
+  educationalAttainments: API_ROUTES.iir.lookups.educationalAttainments,
 };
 
 const INVENTORY_GET_ROUTES = {
