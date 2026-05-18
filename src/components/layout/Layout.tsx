@@ -304,7 +304,10 @@ export default function Layout({
             <div className="relative min-w-0 flex-1 overflow-hidden">
               <div
                 ref={scrollRef}
-                className="relative z-10 flex h-full flex-col overflow-y-auto overflow-x-hidden"
+                className={cn(
+                  "relative z-10 flex max-h-full flex-col",
+                  "overflow-y-auto overflow-x-hidden pb-12",
+                )}
               >
                 <main className="flex-1 p-4 md:p-6 lg:p-8">
                   {showHeader && showSubHeader && (
