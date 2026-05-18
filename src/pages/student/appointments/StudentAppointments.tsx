@@ -280,7 +280,9 @@ export default function StudentAppointments() {
                 key={stat.id}
                 className={cn(
                   GLASS_CARD,
-                  "animate-fade-in-up group relative h-[124px] transition-all duration-300 hover:-translate-y-0.5 hover:shadow-[0_16px_36px_rgba(15,23,42,0.075)]",
+                  "animate-fade-in-up group relative h-[124px] " +
+                    "transition-all duration-300 hover:-translate-y-0.5 " +
+                    "hover:shadow-[0_16px_36px_rgba(15,23,42,0.075)]",
                   statusMeta.card,
                 )}
                 style={{
@@ -288,133 +290,50 @@ export default function StudentAppointments() {
                   animationFillMode: "both",
                 }}
               >
-                Go to COR Management
-              </Link>
-            </AlertDescription>
-          </Alert>
-        )}
-
-        <section className="overflow-x-auto pb-1">
-          <div
-            className="grid min-w-[1180px] gap-4 xl:min-w-0"
-            style={{
-              gridTemplateColumns: `repeat(${Math.max(
-                appointmentStatuses.length,
-                1,
-              )}, minmax(150px, 1fr))`,
-            }}
-          >
-            {appointmentStatuses.map((stat: AppointmentStatus, index: number) => {
-              const count =
-                statusCounts?.find((s) => String(s.id) === String(stat.id))
-                  ?.count || 0;
-
-              const statusMeta = getStatusCardMeta(stat.name);
-              const StatusIcon = statusMeta.icon;
-
-              return (
-                <Card
-                  key={stat.id}
+                <div
                   className={cn(
-                    "pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full blur-2xl",
+                    "pointer-events-none absolute -right-8 -top-8 " +
+                      "h-28 w-28 rounded-full blur-2xl",
                     statusMeta.glow,
                   )}
-                  style={{
-                    animationDelay: `${0.05 * (index + 1)}s`,
-                    animationFillMode: "both",
-                  }}
-                >
-                  <div
-                    className={cn(
-                      "pointer-events-none absolute -right-8 -top-8 h-28 w-28 rounded-full blur-2xl",
-                      statusMeta.glow,
-                    )}
-                  />
+                />
 
-                  <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/70 dark:bg-white/15" />
-                  <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-white/28 to-transparent dark:from-black/15" />
+                <div className={cn(
+                  "pointer-events-none absolute inset-x-0 top-0 h-px",
+                  "bg-white/70 dark:bg-white/15",
+                )} />
+                <div className={cn(
+                  "pointer-events-none absolute inset-x-0 bottom-0",
+                  "h-1/2 bg-gradient-to-t from-white/28 to-transparent",
+                  "dark:from-black/15",
+                )} />
 
-                  <CardContent className="relative flex h-full flex-col justify-between p-4">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="min-w-0">
-                        <p
-                          title={stat.name}
-                          className={cn(
-                            "whitespace-nowrap text-[11px] font-extrabold uppercase tracking-[0.18em]",
-                            statusMeta.label,
-                          )}
-                        >
-                          {stat.name}
-                        </p>
-
-                <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/70 dark:bg-white/15" />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-white/28 to-transparent dark:from-black/15" />
-
-                      <div
+                <CardContent className="relative flex h-full flex-col justify-between p-4">
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="min-w-0">
+                      <p
+                        title={stat.name}
                         className={cn(
-                          "whitespace-nowrap text-[11px] font-extrabold uppercase tracking-[0.18em]",
+                          "whitespace-nowrap text-[11px] font-extrabold " +
+                            "uppercase tracking-[0.18em]",
                           statusMeta.label,
                         )}
                       >
-                        <StatusIcon className="h-5 w-5" strokeWidth={2} />
-                      </div>
-                    </div>
-
-                      <p className="mt-1 whitespace-nowrap text-[11px] font-medium text-muted-foreground/75">
+                        {stat.name}
+                      </p>
+                      <p className={cn(
+                        "mt-1 whitespace-nowrap text-[11px] font-medium",
+                        "text-muted-foreground/75",
+                      )}>
                         Appointment status
                       </p>
-
-                      <span
-                        className={cn(
-                          "rounded-full px-3 py-1",
-                          "text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground/85",
-                          GLASS_INNER,
-                        )}
-                      >
-                        Total
-                      </span>
                     </div>
-                  </CardContent>
-                </Card>
-              );
-            })}
-          </div>
-        </section>
 
-        <Card className={cn(GLASS_CARD, "animate-fade-in-up")}>
-          <CardHeader className="border-b border-white/30 px-4 py-3 dark:border-white/10">
-            <div className="scrollbar-hide flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
-              {filterStatuses?.map((filter: AppointmentStatus) => {
-                const isActive = selectedStatus.id === filter.id;
-                const count =
-                  filter.id === 0
-                    ? statusCounts.reduce(
-                        (sum, item) => sum + (item.count || 0),
-                        0,
-                      )
-                    : statusCounts?.find((s) => s.id === filter.id)?.count ||
-                      0;
-
-                return (
-                  <Button
-                    key={filter.id}
-                    onClick={() => {
-                      setSelectedStatus(filter);
-                      setCurrentPage(1);
-                    }}
-                    variant={isActive ? "default" : "ghost"}
-                    size="sm"
-                    className={cn(
-                      "flex h-9 shrink-0 items-center gap-1.5 whitespace-nowrap rounded-xl px-3 text-xs font-medium transition-all duration-200",
-                      isActive
-                        ? "shadow-md shadow-primary/15"
-                        : "hover:bg-white/40 dark:hover:bg-white/[0.06]",
-                    )}
-                  >
-                    <span>{filter.name}</span>
-                    <Badge
+                    <div
                       className={cn(
-                        "flex h-11 w-11 shrink-0 items-center justify-center rounded-[15px] transition-transform duration-300 group-hover:scale-105",
+                        "flex h-11 w-11 shrink-0 items-center justify-center " +
+                          "rounded-[15px] transition-transform duration-300 " +
+                          "group-hover:scale-105",
                         statusMeta.iconBox,
                       )}
                     >
@@ -425,35 +344,14 @@ export default function StudentAppointments() {
                   <div className="flex items-end justify-between gap-3">
                     <p className="text-[34px] font-black leading-none tracking-tight text-foreground tabular-nums">
                       {count}
-                    </Badge>
-                  </Button>
-                );
-              })}
-            </div>
-          </CardHeader>
-
-          <CardContent className="p-0">
-            {isAppointmentsLoading ? (
-              <div className="flex items-center justify-center py-16">
-                <Spinner size="md" message="Loading your appointments..." />
-              </div>
-            ) : appointments.length > 0 ? (
-              <>
-                <div className="divide-y divide-white/25 dark:divide-white/10">
-                  {appointments.map((appointment: Appointment, index: number) => (
-                    <div
-                      key={appointment.id}
+                    </p>
+                    <span
                       className={cn(
-                        "rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.16em] text-muted-foreground/85",
+                        "rounded-full px-3 py-1",
+                        "text-[10px] font-bold uppercase " +
+                          "tracking-[0.16em] text-muted-foreground/85",
                         GLASS_INNER,
                       )}
-                      style={{
-                        animationDelay: `${0.04 * (index + 1)}s`,
-                        animationFillMode: "both",
-                      }}
-                      onClick={() =>
-                        navigate(`/student/appointments/${appointment.id}`)
-                      }
                     >
                       Total
                     </span>
@@ -538,25 +436,19 @@ export default function StudentAppointments() {
                           GLASS_INNER,
                         )}
                       >
-                        <div className="mb-1 text-xs font-semibold uppercase text-primary">
+                        <div className={cn(
+                          "mb-1 text-xs font-semibold uppercase text-primary",
+                        )}>
                           {new Date(appointment.whenDate).toLocaleDateString(
                             "en-US",
                             { month: "short" },
                           )}
-                        >
-                          <div className="mb-1 text-xs font-semibold uppercase text-primary">
-                            {new Date(appointment.whenDate).toLocaleDateString(
-                              "en-US",
-                              {
-                                month: "short",
-                              },
-                            )}
-                          </div>
-
-                          <div className="text-2xl font-bold text-primary">
-                            {new Date(appointment.whenDate).getDate()}
-                          </div>
                         </div>
+
+                        <div className="text-2xl font-bold text-primary">
+                          {new Date(appointment.whenDate).getDate()}
+                        </div>
+                      </div>
 
                       <div className="min-w-0 flex-1">
                         <div className="flex items-start justify-between gap-3">
@@ -609,8 +501,9 @@ export default function StudentAppointments() {
                         </div>
                       </div>
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
+              </div>
 
               <Separator className="bg-white/25 dark:bg-white/10" />
 
@@ -622,110 +515,60 @@ export default function StudentAppointments() {
               />
             </>
           ) : (
-            <>
-              <div className="px-4 py-10 sm:px-6 sm:py-12">
-                <div className="mx-auto flex max-w-md flex-col items-center text-center">
-                  <div
-                    className={cn(
-                      "mb-4 flex h-20 w-20 items-center justify-center rounded-full",
-                      GLASS_INNER,
-                    )}
-                  >
-                    <CalendarX className="h-9 w-9 text-muted-foreground" />
-                  </div>
-
-                  <h3 className="mb-2 text-xl font-semibold text-foreground">
-                    No appointments found
-                  </h3>
-
-                  <p className="mb-6 text-sm text-muted-foreground">
-                    {selectedStatus.id === 0
-                      ? "You haven't scheduled any appointments yet. Book your first counseling session now."
-                      : `No ${selectedStatus.name.toLowerCase()} appointments found.`}
-                  </p>
-
-                  {selectedStatus.id === 0 && (
-                    <Button
-                      asChild={!!user?.studentCorUrl}
-                      disabled={!user?.studentCorUrl}
-                      className="rounded-xl shadow-lg shadow-primary/15"
-                      title={
-                        !user?.studentCorUrl
-                          ? "Please upload your COR in your profile to book an appointment"
-                          : ""
-                      }
-                      onClick={(e) => {
-                        if (!user?.studentCorUrl) {
-                          e.preventDefault();
-                        }
-                      }}
-                    >
-                      {user?.studentCorUrl ? (
-                        <Link to="/student/appointments/schedule">
-                          <Plus className="mr-2 h-4 w-4" />
-                          Schedule Appointment
-                        </Link>
-                      ) : (
-                        <div className="flex items-center">
-                          <Plus className="mr-2 h-4 w-4 opacity-50" />
-                          Schedule Appointment
-                        </div>
-                      )}
-                    >
-                      <CalendarX className="h-9 w-9 text-muted-foreground" />
-                    </div>
-
-                    <h3 className="mb-2 text-xl font-semibold text-foreground">
-                      No appointments found
-                    </h3>
-
-                    <p className="mb-6 text-sm text-muted-foreground">
-                      {selectedStatus.id === 0
-                        ? "You haven't scheduled any appointments yet. Book your first counseling session now."
-                        : `No ${selectedStatus.name.toLowerCase()} appointments found.`}
-                    </p>
-
-                    {selectedStatus.id === 0 && (
-                      <Button
-                        asChild={!!user?.studentCorUrl}
-                        disabled={!user?.studentCorUrl}
-                        className="rounded-xl shadow-lg shadow-primary/15"
-                        title={
-                          !user?.studentCorUrl
-                            ? "Please upload your COR in your profile to book an appointment"
-                            : ""
-                        }
-                        onClick={(e) => {
-                          if (!user?.studentCorUrl) {
-                            e.preventDefault();
-                          }
-                        }}
-                      >
-                        {user?.studentCorUrl ? (
-                          <Link to="/student/appointments/schedule">
-                            <Plus className="mr-2 h-4 w-4" />
-                            Schedule Appointment
-                          </Link>
-                        ) : (
-                          <div className="flex items-center">
-                            <Plus className="mr-2 h-4 w-4 opacity-50" />
-                            Schedule Appointment
-                          </div>
-                        )}
-                      </Button>
-                    )}
-                  </div>
+            <div className="px-4 py-10 sm:px-6 sm:py-12">
+              <div className="mx-auto flex max-w-md flex-col items-center text-center">
+                <div
+                  className={cn(
+                    "mb-4 flex h-20 w-20 items-center justify-center rounded-full",
+                    GLASS_INNER,
+                  )}
+                >
+                  <CalendarX className="h-9 w-9 text-muted-foreground" />
                 </div>
 
-              <Separator className="bg-white/25 dark:bg-white/10" />
+                <h3 className="mb-2 text-xl font-semibold text-foreground">
+                  No appointments found
+                </h3>
 
-              <Pagination
-                currentPage={currentPage}
-                totalPages={data?.totalPages || 1}
-                onPageChange={(page) => setCurrentPage(page)}
-                className="mt-0 border-t-0 px-4 py-3"
-              />
-            </>
+                <p className="mb-6 text-sm text-muted-foreground">
+                  {selectedStatus.id === 0
+                    ? "You haven't scheduled any appointments yet. " +
+                      "Book your first counseling session now."
+                    : `No ${selectedStatus.name.toLowerCase()} appointments found.`}
+                </p>
+
+                {selectedStatus.id === 0 && (
+                  <Button
+                    asChild={!!user?.studentCorUrl}
+                    disabled={!user?.studentCorUrl}
+                    className="rounded-xl shadow-lg shadow-primary/15"
+                    title={
+                      !user?.studentCorUrl
+                        ? "Please upload your COR " +
+                          "in your profile to book an appointment"
+                        : ""
+                    }
+                    onClick={(e) => {
+                      if (!user?.studentCorUrl) {
+                        e.preventDefault();
+                      }
+                    }}
+                  >
+                    {user?.studentCorUrl ? (
+                      <Link to="/student/appointments/schedule">
+                        <Plus className="mr-2 h-4 w-4" />
+                        Schedule Appointment
+                      </Link>
+                    ) : (
+                      <div className="flex items-center">
+                        <Plus className="mr-2 h-4 w-4 opacity-50" />
+                        Schedule Appointment
+                      </div>
+                    )}
+                  </Button>
+                )}
+              </div>
+            </div>
           )}
         </CardContent>
       </Card>
