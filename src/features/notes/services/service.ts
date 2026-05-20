@@ -28,14 +28,11 @@ export async function PostNote(
     // Handle Day One student (403 Forbidden)
     if (error.response?.status === 403) {
       const stepName = config?.stepName || "Check IIR Profile";
-      console.error(
-        `[${handlerName}] {${stepName}}: ` + `${error.response.data?.error}`,
-      );
       throw new Error("Please complete your IIR profile");
     }
 
     const stepName = config?.stepName || "Create Note";
-    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
+
     throw error;
   }
 }
@@ -63,14 +60,12 @@ export async function GetNotesByIirId(
     // Handle Day One student (403 Forbidden)
     if (error.response?.status === 403) {
       const stepName = config?.stepName || "Check IIR Profile";
-      console.error(
-        `[${handlerName}] {${stepName}}: ` + `${error.response.data?.error}`,
-      );
+
       throw new Error("Please complete your IIR profile");
     }
 
     const stepName = config?.stepName || "Fetch Notes";
-    console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
+
     throw error;
   }
 }

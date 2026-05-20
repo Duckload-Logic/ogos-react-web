@@ -36,9 +36,7 @@ export const GetM2MClients = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetM2MClients";
-    const stepName = config?.stepName || "Fetch M2M Clients";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -58,9 +56,7 @@ export const PostM2MClient = async (
     );
     return response.data;
   } catch (error) {
-    const handlerName = config?.handlerName || "PostM2MClient";
-    const stepName = config?.stepName || "Create M2M Client";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -73,14 +69,9 @@ export const DeleteM2MClient = async (
   config?: AxiosConfigWithMeta,
 ): Promise<void> => {
   try {
-    await apiClient.delete(
-      API_ROUTES.superadmin.m2mClients.revoke(id),
-      config,
-    );
+    await apiClient.delete(API_ROUTES.superadmin.m2mClients.revoke(id), config);
   } catch (error) {
-    const handlerName = config?.handlerName || "DeleteM2MClient";
-    const stepName = config?.stepName || "Revoke M2M Client";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -100,9 +91,7 @@ export const PostM2MSecret = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "PostM2MSecret";
-    const stepName = config?.stepName || "Rotate M2M Secret";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -121,9 +110,7 @@ export const PatchVerifyM2MClient = async (
       config,
     );
   } catch (error) {
-    const handlerName = config?.handlerName || "PatchVerifyM2MClient";
-    const stepName = config?.stepName || "Verify M2M Client";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -136,15 +123,13 @@ export const GetUsers = async (
   config?: AxiosConfigWithMeta,
 ): Promise<ListUsersResponse> => {
   try {
-    const { data } = await apiClient.get(
-      API_ROUTES.superadmin.users.list,
-      { ...config, params },
-    );
+    const { data } = await apiClient.get(API_ROUTES.superadmin.users.list, {
+      ...config,
+      params,
+    });
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetUsers";
-    const stepName = config?.stepName || "Fetch User List";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -162,9 +147,7 @@ export const GetUserDistribution = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetUserDistribution";
-    const stepName = config?.stepName || "Fetch User Distribution";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -184,9 +167,7 @@ export const PostToggleUserStatus = async (
       config,
     );
   } catch (error) {
-    const handlerName = config?.handlerName || "PostToggleUserStatus";
-    const stepName = config?.stepName || `${action} user`.toUpperCase();
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -204,9 +185,7 @@ export const GetAdminAnalytics = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetAdminAnalytics";
-    const stepName = config?.stepName || "Fetch Admin Analytics";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -219,15 +198,13 @@ export const GetSecurityLogs = async (
   config?: AxiosConfigWithMeta,
 ): Promise<SystemLogsResponse> => {
   try {
-    const { data } = await apiClient.get(
-      API_ROUTES.superadmin.logs.security,
-      { ...config, params },
-    );
+    const { data } = await apiClient.get(API_ROUTES.superadmin.logs.security, {
+      ...config,
+      params,
+    });
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetSecurityLogs";
-    const stepName = config?.stepName || "Fetch Security Logs";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -240,15 +217,13 @@ export const GetSystemLogs = async (
   config?: AxiosConfigWithMeta,
 ): Promise<SystemLogsResponse> => {
   try {
-    const { data } = await apiClient.get(
-      API_ROUTES.superadmin.logs.system,
-      { ...config, params },
-    );
+    const { data } = await apiClient.get(API_ROUTES.superadmin.logs.system, {
+      ...config,
+      params,
+    });
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetSystemLogs";
-    const stepName = config?.stepName || "Fetch System Logs";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -261,15 +236,13 @@ export const GetAuditLogs = async (
   config?: AxiosConfigWithMeta,
 ): Promise<SystemLogsResponse> => {
   try {
-    const { data } = await apiClient.get(
-      API_ROUTES.superadmin.logs.audit,
-      { ...config, params },
-    );
+    const { data } = await apiClient.get(API_ROUTES.superadmin.logs.audit, {
+      ...config,
+      params,
+    });
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetAuditLogs";
-    const stepName = config?.stepName || "Fetch Audit Logs";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -283,21 +256,16 @@ export const GetLogStats = async (
   config?: AxiosConfigWithMeta,
 ): Promise<LogStats[]> => {
   try {
-    const { data } = await apiClient.get(
-      API_ROUTES.superadmin.logs.stats,
-      {
-        ...config,
-        params: {
-          start_date: startDate,
-          end_date: endDate,
-        },
+    const { data } = await apiClient.get(API_ROUTES.superadmin.logs.stats, {
+      ...config,
+      params: {
+        start_date: startDate,
+        end_date: endDate,
       },
-    );
+    });
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetLogStats";
-    const stepName = config?.stepName || "Fetch Log Stats";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -315,9 +283,7 @@ export const GetLogActivity = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetLogActivity";
-    const stepName = config?.stepName || "Fetch Log Activity";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -336,9 +302,7 @@ export const GetUserSessions = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetUserSessions";
-    const stepName = config?.stepName || "Fetch User Sessions";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -357,9 +321,7 @@ export const DeleteUserSession = async (
       config,
     );
   } catch (error) {
-    const handlerName = config?.handlerName || "DeleteUserSession";
-    const stepName = config?.stepName || "Revoke User Session";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -379,9 +341,7 @@ export const GetUserActivity = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetUserActivity";
-    const stepName = config?.stepName || "Fetch User Activity";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
