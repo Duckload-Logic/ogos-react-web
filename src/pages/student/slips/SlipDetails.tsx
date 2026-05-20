@@ -88,7 +88,7 @@ export default function SlipDetails() {
                 <CardContent className="space-y-6 pt-6">
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground">
                         Date of Absence
                       </p>
                       <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ export default function SlipDetails() {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground">
                         Date Needed
                       </p>
                       <div className="flex items-center gap-2">
@@ -117,7 +117,7 @@ export default function SlipDetails() {
                       </div>
                     </div>
                     <div className="space-y-1 sm:col-span-2">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground">
                         Category
                       </p>
                       <div className="flex items-center gap-2">
@@ -129,7 +129,7 @@ export default function SlipDetails() {
                   </div>
 
                   <div className="border-t border-border/40 pt-4">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
                       Reason provided
                     </p>
                     <div className="rounded-lg border border-border/40 bg-muted/50 p-4">
@@ -203,10 +203,10 @@ export default function SlipDetails() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex flex-col items-center justify-center rounded-xl bg-background/50 py-6 text-center shadow-inner">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      <p className="text-[10px] font-bold uppercase text-muted-foreground">
                         Your Ticket Code
                       </p>
-                      <p className="font-mono text-3xl font-black tracking-tighter text-foreground">
+                      <p className="font-mono text-3xl tracking-tighter text-foreground">
                         {slip.ticket.ticketCode}
                       </p>
                     </div>

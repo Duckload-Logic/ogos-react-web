@@ -120,7 +120,7 @@ const DashboardLayout: React.FC = () => {
             >
               {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
             </button>
-            <div className="hidden items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted-foreground/60 lg:flex">
+            <div className="hidden items-center gap-2 text-xs font-bold uppercase text-muted-foreground/60 lg:flex">
               Service <span className="text-border">/</span>{" "}
               {menuItems.find((i) => i.path === location.pathname)?.name ||
                 "Dashboard"}

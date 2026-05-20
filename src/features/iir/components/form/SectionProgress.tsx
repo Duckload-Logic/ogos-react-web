@@ -95,7 +95,7 @@ export function SectionProgress({
             )}
           >
             <div className="flex flex-col text-left">
-              <span className="mb-0.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+              <span className="mb-0.5 text-[10px] font-bold uppercase text-muted-foreground">
                 Section {currentSection} of {sections.length}
               </span>
               <span className="max-w-[200px] truncate text-sm font-bold text-foreground">
@@ -168,7 +168,7 @@ export function SectionProgress({
             )}
           >
             <div className="flex flex-col gap-1 px-1">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.25em] text-primary">
+              <h2 className="text-[10px] uppercase tracking-[0.25em] text-primary">
                 IIR Wizard Progress
               </h2>
               <div className="flex items-center gap-2">
@@ -267,7 +267,7 @@ export function SectionProgress({
                         {sectionTitle}
                       </span>
                       {active && (
-                        <span className="text-[9px] font-medium uppercase tracking-widest text-primary/70">
+                        <span className="text-[9px] font-medium uppercase text-primary/70">
                           Current Step
                         </span>
                       )}

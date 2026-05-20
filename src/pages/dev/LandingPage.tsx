@@ -217,7 +217,7 @@ const LandingPage: React.FC = () => {
               </span>
             </span>
           </div>
-          <div className="flex gap-8 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
+          <div className="flex gap-8 text-[10px] font-bold uppercase text-muted-foreground/40">
             <a
               href="https://www.pup.edu.ph/privacy/"
               target="_blank"

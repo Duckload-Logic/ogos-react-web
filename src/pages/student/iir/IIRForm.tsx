@@ -10,13 +10,10 @@ import {
 } from "@/features/iir/hooks";
 import { IIRForm as IIRFormType } from "@/features/iir/types";
 import { EMPTY_IIR_FORM } from "@/features/iir/constants";
-import { Spinner } from "@/components/shared";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import Layout from "@/components/layout/Layout";
 import { usePageMetadata } from "@/context";
 import { useToast } from "@/context";
 import { Button } from "@/components/ui/button";
-import { HeroSection } from "@/components/ui/hero-section";
 import { AnimationStyles } from "@/components/ui/animations";
 import {
   AlertDialog,
@@ -48,8 +45,6 @@ import {
 } from "@/features/iir/components/form";
 import {
   updateNestedField,
-  getOverallCompletion,
-  getSectionStatus,
   createResetFormData,
   initializeFormData,
   calculateSectionCompletion,
@@ -64,7 +59,6 @@ import { SectionProgress } from "@/features/iir/components/form/SectionProgress"
 import ConsentDialog from "@/features/iir/components/form/ConsentDialog";
 import { cn } from "@/lib/utils";
 import { PatchIIRSubmit } from "@/features/iir/services/service";
-import { completeIIRForm } from "@/features/iir/tests/test";
 
 const FORM_SECTIONS = [
   { title: "Basic Info", id: 1, key: "personal_basic", main: 1 },
@@ -87,9 +81,7 @@ export default function IIRForm() {
   const isEditMode = searchParams.get("edit") === "true" && !!editIirId;
   const activeSections = useMemo(() => {
     if (isEditMode) {
-      return FORM_SECTIONS.filter((s) =>
-        [1, 2, 3, 4, 7, 8].includes(s.id),
-      );
+      return FORM_SECTIONS.filter((s) => [1, 2, 3, 4, 7, 8].includes(s.id));
     }
     return FORM_SECTIONS;
   }, [isEditMode]);
@@ -132,9 +124,7 @@ export default function IIRForm() {
     }
     return parsed;
   });
-  const currentIndex = activeSections.findIndex(
-    (s) => s.id === currentSection,
-  );
+  const currentIndex = activeSections.findIndex((s) => s.id === currentSection);
   const [localFormData, setLocalFormData] = useState<IIRFormType | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -173,10 +163,17 @@ export default function IIRForm() {
       )
         return;
 
+      // In edit mode, wait for the profile fetch to land before
+      // initializing — without this, hasInitialized flips true on the
+      // first render while editProfileData is still undefined, locking
+      // the form on empty permanently and preventing toDateOnly from
+      // ever running on the real server data.
+      if (isEditMode && !editProfileData) return;
+
       const sourceData = isEditMode ? editProfileData || draft : draft;
       const initializedData = initializeFormData(
-        completeIIRForm,
-        // sourceData ?? null,
+        // completeIIRForm,
+        sourceData ?? null,
         EMPTY_IIR_FORM,
         me,
       );
@@ -291,7 +288,6 @@ export default function IIRForm() {
 
     const validation = validateSection(sectionRefs[currentSection]);
     if (!validation.isValid) {
-      console.debug("Validation errors:", validation.errors);
       markAllTouched(); // Reveal inline errors in the current section
       setValidationErrorList(Object.values(validation.errors));
       setShowValidationError(true);
@@ -393,6 +389,7 @@ export default function IIRForm() {
     }
 
     // All validations passed, clear section errors and open legal consent dialog
+    clearDraft();
     setSectionsWithErrors([]);
     setShowValidationError(false);
     setShowConsentDialog(true);
@@ -421,14 +418,12 @@ export default function IIRForm() {
       setShowConsentDialog(false);
       triggerToast(
         isEditMode
-          ? "✓ IIR profile updated successfully!"
-          : "✓ Form submitted successfully!",
+          ? "IIR profile updated successfully!"
+          : "Form submitted successfully!",
       );
       setShowSuccessPopup(true);
 
-      setTimeout(() => {
-        navigate(isEditMode ? "/student/iir" : "/student");
-      }, 3000);
+      localStorage.setItem("refresh_student_profile", "true");
     } catch (err: any) {
       console.error("Error submitting form:", err);
       const errorMessage =
@@ -456,9 +451,6 @@ export default function IIRForm() {
     triggerToast("Form has been reset.");
   };
 
-  const currentSectionDef = activeSections.find(
-    (s) => s.id === currentSection,
-  );
   const badgeIcon = useMemo(() => <User className="h-4 w-4" />, []);
 
   usePageMetadata({
@@ -606,7 +598,7 @@ export default function IIRForm() {
                         />
                         <span
                           className={cn(
-                            "text-[11px] font-black uppercase tracking-wider",
+                            "text-[11px] uppercase",
                             "text-neutral-900 dark:text-white",
                           )}
                         >
@@ -754,7 +746,7 @@ export default function IIRForm() {
                           disabled={isSaving}
                           className={cn(
                             "flex h-12 items-center gap-2 rounded-2xl bg-primary",
-                            "px-6 font-black tracking-tight",
+                            "px-6 tracking-tight",
                             "text-primary-foreground shadow-xl shadow-primary/20",
                             "transition-all duration-300 hover:bg-primary/90",
                             "active:scale-95 sm:px-10",
@@ -800,9 +792,7 @@ export default function IIRForm() {
 
         <SuccessPopup
           isOpen={showSuccessPopup}
-          onReturn={() =>
-            navigate(isEditMode ? "/student/iir" : "/student")
-          }
+          onReturn={() => navigate(isEditMode ? "/student/iir" : "/student")}
           isEditMode={isEditMode}
         />
 
@@ -817,7 +807,7 @@ export default function IIRForm() {
             )}
           >
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-2xl font-black tracking-tight">
+              <AlertDialogTitle className="text-2xl tracking-tight">
                 Erase everything?
               </AlertDialogTitle>
               <AlertDialogDescription className="font-medium leading-relaxed text-neutral-500 dark:text-neutral-400">
@@ -883,10 +873,10 @@ function SuccessPopup({
     >
       <div
         className={cn(
-          "animate-in zoom-in-95 w-full max-w-md rounded-[40px] border",
-          "border-white/20 bg-white/90 p-10 text-center",
+          "animate-in zoom-in-95 w-full max-w-md rounded-2xl border",
+          "border-card bg-card p-10 text-center",
           "shadow-[0_32px_120px_rgba(0,0,0,0.15)] backdrop-blur-2xl",
-          "duration-500 dark:border-white/10 dark:bg-neutral-900/90",
+          "duration-500",
         )}
       >
         <div className="mb-8 flex justify-center">
@@ -895,7 +885,7 @@ function SuccessPopup({
             <div
               className={cn(
                 "relative flex h-20 w-20 items-center justify-center",
-                "rounded-[28px] bg-green-500 shadow-xl shadow-green-500/30",
+                "rounded-full bg-green-500 shadow-xl shadow-green-500/30",
               )}
             >
               <Check
@@ -922,19 +912,18 @@ function SuccessPopup({
           {isEditMode
             ? "Your Individual Inventory Record has been successfully " +
               "updated and saved."
-            : "Your Individual Inventory Record has been successfully " +
+            : "Your Individual Inventory Re1cord has been successfully " +
               "submitted and saved to our secure database."}
         </p>
         <Button
           onClick={onReturn}
           className={cn(
-            "h-14 w-full rounded-2xl bg-neutral-900 text-lg font-bold",
-            "text-white shadow-xl transition-all",
-            "duration-300 hover:bg-neutral-800 active:scale-95",
-            "dark:bg-white dark:text-neutral-950 dark:hover:bg-neutral-200",
+            "h-14 w-full rounded-md bg-primary text-lg font-bold text-primary-foreground",
+            "shadow-xl transition-all",
+            "duration-300 hover:bg-primary/90 active:scale-95",
           )}
         >
-          Back to Dashboard
+          Complete
         </Button>
       </div>
     </div>

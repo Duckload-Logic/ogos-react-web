@@ -1,6 +1,5 @@
 import { useState } from "react";
 import {
-  Key,
   Plus,
   Trash2,
   Copy,
@@ -13,7 +12,6 @@ import {
   Ban,
   RefreshCw,
   Fingerprint,
-  Info,
 } from "lucide-react";
 import { usePageMetadata } from "@/context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -464,7 +462,7 @@ export default function M2MManagement() {
                 </div>
 
                 <div className="flex flex-col gap-2">
-                  <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
+                  <Label className="text-[10px] uppercase text-muted-foreground">
                     Client Secret
                   </Label>
                   <div className="flex min-w-0 items-center gap-2">

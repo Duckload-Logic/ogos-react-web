@@ -54,10 +54,7 @@ export const EMPTY_IIR_FORM: IIRForm = {
       employerName: null,
       employerAddress: null,
       employerContactNumber: null,
-      livingInDorm: false,
-      dormAddress: null,
-      landlordName: null,
-      landlordContactNumber: null,
+
       emergencyContact: {
         firstName: "",
         middleName: null,

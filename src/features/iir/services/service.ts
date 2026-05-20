@@ -5,7 +5,6 @@ import { QueryParam, IIRForm } from "../types";
 import { decamelizeKeys } from "humps";
 import { transformFormToPayload } from "../utils/form/transform";
 
-
 /**
  * Check if student has completed onboarding
  * @param userID - User ID to check
@@ -23,9 +22,7 @@ export const CheckStudentOnboarding = async (
     );
     return data?.isSubmitted;
   } catch (error) {
-    const handlerName = config?.handlerName || "CheckStudentOnboarding";
-    const stepName = config?.stepName || "Check Onboarding";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -33,6 +30,7 @@ export const CheckStudentOnboarding = async (
 const LOOKUP_GET_ROUTES = {
   courses: API_ROUTES.iir.lookups.courses,
   genders: API_ROUTES.iir.lookups.genders,
+  enrollmentYears: API_ROUTES.iir.lookups.enrollmentYears,
   religions: API_ROUTES.iir.lookups.religions,
   parentalStatusTypes: API_ROUTES.iir.lookups.parentalStatusTypes,
   enrollmentReasons: API_ROUTES.iir.lookups.enrollmentReasons,
@@ -103,9 +101,7 @@ export const GetIIRLookup = async (
     const { data } = await apiClient.get(route, config);
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetIIRLookup";
-    const stepName = config?.stepName || `Fetch ${lookupType}`;
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -127,9 +123,7 @@ export const GetStudents = async (
     });
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetStudents";
-    const stepName = config?.stepName || "Fetch Students";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -151,9 +145,7 @@ export const GetIIRByUserId = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetIIRByUserId";
-    const stepName = config?.stepName || "Fetch IIR by User";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -172,9 +164,7 @@ export const GetIIRByMe = async (config?: AxiosConfigWithMeta) => {
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetIIRBySessionId";
-    const stepName = config?.stepName || "Fetch IIR by Session";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -196,9 +186,7 @@ export const GetIIRByIirId = async (
     );
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetIIRByIirId";
-    const stepName = config?.stepName || "Fetch IIR by ID";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -224,9 +212,7 @@ export const GetIIRResource = async (
       return data;
     }
   } catch (error) {
-    const handlerName = config?.handlerName || "GetIIRResource";
-    const stepName = config?.stepName || `Fetch ${resourceType}`;
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -243,9 +229,7 @@ export const GetIIRDraft = async (
     const { data } = await apiClient.get(DRAFT_ROUTES.submitDraft, config);
     return data || null;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetIIRDraft";
-    const stepName = config?.stepName || "Fetch Draft";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -264,9 +248,7 @@ export const PostIIRDraft = async (
     const payload = transformFormToPayload(data);
     await apiClient.post(DRAFT_ROUTES.saveSection, payload, config);
   } catch (error) {
-    const handlerName = config?.handlerName || "PostIIRDraft";
-    const stepName = config?.stepName || "Save Draft";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -285,13 +267,10 @@ export const PostIIRSubmit = async (
     const payload = transformFormToPayload(iir);
     await apiClient.post(POST_ROUTES.submit, payload, config);
   } catch (error) {
-    const handlerName = config?.handlerName || "PostIIRSubmit";
-    const stepName = config?.stepName || "Submit Form";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
-
 
 /**
  * Update an existing IIR form/profile.
@@ -307,9 +286,7 @@ export const PatchIIRSubmit = async (
     const payload = transformFormToPayload({ ...iir, id: iirID });
     await apiClient.patch(POST_ROUTES.update(iirID), payload, config);
   } catch (error) {
-    const handlerName = config?.handlerName || "PatchIIRSubmit";
-    const stepName = config?.stepName || "Update IIR Form";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -338,9 +315,7 @@ export const UploadIIRCor = async (
       headers: { "Content-Type": "multipart/form-data" },
     });
   } catch (error) {
-    const handlerName = config?.handlerName || "UploadIIRCor";
-    const stepName = config?.stepName || "Upload COR";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -379,9 +354,7 @@ export const DownloadIIRPDF = async (
       fileName,
     };
   } catch (error) {
-    const handlerName = config?.handlerName || "DownloadIIRPDF";
-    const stepName = config?.stepName || "Download IIR PDF";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
+
     throw error;
   }
 };
@@ -454,4 +427,3 @@ export const iirService = {
     await apiClient.patch(API_ROUTES.iir.bulkStatus, payload);
   },
 };
-

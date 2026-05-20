@@ -24,7 +24,6 @@ import { IIRProfileView } from "@/features/iir/types";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Spinner } from "@/components/shared";
 import { Pagination } from "@/components/shared";
-import Layout from "@/components/layout/Layout";
 import { usePageMetadata } from "@/context";
 import { cn } from "@/lib/utils";
 
@@ -173,13 +172,11 @@ export default function StudentRecords() {
               yearLevels={yearLevels}
             />
 
-            <div className="flex justify-center pt-4">
-              <Pagination
-                currentPage={page}
-                totalPages={data?.meta?.totalPages || 1}
-                onPageChange={setPage}
-              />
-            </div>
+            <Pagination
+              currentPage={page}
+              totalPages={data?.meta?.totalPages || 1}
+              onPageChange={setPage}
+            />
           </div>
         </div>
       </div>

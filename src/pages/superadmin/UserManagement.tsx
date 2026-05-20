@@ -106,6 +106,7 @@ export default function UserManagement() {
     switch (roleName.toLowerCase()) {
       case "superadmin":
         return "bg-primary/10 text-primary border-primary/20";
+      case "admin":
       case "counselor":
         return "bg-indigo-500/10 text-indigo-600 border-indigo-500/20";
       case "student":
@@ -222,7 +223,7 @@ export default function UserManagement() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1000px] text-left text-sm">
               <thead>
-                <tr className="border-b border-white/10 bg-muted/30 px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur-md">
+                <tr className="border-b border-white/10 bg-muted/30 px-6 py-4 text-xs font-semibold uppercase text-muted-foreground backdrop-blur-md">
                   <th className="px-6 py-4">User</th>
                   <th className="px-6 py-4">Role</th>
                   <th className="px-6 py-4">Status</th>
@@ -390,14 +391,12 @@ export default function UserManagement() {
 
         {/* Pagination Section */}
         {data && data.meta.totalPages > 1 && (
-          <div className="border-t border-white/20 px-4 py-4 dark:border-white/10">
-            <Pagination
-              currentPage={page}
-              totalPages={data.meta.totalPages}
-              onPageChange={setPage}
-              isLoading={isLoading}
-            />
-          </div>
+          <Pagination
+            currentPage={page}
+            totalPages={data.meta.totalPages}
+            onPageChange={setPage}
+            isLoading={isLoading}
+          />
         )}
       </Card>
 

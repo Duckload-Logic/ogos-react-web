@@ -28,7 +28,7 @@ export default function SubHeader({
       className={cn(
         "relative mb-6 overflow-hidden rounded-[20px] border",
         "border-glass-border bg-glass-bg p-5",
-        "shadow-[0_8px_24px_rgba(0,0,0,0.06)] backdrop-blur-xl",
+        "shadow-md",
         "dark:border-white/10 dark:bg-glass-bg",
         "dark:shadow-[0_8px_24px_rgba(0,0,0,0.25)] sm:p-6",
       )}
@@ -57,7 +57,7 @@ export default function SubHeader({
           )}
 
           <div className="space-y-2">
-            <h1 className="text-2xl font-bold tracking-tight text-foreground sm:text-3xl">
+            <h1 className="text-2xl font-bold text-foreground sm:text-3xl">
               {title}
             </h1>
             {description && (

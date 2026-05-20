@@ -14,7 +14,6 @@ import {
   FileText,
   Calendar,
   User,
-  Info,
   ShieldUser,
   Fingerprint,
   Building2,
@@ -243,7 +242,7 @@ export default function SlipDetails() {
               <div className="group space-y-2 transition-all duration-300">
                 <p
                   className={cn(
-                    "text-[10px] font-bold uppercase tracking-wider",
+                    "text-[10px] font-bold uppercase",
                     "text-muted-foreground/60 transition-colors",
                     "group-hover:text-primary",
                   )}
@@ -266,7 +265,7 @@ export default function SlipDetails() {
               <div className="group space-y-2 transition-all duration-300">
                 <p
                   className={cn(
-                    "text-[10px] font-bold uppercase tracking-wider",
+                    "text-[10px] font-bold uppercase",
                     "text-muted-foreground/60 transition-colors",
                     "group-hover:text-primary",
                   )}
@@ -315,7 +314,7 @@ export default function SlipDetails() {
                   <CardTitle className="text-xl font-bold tracking-tight">
                     Submission Context
                   </CardTitle>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground">
                     ID: {slip.id?.substring(0, 8)}
                   </p>
                 </div>
@@ -477,7 +476,7 @@ export default function SlipDetails() {
                       <Ticket className="h-6 w-6" />
                     </div>
                     <div>
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+                      <p className="text-[10px] font-bold uppercase text-muted-foreground">
                         Admission Slip Ticket
                       </p>
                       <p className="font-mono text-xl font-bold tracking-tighter text-foreground">
@@ -603,7 +602,7 @@ export default function SlipDetails() {
             <CardHeader className="border-glass-border/30 border-b bg-muted/20 px-8 py-6">
               <CardTitle
                 className={cn(
-                  "flex items-center gap-2 text-[10px] font-bold tracking-wider",
+                  "flex items-center gap-2 text-[10px] font-bold",
                   "text-muted-foreground",
                 )}
               >

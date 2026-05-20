@@ -8,16 +8,11 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+
+
 import { useAvailableSlots } from "@/features/appointments/hooks";
 import { Dropdown, FormInput } from "@/components/form";
-import { AvailableTimeSlotView, TimeSlot } from "../types";
+import { AvailableTimeSlotView } from "../types";
 import { format12HourTime, toISODateString } from "../utils";
 
 interface RescheduleModalProps {

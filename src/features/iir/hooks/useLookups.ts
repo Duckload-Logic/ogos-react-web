@@ -38,6 +38,20 @@ export function useGenders() {
 }
 
 /**
+ * Fetch enrollment years lookup data
+ * @returns Query result with enrollment years data
+ */
+export function useEnrollmentYears() {
+  return useLookupWithMeta(
+    QUERY_KEYS.iir.lookups.enrollmentYears,
+    (config) => GetIIRLookup("enrollmentYears", config),
+    "GetIIRLookup",
+    "Fetch Enrollment Years",
+    { ...CACHE_TIMING.IIR_LOOKUPS },
+  );
+}
+
+/**
  * Fetch civil statuses lookup data
  * @returns Query result with civil statuses data
  */

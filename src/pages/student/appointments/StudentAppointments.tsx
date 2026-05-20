@@ -127,10 +127,7 @@ const STATUS_CARD_META: Record<string, StatusCardMeta> = {
 };
 
 const getStatusKey = (name?: string) => {
-  const normalized = (name || "")
-    .toLowerCase()
-    .trim()
-    .replace(/\s+/g, "-");
+  const normalized = (name || "").toLowerCase().trim().replace(/\s+/g, "-");
 
   if (normalized === "canceled") return "cancelled";
   if (normalized === "noshow" || normalized === "no-show") return "no-show";
@@ -177,24 +174,28 @@ export default function StudentAppointments() {
 
   const pageBadgeIcon = useMemo(() => <Calendar className="h-4 w-4" />, []);
 
+  const hasValidCor = !!user?.studentCorUrl && !!user?.isStudentCorValid;
+
   const pageHeaderActions = useMemo(
     () => (
       <Button
-        asChild={!!user?.studentCorUrl}
-        disabled={!user?.studentCorUrl}
+        asChild={hasValidCor}
+        disabled={!hasValidCor}
         className="h-10 gap-2 rounded-xl shadow-lg shadow-primary/15"
         title={
           !user?.studentCorUrl
             ? "Please upload your COR in your profile to book an appointment"
+            : !user?.isStudentCorValid
+            ? "Your COR is invalid or outdated for the current academic term"
             : ""
         }
         onClick={(e) => {
-          if (!user?.studentCorUrl) {
+          if (!hasValidCor) {
             e.preventDefault();
           }
         }}
       >
-        {user?.studentCorUrl ? (
+        {hasValidCor ? (
           <Link to="/student/appointments/schedule">
             <Plus className="h-4 w-4" />
             New Appointment
@@ -207,7 +208,7 @@ export default function StudentAppointments() {
         )}
       </Button>
     ),
-    [user?.studentCorUrl],
+    [user?.studentCorUrl, user?.isStudentCorValid, hasValidCor],
   );
 
   usePageMetadata({
@@ -239,8 +240,11 @@ export default function StudentAppointments() {
       <div className="pointer-events-none absolute right-0 top-10 -z-10 h-80 w-80 rounded-full bg-primary/5 blur-3xl dark:bg-primary/10" />
       <div className="pointer-events-none absolute bottom-0 left-1/3 -z-10 h-72 w-72 rounded-full bg-sky-200/10 blur-3xl dark:bg-sky-400/10" />
 
-      {!user?.studentCorUrl && (
-        <Alert variant="destructive" className={ACTION_REQUIRED_ALERT}>
+      {!user?.studentCorUrl ? (
+        <Alert
+          variant="destructive"
+          className={ACTION_REQUIRED_ALERT}
+        >
           <AlertCircle className="h-4 w-4" />
           <AlertTitle className="text-base font-medium">
             Action Required: Missing Certificate of Registration
@@ -255,7 +259,26 @@ export default function StudentAppointments() {
             </Link>
           </AlertDescription>
         </Alert>
-      )}
+      ) : !user?.isStudentCorValid ? (
+        <Alert
+          variant="destructive"
+          className={ACTION_REQUIRED_ALERT}
+        >
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle className="text-base font-medium">
+            Action Required: Invalid or Outdated Certificate of Registration
+          </AlertTitle>
+          <AlertDescription className="text-sm">
+            Your uploaded COR is not valid for the current academic term. Please upload your updated COR to proceed.{" "}
+            <Link
+              to="/student/cor-management"
+              className="font-semibold underline hover:text-rose-700 dark:hover:text-rose-300"
+            >
+              Go to COR Management
+            </Link>
+          </AlertDescription>
+        </Alert>
+      ) : null}
 
       <section className="overflow-x-auto pb-1">
         <div
@@ -281,7 +304,7 @@ export default function StudentAppointments() {
                 className={cn(
                   GLASS_CARD,
                   "animate-fade-in-up group relative h-[124px] " +
-                    "transition-all duration-300 hover:-translate-y-0.5 " +
+                    "transition-all duration-300 hover:-translate-y-0.5" +
                     "hover:shadow-[0_16px_36px_rgba(15,23,42,0.075)]",
                   statusMeta.card,
                 )}
@@ -298,15 +321,19 @@ export default function StudentAppointments() {
                   )}
                 />
 
-                <div className={cn(
-                  "pointer-events-none absolute inset-x-0 top-0 h-px",
-                  "bg-white/70 dark:bg-white/15",
-                )} />
-                <div className={cn(
-                  "pointer-events-none absolute inset-x-0 bottom-0",
-                  "h-1/2 bg-gradient-to-t from-white/28 to-transparent",
-                  "dark:from-black/15",
-                )} />
+                <div
+                  className={cn(
+                    "pointer-events-none absolute inset-x-0 top-0 h-px",
+                    "bg-white/70 dark:bg-white/15",
+                  )}
+                />
+                <div
+                  className={cn(
+                    "pointer-events-none absolute inset-x-0 bottom-0",
+                    "from-white/28 h-1/2 bg-gradient-to-t to-transparent",
+                    "dark:from-black/15",
+                  )}
+                />
 
                 <CardContent className="relative flex h-full flex-col justify-between p-4">
                   <div className="flex items-start justify-between gap-3">
@@ -314,17 +341,19 @@ export default function StudentAppointments() {
                       <p
                         title={stat.name}
                         className={cn(
-                          "whitespace-nowrap text-[11px] font-extrabold " +
-                            "uppercase tracking-[0.18em]",
+                          "whitespace-nowrap text-[11px] font-bold " +
+                            "uppercase",
                           statusMeta.label,
                         )}
                       >
                         {stat.name}
                       </p>
-                      <p className={cn(
-                        "mt-1 whitespace-nowrap text-[11px] font-medium",
-                        "text-muted-foreground/75",
-                      )}>
+                      <p
+                        className={cn(
+                          "mt-1 whitespace-nowrap text-[11px] font-medium",
+                          "text-muted-foreground/75",
+                        )}
+                      >
                         Appointment status
                       </p>
                     </div>
@@ -332,17 +361,20 @@ export default function StudentAppointments() {
                     <div
                       className={cn(
                         "flex h-11 w-11 shrink-0 items-center justify-center " +
-                          "rounded-[15px] transition-transform duration-300 " +
+                          "rounded-[15px] transition-transform duration-300" +
                           "group-hover:scale-105",
                         statusMeta.iconBox,
                       )}
                     >
-                      <StatusIcon className="h-5 w-5" strokeWidth={2} />
+                      <StatusIcon
+                        className="h-5 w-5"
+                        strokeWidth={2}
+                      />
                     </div>
                   </div>
 
                   <div className="flex items-end justify-between gap-3">
-                    <p className="text-[34px] font-black leading-none tracking-tight text-foreground tabular-nums">
+                    <p className="text-[34px] tabular-nums leading-none tracking-tight text-foreground">
                       {count}
                     </p>
                     <span
@@ -412,7 +444,10 @@ export default function StudentAppointments() {
         <CardContent className="p-0">
           {isAppointmentsLoading ? (
             <div className="flex items-center justify-center py-16">
-              <Spinner size="md" message="Loading your appointments..." />
+              <Spinner
+                size="md"
+                message="Loading your appointments..."
+              />
             </div>
           ) : appointments.length > 0 ? (
             <>
@@ -436,9 +471,11 @@ export default function StudentAppointments() {
                           GLASS_INNER,
                         )}
                       >
-                        <div className={cn(
-                          "mb-1 text-xs font-semibold uppercase text-primary",
-                        )}>
+                        <div
+                          className={cn(
+                            "mb-1 text-xs font-semibold uppercase text-primary",
+                          )}
+                        >
                           {new Date(appointment.whenDate).toLocaleDateString(
                             "en-US",
                             { month: "short" },
@@ -539,22 +576,23 @@ export default function StudentAppointments() {
 
                 {selectedStatus.id === 0 && (
                   <Button
-                    asChild={!!user?.studentCorUrl}
-                    disabled={!user?.studentCorUrl}
+                    asChild={hasValidCor}
+                    disabled={!hasValidCor}
                     className="rounded-xl shadow-lg shadow-primary/15"
                     title={
                       !user?.studentCorUrl
-                        ? "Please upload your COR " +
-                          "in your profile to book an appointment"
+                        ? "Please upload your COR in your profile to book an appointment"
+                        : !user?.isStudentCorValid
+                        ? "Your COR is invalid or outdated for the current academic term"
                         : ""
                     }
                     onClick={(e) => {
-                      if (!user?.studentCorUrl) {
+                      if (!hasValidCor) {
                         e.preventDefault();
                       }
                     }}
                   >
-                    {user?.studentCorUrl ? (
+                    {hasValidCor ? (
                       <Link to="/student/appointments/schedule">
                         <Plus className="mr-2 h-4 w-4" />
                         Schedule Appointment

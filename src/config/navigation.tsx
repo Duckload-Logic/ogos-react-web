@@ -119,6 +119,11 @@ export const NAV_CONFIG: Record<string, NavItem[]> = {
       href: "/superadmin/system-logs",
       icon: <Activity size={ICON_SIZE} />,
     },
+    {
+      label: "Academic Settings",
+      href: "/superadmin/academic-settings",
+      icon: <GraduationCap size={ICON_SIZE} />,
+    },
   ],
   developer: [
     {

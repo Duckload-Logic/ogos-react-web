@@ -1,6 +1,4 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { apiClient } from "@/lib/api";
-import { API_ROUTES } from "@/config/apiRoutes";
 import { PostSlip, PatchSlip, PatchSlipStatus, ClaimTicket } from "../services";
 import type { CreateSlipRequest } from "../types";
 import { QUERY_KEYS } from "@/config/queryKeys";

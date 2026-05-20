@@ -114,7 +114,7 @@ curl_close($ch);`,
               className="space-y-6"
             >
               <div className="glass-card space-y-4 p-8">
-                <h2 className="text-3xl font-black uppercase leading-none tracking-tight">
+                <h2 className="text-3xl uppercase leading-none tracking-tight">
                   {snippets[activeTab].title}
                 </h2>
                 <p className="font-medium text-muted-foreground">
@@ -162,7 +162,7 @@ curl_close($ch);`,
                   <h4 className="font-bold uppercase tracking-tight">
                     Authentication
                   </h4>
-                  <p className="text-[10px] text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                  <p className="text-[10px] text-xs font-medium uppercase text-muted-foreground">
                     Bearer Token Auth
                   </p>
                 </div>

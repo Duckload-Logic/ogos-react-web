@@ -2,14 +2,11 @@ import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Archive,
-  CheckCircle2,
   Clock3,
   FileText,
-  RotateCcw,
   XCircle,
   Ticket,
   ShieldCheck,
-  Search,
   User,
   Calendar,
   Clock,
@@ -29,7 +26,7 @@ import {
   useClaimTicket,
 } from "@/features/slips/hooks";
 import { GetTicketDetails } from "@/features/slips/services";
-import type { Slip, SlipStats, SlipStatus } from "@/features/slips/types";
+import type { Slip, SlipStatus } from "@/features/slips/types";
 import { SlipList } from "@/features/slips/components";
 import {
   AlertDialog,
@@ -47,7 +44,6 @@ import {
   getFilterLabel,
   type TimeFilter,
 } from "@/features/slips/utils/dateFilters";
-import Layout from "@/components/layout/Layout";
 import { usePageMetadata } from "@/context";
 
 export default function ReviewSlips() {
@@ -156,7 +152,7 @@ export default function ReviewSlips() {
   const headerActions = useMemo(
     () => (
       <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
-        {(["today", "week", "month"] as TimeFilter[]).map((filter) => (
+        {(["today", "month"] as TimeFilter[]).map((filter) => (
           <Button
             key={filter}
             variant={timeFilter === filter ? "default" : "outline"}
@@ -270,7 +266,7 @@ export default function ReviewSlips() {
         open={!!pendingSlip}
         onOpenChange={(open) => !open && setPendingSlip(null)}
       >
-        <AlertDialogContent className="max-w-md border-glass-border/40 bg-background/80 shadow-2xl backdrop-blur-2xl">
+        <AlertDialogContent className="border-glass-border/40 max-w-md bg-background/80 shadow-2xl backdrop-blur-2xl">
           <AlertDialogHeader>
             <AlertDialogTitle className="flex items-center gap-3 text-xl font-bold">
               <div className="rounded-xl bg-primary/10 p-2 text-primary">
@@ -279,15 +275,16 @@ export default function ReviewSlips() {
               Confirm Ticket Verification
             </AlertDialogTitle>
             <AlertDialogDescription className="text-sm font-medium text-muted-foreground">
-              Please review the slip details below before marking it as verified.
+              Please review the slip details below before marking it as
+              verified.
             </AlertDialogDescription>
           </AlertDialogHeader>
 
           {pendingSlip && (
-            <div className="my-4 space-y-4 rounded-2xl border border-glass-border/30 bg-glass-bg/20 p-5 shadow-inner">
+            <div className="border-glass-border/30 bg-glass-bg/20 my-4 space-y-4 rounded-2xl border p-5 shadow-inner">
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground/60">
                     Student Name
                   </p>
                   <p className="flex items-center gap-2 text-sm font-bold text-foreground">
@@ -296,38 +293,48 @@ export default function ReviewSlips() {
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground/60">
                     Category
                   </p>
-                  <Badge variant="secondary" className="rounded-full px-2 py-0 text-[10px]">
+                  <Badge
+                    variant="secondary"
+                    className="rounded-full px-2 py-0 text-[10px]"
+                  >
                     {pendingSlip.category?.name}
                   </Badge>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground/60">
                     Date of Absence
                   </p>
                   <p className="flex items-center gap-2 text-sm font-bold text-foreground">
                     <Calendar className="h-3.5 w-3.5 text-primary/60" />
-                    {pendingSlip.dateOfAbsence ? format(new Date(pendingSlip.dateOfAbsence), "MMM d, yyyy") : "N/A"}
+                    {pendingSlip.dateOfAbsence
+                      ? format(
+                          new Date(pendingSlip.dateOfAbsence),
+                          "MMM d, yyyy",
+                        )
+                      : "N/A"}
                   </p>
                 </div>
                 <div className="space-y-1">
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground/60">
                     Date Needed
                   </p>
                   <p className="flex items-center gap-2 text-sm font-bold text-foreground">
                     <Clock className="h-3.5 w-3.5 text-primary/60" />
-                    {pendingSlip.dateNeeded ? format(new Date(pendingSlip.dateNeeded), "MMM d, yyyy") : "N/A"}
+                    {pendingSlip.dateNeeded
+                      ? format(new Date(pendingSlip.dateNeeded), "MMM d, yyyy")
+                      : "N/A"}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-1.5 pt-2">
-                <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground/60">
+                <p className="text-[10px] font-bold uppercase text-muted-foreground/60">
                   Reason
                 </p>
-                <div className="rounded-xl border border-glass-border/20 bg-muted/30 p-3 shadow-sm">
+                <div className="border-glass-border/20 rounded-xl border bg-muted/30 p-3 shadow-sm">
                   <p className="line-clamp-3 text-xs italic leading-relaxed text-foreground/80">
                     "{pendingSlip.reason}"
                   </p>
@@ -337,7 +344,7 @@ export default function ReviewSlips() {
           )}
 
           <AlertDialogFooter className="gap-3 sm:gap-0">
-            <AlertDialogCancel className="rounded-xl border-glass-border/40 font-bold transition-all hover:bg-glass-bg/10">
+            <AlertDialogCancel className="border-glass-border/40 hover:bg-glass-bg/10 rounded-xl font-bold transition-all">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -357,8 +364,11 @@ export default function ReviewSlips() {
       </AlertDialog>
 
       {/* Already Verified Dialog */}
-      <AlertDialog open={showAlreadyVerified} onOpenChange={setShowAlreadyVerified}>
-        <AlertDialogContent className="max-w-sm border-glass-border/40 bg-background/80 shadow-2xl backdrop-blur-2xl">
+      <AlertDialog
+        open={showAlreadyVerified}
+        onOpenChange={setShowAlreadyVerified}
+      >
+        <AlertDialogContent className="border-glass-border/40 max-w-sm bg-background/80 shadow-2xl backdrop-blur-2xl">
           <AlertDialogHeader>
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-500/10 text-blue-500">
               <ShieldCheck className="h-8 w-8" />
@@ -367,7 +377,8 @@ export default function ReviewSlips() {
               Already Verified
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center text-sm font-medium text-muted-foreground">
-              This ticket has already been verified and claimed. No further action is required.
+              This ticket has already been verified and claimed. No further
+              action is required.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -379,8 +390,11 @@ export default function ReviewSlips() {
       </AlertDialog>
 
       {/* Not Found Dialog */}
-      <AlertDialog open={showNotFound} onOpenChange={setShowNotFound}>
-        <AlertDialogContent className="max-w-sm border-glass-border/40 bg-background/80 shadow-2xl backdrop-blur-2xl">
+      <AlertDialog
+        open={showNotFound}
+        onOpenChange={setShowNotFound}
+      >
+        <AlertDialogContent className="border-glass-border/40 max-w-sm bg-background/80 shadow-2xl backdrop-blur-2xl">
           <AlertDialogHeader>
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 text-red-500">
               <XCircle className="h-8 w-8" />
@@ -389,7 +403,8 @@ export default function ReviewSlips() {
               Ticket Not Found
             </AlertDialogTitle>
             <AlertDialogDescription className="text-center text-sm font-medium text-muted-foreground">
-              We couldn't find any admission slip matching the ticket code you entered.
+              We couldn't find any admission slip matching the ticket code you
+              entered.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

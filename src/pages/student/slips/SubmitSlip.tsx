@@ -46,7 +46,6 @@ import { DatePicker } from "@/components/form/DatePicker";
 import FormInput from "@/components/form/FormInput";
 import { useToast } from "@/context";
 import { cn } from "@/lib/utils";
-import { validateCorFile } from "@/utils/corValidation";
 
 interface SubmitSlipFormState {
   dateOfAbsence: string;

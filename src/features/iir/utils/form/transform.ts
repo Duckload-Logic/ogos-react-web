@@ -114,16 +114,7 @@ export function transformFormToPayload(formData: IIRForm): any {
         employerContactNumber: handleNullableString(
           formData.student.personalInfo.employerContactNumber,
         ),
-        livingInDorm: formData.student.personalInfo.livingInDorm,
-        dormAddress: handleNullableString(
-          formData.student.personalInfo.dormAddress,
-        ),
-        landlordName: handleNullableString(
-          formData.student.personalInfo.landlordName,
-        ),
-        landlordContactNumber: handleNullableString(
-          formData.student.personalInfo.landlordContactNumber,
-        ),
+
         emergencyContact: {
           id: formData.student.personalInfo.emergencyContact.id,
           firstName: formData.student.personalInfo.emergencyContact.firstName,

@@ -2,7 +2,6 @@ import {
   Calendar,
   Users,
   FileText,
-  Clock,
   MoreHorizontal,
   Sparkles,
 } from "lucide-react";
@@ -15,8 +14,6 @@ import {
   XAxis,
   YAxis,
   CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
 } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -320,10 +317,10 @@ export default function Dashboard() {
           {/* Slip Status Tracker */}
           <SlipStatusTracker
             stats={{
-              pending: slipStats?.pending || 12,
-              approvedToday: slipStats?.approvedToday || 5,
-              rejectedToday: slipStats?.rejectedToday || 1,
-              urgentRequests: 3,
+              pending: slipStats?.pending || 0,
+              approvedToday: slipStats?.approvedToday || 0,
+              rejectedToday: slipStats?.rejectedToday || 0,
+              urgentRequests: 0,
             }}
           />
         </div>

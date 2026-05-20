@@ -6,9 +6,6 @@ import {
   YAxis,
   CartesianGrid,
   Tooltip,
-  ResponsiveContainer,
-  ScatterChart,
-  Scatter,
 } from "recharts";
 import {
   ChartContainer,

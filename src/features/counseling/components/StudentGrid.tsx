@@ -60,7 +60,7 @@ export default function StudentGrid({
         >
           {/* Status Badge */}
           <div
-            className={`absolute right-4 top-4 rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${statusColors[student.status?.id] || "bg-gray-200"}`}
+            className={`absolute right-4 top-4 rounded-full border px-3 py-1 text-[10px] font-bold uppercase ${statusColors[student.status?.id] || "bg-gray-200"}`}
           >
             {student.status?.name || "Unknown"}
           </div>
@@ -126,7 +126,7 @@ export default function StudentGrid({
                 >
                   {student.firstName} {student.lastName} {student.suffixName}
                 </h3>
-                <p className="text-[11px] font-bold uppercase tracking-widest text-primary/60">
+                <p className="text-[11px] font-bold uppercase text-primary/60">
                   {student.studentNumber}
                 </p>
               </div>
@@ -135,7 +135,7 @@ export default function StudentGrid({
             {/* Info Grid */}
             <div className="border-glass-border/30 grid grid-cols-1 gap-3 border-t pt-2">
               <div className="flex flex-col gap-0.5">
-                <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+                <span className="text-[9px] font-bold uppercase text-muted-foreground opacity-60">
                   Email Address
                 </span>
                 <span className="truncate text-sm font-medium text-foreground/80">
@@ -145,7 +145,7 @@ export default function StudentGrid({
 
               <div className="grid grid-cols-2 gap-2">
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+                  <span className="text-[9px] font-bold uppercase text-muted-foreground opacity-60">
                     Course
                   </span>
                   <span className="text-sm font-semibold text-primary/80">
@@ -153,7 +153,7 @@ export default function StudentGrid({
                   </span>
                 </div>
                 <div className="flex flex-col gap-0.5">
-                  <span className="text-[9px] font-bold uppercase tracking-widest text-muted-foreground opacity-60">
+                  <span className="text-[9px] font-bold uppercase text-muted-foreground opacity-60">
                     Year Level
                   </span>
                   <span className="text-sm font-semibold text-foreground/80">
@@ -173,7 +173,7 @@ export default function StudentGrid({
                 className={cn(
                   "group/btn inline-flex w-full items-center justify-center",
                   "gap-2 rounded-xl border border-primary/20 bg-primary/10 py-3",
-                  "text-xs font-bold uppercase tracking-wider text-primary",
+                  "text-xs font-bold uppercase text-primary",
                   "transition-all duration-300 hover:bg-primary hover:text-white",
                   "active:scale-[0.97]",
                 )}

@@ -3,7 +3,7 @@
  * Provides date range calculations for filtering appointments by time periods
  */
 
-export type TimeFilter = "today" | "week" | "month" | "all";
+export type TimeFilter = "today" | "month" | "all";
 
 export interface DateRange {
   startDate: string;
@@ -27,15 +27,6 @@ export function getDateRange(filter: TimeFilter): DateRange {
     case "today":
       startDate = new Date(today);
       break;
-
-    case "week": {
-      // Start from Monday of the current week
-      startDate = new Date(today);
-      const day = startDate.getDay();
-      const diff = startDate.getDate() - day + (day === 0 ? -6 : 1); // Adjust when day is Sunday
-      startDate.setDate(diff);
-      break;
-    }
 
     case "month": {
       // Start from the first day of the current month
@@ -77,7 +68,6 @@ function formatDateString(date: Date): string {
 export function getFilterLabel(filter: TimeFilter): string {
   const labels: Record<TimeFilter, string> = {
     today: "Today",
-    week: "This 7 days",
     month: "This Month",
     all: "All Time",
   };

@@ -7,7 +7,6 @@ import {
   Clock,
   ArrowUpRight,
   BarChart,
-  Filter,
   Activity,
 } from "lucide-react";
 import {
@@ -83,7 +82,7 @@ export default function AnalyticsOverview() {
     <div className="mx-auto w-full max-w-[1700px] space-y-6">
       {/* Tooling Bar */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="backdrop-blur-l flex items-center gap-1 rounded-2xl border border-white/10 bg-white/[0.03] p-1.5 shadow-xl">
+        <div className="backdrop-blur-l flex items-center gap-1 rounded-2xl border border-white/10 bg-white/[0.03] p-1.5 shadow-md">
           {(["daily", "weekly", "monthly", "yearly"] as const).map((r) => (
             <Button
               key={r}
@@ -147,7 +146,7 @@ export default function AnalyticsOverview() {
                 <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="mt-4">
-                <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">
+                <p className="text-xs font-bold uppercase text-muted-foreground">
                   {item.label}
                 </p>
                 <p className="mt-1 text-4xl font-bold">{item.value}</p>

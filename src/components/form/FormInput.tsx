@@ -1,4 +1,4 @@
-import { Info, Check, Mic, MicOff, Banknote } from "lucide-react";
+import { Info, Mic, MicOff } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
 import { useSpeechToText } from "@/hooks/useSpeechToText";
 import { SPECIAL_CHARS_REGEX } from "@/utils/validation";

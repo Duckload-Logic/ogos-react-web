@@ -1,4 +1,4 @@
-import { Bell, CircleCheck } from "lucide-react";
+import { Bell } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Props {

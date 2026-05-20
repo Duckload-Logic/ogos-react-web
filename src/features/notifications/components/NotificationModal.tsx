@@ -3,7 +3,6 @@ import {
   Calendar,
   FileText,
   Bell,
-  X,
   User,
   Shield,
   Info,

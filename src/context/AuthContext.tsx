@@ -5,7 +5,7 @@
  * timeout safeguards to prevent infinite loading
  */
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, { createContext, useEffect, useState } from "react";
 import { useMe } from "@/features/users/hooks/useMe";
 import { useLogout as useLogoutMutation } from "@/features/auth/hooks";
 import { User, UserRole } from "@/features/users/types/user";

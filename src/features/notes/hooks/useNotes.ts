@@ -70,7 +70,6 @@ export function useCreateNote(
       onSuccess?.();
     },
     onError: (error: any) => {
-      console.error("[useCreateNote] Error:", error);
       onError?.(error);
     },
   });

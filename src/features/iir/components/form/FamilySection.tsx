@@ -64,7 +64,6 @@ const ParentInformationCard = memo(
     isEditMode = false,
   }: ParentInformationCardProps) => {
     const person = family?.relatedPersons?.[idx] || {};
-
     const calculateAge = (dobString: string) => {
       if (!dobString) return "";
       const dob = new Date(dobString);
@@ -98,7 +97,7 @@ const ParentInformationCard = memo(
                   }
                   className={cn(
                     "rounded-lg border px-3 py-1.5 text-[10px]",
-                    "font-bold uppercase tracking-wider transition-all duration-300",
+                    "font-bold uppercase transition-all duration-300",
                     isSelected
                       ? isLiving
                         ? "border-emerald-500/50 bg-emerald-500/10 text-emerald-600"
@@ -168,7 +167,7 @@ const ParentInformationCard = memo(
           </div>
 
           <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-            <div className="md:col-span-2 grid grid-cols-1 gap-4 sm:grid-cols-3">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:col-span-2">
               <div className="sm:col-span-2">
                 <DatePicker
                   label="Date of Birth"
@@ -778,7 +777,7 @@ export const FamilySection = forwardRef<
               </div>
 
               <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
-                <div className="md:col-span-2 grid grid-cols-1 gap-4 sm:grid-cols-3">
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-3 md:col-span-2">
                   <div className="sm:col-span-2">
                     <DatePicker
                       label="Date of Birth"
@@ -788,7 +787,8 @@ export const FamilySection = forwardRef<
                         { family },
                       )}
                       value={
-                        family?.relatedPersons?.[GUARDIAN_IDX]?.dateOfBirth || ""
+                        family?.relatedPersons?.[GUARDIAN_IDX]?.dateOfBirth ||
+                        ""
                       }
                       onChange={(val) =>
                         handleInputChange(
@@ -809,17 +809,16 @@ export const FamilySection = forwardRef<
                   </div>
                   <FormInput
                     label="Age"
-                    value={
-                      (() => {
-                        const dob = family?.relatedPersons?.[GUARDIAN_IDX]?.dateOfBirth;
-                        if (!dob) return "";
-                        const d = new Date(dob);
-                        if (isNaN(d.getTime())) return "";
-                        const diff = Date.now() - d.getTime();
-                        const ageDate = new Date(diff);
-                        return String(Math.abs(ageDate.getUTCFullYear() - 1970));
-                      })()
-                    }
+                    value={(() => {
+                      const dob =
+                        family?.relatedPersons?.[GUARDIAN_IDX]?.dateOfBirth;
+                      if (!dob) return "";
+                      const d = new Date(dob);
+                      if (isNaN(d.getTime())) return "";
+                      const diff = Date.now() - d.getTime();
+                      const ageDate = new Date(diff);
+                      return String(Math.abs(ageDate.getUTCFullYear() - 1970));
+                    })()}
                     onChange={() => {}}
                     placeholder="Age"
                     disabled

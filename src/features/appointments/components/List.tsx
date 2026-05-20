@@ -3,7 +3,15 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Pagination } from "@/components/shared";
 import { STATUS_COLORS } from "@/config/constants";
 import { Appointment, AppointmentStatus, StatusCount } from "../types";
-import { CalendarX, Eye, Tag, User, CalendarDays, Clock, AlertTriangle } from "lucide-react";
+import {
+  CalendarX,
+  Eye,
+  Tag,
+  User,
+  CalendarDays,
+  Clock,
+  AlertTriangle,
+} from "lucide-react";
 import { useMemo } from "react";
 import { SearchInput } from "@/components/form";
 import { format12HourTime } from "../utils";
@@ -12,7 +20,6 @@ import { Spinner } from "@/components/shared";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 import { Dropdown } from "@/components/form";
-
 
 function getUrgencyValue(apt: Appointment) {
   const raw = apt.urgencyLevel ?? apt.urgency;
@@ -33,19 +40,20 @@ function UrgencyCapsule({ appointment }: { appointment: Appointment }) {
   if (!urgency?.label) return null;
 
   const level = urgency.key.toLowerCase();
-  const tone = level.includes("high") || level.includes("urgent")
-    ? "border-red-500/25 bg-red-500/10 text-red-600 dark:text-red-300"
-    : level.includes("medium") || level.includes("moderate")
-      ? "border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300"
-      : level.includes("low")
-        ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
-        : "border-primary/20 bg-primary/10 text-primary";
+  const tone =
+    level.includes("high") || level.includes("urgent")
+      ? "border-red-500/25 bg-red-500/10 text-red-600 dark:text-red-300"
+      : level.includes("medium") || level.includes("moderate")
+        ? "border-amber-500/25 bg-amber-500/10 text-amber-700 dark:text-amber-300"
+        : level.includes("low")
+          ? "border-emerald-500/25 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300"
+          : "border-primary/20 bg-primary/10 text-primary";
 
   return (
     <span
       className={cn(
         "inline-flex w-fit items-center gap-1.5 rounded-full border",
-        "px-2.5 py-1 text-[10px] font-black uppercase tracking-wide",
+        "px-2.5 py-1 text-[10px] uppercase",
         tone,
       )}
       title={`Urgency level: ${urgency.label}`}
@@ -109,14 +117,12 @@ export default function AppointmentList({
 
   return (
     <Card
-      className={`bg-glass-bg/40 hover:bg-glass-bg/50 flex flex-col overflow-hidden border-glass-border shadow-2xl backdrop-blur-2xl transition-all duration-500 dark:bg-glass-bg/20 lg:col-span-3 ${className || ""}`}
+      className={`bg-glass-bg/40 hover:bg-glass-bg/50 dark:bg-glass-bg/20 flex flex-col overflow-hidden border-glass-border shadow-2xl backdrop-blur-2xl transition-all duration-500 lg:col-span-3 ${className || ""}`}
     >
       <CardHeader className="border-glass-border/30 space-y-6 border-b bg-muted/10 px-8 py-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <div className="space-y-1.5 text-left">
-            <h2 className="text-xl font-bold tracking-tight text-foreground/90">
-              {title}
-            </h2>
+            <h2 className="text-xl font-bold text-foreground/90">{title}</h2>
           </div>
 
           {!isLoading && appointments.length > 0 && (
@@ -177,7 +183,7 @@ export default function AppointmentList({
               <CalendarX className="h-10 w-10 text-muted-foreground/50" />
             </div>
             <div className="space-y-2">
-              <h3 className="text-xl font-black tracking-tight text-foreground/80">
+              <h3 className="text-xl tracking-tight text-foreground/80">
                 Inbox Empty
               </h3>
               <p
@@ -298,7 +304,7 @@ export default function AppointmentList({
                     <div className="flex flex-col items-end gap-2">
                       <Badge
                         className={cn(
-                          "rounded-full border px-3 py-1 text-[9px] font-bold tracking-wide shadow-sm whitespace-nowrap",
+                          "whitespace-nowrap rounded-full border px-3 py-1 text-[9px] font-bold tracking-wide shadow-sm",
                           STATUS_COLORS[apt.status?.colorKey || "info"],
                         )}
                       >

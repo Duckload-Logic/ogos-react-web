@@ -71,19 +71,15 @@ export default function PersonalView({
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2">
           {addresses?.length > 0 ? (
             addresses?.map((entry: StudentAddress) => (
-              <div
+              <CardBlock
+                icon={Home}
                 key={entry?.id}
-                className="rounded-xl border border-border p-4 shadow-sm"
+                title={asText(entry.addressType)}
               >
-                <CardBlock
-                  icon={Home}
-                  title={asText(entry.addressType)}
-                >
-                  <p className="text-xs text-card-foreground">
-                    {renderAddress(entry?.address)}
-                  </p>
-                </CardBlock>
-              </div>
+                <p className="text-xs text-card-foreground">
+                  {renderAddress(entry?.address)}
+                </p>
+              </CardBlock>
             ))
           ) : (
             <EmptyState label="No address records found" />

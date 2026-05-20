@@ -44,6 +44,7 @@ export default function Breadcrumbs() {
     ) {
       return "Details";
     }
+
     return (
       PATH_LABELS[path] ||
       path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ")

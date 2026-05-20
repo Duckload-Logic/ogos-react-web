@@ -51,10 +51,7 @@ export const PERSONAL_SUBSTEP_FIELDS: Record<number, string[]> = {
     "student.personalInfo.employerName",
     "student.personalInfo.employerAddress",
     "student.personalInfo.employerContactNumber",
-    "student.personalInfo.livingInDorm",
-    "student.personalInfo.dormAddress",
-    "student.personalInfo.landlordName",
-    "student.personalInfo.landlordContactNumber",
+
   ],
 };
 

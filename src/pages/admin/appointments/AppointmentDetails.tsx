@@ -8,9 +8,7 @@ import {
 import {
   CalendarDays,
   Clock,
-  Tag,
   User,
-  Mail,
   FileText,
   Calendar,
   CheckCircle,
@@ -29,7 +27,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { STATUS_COLORS } from "@/config/constants";
 import { format12HourTime } from "@/features/appointments/utils";
 import { formatDate } from "@/features/schedules/utils/formatters";
@@ -361,7 +358,7 @@ export default function AppointmentDetails() {
               <div className="group space-y-2 transition-all duration-300">
                 <p
                   className={cn(
-                    "text-[10px] font-bold uppercase tracking-wider",
+                    "text-[10px] font-bold uppercase",
                     "text-muted-foreground/60 transition-colors",
                     "group-hover:text-primary",
                   )}
@@ -385,7 +382,7 @@ export default function AppointmentDetails() {
               <div className="group space-y-2 transition-all duration-300">
                 <p
                   className={cn(
-                    "text-[10px] font-bold uppercase tracking-wider",
+                    "text-[10px] font-bold uppercase",
                     "text-muted-foreground/60 transition-colors",
                     "group-hover:text-primary",
                   )}
@@ -434,7 +431,7 @@ export default function AppointmentDetails() {
                   <CardTitle className="text-xl font-bold tracking-tight">
                     Session Context
                   </CardTitle>
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+                  <p className="text-[10px] font-bold uppercase text-muted-foreground">
                     ID: {appointment.id?.substring(0, 8)}
                   </p>
                 </div>
@@ -610,7 +607,7 @@ export default function AppointmentDetails() {
             <CardHeader className="border-glass-border/30 border-b bg-muted/20 px-8 py-6">
               <CardTitle
                 className={cn(
-                  "flex items-center gap-2 text-[10px] font-bold tracking-wider",
+                  "flex items-center gap-2 text-[10px] font-bold",
                   "text-muted-foreground",
                 )}
               >

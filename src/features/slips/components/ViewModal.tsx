@@ -21,8 +21,6 @@ import {
   CheckCircle2,
   Ban,
   RefreshCw,
-  Download,
-  Eye,
   Clock,
   ExternalLink,
   FileText,
@@ -259,7 +257,7 @@ export function ViewModal({
                           <p className="text-sm font-medium text-muted-foreground">
                             Admission Slip Ticket Code
                           </p>
-                          <p className="font-mono text-2xl font-bold tracking-wider text-foreground">
+                          <p className="font-mono text-2xl font-bold text-foreground">
                             {slip.ticket.ticketCode}
                           </p>
                         </div>
