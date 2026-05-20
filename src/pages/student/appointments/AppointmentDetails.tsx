@@ -11,13 +11,9 @@ import {
   Calendar,
   Clock,
   MapPin,
-  ArrowLeft,
-  X,
   FileCheck,
   AlertCircle,
   MessageSquare,
-  User,
-  ExternalLink,
 } from "lucide-react";
 import { usePageMetadata } from "@/context";
 import { AnimationStyles } from "@/components/ui/animations";
@@ -129,7 +125,7 @@ export default function AppointmentDetails() {
                 <CardContent className="space-y-6 pt-6">
                   <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground">
                         Date
                       </p>
                       <div className="flex items-center gap-2">
@@ -145,7 +141,7 @@ export default function AppointmentDetails() {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground">
                         Time
                       </p>
                       <div className="flex items-center gap-2">
@@ -156,7 +152,7 @@ export default function AppointmentDetails() {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground">
                         Category
                       </p>
                       <div className="flex items-center gap-2">
@@ -166,7 +162,7 @@ export default function AppointmentDetails() {
                       </div>
                     </div>
                     <div className="space-y-1">
-                      <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      <p className="text-xs font-semibold uppercase text-muted-foreground">
                         Location
                       </p>
                       <div className="flex items-center gap-2">
@@ -179,7 +175,7 @@ export default function AppointmentDetails() {
                   </div>
 
                   <div className="border-t border-border/40 pt-4">
-                    <p className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                    <p className="mb-2 text-xs font-semibold uppercase text-muted-foreground">
                       My Reason / Concern
                     </p>
                     <div className="rounded-lg border border-border/40 bg-muted/50 p-4">

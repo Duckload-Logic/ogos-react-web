@@ -153,7 +153,7 @@ export function FormErrorModal({
             >
               <h3
                 className={cn(
-                  "border-b pb-1 text-sm font-semibold uppercase tracking-wider",
+                  "border-b pb-1 text-sm font-semibold uppercase",
                   "text-muted-foreground",
                 )}
               >

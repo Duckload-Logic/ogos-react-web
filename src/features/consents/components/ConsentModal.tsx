@@ -8,6 +8,7 @@ type ConsentModalProps = {
   role: string;
   loading?: boolean;
   onAccept: () => Promise<void> | void;
+  onCancel?: () => void;
 };
 
 export default function ConsentModal({
@@ -15,6 +16,7 @@ export default function ConsentModal({
   role,
   loading = false,
   onAccept,
+  onCancel,
 }: ConsentModalProps) {
   const [agreed, setAgreed] = useState(false);
 
@@ -140,7 +142,18 @@ export default function ConsentModal({
           </label>
         </div>
 
-        <div className="mt-7 flex justify-end">
+        <div className="mt-7 flex flex-col gap-3 sm:flex-row sm:justify-end">
+          {onCancel ? (
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onCancel}
+              disabled={loading}
+              className="min-w-[160px] rounded-2xl px-6 py-6 text-base font-semibold"
+            >
+              Sign out
+            </Button>
+          ) : null}
           <Button
             type="button"
             disabled={!agreed || loading}

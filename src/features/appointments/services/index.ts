@@ -73,8 +73,6 @@ export async function GetAllAppointments(
     });
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || "GetAllAppointments";
-    const stepName = config?.stepName || "Fetch All Appointments";
     console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
@@ -98,8 +96,6 @@ export async function GetAppointmentStats(
     // Fallback unwrap if interceptor hasn't handled it
     return response.data?.data || response.data || [];
   } catch (error: any) {
-    const handlerName = config?.handlerName || "GetAppointmentStats";
-    const stepName = config?.stepName || "Fetch Stats";
     console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
@@ -122,8 +118,6 @@ export async function GetCalendarStats(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || "GetCalendarStats";
-    const stepName = config?.stepName || "Fetch Calendar Stats";
     console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
@@ -146,8 +140,6 @@ export async function GetAppointmentById(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || "GetAppointmentById";
-    const stepName = config?.stepName || "Fetch Appointment";
     console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
@@ -171,8 +163,6 @@ export async function GetAvailableSlots(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || "GetAvailableSlots";
-    const stepName = config?.stepName || "Fetch Available Slots";
     console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
@@ -193,8 +183,6 @@ export async function GetAppointmentCategories(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || "GetAppointmentCategories";
-    const stepName = config?.stepName || "Fetch Categories";
     console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
@@ -215,8 +203,6 @@ export async function GetAppointmentStatuses(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || "GetAppointmentStatuses";
-    const stepName = config?.stepName || "Fetch Statuses";
     console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
@@ -279,8 +265,6 @@ export async function PatchAppointmentStatus(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || "PatchAppointmentStatus";
-    const stepName = config?.stepName || "Update Status";
     console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
@@ -306,8 +290,6 @@ export async function PatchAppointment(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || "PatchAppointment";
-    const stepName = config?.stepName || "Update Appointment";
     console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }
@@ -332,8 +314,6 @@ export async function PostCancelAppointment(
     );
     return response.data;
   } catch (error: any) {
-    const handlerName = config?.handlerName || "PostCancelAppointment";
-    const stepName = config?.stepName || "Cancel Appointment";
     console.error(`[${handlerName}] {${stepName}}: ${error.message}`);
     throw error;
   }

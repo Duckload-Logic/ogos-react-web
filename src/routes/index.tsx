@@ -4,7 +4,6 @@ import { IIRGate } from "@/features/auth/components/IIRGate";
 
 // Shared
 import Layout from "@/components/layout/Layout";
-import { usePageMetadata } from "@/context";
 import NotFound from "@/components/shared/NotFound";
 
 // Student Features
@@ -29,7 +28,6 @@ import SlipLogs from "@/pages/admin/slips/SlipLogs";
 import Analytics from "@/pages/admin/Analytics";
 import LifecycleManagement from "@/pages/admin/LifecycleManagement";
 import CreateAppointment from "@/pages/student/appointments/CreateAppointment";
-import StatementPage from "@/pages/shared/Statement";
 import Profile from "@/pages/shared/Profile";
 import Callback from "@/pages/auth/Callback";
 import NotificationsPage from "@/pages/shared/Notifications";
@@ -47,6 +45,7 @@ import SystemLogs from "@/pages/superadmin/SystemLogs";
 import AuditLogs from "@/pages/superadmin/AuditLogs";
 import UserActivity from "@/pages/superadmin/UserActivity";
 import UserSessions from "@/pages/superadmin/UserSessions";
+import AcademicSettings from "@/pages/superadmin/AcademicSettings";
 
 // Dev Portal Pages
 import DevM2M from "@/pages/dev/M2MManagement";
@@ -257,6 +256,7 @@ export const routes: RouteObject[] = [
       { path: "audit-logs", element: <AuditLogs /> },
       { path: "users/:userId/activity", element: <UserActivity /> },
       { path: "users/:userId/sessions", element: <UserSessions /> },
+      { path: "academic-settings", element: <AcademicSettings /> },
       { path: "profile", element: <Profile /> },
       { path: "notifications", element: <NotificationsPage /> },
     ],

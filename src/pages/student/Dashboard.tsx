@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   CalendarPlus,
   FileText,
@@ -68,83 +68,88 @@ export default function Dashboard() {
   ];
 
   const statCards = [
-  {
-    title: "My Appointments",
-    value: totalAppointments,
-    subtitle: "scheduled sessions",
-    icon: Clock,
-    iconWrap:
-      "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
-  },
-  {
-    title: "Admission Slips",
-    value: totalSlips,
-    subtitle: "submitted excuses",
-    icon: ClipboardCheck,
-    iconWrap:
-      "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
-  },
-  {
-    title: "IIR Profile",
-    value: iirProfileStatus,
-    subtitle: iir?.isSubmitted
-      ? "student record completed"
-      : "complete your student record",
-    icon: ClipboardList,
-    iconWrap: iir?.isSubmitted
-      ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
-      : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
-  },
-];
+    {
+      title: "My Appointments",
+      value: totalAppointments,
+      subtitle: "scheduled sessions",
+      icon: Clock,
+      iconWrap:
+        "bg-blue-500/10 text-blue-600 dark:text-blue-400 border-blue-500/20",
+    },
+    {
+      title: "Admission Slips",
+      value: totalSlips,
+      subtitle: "submitted excuses",
+      icon: ClipboardCheck,
+      iconWrap:
+        "bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border-emerald-500/20",
+    },
+    {
+      title: "IIR Profile",
+      value: iirProfileStatus,
+      subtitle: iir?.isSubmitted
+        ? "student record completed"
+        : "complete your student record",
+      icon: ClipboardList,
+      iconWrap: iir?.isSubmitted
+        ? "bg-rose-500/10 text-rose-600 dark:text-rose-400 border-rose-500/20"
+        : "bg-amber-500/10 text-amber-600 dark:text-amber-400 border-amber-500/20",
+    },
+  ];
 
-  usePageMetadata({
-    title: me ? `Welcome back, ${me.firstName}!` : "Welcome back",
-    description:
-      "PUP Guidance Services — Supporting your academic and personal growth",
-    badgeText: "Student Overview",
-    badgeIcon: <LayoutDashboard className="h-4 w-4" />,
-    isLoading,
-    headerStats: (
-      <div className="grid grid-cols-2 gap-3">
-        <div
-          className={cn(
-            "rounded-xl border border-white/30 bg-white/60 px-4 py-3",
-            "backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]",
-          )}
-        >
-          <p
+  const pageMeta = useMemo(
+    () => ({
+      title: me ? `Welcome back, ${me.firstName}!` : "Welcome back",
+      description:
+        "PUP Guidance Services — Supporting your academic and personal growth",
+      badgeText: "Student Overview",
+      badgeIcon: <LayoutDashboard className="h-4 w-4" />,
+      isLoading,
+      headerStats: (
+        <div className="grid grid-cols-2 gap-3">
+          <div
             className={cn(
-              "text-center text-[11px] font-medium uppercase",
-              "tracking-[0.18em] text-muted-foreground",
+              "rounded-xl border border-white/30 bg-white/60 px-4 py-3",
+              "backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]",
             )}
           >
-            Appts
-          </p>
-          <p className="mt-1 text-center text-2xl font-bold tabular-nums text-foreground">
-            {totalAppointments}
-          </p>
-        </div>
-        <div
-          className={cn(
-            "rounded-xl border border-white/30 bg-white/60 px-4 py-3",
-            "backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]",
-          )}
-        >
-          <p
+            <p
+              className={cn(
+                "text-center text-[11px] font-medium uppercase",
+                "tracking-[0.18em] text-muted-foreground",
+              )}
+            >
+              Appts
+            </p>
+            <p className="mt-1 text-center text-2xl font-bold tabular-nums text-foreground">
+              {totalAppointments}
+            </p>
+          </div>
+          <div
             className={cn(
-              "text-center text-[11px] font-medium uppercase",
-              "tracking-[0.18em] text-muted-foreground",
+              "rounded-xl border border-white/30 bg-white/60 px-4 py-3",
+              "backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]",
             )}
           >
-            Slips
-          </p>
-          <p className="mt-1 text-center text-2xl font-bold tabular-nums text-foreground">
-            {totalSlips}
-          </p>
+            <p
+              className={cn(
+                "text-center text-[11px] font-medium uppercase",
+                "tracking-[0.18em] text-muted-foreground",
+              )}
+            >
+              Slips
+            </p>
+            <p className="mt-1 text-center text-2xl font-bold tabular-nums text-foreground">
+              {totalSlips}
+            </p>
+          </div>
         </div>
-      </div>
-    ),
-  });
+      ),
+    }),
+    [me, totalAppointments, totalSlips, isLoading],
+  );
+
+  usePageMetadata(pageMeta);
 
   if (isLoading) return null;
 

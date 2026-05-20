@@ -15,6 +15,20 @@ function cloneValue<T>(value: T): T {
 }
 
 /**
+ * Strips the time component from an ISO8601 datetime string returned
+ * by the Go backend (e.g. "2000-01-01T00:00:00Z" → "2000-01-01").
+ * Returns an empty string for any falsy input.
+ * The backend's validateDate expects strictly "YYYY-MM-DD".
+ */
+function toDateOnly(dateStr: string | null | undefined): string {
+  if (!dateStr) return "";
+  // Fast path: already in YYYY-MM-DD format
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateStr)) return dateStr;
+  return dateStr.split("T")[0];
+}
+
+
+/**
  * Updates a nested field in the form data immutably
  * @param formData - Current form data
  * @param path - Array of keys representing the path to the field
@@ -160,6 +174,9 @@ export function initializeFormData(
       personalInfo: {
         ...emptyData.student?.personalInfo,
         ...baseData.student?.personalInfo,
+        dateOfBirth: toDateOnly(
+          baseData.student?.personalInfo?.dateOfBirth,
+        ),
       },
       addresses: Array.isArray(baseData.student?.addresses)
         ? baseData.student.addresses
@@ -201,6 +218,7 @@ export function initializeFormData(
             return {
               ...template,
               ...existing,
+              dateOfBirth: toDateOnly(existing.dateOfBirth),
               relationship:
                 existing.relationship?.id && existing.relationship.id > 0
                   ? existing.relationship

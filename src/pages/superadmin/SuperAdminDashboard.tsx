@@ -33,8 +33,6 @@ import {
   useUserDistribution,
   useLogActivity,
 } from "@/features/system-admin/hooks";
-import { SearchInput } from "@/components/form";
-import { toLowerCase } from "zod";
 
 export default function SuperAdminDashboard() {
   const { data: logStatsData } = useLogStats();
@@ -64,7 +62,7 @@ export default function SuperAdminDashboard() {
 
     const colors: Record<string, string> = {
       superadmin: "hsl(var(--primary) / 0.8)",
-      counselor: "hsl(var(--info-background) / 0.8)",
+      admin: "hsl(var(--info-background) / 0.8)",
       student: "hsl(var(--primary) / 0.8)",
       developer: "hsl(var(--notice-foreground) / 0.8)",
     };
@@ -155,7 +153,7 @@ export default function SuperAdminDashboard() {
                   </Badge>
                 </div>
                 <div className="mt-4 space-y-1">
-                  <p className="text-sm font-medium uppercase tracking-wider text-muted-foreground">
+                  <p className="text-sm font-medium uppercase text-muted-foreground">
                     {stat.label}
                   </p>
                   <p className="text-3xl font-bold tracking-tight text-foreground">

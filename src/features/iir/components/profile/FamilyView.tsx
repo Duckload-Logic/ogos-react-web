@@ -22,7 +22,6 @@ import {
   SibilingSupportType,
   StudentSupportType,
 } from "../../types";
-import { NOT_SPECIFIED } from "../../constants";
 import { cn } from "@/lib/utils";
 
 export default function FamilyView({
@@ -40,11 +39,13 @@ export default function FamilyView({
             value={asText(data?.background?.parentalStatus?.name)}
             icon={Users}
           />
-          <StatCard
-            label="Parental Details"
-            value={asText(data?.background?.parentalStatusDetails)}
-            icon={FileText}
-          />
+          {data?.background?.parentalStatusDetails && (
+            <StatCard
+              label="Parental Details"
+              value={asText(data?.background?.parentalStatusDetails)}
+              icon={FileText}
+            />
+          )}
           <StatCard
             label="Nature of Residence"
             value={asText(data?.background?.natureOfResidence?.name)}
@@ -83,13 +84,15 @@ export default function FamilyView({
         </div>
 
         <div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-          <CardBlock title="Room Sharing Details">
-            <p className="text-xs text-card-foreground">
-              {asText(data?.background?.roomSharingDetails)}
-            </p>
-          </CardBlock>
-          <CardBlock title="Sibling Support Types">
-            {(data?.background?.siblingSupportTypes?.length ?? 0) > 0 && (
+          {data?.background?.isSharingRoom && (
+            <CardBlock title="Room Sharing Details">
+              <p className="text-xs text-card-foreground">
+                {asText(data?.background?.roomSharingDetails)}
+              </p>
+            </CardBlock>
+          )}
+          <CardBlock title="Employed Siblings' Support">
+            {data?.background?.siblingSupportTypes?.length !== 0 && (
               <TagList
                 values={data!.background!.siblingSupportTypes.map(
                   (item: SibilingSupportType) => getOptionLabel(item.name),
@@ -119,9 +122,7 @@ export default function FamilyView({
                   <div>
                     <p className="text-sm font-bold text-card-foreground">
                       {asText(person?.lastName)}, {asText(person?.firstName)}
-                      {person?.middleName
-                        ? ` ${person?.middleName[0]}.`
-                        : ""}
+                      {person?.middleName ? ` ${person?.middleName[0]}.` : ""}
                     </p>
                     <p
                       className={cn(

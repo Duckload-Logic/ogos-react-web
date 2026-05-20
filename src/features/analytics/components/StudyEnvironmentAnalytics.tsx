@@ -3,15 +3,10 @@ import {
   PieChart,
   Pie,
   Cell,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import { ChartContainer, ChartConfig } from "@/components/ui/chart";
+import { ChartConfig } from "@/components/ui/chart";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 

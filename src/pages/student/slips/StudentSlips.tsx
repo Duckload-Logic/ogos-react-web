@@ -118,12 +118,16 @@ const getSlipStatusCardMeta = (
 
   const normalizedColor = (status?.colorKey || "").toLowerCase();
 
-  if (normalizedName.includes("revision")) return SLIP_STATUS_META["for-revision"];
+  if (normalizedName.includes("revision"))
+    return SLIP_STATUS_META["for-revision"];
   if (normalizedName.includes("approve")) return SLIP_STATUS_META.approved;
   if (normalizedName.includes("reject")) return SLIP_STATUS_META.rejected;
   if (normalizedName.includes("pending")) return SLIP_STATUS_META.pending;
 
-  if (normalizedColor.includes("success") || normalizedColor.includes("green")) {
+  if (
+    normalizedColor.includes("success") ||
+    normalizedColor.includes("green")
+  ) {
     return SLIP_STATUS_META.approved;
   }
 
@@ -131,7 +135,10 @@ const getSlipStatusCardMeta = (
     return SLIP_STATUS_META.rejected;
   }
 
-  if (normalizedColor.includes("warning") || normalizedColor.includes("yellow")) {
+  if (
+    normalizedColor.includes("warning") ||
+    normalizedColor.includes("yellow")
+  ) {
     return SLIP_STATUS_META.pending;
   }
 
@@ -180,24 +187,28 @@ export default function StudentSlips() {
 
   const pageBadgeIcon = useMemo(() => <FileText className="h-4 w-4" />, []);
 
+  const hasValidCor = !!user?.studentCorUrl && !!user?.isStudentCorValid;
+
   const pageHeaderActions = useMemo(
     () => (
       <Button
-        asChild={!!user?.studentCorUrl}
-        disabled={!user?.studentCorUrl}
+        asChild={hasValidCor}
+        disabled={!hasValidCor}
         className="gap-2 rounded-xl shadow-lg shadow-primary/15"
         title={
           !user?.studentCorUrl
             ? "Please upload your COR in your profile to submit a slip"
+            : !user?.isStudentCorValid
+            ? "Your COR is invalid or outdated for the current academic term"
             : ""
         }
         onClick={(e) => {
-          if (!user?.studentCorUrl) {
+          if (!hasValidCor) {
             e.preventDefault();
           }
         }}
       >
-        {user?.studentCorUrl ? (
+        {hasValidCor ? (
           <Link to="/student/slips/submit">
             <Plus className="h-4 w-4" />
             Submit Slip
@@ -210,7 +221,7 @@ export default function StudentSlips() {
         )}
       </Button>
     ),
-    [user?.studentCorUrl],
+    [user?.studentCorUrl, user?.isStudentCorValid, hasValidCor],
   );
 
   usePageMetadata({
@@ -245,8 +256,11 @@ export default function StudentSlips() {
         <div className="pointer-events-none absolute right-0 top-10 -z-10 h-80 w-80 rounded-full bg-primary/5 blur-3xl dark:bg-primary/10" />
         <div className="pointer-events-none absolute bottom-0 left-1/3 -z-10 h-72 w-72 rounded-full bg-emerald-200/10 blur-3xl dark:bg-emerald-400/10" />
 
-        {!user?.studentCorUrl && (
-          <Alert variant="destructive" className={ACTION_REQUIRED_ALERT}>
+        {!user?.studentCorUrl ? (
+          <Alert
+            variant="destructive"
+            className={ACTION_REQUIRED_ALERT}
+          >
             <AlertCircle className="h-4 w-4" />
             <AlertTitle className="text-base font-medium">
               Action Required: Missing Certificate of Registration
@@ -261,7 +275,26 @@ export default function StudentSlips() {
               </Link>
             </AlertDescription>
           </Alert>
-        )}
+        ) : !user?.isStudentCorValid ? (
+          <Alert
+            variant="destructive"
+            className={ACTION_REQUIRED_ALERT}
+          >
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle className="text-base font-medium">
+              Action Required: Invalid or Outdated Certificate of Registration
+            </AlertTitle>
+            <AlertDescription className="text-sm">
+              Your uploaded COR is not valid for the current academic term. Please upload your updated COR to proceed.{" "}
+              <Link
+                to="/student/cor-management"
+                className="font-semibold underline hover:text-rose-700 dark:hover:text-rose-300"
+              >
+                Go to COR Management
+              </Link>
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
         <section
           className="grid gap-4"
@@ -299,7 +332,7 @@ export default function StudentSlips() {
                 />
 
                 <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-white/70 dark:bg-white/15" />
-                <div className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-white/28 to-transparent dark:from-black/15" />
+                <div className="from-white/28 pointer-events-none absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t to-transparent dark:from-black/15" />
 
                 <CardContent className="relative flex h-full flex-col justify-between p-4">
                   <div className="flex items-start justify-between gap-3">
@@ -307,7 +340,7 @@ export default function StudentSlips() {
                       <p
                         title={stat.name}
                         className={cn(
-                          "truncate text-[11px] font-extrabold uppercase tracking-[0.18em]",
+                          "truncate text-[11px] font-bold uppercase tracking-[0.18em]",
                           statusMeta.label,
                         )}
                       >
@@ -325,12 +358,15 @@ export default function StudentSlips() {
                         statusMeta.iconBox,
                       )}
                     >
-                      <StatusIcon className="h-5 w-5" strokeWidth={2} />
+                      <StatusIcon
+                        className="h-5 w-5"
+                        strokeWidth={2}
+                      />
                     </div>
                   </div>
 
                   <div className="flex items-end justify-between gap-3">
-                    <p className="text-[34px] font-black leading-none tracking-tight text-foreground tabular-nums">
+                    <p className="text-[34px] tabular-nums leading-none tracking-tight text-foreground">
                       {count}
                     </p>
 
@@ -353,7 +389,8 @@ export default function StudentSlips() {
           <CardHeader className="border-b border-white/30 px-4 py-3 dark:border-white/10">
             <div className="scrollbar-hide flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0">
               {statsWithAll?.map((filter) => {
-                const isActive = String(selectedStatus.id) === String(filter.id);
+                const isActive =
+                  String(selectedStatus.id) === String(filter.id);
 
                 return (
                   <Button
@@ -391,7 +428,10 @@ export default function StudentSlips() {
           <CardContent className="p-0">
             {isSlipsLoading ? (
               <div className="flex items-center justify-center py-16">
-                <Spinner size="md" message="Loading your slips..." />
+                <Spinner
+                  size="md"
+                  message="Loading your slips..."
+                />
               </div>
             ) : slips.length > 0 ? (
               <div className="divide-y divide-white/25 dark:divide-white/10">
@@ -447,16 +487,20 @@ export default function StudentSlips() {
                               </Badge>
                             </div>
 
-                            <div className={cn(
-                              "mt-2 flex flex-wrap items-center gap-3",
-                              "text-xs text-muted-foreground",
-                            )}>
+                            <div
+                              className={cn(
+                                "mt-2 flex flex-wrap items-center gap-3",
+                                "text-xs text-muted-foreground",
+                              )}
+                            >
                               <div className="flex items-center gap-1.5">
                                 <Calendar className="h-3.5 w-3.5" />
                                 <span>{formatDate(slip.dateOfAbsence)}</span>
                               </div>
 
-                              <span className="text-muted-foreground/40">•</span>
+                              <span className="text-muted-foreground/40">
+                                •
+                              </span>
 
                               <div className="flex items-center gap-1.5">
                                 <Calendar className="h-3.5 w-3.5" />
@@ -497,22 +541,23 @@ export default function StudentSlips() {
 
                   {String(selectedStatus?.id) === "0" && (
                     <Button
-                      asChild={!!user?.studentCorUrl}
-                      disabled={!user?.studentCorUrl}
+                      asChild={hasValidCor}
+                      disabled={!hasValidCor}
                       className="rounded-xl shadow-lg shadow-primary/15"
                       title={
                         !user?.studentCorUrl
-                          ? "Please upload your COR " +
-                            "in your profile to submit a slip"
+                          ? "Please upload your COR in your profile to submit a slip"
+                          : !user?.isStudentCorValid
+                          ? "Your COR is invalid or outdated for the current academic term"
                           : ""
                       }
                       onClick={(e) => {
-                        if (!user?.studentCorUrl) {
+                        if (!hasValidCor) {
                           e.preventDefault();
                         }
                       }}
                     >
-                      {user?.studentCorUrl ? (
+                      {hasValidCor ? (
                         <Link to="/student/slips/submit">
                           <Plus className="mr-2 h-4 w-4" />
                           Submit Admission Slip

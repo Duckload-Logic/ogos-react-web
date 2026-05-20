@@ -4,15 +4,9 @@ import {
   Pie,
   Cell,
   ResponsiveContainer,
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
   Tooltip,
-  Legend,
 } from "recharts";
-import { ChartContainer, ChartConfig } from "@/components/ui/chart";
+import { ChartConfig } from "@/components/ui/chart";
 
 const COLORS = [
   "#3b82f6",

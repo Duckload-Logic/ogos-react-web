@@ -23,10 +23,8 @@ import {
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import type { ConcernCategory } from "@/features/appointments/types";
 import { useSubmitAppointment } from "@/features/appointments/hooks/useAppointments";
 import { toISODateString } from "@/features/appointments/utils";
-import Layout from "@/components/layout/Layout";
 import { usePageMetadata } from "@/context";
 import { cn } from "@/lib/utils";
 

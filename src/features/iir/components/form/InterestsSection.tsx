@@ -2,15 +2,10 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import {
   Star,
   Library,
-  Trophy,
   Users,
-  CheckCircle2,
   Heart,
-  BookOpen,
-  Music,
   Palette,
   Briefcase,
-  ChevronRight,
   Sparkles,
 } from "lucide-react";
 import { FormInput, Checkbox } from "@/components/form";
@@ -18,7 +13,7 @@ import { SectionContainer } from "./SectionContainer";
 import { validateObject, validateField } from "@/services/validationSchema";
 import { interestsValidationSchema } from "@/features/iir/config/interestsValidationSchema";
 import { useActivityOptions } from "@/features/iir/hooks/useLookups";
-import { Activity, Hobby, SubjectPreference } from "@/features/iir/types";
+import { Activity, Hobby } from "@/features/iir/types";
 import { cn } from "@/lib/utils";
 
 interface FormErrors {
@@ -235,16 +230,16 @@ export const InterestsSection = forwardRef<
     if (index > -1) {
       newRoles.splice(index, 1);
     } else {
-      // Logic for mutual exclusivity: Officer and Member and Other cannot both be selected
+      // Logic for mutual exclusivity: Officer and Member and Others cannot both be selected
       if (role === "Officer") {
         newRoles = newRoles.filter(
-          (r) => !namesMatch(r, "Member") && !namesMatch(r, "Other"),
+          (r) => !namesMatch(r, "Member") && !namesMatch(r, "Others"),
         );
       } else if (role === "Member") {
         newRoles = newRoles.filter(
-          (r) => !namesMatch(r, "Officer") && !namesMatch(r, "Other"),
+          (r) => !namesMatch(r, "Officer") && !namesMatch(r, "Others"),
         );
-      } else if (role === "Other") {
+      } else if (role === "Others") {
         newRoles = newRoles.filter(
           (r) => !namesMatch(r, "Officer") && !namesMatch(r, "Member"),
         );
@@ -437,7 +432,7 @@ export const InterestsSection = forwardRef<
             >
               <h4
                 className={cn(
-                  "mb-6 flex items-center gap-2 text-xs font-black uppercase",
+                  "mb-6 flex items-center gap-2 text-xs uppercase",
                   "tracking-widest text-neutral-400 dark:text-neutral-500",
                 )}
               >
@@ -471,7 +466,7 @@ export const InterestsSection = forwardRef<
             >
               <h4
                 className={cn(
-                  "mb-6 flex items-center gap-2 text-xs font-black uppercase",
+                  "mb-6 flex items-center gap-2 text-xs uppercase",
                   "tracking-widest text-neutral-400 dark:text-neutral-500",
                 )}
               >
@@ -539,7 +534,7 @@ export const InterestsSection = forwardRef<
               </h4>
               <p
                 className={cn(
-                  "mb-8 text-[10px] font-bold uppercase tracking-widest",
+                  "mb-8 text-[10px] font-bold uppercase",
                   "text-neutral-400 dark:text-neutral-500",
                 )}
               >
@@ -556,7 +551,7 @@ export const InterestsSection = forwardRef<
                       <div
                         className={cn(
                           "flex h-10 w-10 shrink-0 items-center justify-center",
-                          "rounded-xl text-xs font-black",
+                          "rounded-xl text-xs",
                           rank <= 2
                             ? "bg-primary text-white shadow-sm"
                             : "bg-primary/10 text-primary",
@@ -652,7 +647,7 @@ export const InterestsSection = forwardRef<
                     className="text-primary"
                   />
                 </div>
-                <h5 className="mb-6 text-[10px] font-black uppercase tracking-[0.2em] text-primary sm:mb-8">
+                <h5 className="mb-6 text-[10px] uppercase tracking-[0.2em] text-primary sm:mb-8">
                   Occupational Role/Position:
                 </h5>
                 <div className="grid grid-cols-2 items-start gap-5 sm:grid-cols-4 sm:gap-6">
@@ -670,11 +665,11 @@ export const InterestsSection = forwardRef<
                     <Checkbox
                       id="role-others-check"
                       name="occupational_role"
-                      label="Other (Specify)"
-                      checked={isRoleChecked("Other")}
-                      onCheckedChange={() => toggleRole("Other")}
+                      label="Others (Specify)"
+                      checked={isRoleChecked("Others")}
+                      onCheckedChange={() => toggleRole("Others")}
                     />
-                    {isRoleChecked("Other") && (
+                    {isRoleChecked("Others") && (
                       <div
                         className={cn(
                           "animate-in fade-in slide-in-from-top-2",

@@ -1,4 +1,3 @@
-import { User } from "@/features/users/types/user";
 
 export interface Gender {
   id: number;
@@ -162,10 +161,7 @@ export interface PersonalInfo {
   employerName: string | null;
   employerAddress: string | null;
   employerContactNumber: string | null;
-  livingInDorm: boolean;
-  dormAddress: string | null;
-  landlordName: string | null;
-  landlordContactNumber: string | null;
+
   emergencyContact: EmergencyContact;
 }
 

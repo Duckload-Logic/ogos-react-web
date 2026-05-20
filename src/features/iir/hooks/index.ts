@@ -16,6 +16,7 @@ export { useAddressSync } from "./useAddressSync";
 export {
   useCourses,
   useGenders,
+  useEnrollmentYears,
   useCivilStatuses,
   useReligions,
   useParentalStatusTypes,

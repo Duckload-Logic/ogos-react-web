@@ -30,7 +30,7 @@ export function useMarkNotificationRead() {
     },
     onError: (error) => {
       console.error(
-        "[useMarkNotificationRead] {Mutation}: ",
+        "Failed to mark notification as read: ",
         error instanceof Error ? error.message : "Failed to mark as read",
       );
     },

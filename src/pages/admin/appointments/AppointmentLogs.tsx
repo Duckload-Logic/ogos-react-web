@@ -2,10 +2,9 @@ import { useState, useMemo } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Calendar } from "lucide-react";
 import { useAppointments, useAppointmentsStats } from "@/features/appointments/hooks";
-import type { Appointment, StatusCount } from "@/features/appointments/types";
+import type { Appointment } from "@/features/appointments/types";
 import { AppointmentList } from "@/features/appointments/components";
 import { STATUS_COLORS } from "@/config/constants";
 import {

@@ -1,13 +1,6 @@
 import { Dropdown, SearchInput } from "@/components/form";
-import { Button } from "@/components/ui/button";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { Label } from "@radix-ui/react-label";
-import { ChevronDownIcon, X } from "lucide-react";
+
+
 import { cn } from "@/lib/utils";
 
 interface SearchFilterProps {

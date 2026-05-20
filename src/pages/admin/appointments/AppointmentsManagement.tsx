@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import {
   useAppointments,
   useAppointmentsStats,
-  useUpdateAppointment,
 } from "@/features/appointments/hooks";
 import { Calendar, AppointmentList } from "@/features/appointments/components";
 import { Appointment, AppointmentStatus } from "@/features/appointments/types";
@@ -13,7 +12,6 @@ import { toISODateString } from "@/features/appointments/utils";
 import { Card, CardContent } from "@/components/ui/card";
 import { STATUS_COLORS } from "@/config/constants";
 import { Button } from "@/components/ui/button";
-import Layout from "@/components/layout/Layout";
 import { usePageMetadata } from "@/context";
 
 import {
@@ -378,7 +376,7 @@ export default function AppointmentsManagement() {
                       <p className="text-sm font-medium text-muted-foreground/60">
                         No activity recorded for this period
                       </p>
-                      <p className="mt-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/40">
+                      <p className="mt-1 text-[10px] font-bold uppercase text-muted-foreground/40">
                         Appointments Stats
                       </p>
                     </div>

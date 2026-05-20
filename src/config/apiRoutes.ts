@@ -122,6 +122,7 @@ export const API_ROUTES = Object.freeze({
     lookups: Object.freeze({
       courses: "/students/lookups/courses",
       genders: "/students/lookups/genders",
+      enrollmentYears: "/students/lookups/enrollment-years",
       religions: "/students/lookups/religions",
       parentalStatusTypes: "/students/lookups/parental-status-types",
       enrollmentReasons: "/students/lookups/enrollment-reasons",
@@ -221,6 +222,10 @@ export const API_ROUTES = Object.freeze({
       audit: "/logs/audit",
       stats: "/logs/stats",
       activity: "/logs/activity",
+    }),
+    academicSettings: Object.freeze({
+      get: "/students/settings/academic",
+      update: "/students/settings/academic",
     }),
   }),
   /**

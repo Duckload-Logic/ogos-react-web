@@ -129,38 +129,9 @@ const personalInfoSchema = z.object({
   employerName: z.string().nullable(),
   employerAddress: z.string().nullable(),
   employerContactNumber: z.string().nullable(),
-  livingInDorm: z.boolean(),
-  dormAddress: z.string().nullable(),
-  landlordName: z.string().nullable(),
-  landlordContactNumber: z.string().nullable(),
+
   emergencyContact: emergencyContactSchema,
-}).refine(
-  (data) => {
-    if (data.livingInDorm) {
-      return (
-        !!data.dormAddress &&
-        !!data.landlordName &&
-        !!data.landlordContactNumber
-      );
-    }
-    return true;
-  },
-  {
-    message: "Dorm info is required when living in a dorm",
-    path: ["dormAddress"],
-  },
-).refine(
-  (data) => {
-    if (data.livingInDorm && data.landlordName) {
-      return /^[a-zA-Z\s.'-]+$/.test(data.landlordName);
-    }
-    return true;
-  },
-  {
-    message: "Invalid landlord name format",
-    path: ["landlordName"],
-  },
-);
+});
 
 /**
  * Student address validation schema

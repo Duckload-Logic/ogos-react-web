@@ -1,20 +1,17 @@
 import { useState, useMemo } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Calendar } from "lucide-react";
 import { useSlipLogs, useGetSlipStats } from "@/features/slips/hooks";
-import type { Slip, SlipStats, SlipStatus } from "@/features/slips/types";
+import type { Slip, SlipStatus } from "@/features/slips/types";
 import { SlipList } from "@/features/slips/components";
-import { STATUS_COLORS } from "@/config/constants";
 import {
   getMonthsList,
   getYearsList,
   getMonthRange,
 } from "@/features/slips/utils/dateFilters";
 import { Dropdown } from "@/components/form";
-import Layout from "@/components/layout/Layout";
 import { usePageMetadata } from "@/context";
 
 export default function SlipLogs() {

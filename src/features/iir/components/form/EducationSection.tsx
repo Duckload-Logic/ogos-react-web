@@ -2,8 +2,6 @@ import { forwardRef, useImperativeHandle, useState } from "react";
 import {
   GraduationCap,
   School,
-  MapPin,
-  Award,
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
@@ -39,7 +37,9 @@ export const EducationSection = forwardRef<
 ) {
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const validate = (step?: number): { isValid: boolean; errors: FormErrors } => {
+  const validate = (
+    step?: number,
+  ): { isValid: boolean; errors: FormErrors } => {
     const sectionErrors = validateObject(
       { education },
       educationValidationSchema,
@@ -168,7 +168,7 @@ export const EducationSection = forwardRef<
                       )
                     : cn(
                         "bg-glass-bg/60 border-glass-border/20",
-                        "hover:border-primary/20 hover:bg-glass-bg/80",
+                        "hover:bg-glass-bg/80 hover:border-primary/20",
                       ),
               )}
             >
@@ -206,7 +206,7 @@ export const EducationSection = forwardRef<
                       )
                     : cn(
                         "bg-glass-bg/60 border-glass-border/20",
-                        "hover:border-primary/20 hover:bg-glass-bg/80",
+                        "hover:bg-glass-bg/80 hover:border-primary/20",
                       ),
               )}
             >
@@ -311,7 +311,7 @@ export const EducationSection = forwardRef<
                         />
                         <span
                           className={cn(
-                            "text-[10px] font-bold uppercase tracking-wider",
+                            "text-[10px] font-bold uppercase",
                             "text-muted-foreground",
                           )}
                         >
@@ -322,7 +322,10 @@ export const EducationSection = forwardRef<
                   </div>
                   {StatusIcon && (
                     <StatusIcon
-                      className={cn("h-5 w-5", status.color.replace("bg-", "text-"))}
+                      className={cn(
+                        "h-5 w-5",
+                        status.color.replace("bg-", "text-"),
+                      )}
                     />
                   )}
                 </div>

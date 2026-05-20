@@ -89,6 +89,7 @@ export const QUERY_KEYS = {
     lookups: {
       courses: ["iir", "lookups", "courses"] as const,
       genders: ["iir", "lookups", "genders"] as const,
+      enrollmentYears: ["iir", "lookups", "enrollment-years"] as const,
       religions: ["iir", "lookups", "religions"] as const,
       parentalStatusTypes: ["iir", "lookups", "parental-status-types"] as const,
       enrollmentReasons: ["iir", "lookups", "enrollment-reasons"] as const,

@@ -71,7 +71,7 @@ export default function HealthView({
                 </div>
                 <span
                   className={cn(
-                    "text-[10px] font-black uppercase tracking-widest",
+                    "text-[10px] uppercase",
                     "text-muted-foreground",
                   )}
                 >

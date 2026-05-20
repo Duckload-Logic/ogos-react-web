@@ -8,8 +8,6 @@ import {
   Brain,
   User,
   Users,
-  Calendar,
-  ChevronDown,
   Check,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,7 +42,9 @@ export const HealthSection = forwardRef<
 ) {
   const [errors, setErrors] = useState<FormErrors>({});
 
-  const validate = (step?: number): { isValid: boolean; errors: FormErrors } => {
+  const validate = (
+    step?: number,
+  ): { isValid: boolean; errors: FormErrors } => {
     // Helper to map consultations by type for easy access in rules
     const _consultations = (health?.consultations || []).reduce(
       (acc: any, c: any) => {
@@ -297,7 +297,7 @@ export const HealthSection = forwardRef<
                       {item.label}
                     </h4>
                     {isFieldRequired(healthValidationSchema, item.yesKey) && (
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-primary">
+                      <span className="text-[10px] font-bold uppercase text-primary">
                         Required
                       </span>
                     )}
@@ -412,7 +412,7 @@ export const HealthSection = forwardRef<
                     healthValidationSchema,
                     `_consultations.${type.type}.hasConsulted`,
                   ) && (
-                    <span className="mt-1 text-[10px] font-bold uppercase tracking-wider text-primary">
+                    <span className="mt-1 text-[10px] font-bold uppercase text-primary">
                       Required
                     </span>
                   )}

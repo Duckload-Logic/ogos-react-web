@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
 import { useAuth, useToast, usePageMetadata } from "@/context";
 import {
   Card,
@@ -13,8 +13,6 @@ import {
   Upload,
   FileText,
   Eye,
-  Download,
-  Trash2,
   AlertCircle,
   CheckCircle2,
   ExternalLink,
@@ -25,6 +23,17 @@ import { UploadCOR } from "@/features/student-core/services/corService";
 import { cn } from "@/lib/utils";
 import { validateCorFile } from "@/utils/corValidation";
 import { motion, AnimatePresence } from "framer-motion";
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogAction,
+} from "@/components/ui/alert-dialog";
+import { getErrorMessage } from "@/lib/api";
 
 export default function CORManagement() {
   const { user, refresh } = useAuth();
@@ -32,16 +41,21 @@ export default function CORManagement() {
   const [isUploading, setIsUploading] = useState(false);
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [showConfirm, setShowConfirm] = useState(false);
 
-  usePageMetadata({
-    title: "COR Management",
-    showSubHeader: true,
-    description:
-      "Manage your current academic credentials and verification documents.",
-    isLoading: false,
-    badgeText: "Verified Student",
-    badgeIcon: <ShieldCheck size={16} />,
-  });
+  usePageMetadata(
+    useMemo(() => {
+      return {
+        title: "COR Management",
+        showSubHeader: true,
+        description:
+          "Manage your current academic credentials and verification documents.",
+        isLoading: false,
+        badgeText: "Verified Student",
+        badgeIcon: <ShieldCheck size={16} />,
+      };
+    }, [user]),
+  );
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -101,15 +115,19 @@ export default function CORManagement() {
 
       if (!validation.isValid) {
         triggerToast(validation.error || "Please upload a valid COR file.");
+        setShowConfirm(false);
         return;
       }
 
       await UploadCOR(selectedFile);
       await refresh();
       setSelectedFile(null);
-      triggerToast("COR uploaded successfully! OCR processing started.");
+      triggerToast("COR uploaded and validated successfully!");
+      setShowConfirm(false);
     } catch (error: any) {
-      triggerToast(error.message || "Failed to upload COR.");
+      const errMsg = getErrorMessage(error);
+      triggerToast(errMsg);
+      setShowConfirm(false);
     } finally {
       setIsUploading(false);
     }
@@ -131,9 +149,24 @@ export default function CORManagement() {
                     <Eye size={24} />
                   </div>
                   <div>
-                    <CardTitle className="text-2xl font-bold">
-                      Document Preview
-                    </CardTitle>
+                    <div className="flex items-center gap-3">
+                      <CardTitle className="text-2xl font-bold">
+                        Document Preview
+                      </CardTitle>
+                      {corUrl &&
+                        (user?.isStudentCorValid ? (
+                          <Badge className="flex items-center gap-1 rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white hover:bg-emerald-600">
+                            <CheckCircle2 size={12} /> Valid COR
+                          </Badge>
+                        ) : (
+                          <Badge
+                            variant="destructive"
+                            className="flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+                          >
+                            <AlertCircle size={12} /> Outdated COR
+                          </Badge>
+                        ))}
+                    </div>
                     <CardDescription>
                       Visual inspection of your latest uploaded COR.
                     </CardDescription>
@@ -265,8 +298,8 @@ export default function CORManagement() {
                       <div className="space-y-1">
                         <p className="font-bold">Click or drag file here</p>
                         <p className="text-xs text-muted-foreground">
-                          PDF, JPG, or PNG (Max 10MB). Filename should include
-                          COR or Certificate of Registration.
+                          PDF, JPG, or PNG (Max 5MB). Filename should include
+                          "COR" or "Certificate of Registration".
                         </p>
                       </div>
                     </motion.div>
@@ -289,7 +322,7 @@ export default function CORManagement() {
                   </Button>
                   <Button
                     className="flex-1 rounded-xl shadow-lg shadow-primary/20"
-                    onClick={handleUpload}
+                    onClick={() => setShowConfirm(true)}
                     disabled={isUploading}
                   >
                     {isUploading ? (
@@ -317,6 +350,13 @@ export default function CORManagement() {
             </CardHeader>
             <CardContent className="space-y-4 p-8 pt-0">
               <ul className="space-y-3 text-sm font-medium text-muted-foreground">
+                <li className="flex items-start gap-3">
+                  <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
+                  <span>
+                    The file name must contain the words "COR" or "Certificate
+                    of Registration"
+                  </span>
+                </li>
                 <li className="flex items-start gap-3">
                   <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                   <span>
@@ -349,6 +389,72 @@ export default function CORManagement() {
           </Card>
         </div>
       </div>
+
+      <AlertDialog
+        open={showConfirm}
+        onOpenChange={setShowConfirm}
+      >
+        <AlertDialogContent className="rounded-2xl backdrop-blur-xl dark:bg-slate-900/80">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-xl font-bold">
+              Confirm COR Upload
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to upload this Certificate of Registration?
+              The system will automatically check if it is valid for the current
+              academic term.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              disabled={isUploading}
+              className="rounded-xl"
+            >
+              Cancel
+            </AlertDialogCancel>
+            <AlertDialogAction
+              disabled={isUploading}
+              onClick={(e) => {
+                e.preventDefault();
+                handleUpload();
+              }}
+              className="rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/95"
+            >
+              {isUploading ? "Uploading..." : "Upload COR"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AnimatePresence>
+        {isUploading && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/30 backdrop-blur-md"
+          >
+            <div className="flex flex-col items-center gap-4 rounded-3xl border border-white/25 bg-white/45 p-10 shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-white/[0.045]">
+              <div className="relative">
+                <RefreshCw
+                  size={48}
+                  className="animate-spin text-primary"
+                />
+                <div className="absolute inset-0 animate-ping rounded-full border border-primary/20" />
+              </div>
+              <div className="space-y-1 text-center">
+                <h3 className="text-lg font-bold text-foreground">
+                  Processing COR
+                </h3>
+                <p className="max-w-[280px] text-sm text-muted-foreground">
+                  Extracting document details and validating academic term.
+                  Please wait...
+                </p>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

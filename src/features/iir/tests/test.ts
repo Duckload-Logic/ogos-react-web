@@ -33,10 +33,7 @@ export const completeIIRForm: IIRForm = {
       employerName: null,
       employerAddress: null,
       employerContactNumber: null,
-      livingInDorm: false,
-      dormAddress: null,
-      landlordName: null,
-      landlordContactNumber: null,
+
       emergencyContact: {
         firstName: "Maria",
         middleName: "Dela",
@@ -282,10 +279,7 @@ export const incompleteIIRForm: IIRForm = {
       employerName: null,
       employerAddress: null,
       employerContactNumber: null,
-      livingInDorm: false,
-      dormAddress: null,
-      landlordName: null,
-      landlordContactNumber: null,
+
       emergencyContact: {} as any, // Incomplete
     },
     addresses: [],

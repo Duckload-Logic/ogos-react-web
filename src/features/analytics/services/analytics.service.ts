@@ -26,9 +26,6 @@ const FetchStudentPage = async (
     });
     return data;
   } catch (error) {
-    const handlerName = config?.handlerName || "FetchStudentPage";
-    const stepName = config?.stepName || `Fetch Page ${page}`;
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };
@@ -66,9 +63,6 @@ export const GetStudentsAnalytics = async (
 
     return allStudents;
   } catch (error) {
-    const handlerName = config?.handlerName || "GetStudentsAnalytics";
-    const stepName = config?.stepName || "Aggregate Analytics";
-    console.error(`[${handlerName}] {${stepName}}: ${error}`);
     throw error;
   }
 };

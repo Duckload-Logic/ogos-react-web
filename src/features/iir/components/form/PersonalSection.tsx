@@ -3,7 +3,6 @@ import {
   useImperativeHandle,
   useState,
   useCallback,
-  useMemo,
 } from "react";
 import { Dropdown, FormInput, Checkbox, DatePicker } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
@@ -11,16 +10,8 @@ import {
   User,
   MapPin,
   Phone,
-  ShieldCheck,
   Briefcase,
-  GraduationCap,
-  Info,
-  Mail,
-  Calendar,
-  Layers,
-  Hash,
   Activity,
-  UserCheck,
 } from "lucide-react";
 import {
   useCourses,
@@ -317,18 +308,6 @@ export const PersonalSection = forwardRef<
         commonRules.required("Employer address"),
       ];
     }
-    if ((studentInfo as any)?.personalInfo?.livingInDorm) {
-      schema["student.personalInfo.dormAddress"] = [
-        commonRules.required("Dorm address"),
-      ];
-      schema["student.personalInfo.landlordName"] = [
-        commonRules.required("Landlord name"),
-        commonRules.nameFormat(),
-      ];
-      schema["student.personalInfo.landlordContactNumber"] = [
-        commonRules.required("Landlord contact number"),
-      ];
-    }
     return schema;
   };
   const runtimeSchema = getRuntimeSchema();
@@ -522,6 +501,7 @@ export const PersonalSection = forwardRef<
                   runtimeSchema,
                   "student.personalInfo.studentNumber",
                 )}
+                disabled={isEditMode}
               />
             </div>
             <div className="md:col-span-3">
@@ -905,91 +885,6 @@ export const PersonalSection = forwardRef<
                 </div>
               </div>
             )}
-
-            <div className="border-t border-border/10 pt-8 flex flex-col gap-6">
-              <Checkbox
-                id="livingInDorm"
-                label="Are you living in a dorm/boarding house while attending school?"
-                name="livingInDorm"
-                checked={studentInfo?.personalInfo?.livingInDorm || false}
-                onCheckedChange={(checked: boolean | "indeterminate") => {
-                  const isChecked = checked === true;
-                  handleInputChange(
-                    "student.personalInfo.livingInDorm",
-                    isChecked,
-                  );
-                }}
-                info="Mark this if you are staying in a dorm or boarding house."
-              />
-
-              {studentInfo?.personalInfo?.livingInDorm && (
-                <div
-                  className={cn(
-                    "animate-fade-in grid grid-cols-1 gap-6 border-t",
-                    "border-border/10 pt-6 md:grid-cols-3",
-                  )}
-                >
-                  <div className="md:col-span-3">
-                    <FormInput
-                      label="Dorm/Boarding House Address"
-                      value={studentInfo?.personalInfo?.dormAddress || ""}
-                      onChange={(val: any) =>
-                        handleInputChange(
-                          "student.personalInfo.dormAddress",
-                          val,
-                        )
-                      }
-                      placeholder="Full dorm/boarding house address"
-                      error={errors["student.personalInfo.dormAddress"]}
-                      required={isFieldRequired(
-                        runtimeSchema,
-                        "student.personalInfo.dormAddress",
-                      )}
-                    />
-                  </div>
-                  <div className="md:col-span-2">
-                    <FormInput
-                      label="Name of Landlord/Landlady"
-                      value={studentInfo?.personalInfo?.landlordName || ""}
-                      onChange={(val: any) =>
-                        handleInputChange(
-                          "student.personalInfo.landlordName",
-                          val,
-                        )
-                      }
-                      placeholder="Landlord/landlady full name"
-                      error={errors["student.personalInfo.landlordName"]}
-                      required={isFieldRequired(
-                        runtimeSchema,
-                        "student.personalInfo.landlordName",
-                      )}
-                    />
-                  </div>
-                  <div>
-                    <FormInput
-                      label="Landlord Contact Number"
-                      value={
-                        studentInfo?.personalInfo?.landlordContactNumber || ""
-                      }
-                      onChange={(val: any) =>
-                        handleInputChange(
-                          "student.personalInfo.landlordContactNumber",
-                          val.replace(/[^0-9]/g, ""),
-                        )
-                      }
-                      placeholder="Landlord phone number"
-                      error={
-                        errors["student.personalInfo.landlordContactNumber"]
-                      }
-                      required={isFieldRequired(
-                        runtimeSchema,
-                        "student.personalInfo.landlordContactNumber",
-                      )}
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </SectionContainer>
       )}

@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
-  Search,
   Users,
   ShieldAlert,
   MoreVertical,
@@ -9,10 +8,8 @@ import {
   UserX,
   Mail,
   Calendar,
-  Filter,
   Shield,
   ArrowRight,
-  Sparkles,
   ChevronLeft,
   ChevronRight,
 } from "lucide-react";
@@ -20,7 +17,6 @@ import { usePageMetadata } from "@/context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Input } from "@/components/ui/input";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -87,6 +83,7 @@ export default function UserManagement() {
     switch (roleName.toLowerCase()) {
       case "superadmin":
         return "bg-primary/10 text-primary border-primary/20";
+      case "admin":
       case "counselor":
         return "bg-indigo-500/10 text-indigo-600 border-indigo-500/20";
       case "student":
@@ -178,7 +175,7 @@ export default function UserManagement() {
           <div className="overflow-x-auto">
             <table className="w-full min-w-[1000px] text-left text-sm">
               <thead>
-                <tr className="border-b border-white/10 bg-white/30 px-6 py-4 text-xs font-semibold uppercase tracking-wider text-muted-foreground backdrop-blur-md">
+                <tr className="border-b border-white/10 bg-white/30 px-6 py-4 text-xs font-semibold uppercase text-muted-foreground backdrop-blur-md">
                   <th className="px-6 py-4">User</th>
                   <th className="px-6 py-4">Role</th>
                   <th className="px-6 py-4">Status</th>

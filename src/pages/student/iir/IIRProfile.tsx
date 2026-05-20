@@ -1,5 +1,10 @@
 import { useEffect, useState, useMemo } from "react";
-import { useParams, Link, useNavigate, useSearchParams } from "react-router-dom";
+import {
+  useParams,
+  Link,
+  useNavigate,
+  useSearchParams,
+} from "react-router-dom";
 import { Spinner, FullScreenLoader } from "@/components/shared";
 import {
   useIIRProfile,
@@ -9,9 +14,12 @@ import {
 import { useMe } from "@/features/users/hooks/useMe";
 import type { TabId } from "@/features/iir/constants";
 import { asText } from "@/features/iir/utils";
-import { Trash, Edit, User, Printer, Loader2 } from "lucide-react";
-import { BioCard, InfoContent, InfoNavigation } from "@/features/iir/components/profile";
-import Layout from "@/components/layout/Layout";
+import { Edit, User, Printer, Trash } from "lucide-react";
+import {
+  BioCard,
+  InfoContent,
+  InfoNavigation,
+} from "@/features/iir/components/profile";
 import { usePageMetadata } from "@/context";
 import { cn } from "@/lib/utils";
 import {
@@ -46,23 +54,36 @@ export default function IIRProfile() {
     error,
   } = useIIRProfile(finalIirId || "");
 
-  const { generatePreview, downloadFromPreview, clearPreview, pdfUrl, isDownloading } = useIIRDownload();
+  useEffect(() => {
+    if (localStorage.getItem("refresh_student_profile") === "true") {
+      window.location.reload();
+      localStorage.removeItem("refresh_student_profile");
+    }
+  }, []);
+
+  const {
+    generatePreview,
+    downloadFromPreview,
+    clearPreview,
+    pdfUrl,
+    isDownloading,
+  } = useIIRDownload();
   const [searchParams] = useSearchParams();
 
   const [activeTab, setActiveTab] = useState<TabId>("personal");
   const [isPreparingPrint, setIsPreparingPrint] = useState(false);
 
   useEffect(() => {
-  const handleBeforePrint = () => setIsPreparingPrint(true);
-  const handleAfterPrint = () => setIsPreparingPrint(false);
+    const handleBeforePrint = () => setIsPreparingPrint(true);
+    const handleAfterPrint = () => setIsPreparingPrint(false);
 
-  window.addEventListener("beforeprint", handleBeforePrint);
-  window.addEventListener("afterprint", handleAfterPrint);
+    window.addEventListener("beforeprint", handleBeforePrint);
+    window.addEventListener("afterprint", handleAfterPrint);
 
-  return () => {
-    window.removeEventListener("beforeprint", handleBeforePrint);
-    window.removeEventListener("afterprint", handleAfterPrint);
-  };
+    return () => {
+      window.removeEventListener("beforeprint", handleBeforePrint);
+      window.removeEventListener("afterprint", handleAfterPrint);
+    };
   }, []);
 
   // Switch to significantNotes tab if prompted by URL
@@ -82,7 +103,7 @@ export default function IIRProfile() {
   const isLoading = isWaitingForMe || isWaitingForIirId || isWaitingForProfile;
 
   const isAdmin =
-    me?.roles?.some(r => r.name.toLowerCase() === "admin") || false;
+    me?.roles?.some((r) => r.name.toLowerCase() === "admin") || false;
   const showSignificantNotes = isAdmin;
 
   const badgeIcon = useMemo(() => <User size={16} />, []);
@@ -111,28 +132,10 @@ export default function IIRProfile() {
           />
         </button>
 
-        {isAdmin ? (
-          <button
-            className={cn(
-              "group flex h-10 w-10 items-center justify-center rounded-xl",
-              "border border-red-500/20 p-0 transition-colors",
-              "hover:bg-red-500/10",
-            )}
-          >
-            <Trash
-              size={ICON_SIZE}
-              className={cn(
-                "text-red-500 transition-transform",
-                "group-hover:scale-110",
-              )}
-            />
-          </button>
-        ) : (
+        {!isAdmin && (
           <button
             onClick={() =>
-              navigate(
-                `/student/iir/form?edit=true&iirId=${finalIirId}`
-              )
+              navigate(`/student/iir/form?edit=true&iirId=${finalIirId}`)
             }
             className={cn(
               "group flex h-10 w-10 items-center justify-center rounded-xl",
@@ -218,7 +221,7 @@ export default function IIRProfile() {
 
   return (
     <>
-    <style>{`
+      <style>{`
     .iir-print-indicator {
       display: none;
     }
@@ -245,20 +248,23 @@ export default function IIRProfile() {
     }
   `}</style>
 
-  <div
-    className={cn(
-      "iir-print-indicator",
-      isPreparingPrint &&
-        "fixed right-4 top-4 z-50 items-center gap-2 rounded-full border border-emerald-500/30 bg-white/90 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-emerald-700 shadow-lg backdrop-blur-md dark:bg-neutral-900/90 dark:text-emerald-300",
-    )}
-    style={{ display: isPreparingPrint ? "flex" : undefined }}
-  >
-    <Printer className="h-3.5 w-3.5" />
-    IIR Print Copy
-  </div>
+      <div
+        className={cn(
+          "iir-print-indicator",
+          isPreparingPrint &&
+            "fixed right-4 top-4 z-50 items-center gap-2 rounded-full border border-emerald-500/30 bg-white/90 px-3 py-2 text-[10px] font-bold uppercase text-emerald-700 shadow-lg backdrop-blur-md dark:bg-neutral-900/90 dark:text-emerald-300",
+        )}
+        style={{ display: isPreparingPrint ? "flex" : undefined }}
+      >
+        <Printer className="h-3.5 w-3.5" />
+        IIR Print Copy
+      </div>
 
-  <FullScreenLoader isLoading={isDownloading} message="Generating Document..." />
-  
+      <FullScreenLoader
+        isLoading={isDownloading}
+        message="Generating Document..."
+      />
+
       <div className="mt-4 flex w-full flex-col gap-8">
         <div className="grid h-full grid-cols-1 gap-4 xl:grid-cols-4">
           <BioCard data={studentData?.student} />
@@ -283,8 +289,11 @@ export default function IIRProfile() {
         open={!!pdfUrl}
         onOpenChange={(open) => !open && clearPreview()}
       >
-        <ResponsiveModalContent className="flex h-[90vh] max-h-[90vh] flex-col p-0 sm:max-w-4xl">
-          <ResponsiveModalHeader className="px-4 py-3 sm:px-6">
+        <ResponsiveModalContent
+          hasCloseButton={false}
+          className="flex h-[90vh] max-h-[90vh] flex-col p-0 sm:max-w-4xl"
+        >
+          <ResponsiveModalHeader className="h-14 px-4 py-3 sm:px-6">
             <div className="flex items-center justify-between">
               <ResponsiveModalTitle>IIR PDF Preview</ResponsiveModalTitle>
               <button

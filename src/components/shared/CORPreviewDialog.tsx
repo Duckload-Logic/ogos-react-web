@@ -6,8 +6,7 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Download, ExternalLink, X, FileText, Maximize2 } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Download, ExternalLink, FileText } from "lucide-react";
 
 interface CORPreviewDialogProps {
   isOpen: boolean;
