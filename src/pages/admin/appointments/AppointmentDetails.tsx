@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   useAppointment,
@@ -66,14 +66,19 @@ export default function AppointmentDetails() {
     ? `${appointment.user.firstName[0]}${appointment.user.lastName[0]}`
     : "??";
 
-  usePageMetadata({
-    title: "Appointment Details",
-    description: `Managing session for ${fullName || "Student"}`,
-    badgeText: "Admin Management",
-    badgeIcon: <Calendar className="h-4 w-4" />,
-    isLoading: isLoading && !appointment,
-    headerActions: null,
-  });
+  usePageMetadata(
+    useMemo(
+      () => ({
+        title: "Appointment Details",
+        description: `Managing session for ${fullName || "Student"}`,
+        badgeText: "Admin Management",
+        badgeIcon: <Calendar className="h-4 w-4" />,
+        isLoading: isLoading && !appointment,
+        headerActions: null,
+      }),
+      [appointment],
+    ),
+  );
 
   if (isError) {
     return (
@@ -241,7 +246,7 @@ export default function AppointmentDetails() {
           className={cn(
             "animate-in zoom-in-95 flex flex-col items-center",
             "justify-between gap-4 rounded-[28px] border border-primary/20",
-            "bg-primary/10 p-6 shadow-xl backdrop-blur-xl duration-500",
+            "bg-primary/10 p-6 shadow-md backdrop-blur-xl duration-500",
             "sm:flex-row",
           )}
         >
@@ -282,7 +287,7 @@ export default function AppointmentDetails() {
         <Card
           className={cn(
             "bg-glass-bg/40 group relative overflow-hidden",
-            "border-glass-border shadow-xl backdrop-blur-2xl lg:col-span-1",
+            "border-glass-border shadow-md backdrop-blur-2xl lg:col-span-1",
           )}
         >
           <CardContent className="relative z-10 flex flex-col items-center space-y-5 p-8 text-center">
@@ -341,7 +346,7 @@ export default function AppointmentDetails() {
         </Card>
 
         {/* General Information Card */}
-        <Card className="bg-glass-bg/40 border-glass-border shadow-xl backdrop-blur-2xl lg:col-span-2">
+        <Card className="bg-glass-bg/40 border-glass-border shadow-md backdrop-blur-2xl lg:col-span-2">
           <CardHeader
             className={cn(
               "border-glass-border/30 flex flex-row items-center",
@@ -387,7 +392,7 @@ export default function AppointmentDetails() {
                     "group-hover:text-primary",
                   )}
                 >
-                  Contact Channel
+                  Student email
                 </p>
                 <div
                   className={cn(
@@ -414,7 +419,7 @@ export default function AppointmentDetails() {
           <Card
             className={cn(
               "bg-glass-bg/40 h-full overflow-hidden border-glass-border",
-              "shadow-xl backdrop-blur-2xl",
+              "shadow-md",
             )}
           >
             <CardHeader
@@ -432,7 +437,7 @@ export default function AppointmentDetails() {
                     Session Context
                   </CardTitle>
                   <p className="text-[10px] font-bold uppercase text-muted-foreground">
-                    ID: {appointment.id?.substring(0, 8)}
+                    ID: {appointment.id}
                   </p>
                 </div>
               </div>
@@ -550,7 +555,7 @@ export default function AppointmentDetails() {
 
         {/* Right: Actions & Timeline (Col-span 4) */}
         <div className="space-y-8 lg:col-span-4">
-          <Card className="bg-glass-bg/40 overflow-hidden border-glass-border shadow-xl backdrop-blur-2xl">
+          <Card className="bg-glass-bg/40 overflow-hidden border-glass-border shadow-md backdrop-blur-2xl">
             <CardHeader className="border-glass-border/30 border-b bg-muted/10 px-8 py-6">
               <CardTitle className="flex items-center gap-3 text-lg font-bold tracking-tight">
                 <ShieldUser className="h-5 w-5 text-primary" />
@@ -566,7 +571,7 @@ export default function AppointmentDetails() {
                       onClick={() => handleActionClick(action)}
                       className={cn(
                         actionColor(action),
-                        "group/action h-14 w-full items-center justify-between rounded-2xl border border-white/10 px-6 shadow-lg transition-all duration-300 hover:scale-[1.02] hover:shadow-xl",
+                        "group/action h-14 w-full items-center justify-between rounded-2xl border border-white/10 px-6 shadow-lg transition-all duration-300 hover:shadow-md",
                       )}
                     >
                       <div className="flex items-center gap-4">
@@ -603,7 +608,7 @@ export default function AppointmentDetails() {
             </CardContent>
           </Card>
 
-          <Card className="bg-glass-bg/40 overflow-hidden border-glass-border shadow-xl backdrop-blur-2xl">
+          <Card className="bg-glass-bg/40 overflow-hidden border-glass-border shadow-md backdrop-blur-2xl">
             <CardHeader className="border-glass-border/30 border-b bg-muted/20 px-8 py-6">
               <CardTitle
                 className={cn(

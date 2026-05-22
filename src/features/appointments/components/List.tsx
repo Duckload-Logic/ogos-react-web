@@ -117,7 +117,7 @@ export default function AppointmentList({
 
   return (
     <Card
-      className={`bg-glass-bg/40 hover:bg-glass-bg/50 dark:bg-glass-bg/20 flex flex-col overflow-hidden border-glass-border shadow-2xl backdrop-blur-2xl transition-all duration-500 lg:col-span-3 ${className || ""}`}
+      className={`bg-glass-bg/40 hover:bg-glass-bg/50 dark:bg-glass-bg/20 flex flex-col overflow-hidden border-glass-border shadow-md backdrop-blur-2xl transition-all duration-500 lg:col-span-3 ${className || ""}`}
     >
       <CardHeader className="border-glass-border/30 space-y-6 border-b bg-muted/10 px-8 py-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
@@ -201,10 +201,16 @@ export default function AppointmentList({
             {/* Desktop Table View */}
             <div className="hidden overflow-x-auto px-6 pb-6 pt-4 md:block">
               <table className="w-full border-separate border-spacing-y-3 text-sm">
-                <thead className="text-[10px] font-bold tracking-wide text-muted-foreground opacity-60">
+                <thead
+                  className={cn(
+                    "text-[10px] font-bold tracking-wide",
+                    "text-muted-foreground opacity-60",
+                  )}
+                >
                   <tr>
+                    <th className="px-6 py-4 text-left">Date</th>
                     <th className="px-6 py-4 text-left">Student Name</th>
-                    <th className="px-6 py-4 text-left">Session Time</th>
+                    <th className="px-6 py-4 text-left">Time</th>
                     <th className="px-6 py-4 text-left">Category</th>
                     <th className="px-6 py-4 text-left">Status</th>
                     <th className="px-6 py-4 text-left">Urgency</th>
@@ -217,13 +223,51 @@ export default function AppointmentList({
                     <tr
                       key={apt.id}
                       className={cn(
-                        "bg-glass-bg/20 border-glass-border/20 hover:bg-glass-bg/60",
-                        "group rounded-[20px] border shadow-sm backdrop-blur-sm",
+                        "bg-glass-bg/20 border-glass-border/20",
+                        "hover:bg-glass-bg/60",
+                        "group rounded-[20px] border shadow-sm",
+                        "backdrop-blur-sm",
                         "transition-all duration-300 hover:scale-[1.005]",
                         "hover:border-primary/20 hover:shadow-xl",
                       )}
                     >
-                      <td className="rounded-l-[20px] px-6 py-6 text-sm font-bold tracking-tight text-foreground">
+                      <td className="rounded-l-[20px] pl-6 pr-2 py-4">
+                        <div
+                          className={cn(
+                            "flex h-12 w-12 shrink-0 flex-col items-center",
+                            "justify-center rounded-xl border border-white/55",
+                            "bg-white/45 shadow-sm backdrop-blur-xl",
+                            "dark:border-white/10 dark:bg-white/[0.055]",
+                          )}
+                        >
+                          <span
+                            className={cn(
+                              "text-[9px] font-bold uppercase",
+                              "tracking-wider text-primary",
+                            )}
+                          >
+                            {new Date(apt.whenDate).toLocaleDateString(
+                              "en-US",
+                              { month: "short" },
+                            )}
+                          </span>
+                          <span
+                            className={cn(
+                              "text-base font-extrabold",
+                              "text-foreground",
+                            )}
+                          >
+                            {new Date(apt.whenDate).getDate()}
+                          </span>
+                        </div>
+                      </td>
+
+                      <td
+                        className={cn(
+                          "px-4 py-6 text-sm font-bold",
+                          "tracking-tight text-foreground",
+                        )}
+                      >
                         {apt.user?.firstName}{" "}
                         {apt.user?.middleName?.[0]
                           ? `${apt.user?.middleName?.[0]}. `
@@ -231,7 +275,12 @@ export default function AppointmentList({
                         {apt.user?.lastName}
                       </td>
 
-                      <td className="whitespace-nowrap px-6 py-6 text-xs font-bold tracking-wide text-foreground/80">
+                      <td
+                        className={cn(
+                          "whitespace-nowrap px-6 py-6 text-xs",
+                          "font-bold tracking-wide text-foreground/80",
+                        )}
+                      >
                         {format12HourTime(apt.timeSlot?.time || "")}
                       </td>
 

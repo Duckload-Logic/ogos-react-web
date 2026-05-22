@@ -225,9 +225,9 @@ export const completeIIRForm: IIRForm = {
   interests: {
     activities: [
       {
-        activityOption: { id: 1 },
+        activityOption: { id: 0 },
         otherSpecification: null,
-        role: "Member",
+        role: "",
         roleSpecification: null,
       },
     ],

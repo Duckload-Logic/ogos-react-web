@@ -242,7 +242,7 @@ export default function AppointmentsManagement() {
 
           <Card
             className={cn(
-              "hover:bg-glass-bg/50 overflow-hidden shadow-2xl",
+              "hover:bg-glass-bg/50 overflow-hidden shadow-md",
               "backdrop-blur-2xl transition-all duration-500 lg:col-span-4",
             )}
           >

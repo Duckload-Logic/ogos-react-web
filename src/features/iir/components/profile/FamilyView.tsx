@@ -91,7 +91,7 @@ export default function FamilyView({
               </p>
             </CardBlock>
           )}
-          <CardBlock title="Employed Siblings' Support">
+          <CardBlock title="Employed Siblings' Supports">
             {data?.background?.siblingSupportTypes?.length !== 0 && (
               <TagList
                 values={data!.background!.siblingSupportTypes.map(

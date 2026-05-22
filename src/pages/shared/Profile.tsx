@@ -140,12 +140,17 @@ export default function Profile() {
 
   if (!user) return null;
 
-  usePageMetadata({
-    title: "Account Profile",
-    isLoading: false,
-    badgeText: "Management",
-    badgeIcon: <Settings size={16} />,
-  });
+  usePageMetadata(
+    useMemo(
+      () => ({
+        title: "Account Profile",
+        isLoading: false,
+        badgeText: "Management",
+        badgeIcon: <Settings size={16} />,
+      }),
+      [user],
+    ),
+  );
 
   return (
     <div
@@ -158,11 +163,9 @@ export default function Profile() {
       <div
         className={cn(
           "group relative overflow-hidden rounded-[32px] border",
-          "border-white/20 bg-white/45 p-8",
-          "shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl",
+          "border-glass-border bg-glass-bg p-8 shadow-md",
           "transition-all duration-500 hover:shadow-primary/5",
-          "dark:border-white/10 dark:bg-white/[0.04]",
-          "dark:shadow-[0_8px_22px_rgba(0,0,0,0.22)] md:p-12",
+          "md:p-12",
         )}
       >
         <div className="relative flex flex-col items-center gap-10 md:flex-row md:items-start">
@@ -176,12 +179,12 @@ export default function Profile() {
             >
               <div className="absolute inset-x-0 bottom-0 h-1/2 rounded-b-full bg-black/40 blur-sm" />
               <Avatar className="relative z-10 h-full w-full rounded-full border-4 border-card">
-                <AvatarImage
+                {/* <AvatarImage
                   src={
                     previewImage || getProfilePictureUrl(user?.profilePicture)
                   }
                   className="object-cover transition-transform duration-500 group-hover/avatar:scale-110"
-                />
+                /> */}
                 <AvatarFallback className="bg-muted text-4xl font-bold uppercase text-muted-foreground">
                   {user.firstName[0]}
                   {user.lastName[0]}
@@ -189,7 +192,7 @@ export default function Profile() {
               </Avatar>
             </div>
 
-            <button
+            {/* <button
               onClick={triggerFileInput}
               className={cn(
                 "absolute bottom-2 right-2 z-20 transform rounded-full",
@@ -203,7 +206,7 @@ export default function Profile() {
               disabled={isUploadingPicture}
             >
               <Camera size={20} />
-            </button>
+            </button> */}
             <input
               type="file"
               ref={fileInputRef}
@@ -287,8 +290,8 @@ export default function Profile() {
         <div className="flex flex-col justify-between gap-4 md:flex-row md:items-center">
           <TabsList
             className={cn(
-              "h-auto self-start rounded-2xl border border-white/20",
-              "bg-white/45 p-1 backdrop-blur-md dark:bg-white/[0.04]",
+              "h-auto self-start rounded-2xl border border-glass-border bg-glass-bg",
+              "p-1 shadow-md backdrop-blur-md",
             )}
           >
             {[
@@ -327,13 +330,13 @@ export default function Profile() {
         >
           <Card
             className={cn(
-              "overflow-hidden rounded-[32px] border-white/20 bg-white/45",
-              "shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl",
-              "transition-colors hover:border-primary/20",
-              "dark:border-white/10 dark:bg-white/[0.04] md:col-span-2",
+              "overflow-hidden rounded-2xl border-glass-border bg-glass-bg",
+              "shadow-md backdrop-blur-xl",
+              "transition-colors",
+              "md:col-span-2",
             )}
           >
-            <CardHeader className="border-b border-white/10 bg-white/20 p-8 dark:bg-white/[0.02]">
+            <CardHeader className="border-b border-glass-border bg-glass-bg p-8">
               <div className="flex items-center justify-between">
                 <div className="space-y-1">
                   <CardTitle className="flex items-center gap-2 text-2xl font-bold">
@@ -474,12 +477,11 @@ export default function Profile() {
 
           <Card
             className={cn(
-              "self-start overflow-hidden rounded-[32px] border-white/20",
-              "bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)]",
-              "backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]",
+              "self-start overflow-hidden rounded-2xl border-glass-border bg-glass-bg",
+              "shadow-md backdrop-blur-xl",
             )}
           >
-            <CardHeader className="border-b border-white/10 p-8">
+            <CardHeader className="border-b border-glass-border p-8">
               <CardTitle className="text-lg font-bold">Quick Stats</CardTitle>
               <CardDescription>Engagement and account metrics.</CardDescription>
             </CardHeader>
@@ -520,12 +522,11 @@ export default function Profile() {
         >
           <Card
             className={cn(
-              "overflow-hidden rounded-[32px] border-white/20 bg-white/45",
-              "shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl",
-              "dark:border-white/10 dark:bg-white/[0.04]",
+              "overflow-hidden rounded-2xl border-glass-border bg-glass-bg",
+              "shadow-md backdrop-blur-xl",
             )}
           >
-            <CardHeader className="border-b border-white/10 p-10">
+            <CardHeader className="border-b border-glass-border p-8">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-4">
                   <div className="rounded-2xl bg-primary/10 p-3 text-primary">

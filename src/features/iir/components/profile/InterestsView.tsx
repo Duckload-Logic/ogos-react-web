@@ -9,7 +9,8 @@ import { ActivityOption, Hobby, InterestsSection } from "../../types";
 
 function getActivityOption(activity: any): ActivityOption | undefined {
   if (activity?.activityOption) return activity.activityOption;
-  if (Array.isArray(activity?.activityOptions)) return activity.activityOptions[0];
+  if (Array.isArray(activity?.activityOptions))
+    return activity.activityOptions[0];
   return undefined;
 }
 
@@ -46,11 +47,11 @@ export default function InterestsHobbiesView({
         <SectionTitle title="Activities" />
         <div className="mt-6 grid grid-cols-1 gap-4 lg:grid-cols-2">
           <ActivityCard
-            title="Academic"
+            title="Academic Clubs/Organizations"
             list={academicInterests}
           />
           <ActivityCard
-            title="Other"
+            title="Extracurricular Activities/Organizations"
             list={otherActivities}
           />
         </div>
@@ -116,10 +117,15 @@ function ActivityCard({ title, list }: { title: string; list: any[] }) {
                 className="rounded-lg border border-glass-border bg-glass-bg p-3"
               >
                 <p className="text-xs font-semibold text-card-foreground">
-                  {asText(activityOption?.name || activity.otherSpecification || "Activity")}
+                  {asText(
+                    activityOption?.name ||
+                      activity.otherSpecification ||
+                      "Activity",
+                  )}
                 </p>
                 <p className="mt-1 text-[11px] text-muted-foreground">
-                  Role: {asText(activity.role)}
+                  {!title.includes("Academic") &&
+                    `Role: ${asText(activity.role)}`}
                 </p>
               </div>
             );
@@ -131,4 +137,3 @@ function ActivityCard({ title, list }: { title: string; list: any[] }) {
     </CardBlock>
   );
 }
-

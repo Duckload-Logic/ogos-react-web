@@ -42,7 +42,7 @@ export const yearCompletedRule = (startedKey: string): ValidationRule => ({
 
 export const educationValidationSchema: FieldValidationSchema = {
   "education.natureOfSchooling": [commonRules.required("Nature of schooling")],
-  "education.natureOfInterruption": [
+  "education.interruptedDetails": [
     {
       type: "required",
       validate: (value: any, rootData: any) => {
@@ -52,7 +52,7 @@ export const educationValidationSchema: FieldValidationSchema = {
         return true;
       },
       message:
-        "Reason for interruption is required and must be at least 2 characters",
+        "Reason for interruption is required (at least 2 characters)",
     },
     commonRules.noSpecialChars("Reason for interruption"),
   ],

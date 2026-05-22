@@ -208,7 +208,7 @@ export default function AppointmentDetails() {
 
             {/* Right Column: Actions & Metadata */}
             <div className="space-y-6">
-              <Card className="border-0 bg-muted/30 shadow-md">
+              <Card className="border-0 bg-glass-bg shadow-md">
                 <CardHeader className="border-b border-border/40 pb-3">
                   <CardTitle className="text-sm font-semibold uppercase">
                     Management
@@ -223,7 +223,7 @@ export default function AppointmentDetails() {
                       </p>
                       <Button
                         variant="destructive"
-                        className="w-full"
+                        className="w-full bg-rose-600 hover:bg-rose-700"
                         onClick={() => setIsCancelModalOpen(true)}
                         disabled={isCancelling}
                       >
