@@ -2,12 +2,12 @@ import { useMemo, useState } from "react";
 import {
   TrendingUp,
   Users,
-  Calendar,
-  FileText,
-  Clock,
   ArrowUpRight,
   BarChart,
   Activity,
+  Fingerprint,
+  ShieldAlert,
+  Server,
 } from "lucide-react";
 import {
   XAxis,
@@ -18,25 +18,62 @@ import {
   Legend,
   LineChart,
   Line,
+  AreaChart,
+  PieChart,
+  Area,
+  Cell,
+  Pie,
 } from "recharts";
 import { usePageMetadata } from "@/context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { useAdminAnalytics } from "@/features/system-admin/hooks";
+import {
+  useAdminAnalytics,
+  useUsers,
+  useM2MClients,
+  useLogStats,
+  useUserDistribution,
+  useLogActivity,
+} from "@/features/system-admin/hooks";
+import { cn } from "@/lib/utils";
 
 export default function AnalyticsOverview() {
   const [range, setRange] = useState<"daily" | "weekly" | "monthly" | "yearly">(
-    "monthly",
+    "daily",
   );
-  const { data: analytics, isLoading } = useAdminAnalytics(range);
 
-  usePageMetadata({
-    title: "Deep Analytics",
-    badgeText: "System Intelligence",
-    badgeIcon: <BarChart className="h-3 w-3" />,
-    description:
-      "Deep dive into system growth, visitor trends, and administrative overhead.",
+  const { data: analytics, isLoading: analyticsLoading } =
+    useAdminAnalytics(range);
+  const { data: usersData, isLoading: usersLoading } = useUsers({
+    page_size: 1,
   });
+  const { data: m2mClientsData, isLoading: m2mLoading } = useM2MClients();
+  const { data: logStatsData, isLoading: statsLoading } = useLogStats();
+  const { data: userDistData, isLoading: distLoading } = useUserDistribution();
+  const { data: logActivityData, isLoading: activityLoading } =
+    useLogActivity();
+
+  const isLoading =
+    analyticsLoading ||
+    usersLoading ||
+    m2mLoading ||
+    statsLoading ||
+    distLoading ||
+    activityLoading;
+
+  usePageMetadata(
+    useMemo(
+      () => ({
+        title: "System Analytics",
+        badgeText: "System Intelligence",
+        badgeIcon: <BarChart className="h-3 w-3" />,
+        description:
+          "Deep dive into system growth, visitor trends, " +
+          "and administrative overhead.",
+      }),
+      [],
+    ),
+  );
 
   const visitorData = useMemo(() => {
     if (!analytics?.monthlyVisitors) return [];
@@ -47,21 +84,91 @@ export default function AnalyticsOverview() {
     }));
   }, [analytics]);
 
-  const distributionData = [
+  const logActivity = logActivityData ?? [];
+
+  const activeM2M = useMemo(
+    () => (m2mClientsData ?? []).filter((c) => c.isActive).length,
+    [m2mClientsData],
+  );
+
+  const totalM2M = useMemo(
+    () => (m2mClientsData ?? []).length,
+    [m2mClientsData],
+  );
+
+  const totalLogs = useMemo(
+    () => (logStatsData ?? []).reduce((acc, curr) => acc + curr.count, 0),
+    [logStatsData],
+  );
+
+  const securityEvents = useMemo(
+    () =>
+      (logStatsData ?? []).find((s) => s.category === "SECURITY")?.count ?? 0,
+    [logStatsData],
+  );
+
+  const totalUsers = useMemo(
+    () => (userDistData ?? []).reduce((acc, curr) => acc + curr.count, 0),
+    [userDistData],
+  );
+
+  const getCategoryColor = (category: string) => {
+    switch (category.toUpperCase()) {
+      case "SECURITY":
+        return "bg-red-500";
+      case "SYSTEM":
+        return "bg-amber-500";
+      default:
+        return "bg-primary";
+    }
+  };
+
+  const getRoleColor = (role: string) => {
+    switch (role.toLowerCase()) {
+      case "superadmin":
+        return "#6366f1";
+      case "admin":
+      case "counselor":
+        return "#3b82f6";
+      case "developer":
+        return "#10b981";
+      case "student":
+        return "hsl(var(--primary))";
+      default:
+        return "#6b7280";
+    }
+  };
+
+  const metrics = [
     {
-      name: "Reports",
-      value: analytics?.totalReports || 0,
-      color: "hsl(var(--primary))",
+      label: "Total Registered Users",
+      value: usersData?.meta?.total ?? 0,
+      icon: Users,
+      color: "primary",
     },
     {
-      name: "Appts",
-      value: analytics?.totalAppointments || 0,
-      color: "hsl(var(--secondary))",
+      label: "Active M2M Clients",
+      value: `${activeM2M} / ${totalM2M}`,
+      icon: Fingerprint,
+      color: "secondary",
     },
     {
-      name: "Slips",
-      value: analytics?.totalSlips || 0,
-      color: "hsl(var(--primary) / 0.7)",
+      label: "Total System Logs",
+      value: totalLogs.toLocaleString(),
+      icon: Server,
+      color: "primary",
+    },
+    {
+      label: "Security Alerts",
+      value: securityEvents.toLocaleString(),
+      icon: ShieldAlert,
+      color: "secondary",
+    },
+    {
+      label: "Active Redis Sessions",
+      value: analytics?.liveSessions ?? 0,
+      icon: Activity,
+      color: "primary",
     },
   ];
 
@@ -69,7 +176,12 @@ export default function AnalyticsOverview() {
     return (
       <div className="flex h-[400px] w-full items-center justify-center">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          <div
+            className={
+              "h-12 w-12 animate-spin rounded-full border-4 " +
+              "border-primary border-t-transparent"
+            }
+          />
           <p className="animate-pulse text-sm text-muted-foreground">
             Aggregating system intelligence...
           </p>
@@ -80,73 +192,29 @@ export default function AnalyticsOverview() {
 
   return (
     <div className="mx-auto w-full max-w-[1700px] space-y-6">
-      {/* Tooling Bar */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="backdrop-blur-l flex items-center gap-1 rounded-2xl border border-white/10 bg-white/[0.03] p-1.5 shadow-md">
-          {(["daily", "weekly", "monthly", "yearly"] as const).map((r) => (
-            <Button
-              key={r}
-              variant="ghost"
-              size="sm"
-              onClick={() => setRange(r)}
-              className={`h-9 rounded-xl px-6 font-medium capitalize transition-all duration-300 ${
-                range === r
-                  ? "bg-primary text-primary-foreground shadow-[0_0_20px_rgba(var(--primary-rgb),0.3)] hover:bg-primary/90"
-                  : "text-muted-foreground hover:bg-white/5 hover:text-foreground"
-              }`}
-            >
-              {r}
-            </Button>
-          ))}
-        </div>
-      </div>
-
       {/* Hero Metrics Row */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
-        {[
-          {
-            label: "Total Students",
-            value: analytics?.totalStudents,
-            icon: Users,
-            color: "primary",
-          },
-          {
-            label: "Significant Notes",
-            value: analytics?.totalReports,
-            icon: FileText,
-            color: "secondary",
-          },
-          {
-            label: "Appointments",
-            value: analytics?.totalAppointments,
-            icon: Calendar,
-            color: "primary",
-          },
-          {
-            label: "Medical Slips",
-            value: analytics?.totalSlips,
-            icon: Clock,
-            color: "secondary",
-          },
-          {
-            label: "Live Sessions",
-            value: analytics?.liveSessions,
-            icon: Activity,
-            color: "primary",
-          },
-        ].map((item) => (
+        {metrics.map((item) => (
           <Card key={item.label}>
             <CardContent className="p-6">
               <div className="flex items-center justify-between">
                 <div
-                  className={`rounded-2xl p-3 bg-${item.color}/10 text-${item.color}`}
+                  className={
+                    "rounded-2xl p-3 " +
+                    (item.color === "primary"
+                      ? "bg-primary/10 text-primary"
+                      : "bg-secondary/10 text-secondary")
+                  }
                 >
                   <item.icon size={20} />
                 </div>
-                <ArrowUpRight className="h-4 w-4 text-muted-foreground" />
               </div>
               <div className="mt-4">
-                <p className="text-xs font-bold uppercase text-muted-foreground">
+                <p
+                  className={
+                    "text-xs font-bold uppercase " + "text-muted-foreground"
+                  }
+                >
                   {item.label}
                 </p>
                 <p className="mt-1 text-4xl font-bold">{item.value}</p>
@@ -156,19 +224,44 @@ export default function AnalyticsOverview() {
         ))}
       </div>
 
+      {/* Traffic Trends Row */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Visitors Growth */}
         <Card className="col-span-1 min-h-[450px] lg:col-span-3">
-          <CardHeader className="flex flex-row items-center justify-between pb-8">
-            <div>
-              <CardTitle className="flex items-center gap-2 text-2xl font-bold">
-                <TrendingUp
-                  size={24}
-                  className="text-primary"
-                />
-                System Traffic
-              </CardTitle>
-            </div>
+          <CardHeader
+            className={"flex flex-row items-center justify-between pb-8"}
+          >
+            <CardTitle className="flex items-center gap-4 text-2xl font-bold">
+              <TrendingUp
+                size={24}
+                className="text-primary"
+              />
+              System Traffic & Logins
+              <div
+                className={
+                  "backdrop-blur-l flex items-center gap-1 rounded-2xl " +
+                  "ml-10 p-1.5"
+                }
+              >
+                {(["daily", "weekly", "monthly", "yearly"] as const).map(
+                  (r) => (
+                    <Button
+                      key={r}
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setRange(r)}
+                      className={cn(
+                        "h-9 rounded-xl px-6 font-medium capitalize transition-all duration-300",
+                        range === r
+                          ? "bg-secondary text-secondary-foreground hover:bg-secondary/90"
+                          : "text-muted-foreground hover:bg-white/5 hover:text-foreground",
+                      )}
+                    >
+                      {r}
+                    </Button>
+                  ),
+                )}
+              </div>
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="h-[320px] w-full">
@@ -234,6 +327,189 @@ export default function AnalyticsOverview() {
                   />
                 </LineChart>
               </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Hourly Requests and Distribution Row */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        {/* System Activity Chart */}
+        <Card className="col-span-1 min-h-[420px] lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between">
+            <div>
+              <CardTitle className="text-lg font-semibold">
+                System Activity Heat
+              </CardTitle>
+              <p className="mt-1 text-xs text-muted-foreground">
+                Traffic and errors in the last 24 hours
+              </p>
+            </div>
+            <div className="flex gap-2">
+              <div
+                className={
+                  "rounded-md border px-2 py-0.5 text-xs font-semibold " +
+                  "border-emerald-500/20 bg-emerald-500/10 text-emerald-500"
+                }
+              >
+                Requests
+              </div>
+              <div
+                className={
+                  "rounded-md border px-2 py-0.5 text-xs font-semibold " +
+                  "border-red-500/20 bg-red-500/10 text-red-500"
+                }
+              >
+                Errors
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="h-80 w-full">
+              <ResponsiveContainer
+                width="100%"
+                height="100%"
+              >
+                <AreaChart
+                  data={logActivity}
+                  key={logActivity.length}
+                >
+                  <defs>
+                    <linearGradient
+                      id="colorRequests"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="#059669"
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="#059669"
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                    <linearGradient
+                      id="colorErrors"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop
+                        offset="5%"
+                        stopColor="#dc2626"
+                        stopOpacity={0.3}
+                      />
+                      <stop
+                        offset="95%"
+                        stopColor="#dc2626"
+                        stopOpacity={0}
+                      />
+                    </linearGradient>
+                  </defs>
+
+                  <CartesianGrid
+                    strokeDasharray="3 3"
+                    vertical={false}
+                    stroke="rgba(255,255,255,0.05)"
+                  />
+
+                  <XAxis
+                    dataKey="time"
+                    axisLine={false}
+                    tickLine={false}
+                    tick={{ fontSize: 10, fill: "#888888" }}
+                    interval={0}
+                  />
+
+                  {/* Set concrete baseline constraints */}
+                  <YAxis
+                    hide
+                    domain={[0, "auto"]}
+                  />
+
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: "rgba(0, 0, 0, 0.7)",
+                      backdropFilter: "blur(12px)",
+                      border: "1px solid rgba(255,255,255,0.1)",
+                      borderRadius: "16px",
+                      color: "#fff",
+                    }}
+                    itemStyle={{ color: "#fff" }}
+                  />
+
+                  <Area
+                    type="monotone"
+                    dataKey="requests"
+                    stroke="#059669"
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#colorRequests)"
+                    connectNulls
+                  />
+
+                  <Area
+                    type="monotone"
+                    dataKey="errors"
+                    stroke="#dc2626"
+                    strokeWidth={3}
+                    fillOpacity={1}
+                    fill="url(#colorErrors)"
+                    connectNulls
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Distributions Card */}
+        <Card className="col-span-1 min-h-[420px]">
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">
+              System Distributions
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <h4 className="text-sm font-semibold text-muted-foreground">
+              User Roles Breakdown
+            </h4>
+            <div className="space-y-2">
+              {(userDistData ?? []).map((item) => {
+                const percentage =
+                  totalUsers > 0 ? (item.count / totalUsers) * 100 : 0;
+                return (
+                  <div
+                    key={item.roleName}
+                    className="flex items-center justify-between rounded-xl border border-white/5 bg-white/[0.02] p-3 text-sm"
+                  >
+                    <div className="flex items-center gap-2">
+                      {/* Legend Color Indicator */}
+                      <span
+                        className="h-2.5 w-2.5 rounded-full"
+                        style={{ backgroundColor: getRoleColor(item.roleName) }}
+                      />
+                      <span className="capitalize text-muted-foreground">
+                        {item.roleName.toLowerCase()}s
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-3 font-medium">
+                      <span>{item.count.toLocaleString()}</span>
+                      <span className="w-12 text-right text-xs text-muted-foreground/60">
+                        {percentage < 0.1 && percentage > 0
+                          ? "< 0.1%"
+                          : `${percentage.toFixed(1)}%`}
+                      </span>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           </CardContent>
         </Card>

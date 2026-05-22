@@ -23,6 +23,7 @@ export default function AuditLogs() {
       description="Review data changes and trace important actions across the system."
       useLogsHook={useAuditLogs}
       actionOptions={AUDIT_ACTIONS}
+      showIPAddress={true}
     />
   );
 }

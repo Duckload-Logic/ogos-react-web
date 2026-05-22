@@ -177,7 +177,7 @@ export default function UserSessions() {
                     </div>
                   </div>
 
-                  <div className="flex items-center border-t border-white/10 bg-white/20 p-4 dark:bg-white/[0.02] sm:border-l sm:border-t-0 sm:px-8">
+                  <div className="flex items-center bg-card sm:border-l sm:border-t-0 sm:px-8">
                     <AlertDialog>
                       <AlertDialogTrigger asChild>
                         <Button
@@ -188,7 +188,7 @@ export default function UserSessions() {
                           Revoke Session
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className="rounded-[24px] border-white/20 backdrop-blur-3xl">
+                      <AlertDialogContent className="bg-card">
                         <AlertDialogHeader>
                           <AlertDialogTitle>
                             Revoke Device Session?
