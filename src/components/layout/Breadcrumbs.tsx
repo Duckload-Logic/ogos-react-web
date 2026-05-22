@@ -24,6 +24,11 @@ const PATH_LABELS: Record<string, string> = {
   lifecycle: "Records Lifecycle",
 };
 
+interface BreadcrumbItem {
+  label: string;
+  to: string;
+}
+
 export default function Breadcrumbs() {
   const location = useLocation();
   const pathnames = location.pathname.split("/").filter((x) => x);
@@ -34,24 +39,54 @@ export default function Breadcrumbs() {
     (pathnames.length === 2 && pathnames[1] === "home");
   if (isMainPage) return null;
 
-  const getLabel = (path: string) => {
-    // Check if it's a UUID/ID (heuristic: contains numbers or is long)
-    if (
-      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
-        path,
-      ) ||
-      /^\d+$/.test(path)
-    ) {
-      return "Details";
+  const items: BreadcrumbItem[] = [];
+
+  for (let i = 0; i < pathnames.length; i++) {
+    const value = pathnames[i];
+
+    // Skip first segment if it's just the role prefix
+    if (i === 0 && ["admin", "student"].includes(value)) {
+      continue;
     }
 
-    return (
-      PATH_LABELS[path] ||
-      path.charAt(0).toUpperCase() + path.slice(1).replace(/-/g, " ")
-    );
-  };
+    const isId =
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+        value,
+      ) || /^\d+$/.test(value);
 
-  const parentPath = "/" + pathnames.slice(0, -1).join("/");
+    if (isId) {
+      if (i + 1 < pathnames.length) {
+        continue;
+      } else {
+        items.push({
+          label: "Details",
+          to: `/${pathnames.slice(0, i + 1).join("/")}`,
+        });
+      }
+    } else {
+      let label =
+        PATH_LABELS[value] ||
+        value.charAt(0).toUpperCase() + value.slice(1).replace(/-/g, " ");
+
+      const prevValue = i > 0 ? pathnames[i - 1] : "";
+      const isPrevId =
+        prevValue &&
+        (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+          .test(prevValue) ||
+          /^\d+$/.test(prevValue));
+
+      if (isPrevId) {
+        label = `${label} Details`;
+      }
+
+      items.push({
+        label,
+        to: `/${pathnames.slice(0, i + 1).join("/")}`,
+      });
+    }
+  }
+
+  const parentPath = items.length > 1 ? items[items.length - 2].to : "/";
 
   return (
     <nav
@@ -65,11 +100,19 @@ export default function Breadcrumbs() {
 
       <div className="mx-1 h-4 w-[1px] bg-border" />
 
-      <ol className="flex items-center gap-2 overflow-hidden text-sm font-medium">
+      <ol
+        className={cn(
+          "flex items-center gap-2 overflow-hidden",
+          "text-sm font-medium",
+        )}
+      >
         <li className="flex items-center">
           <Link
             to={pathnames[0] === "admin" ? "/admin" : "/student"}
-            className="flex items-center text-muted-foreground transition-colors hover:text-primary"
+            className={cn(
+              "flex items-center text-muted-foreground",
+              "transition-colors hover:text-primary",
+            )}
           >
             <Home
               size={14}
@@ -79,15 +122,11 @@ export default function Breadcrumbs() {
           </Link>
         </li>
 
-        {pathnames.map((value, index) => {
-          // Skip first segment if it's just the role prefix
-          if (index === 0 && ["admin", "student"].includes(value)) return null;
-
-          const last = index === pathnames.length - 1;
-          const to = `/${pathnames.slice(0, index + 1).join("/")}`;
+        {items.map((item, index) => {
+          const last = index === items.length - 1;
 
           return (
-            <React.Fragment key={to}>
+            <React.Fragment key={item.to}>
               <li className="flex items-center text-muted-foreground/50">
                 <ChevronRight
                   size={14}
@@ -96,18 +135,24 @@ export default function Breadcrumbs() {
               </li>
               <li className="flex items-center">
                 {last ? (
-                  <span className="max-w-[150px] truncate font-semibold text-foreground sm:max-w-[250px]">
-                    {getLabel(value)}
+                  <span
+                    className={cn(
+                      "max-w-[150px] truncate font-semibold",
+                      "text-foreground sm:max-w-[250px]",
+                    )}
+                  >
+                    {item.label}
                   </span>
                 ) : (
                   <Link
-                    to={to}
+                    to={item.to}
                     className={cn(
                       "max-w-[100px] truncate text-muted-foreground",
-                      "transition-colors hover:text-primary sm:max-w-[150px]",
+                      "transition-colors hover:text-primary",
+                      "sm:max-w-[150px]",
                     )}
                   >
-                    {getLabel(value)}
+                    {item.label}
                   </Link>
                 )}
               </li>

@@ -136,7 +136,7 @@ const FormInput = forwardRef<
       text-sm font-medium tracking-tight text-foreground placeholder:text-muted-foreground/70
       ${
         disabled
-          ? "bg-muted/80 border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-60"
+          ? "bg-muted border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-90"
           : value !== undefined && value !== null && value !== ""
             ? "bg-muted/20 border-primary/30 focus:bg-glass-bg dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm"
             : required

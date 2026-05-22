@@ -1,3 +1,4 @@
+import { capitalizeFirstLetter } from "@/utils";
 import axios, { AxiosError, type InternalAxiosRequestConfig } from "axios";
 import { decamelizeKeys, camelizeKeys } from "humps";
 
@@ -154,29 +155,31 @@ export function getErrorMessage(error: any): string {
       responseData.status === "error" &&
       typeof responseData.message === "string"
     ) {
-      return responseData.message;
+      return capitalizeFirstLetter(responseData.message);
     }
     // 2. JSend 'fail' pattern: client-side/validation failures
     if (responseData.status === "fail" && responseData.data) {
       const data = responseData.data;
       if (typeof data === "object") {
-        if (typeof data.error === "string") return data.error;
-        if (typeof data.message === "string") return data.message;
+        if (typeof data.error === "string") {
+          return capitalizeFirstLetter(data.error);
+        }
+        if (typeof data.message === "string") {
+          return capitalizeFirstLetter(data.message);
+        }
 
         // Return the first validation message if it's a map
         const values = Object.values(data);
         if (values.length > 0 && typeof values[0] === "string") {
-          return values[0];
+          return capitalizeFirstLetter(values[0]);
         }
       }
-      if (typeof data === "string") return data;
+      if (typeof data === "string") return capitalizeFirstLetter(data);
     }
   }
 
-  if (typeof error.message == "string" && error.message !== "") {
-    error.message = error.message[0].toUpperCase() + error.message.slice(1);
-  }
-
   // Fallback to standard Axios or native Error message
-  return error.message || "An unexpected error occurred.";
+  return (
+    capitalizeFirstLetter(error.message) || "An unexpected error occurred."
+  );
 }
