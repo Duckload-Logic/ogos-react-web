@@ -1,12 +1,16 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { GraduationCap, AlertTriangle, ShieldCheck } from "lucide-react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { superadminService } from "@/features/system-admin/services";
+import {
+  GetAcademicSettings,
+  PutAcademicSettings,
+} from "@/features/student-core/services/academicSettingsService";
 import { useToast, usePageMetadata } from "@/context/hooks";
+import Dropdown from "@/components/form/Dropdown";
 
 // ─── constants ───────────────────────────────────────────────────────────────
 
-const QUERY_KEY = ["superadmin", "academicSettings"] as const;
+const QUERY_KEY = ["counselor", "academicSettings"] as const;
 
 const TERM_LABELS: Record<number, string> = {
   1: "Term 1",
@@ -36,15 +40,13 @@ export default function AcademicSettings() {
 
   const { data: current, isLoading } = useQuery({
     queryKey: QUERY_KEY,
-    queryFn: superadminService.getAcademicSettings,
+    queryFn: GetAcademicSettings,
     staleTime: 1000 * 60 * 5,
   });
 
   // ── local form state ──────────────────────────────────────────────────────
 
-  const [yearStart, setYearStart] = useState<number>(
-    new Date().getFullYear(),
-  );
+  const [yearStart, setYearStart] = useState<number>(new Date().getFullYear());
   const [term, setTerm] = useState<number>(1);
 
   // Derive yearEnd automatically — always start + 1.
@@ -57,23 +59,31 @@ export default function AcademicSettings() {
     }
   }, [current]);
 
+  const yearOptions = useMemo(
+    () => YEAR_RANGE.map((y) => ({ id: y, label: String(y) })),
+    [],
+  );
+
+  const termOptions = useMemo(
+    () => [1, 2, 3].map((t) => ({ id: t, label: TERM_LABELS[t] })),
+    [],
+  );
+
   // ── confirmation dialog state ─────────────────────────────────────────────
 
   const [dialogOpen, setDialogOpen] = useState(false);
   const [confirmText, setConfirmText] = useState("");
 
   // The exact string the admin must type to confirm the update.
-  const expectedConfirm =
-    `${yearStart}-${yearEnd} ${TERM_LABELS[term]}`;
+  const expectedConfirm = `${yearStart}-${yearEnd} ${TERM_LABELS[term]}`;
 
-  const confirmMatch =
-    confirmText.trim() === expectedConfirm;
+  const confirmMatch = confirmText.trim() === expectedConfirm;
 
   // ── mutation ──────────────────────────────────────────────────────────────
 
   const mutation = useMutation({
     mutationFn: () =>
-      superadminService.updateAcademicSettings({
+      PutAcademicSettings({
         currentYearStart: yearStart,
         currentYearEnd: yearEnd,
         currentTerm: term,
@@ -89,9 +99,7 @@ export default function AcademicSettings() {
       setConfirmText("");
     },
     onError: () => {
-      triggerToast(
-        "Failed to update academic setting. Please try again.",
-      );
+      triggerToast("Failed to update academic setting. Please try again.");
     },
   });
 
@@ -99,8 +107,7 @@ export default function AcademicSettings() {
 
   const isDirty =
     current &&
-    (yearStart !== current.currentYearStart ||
-      term !== current.currentTerm);
+    (yearStart !== current.currentYearStart || term !== current.currentTerm);
 
   // ─────────────────────────────────────────────────────────────────────────
 
@@ -117,12 +124,11 @@ export default function AcademicSettings() {
           <GraduationCap className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-xl font-semibold">Academic Settings</h1>
-          <p className="mt-0.5 text-sm text-muted-foreground">
-            Set the current active school year and term. All student
-            COR uploads will be automatically validated against this
-            setting by the OCR service.
-          </p>
+          <h1 className="mt-0.5 text-sm text-muted-foreground">
+            Set the current active school year and term. All student COR uploads
+            will be automatically validated against this setting by the OCR
+            service.
+          </h1>
         </div>
       </div>
 
@@ -149,42 +155,23 @@ export default function AcademicSettings() {
       <div
         className={
           "rounded-2xl border border-border bg-card " +
-          "px-6 py-5 shadow-sm space-y-5"
+          "space-y-5 px-6 py-5 shadow-sm"
         }
       >
         {/* School year start */}
-        <div className="space-y-1.5">
-          <label
-            htmlFor="yearStart"
-            className="block text-sm font-medium"
-          >
-            School Year Start
-          </label>
-          <select
-            id="yearStart"
-            value={yearStart}
-            onChange={(e) => setYearStart(Number(e.target.value))}
-            className={
-              "w-full rounded-lg border border-border bg-background " +
-              "px-3 py-2 text-sm focus:outline-none " +
-              "focus:ring-2 focus:ring-primary"
-            }
-          >
-            {YEAR_RANGE.map((y) => (
-              <option key={y} value={y}>
-                {y}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Dropdown
+          id="yearStart"
+          label="School Year Start"
+          options={yearOptions}
+          value={yearStart}
+          onChange={(val) => setYearStart(Number(val))}
+        />
 
         {/* School year end — derived, read-only */}
         <div className="space-y-1.5">
           <label className="block text-sm font-medium">
             School Year End
-            <span className="ml-1 text-xs text-muted-foreground">
-              (auto)
-            </span>
+            <span className="ml-1 text-xs text-muted-foreground">(auto)</span>
           </label>
           <div
             className={
@@ -197,30 +184,13 @@ export default function AcademicSettings() {
         </div>
 
         {/* Term */}
-        <div className="space-y-1.5">
-          <label
-            htmlFor="term"
-            className="block text-sm font-medium"
-          >
-            Current Term
-          </label>
-          <select
-            id="term"
-            value={term}
-            onChange={(e) => setTerm(Number(e.target.value))}
-            className={
-              "w-full rounded-lg border border-border bg-background " +
-              "px-3 py-2 text-sm focus:outline-none " +
-              "focus:ring-2 focus:ring-primary"
-            }
-          >
-            {[1, 2, 3].map((t) => (
-              <option key={t} value={t}>
-                {TERM_LABELS[t]}
-              </option>
-            ))}
-          </select>
-        </div>
+        <Dropdown
+          id="term"
+          label="Current Term"
+          options={termOptions}
+          value={term}
+          onChange={(val) => setTerm(Number(val))}
+        />
 
         {/* Warning notice */}
         <div
@@ -231,9 +201,9 @@ export default function AcademicSettings() {
         >
           <AlertTriangle className="mt-0.5 h-4 w-4 shrink-0 text-yellow-500" />
           <p className="text-xs text-muted-foreground">
-            Changing this setting immediately affects how the OCR
-            service validates COR uploads. CORs that do not match the
-            active school year and term will be marked as unvalidated.
+            Changing this setting immediately affects how the OCR service
+            validates COR uploads. CORs that do not match the active school year
+            and term will be marked as unvalidated.
           </p>
         </div>
 
@@ -247,8 +217,8 @@ export default function AcademicSettings() {
           }}
           className={
             "w-full rounded-xl bg-primary py-2.5 text-sm font-semibold " +
-            "text-primary-foreground transition-all " +
-            "hover:bg-primary/90 active:scale-[.98] " +
+            "text-primary-foreground transition-all" +
+            "hover:bg-primary/90 active:scale-[.98]" +
             "disabled:cursor-not-allowed disabled:opacity-40"
           }
         >
@@ -310,7 +280,7 @@ export default function AcademicSettings() {
               placeholder="Type the confirmation string…"
               className={
                 "mb-5 w-full rounded-lg border bg-background px-3 " +
-                "py-2 text-sm focus:outline-none focus:ring-2 " +
+                "py-2 text-sm focus:outline-none focus:ring-2" +
                 (confirmMatch
                   ? "border-green-500 focus:ring-green-500"
                   : "border-border focus:ring-primary")
@@ -337,8 +307,8 @@ export default function AcademicSettings() {
                 onClick={() => mutation.mutate()}
                 className={
                   "flex-1 rounded-xl bg-primary py-2.5 text-sm " +
-                  "font-semibold text-primary-foreground transition-all " +
-                  "hover:bg-primary/90 active:scale-[.98] " +
+                  "font-semibold text-primary-foreground transition-all" +
+                  "hover:bg-primary/90 active:scale-[.98]" +
                   "disabled:cursor-not-allowed disabled:opacity-40"
                 }
               >
