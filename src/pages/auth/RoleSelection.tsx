@@ -9,19 +9,14 @@ import { Button } from "@/components/ui/button";
 const ROLE_ICONS: Record<string, React.ReactNode> = {
   student: <User className="h-8 w-8" />,
   admin: <Users className="h-8 w-8" />,
-  counselor: <Users className="h-8 w-8" />,
   superadmin: <Shield className="h-8 w-8" />,
   developer: <Code className="h-8 w-8" />,
 };
 
 const ROLE_COLORS: Record<string, string> = {
   student:
-    "from-blue-500/20 to-indigo-500/20 " +
-    "text-blue-500 border-blue-500/20",
+    "from-blue-500/20 to-indigo-500/20 " + "text-blue-500 border-blue-500/20",
   admin:
-    "from-emerald-500/20 to-teal-500/20 " +
-    "text-emerald-500 border-emerald-500/20",
-  counselor:
     "from-emerald-500/20 to-teal-500/20 " +
     "text-emerald-500 border-emerald-500/20",
   superadmin:

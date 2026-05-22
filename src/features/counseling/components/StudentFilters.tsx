@@ -1,6 +1,5 @@
 import { Dropdown, SearchInput } from "@/components/form";
 
-
 import { cn } from "@/lib/utils";
 
 interface SearchFilterProps {
@@ -48,7 +47,7 @@ export default function StudentFilters({
         "duration-500",
       )}
     >
-      <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-3">
+      <div className="grid w-full grid-cols-1 gap-8 md:grid-cols-4">
         <SearchInput
           className="md:col-span-2"
           searchTerm={searchTerm}
@@ -58,7 +57,7 @@ export default function StudentFilters({
         <div
           className={cn(
             "grid w-full grid-cols-1 items-center justify-center gap-2",
-            "md:col-span-1 md:grid-cols-4",
+            "md:col-span-2 md:grid-cols-3",
           )}
         >
           <Dropdown
@@ -82,13 +81,13 @@ export default function StudentFilters({
               ...(yearLevels || []),
             ]}
           />
-          <Dropdown
+          {/* <Dropdown
             label="Status"
             value={selectedStatusId}
             onChange={onStatusChange}
             options={[{ id: 0, name: "All Statuses" }, ...(statuses || [])]}
             labelKey="name"
-          />
+          /> */}
         </div>
       </div>
     </div>

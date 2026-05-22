@@ -1,10 +1,5 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
-import {
-  GraduationCap,
-  School,
-  CheckCircle2,
-  AlertCircle,
-} from "lucide-react";
+import { GraduationCap, School, CheckCircle2, AlertCircle } from "lucide-react";
 import { FormInput, Dropdown } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
 import {
@@ -148,6 +143,7 @@ export const EducationSection = forwardRef<
               <span className="h-1.5 w-1.5 rounded-full bg-primary" />
             )}
             Nature of Schooling
+            <span className="text-primary">*</span>
           </label>
 
           <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 sm:gap-4">

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import StudentFilters from "@/features/counseling/components/StudentFilters";
 import StudentGrid from "@/features/counseling/components/StudentGrid";
@@ -89,14 +89,19 @@ export default function StudentRecords() {
   const isLoading =
     isCoursesLoading || isGendersLoading || isStudentsLoading || isDeleting;
 
-  usePageMetadata({
-    title: "Student Records",
-    description:
-      "Access and manage student cumulative records and personal information",
-    badgeText: "Admin Management",
-    badgeIcon: <Users className="h-4 w-4" />,
-    isLoading,
-  });
+  usePageMetadata(
+    useMemo(
+      () => ({
+        title: "Student Records",
+        description:
+          "Access and manage student cumulative records and personal information",
+        badgeText: "Admin Management",
+        badgeIcon: <Users className="h-4 w-4" />,
+        isLoading,
+      }),
+      [isLoading],
+    ),
+  );
 
   return (
     <>

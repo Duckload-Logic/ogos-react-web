@@ -45,7 +45,8 @@ import SystemLogs from "@/pages/superadmin/SystemLogs";
 import AuditLogs from "@/pages/superadmin/AuditLogs";
 import UserActivity from "@/pages/superadmin/UserActivity";
 import UserSessions from "@/pages/superadmin/UserSessions";
-import AcademicSettings from "@/pages/superadmin/AcademicSettings";
+import LogDetails from "@/pages/superadmin/LogDetails";
+import AcademicSettings from "@/pages/admin/AcademicSettings";
 
 // Dev Portal Pages
 import DevM2M from "@/pages/dev/M2MManagement";
@@ -235,6 +236,7 @@ export const routes: RouteObject[] = [
         path: "notifications",
         element: <NotificationsPage />,
       },
+      { path: "academic-settings", element: <AcademicSettings /> },
     ],
   },
 
@@ -256,7 +258,7 @@ export const routes: RouteObject[] = [
       { path: "audit-logs", element: <AuditLogs /> },
       { path: "users/:userId/activity", element: <UserActivity /> },
       { path: "users/:userId/sessions", element: <UserSessions /> },
-      { path: "academic-settings", element: <AcademicSettings /> },
+      { path: ":logType/:id", element: <LogDetails /> },
       { path: "profile", element: <Profile /> },
       { path: "notifications", element: <NotificationsPage /> },
     ],

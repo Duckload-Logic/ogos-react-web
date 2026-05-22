@@ -186,8 +186,8 @@ export default function StudentAppointments() {
           !user?.studentCorUrl
             ? "Please upload your COR in your profile to book an appointment"
             : !user?.isStudentCorValid
-            ? "Your COR is invalid or outdated for the current academic term"
-            : ""
+              ? "Your COR is invalid or outdated for the current academic term"
+              : ""
         }
         onClick={(e) => {
           if (!hasValidCor) {
@@ -269,7 +269,8 @@ export default function StudentAppointments() {
             Action Required: Invalid or Outdated Certificate of Registration
           </AlertTitle>
           <AlertDescription className="text-sm">
-            Your uploaded COR is not valid for the current academic term. Please upload your updated COR to proceed.{" "}
+            Your uploaded COR is not valid for the current academic term. Please
+            upload your updated COR to proceed.{" "}
             <Link
               to="/student/cor-management"
               className="font-semibold underline hover:text-rose-700 dark:hover:text-rose-300"
@@ -487,7 +488,7 @@ export default function StudentAppointments() {
                         </div>
                       </div>
 
-                      <div className="min-w-0 flex-1">
+                      <div className="min-w-0 flex-1 space-y-4">
                         <div className="flex items-start justify-between gap-3">
                           <div className="flex-1 space-y-1.5">
                             <div className="flex flex-wrap items-center gap-2">
@@ -583,8 +584,8 @@ export default function StudentAppointments() {
                       !user?.studentCorUrl
                         ? "Please upload your COR in your profile to book an appointment"
                         : !user?.isStudentCorValid
-                        ? "Your COR is invalid or outdated for the current academic term"
-                        : ""
+                          ? "Your COR is invalid or outdated for the current academic term"
+                          : ""
                     }
                     onClick={(e) => {
                       if (!hasValidCor) {

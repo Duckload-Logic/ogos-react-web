@@ -4,17 +4,16 @@ import {
   FileText,
   MoreHorizontal,
   Sparkles,
+  AlertTriangle,
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useAppointments } from "@/features/appointments/hooks/useAppointments";
 import { useAdminDashboard } from "@/features/analytics/hooks";
+import { useQuery } from "@tanstack/react-query";
 import {
-  LineChart,
-  Line,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-} from "recharts";
+  GetAcademicSettings,
+} from "@/features/student-core/services/academicSettingsService";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid } from "recharts";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   ChartContainer,
@@ -37,6 +36,25 @@ import { cn } from "@/lib/utils";
 export default function Dashboard() {
   const navigate = useNavigate();
   const todayStr = toISODateString(new Date());
+
+  const { data: settings } = useQuery({
+    queryKey: ["counselor", "academicSettings"],
+    queryFn: GetAcademicSettings,
+    staleTime: 1000 * 60 * 5,
+  });
+
+  const isSettingsOutdated = useMemo(() => {
+    if (!settings) return false;
+    const currentYear = new Date().getFullYear();
+    const currentMonth = new Date().getMonth();
+    if (settings.currentYearEnd < currentYear) {
+      return true;
+    }
+    if (currentMonth >= 8 && settings.currentYearStart < currentYear) {
+      return true;
+    }
+    return false;
+  }, [settings]);
 
   const { data: appointmentData, isLoading: isAppointmentsLoading } =
     useAppointments({
@@ -142,6 +160,59 @@ export default function Dashboard() {
 
   return (
     <div className="space-y-8 pb-10">
+      {/* Outdated Academic Settings Warning */}
+      {isSettingsOutdated && (
+        <div
+          className={cn(
+            "animate-in fade-in slide-in-from-top-4 relative",
+            "overflow-hidden rounded-3xl border border-red-500/20",
+            "bg-gradient-to-r from-red-500/10 to-rose-500/10 p-6",
+            "backdrop-blur-md duration-700",
+          )}
+        >
+          <div className="flex items-start gap-5">
+            <div
+              className={cn(
+                "rounded-2xl bg-red-500 p-3 text-white shadow-lg",
+                "shadow-red-500/20",
+              )}
+            >
+              <AlertTriangle size={24} />
+            </div>
+            <div className="flex-1 pr-10">
+              <h4
+                className={cn(
+                  "mb-1 flex items-center gap-2 text-sm font-bold",
+                  "text-red-950 dark:text-red-100",
+                )}
+              >
+                Academic Year Out of Date
+              </h4>
+              <p
+                className={cn(
+                  "text-sm font-medium leading-relaxed",
+                  "text-red-900/80 dark:text-red-200/80",
+                )}
+              >
+                The active academic year ({settings?.currentYearStart}–
+                {settings?.currentYearEnd}) appears to be outdated. Please
+                update the active term and school year configuration.
+              </p>
+              <button
+                onClick={() => navigate("/admin/academic-settings")}
+                className={cn(
+                  "mt-3 rounded-xl bg-red-500 px-4 py-2 text-xs font-bold",
+                  "text-white transition-all hover:bg-red-600",
+                  "active:scale-[.98]",
+                )}
+              >
+                Configure Settings
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Daily Tip Alert */}
       {showDailyTip && (
         <div

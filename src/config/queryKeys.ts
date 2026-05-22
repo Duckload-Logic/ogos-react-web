@@ -149,6 +149,7 @@ export const QUERY_KEYS = {
     m2mClients: (includeRevoked: boolean) =>
       ["superadmin", "m2mClients", { includeRevoked }] as const,
     users: (params?: any) => ["superadmin", "users", params] as const,
+    whitelist: ["superadmin", "users", "whitelist"] as const,
     userDistribution: ["superadmin", "users", "distribution"] as const,
     analytics: ["superadmin", "analytics", "admin"] as const,
     securityLogs: (params?: any) =>
@@ -161,5 +162,9 @@ export const QUERY_KEYS = {
       ["superadmin", "logs", "stats", { startDate, endDate }] as const,
     logActivity: ["superadmin", "logs", "activity"] as const,
     myLogs: ["superadmin", "logs", "me"] as const,
+    traceTracks: (traceId: string) =>
+      ["superadmin", "logs", "trace", traceId] as const,
+    logDetail: (id: string) =>
+      ["superadmin", "logs", "detail", id] as const,
   },
 } as const;

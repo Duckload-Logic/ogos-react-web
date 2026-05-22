@@ -189,7 +189,7 @@ export default function M2MManagement() {
             return (
               <Card
                 key={card.label}
-                className="rounded-[18px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]"
+                className="rounded-xl border-glass-border bg-glass-bg shadow-md"
               >
                 <CardContent className="p-5">
                   <div className="flex items-start justify-between gap-4">
@@ -214,7 +214,7 @@ export default function M2MManagement() {
           })}
         </section>
 
-        <Card className="overflow-hidden rounded-[20px] border border-white/20 bg-white/45 shadow-[0_8px_22px_rgba(15,23,42,0.06)] backdrop-blur-xl dark:border-white/10 dark:bg-white/[0.04]">
+        <Card className="overflow-hidden rounded-xl border-glass-border bg-glass-bg shadow-md">
           <CardHeader className="border-b border-white/20 pb-4 dark:border-white/10">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
@@ -437,7 +437,7 @@ export default function M2MManagement() {
             }
           }}
         >
-          <DialogContent className="border-white/20 bg-white/80 backdrop-blur-2xl dark:border-white/10 dark:bg-neutral-900/90 sm:max-w-lg">
+          <DialogContent className="backdrop-blur-2xl sm:max-w-lg">
             <DialogHeader>
               <DialogTitle>
                 {createdSecret ? "Client Secret Issued" : "Register M2M Client"}

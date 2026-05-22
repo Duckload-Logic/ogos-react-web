@@ -275,13 +275,24 @@ export function transformFormToPayload(formData: IIRForm): any {
       ),
     },
     interests: {
-      activities: (formData.interests.activities || []).map((activity: Activity) => ({
-        id: activity.id,
-        activityOption: activity.activityOption,
-        otherSpecification: handleNullableString(activity.otherSpecification),
-        role: activity.role,
-        roleSpecification: handleNullableString(activity.roleSpecification),
-      })),
+      activities: (formData.interests.activities || [])
+        .filter(
+          (activity: Activity) =>
+            activity.activityOption &&
+            activity.activityOption.id &&
+            activity.activityOption.id !== 0,
+        )
+        .map((activity: Activity) => ({
+          id: activity.id,
+          activityOption: activity.activityOption,
+          otherSpecification: handleNullableString(
+            activity.otherSpecification,
+          ),
+          role: activity.role,
+          roleSpecification: handleNullableString(
+            activity.roleSpecification,
+          ),
+        })),
       subjectPreferences: (formData.interests.subjectPreferences || []).map(
         (pref: SubjectPreference) => ({
           id: pref.id,

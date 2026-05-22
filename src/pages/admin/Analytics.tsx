@@ -92,7 +92,6 @@ const genderDistributionConfig = {
 export default function AnalyticsPage() {
   const [selectedYear, setSelectedYear] = useState<string>("0");
   const [selectedCourse, setSelectedCourse] = useState<string>("0");
-  const [selectedStatus, setSelectedStatus] = useState<string>("0");
 
   const {
     data,
@@ -120,27 +119,27 @@ export default function AnalyticsPage() {
   // Update filters and refresh
   const handleYearChange = (val: string) => {
     setSelectedYear(val);
-    refresh(parseInt(val), parseInt(selectedCourse), parseInt(selectedStatus));
+    refresh(parseInt(val), parseInt(selectedCourse), 0);
   };
 
   const handleCourseChange = (val: string) => {
     setSelectedCourse(val);
-    refresh(parseInt(selectedYear), parseInt(val), parseInt(selectedStatus));
+    refresh(parseInt(selectedYear), parseInt(val), 0);
   };
 
-  const handleStatusChange = (val: string) => {
-    setSelectedStatus(val);
-    refresh(parseInt(selectedYear), parseInt(selectedCourse), parseInt(val));
-  };
+  const yearOptions = useMemo(() => {
+    const years = enrollmentYears || [];
+    return [
+      { value: "0", label: "All Years" },
+      ...years.map((y: number) => ({
+        value: y.toString(),
+        label: y.toString(),
+      })),
+    ];
+  }, [enrollmentYears]);
 
-  usePageMetadata({
-    title: "Student Analytics",
-    description:
-      "Holistic analysis of student demographics, academic background, and social profiles",
-    badgeText: "Real-time Metrics",
-    badgeIcon: <TrendingUp className="h-4 w-4" />,
-    isLoading: loading,
-    headerActions: (
+  const headerActions = useMemo(
+    () => (
       <div className="flex gap-4">
         <Dropdown
           name="year"
@@ -148,16 +147,7 @@ export default function AnalyticsPage() {
           identifier="value"
           value={selectedYear}
           onChange={handleYearChange}
-          options={useMemo(() => {
-            const years = enrollmentYears || [];
-            return [
-              { value: "0", label: "All Years" },
-              ...years.map((y: number) => ({
-                value: y.toString(),
-                label: y.toString(),
-              })),
-            ];
-          }, [enrollmentYears])}
+          options={yearOptions}
           formStyle={false}
         />
 
@@ -170,19 +160,51 @@ export default function AnalyticsPage() {
           options={courses}
           formStyle={false}
         />
+
         <Button
           variant="outline"
           disabled={isDownloading}
           onClick={() =>
             generatePreview(parseInt(selectedYear), parseInt(selectedCourse))
           }
-          className="border-glass-border/40 hover:border-glass-border/60 dark:focus:bg-glass-bg/40 flex h-11 w-full items-center justify-between rounded-xl border bg-muted/20 px-4 py-2.5 text-left text-sm font-medium tracking-tight text-foreground shadow-sm outline-none transition-all duration-200 focus:border-primary/50 focus:bg-glass-bg focus:ring-2 focus:ring-primary/5"
+          className={cn(
+            "border-glass-border/40 hover:border-glass-border/60",
+            "dark:focus:bg-glass-bg/40 flex h-11 w-full items-center",
+            "justify-between rounded-xl border bg-muted/20 px-4",
+            "py-2.5 text-left text-sm font-medium tracking-tight",
+            "text-foreground shadow-sm outline-none transition-all",
+            "duration-200 focus:border-primary/50 focus:bg-glass-bg",
+            "focus:ring-2 focus:ring-primary/5",
+          )}
         >
           <FileDown className="h-4 w-4" />
           <span>Download Report</span>
         </Button>
       </div>
     ),
+    [
+      selectedYear,
+      handleYearChange,
+      yearOptions,
+      selectedCourse,
+      handleCourseChange,
+      courses,
+      isDownloading,
+      generatePreview,
+    ],
+  );
+
+  const pageBadgeIcon = useMemo(() => <TrendingUp className="h-4 w-4" />, []);
+
+  usePageMetadata({
+    title: "Student Analytics",
+    description:
+      "Holistic analysis of student demographics, academic background, " +
+      "and social profiles",
+    badgeText: "Real-time Metrics",
+    badgeIcon: pageBadgeIcon,
+    isLoading: loading,
+    headerActions,
   });
 
   if (error) {
@@ -200,11 +222,7 @@ export default function AnalyticsPage() {
         <Button
           variant="outline"
           onClick={() =>
-            refresh(
-              parseInt(selectedYear),
-              parseInt(selectedCourse),
-              parseInt(selectedStatus),
-            )
+            refresh(parseInt(selectedYear), parseInt(selectedCourse), 0)
           }
           className="mt-4 border-primary/20 hover:bg-primary/5"
         >

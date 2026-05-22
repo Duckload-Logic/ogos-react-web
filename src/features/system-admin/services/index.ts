@@ -9,6 +9,7 @@ import type {
   M2MClient,
   CreateM2MClientRequest,
   CreateM2MClientResponse,
+  SystemLog,
   SystemLogsResponse,
   SystemLogsParams,
   LogStats,
@@ -17,6 +18,7 @@ import type {
   AdminAnalytics,
   LogActivityStat,
   RoleDistribution,
+  WhitelistEntry,
 } from "../types";
 
 /**
@@ -36,7 +38,6 @@ export const GetM2MClients = async (
     );
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -56,7 +57,6 @@ export const PostM2MClient = async (
     );
     return response.data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -71,7 +71,6 @@ export const DeleteM2MClient = async (
   try {
     await apiClient.delete(API_ROUTES.superadmin.m2mClients.revoke(id), config);
   } catch (error) {
-
     throw error;
   }
 };
@@ -91,7 +90,6 @@ export const PostM2MSecret = async (
     );
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -110,7 +108,6 @@ export const PatchVerifyM2MClient = async (
       config,
     );
   } catch (error) {
-
     throw error;
   }
 };
@@ -129,7 +126,6 @@ export const GetUsers = async (
     });
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -147,7 +143,6 @@ export const GetUserDistribution = async (
     );
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -167,7 +162,6 @@ export const PostToggleUserStatus = async (
       config,
     );
   } catch (error) {
-
     throw error;
   }
 };
@@ -189,7 +183,6 @@ export const GetAdminAnalytics = async (
     );
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -208,7 +201,6 @@ export const GetSecurityLogs = async (
     });
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -227,7 +219,6 @@ export const GetSystemLogs = async (
     });
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -246,7 +237,6 @@ export const GetAuditLogs = async (
     });
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -269,7 +259,6 @@ export const GetLogStats = async (
     });
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -287,7 +276,6 @@ export const GetLogActivity = async (
     );
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -306,7 +294,6 @@ export const GetUserSessions = async (
     );
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -325,7 +312,6 @@ export const DeleteUserSession = async (
       config,
     );
   } catch (error) {
-
     throw error;
   }
 };
@@ -345,7 +331,6 @@ export const GetUserActivity = async (
     );
     return data;
   } catch (error) {
-
     throw error;
   }
 };
@@ -371,56 +356,101 @@ export const PostUpdateUserRoles = async (
       config,
     );
   } catch (error) {
-
+    throw error;
     throw error;
   }
 };
 
 /**
- * Get the current global academic year + term setting
+ * Get single log detail by ID
  */
-export const GetAcademicSettings = async (
+export const GetLogDetail = async (
+  id: string,
   config?: AxiosConfigWithMeta,
-): Promise<{
-  currentYearStart: number;
-  currentYearEnd: number;
-  currentTerm: number;
-  updatedAt: string;
-}> => {
+): Promise<SystemLog> => {
   try {
     const { data } = await apiClient.get(
-      API_ROUTES.superadmin.academicSettings.get,
+      API_ROUTES.superadmin.logs.detail(id),
       config,
     );
     return data;
   } catch (error) {
-
     throw error;
   }
 };
 
 /**
- * Update the global academic year + term setting (SuperAdmin only)
+ * Get trace tracks by trace ID
  */
-export const PutAcademicSettings = async (
-  data: {
-    currentYearStart: number;
-    currentYearEnd: number;
-    currentTerm: number;
-  },
+export const GetTraceTracks = async (
+  traceId: string,
   config?: AxiosConfigWithMeta,
-): Promise<void> => {
+): Promise<SystemLog[]> => {
   try {
-    await apiClient.put(
-      API_ROUTES.superadmin.academicSettings.update,
-      data,
+    const { data } = await apiClient.get(
+      API_ROUTES.superadmin.logs.traceTracks(traceId),
       config,
     );
+    return data;
   } catch (error) {
-
     throw error;
   }
 };
+
+/**
+ * Add a user to whitelist
+ */
+export const PostAddUserToWhitelist = async (
+  email: string,
+  roleIds: number[],
+  config?: AxiosConfigWithMeta,
+): Promise<void> => {
+  try {
+    await apiClient.post(
+      API_ROUTES.superadmin.users.whitelist,
+      { email, roleIds },
+      config,
+    );
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Remove user from whitelist
+ */
+export const PostRemoveUserFromWhitelist = async (
+  email: string,
+  config?: AxiosConfigWithMeta,
+): Promise<void> => {
+  try {
+    await apiClient.post(
+      API_ROUTES.superadmin.users.removeWhitelist,
+      { email },
+      config,
+    );
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
+ * Get all whitelisted users
+ */
+export const GetWhitelist = async (
+  config?: AxiosConfigWithMeta,
+): Promise<WhitelistEntry[]> => {
+  try {
+    const { data } = await apiClient.get<WhitelistEntry[]>(
+      API_ROUTES.superadmin.users.whitelist,
+      config,
+    );
+    return data;
+  } catch (error) {
+    throw error;
+  }
+};
+
 
 export const superadminService = {
   listM2MClients: GetM2MClients,
@@ -432,6 +462,9 @@ export const superadminService = {
   getUserDistribution: GetUserDistribution,
   toggleUserStatus: PostToggleUserStatus,
   updateUserRoles: PostUpdateUserRoles,
+  addUserToWhitelist: PostAddUserToWhitelist,
+  removeUserFromWhitelist: PostRemoveUserFromWhitelist,
+  getWhitelist: GetWhitelist,
   getAdminAnalytics: GetAdminAnalytics,
   getSecurityLogs: GetSecurityLogs,
   getSystemLogs: GetSystemLogs,
@@ -441,6 +474,6 @@ export const superadminService = {
   getUserSessions: GetUserSessions,
   revokeUserSession: DeleteUserSession,
   getUserActivity: GetUserActivity,
-  getAcademicSettings: GetAcademicSettings,
-  updateAcademicSettings: PutAcademicSettings,
+  getTraceTracks: GetTraceTracks,
+  getLogDetail: GetLogDetail,
 };

@@ -64,7 +64,7 @@ export function SlipList({
 
   return (
     <Card
-      className={`bg-glass-bg/40 hover:bg-glass-bg/50 flex flex-col overflow-hidden border-glass-border shadow-2xl backdrop-blur-2xl transition-all duration-500 ${className || ""}`}
+      className={`bg-glass-bg/40 hover:bg-glass-bg/50 flex flex-col overflow-hidden border-glass-border shadow-md backdrop-blur-2xl transition-all duration-500 ${className || ""}`}
     >
       <CardHeader className="border-glass-border/30 space-y-6 border-b bg-muted/10 px-8 py-7">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">

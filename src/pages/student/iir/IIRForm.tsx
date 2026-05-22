@@ -59,6 +59,7 @@ import { SectionProgress } from "@/features/iir/components/form/SectionProgress"
 import ConsentDialog from "@/features/iir/components/form/ConsentDialog";
 import { cn } from "@/lib/utils";
 import { PatchIIRSubmit } from "@/features/iir/services/service";
+import { completeIIRForm } from "@/features/iir/tests/test";
 
 const FORM_SECTIONS = [
   { title: "Basic Info", id: 1, key: "personal_basic", main: 1 },
@@ -106,15 +107,7 @@ export default function IIRForm() {
   const healthSectionRef = useRef<any>(null);
   const interestsSectionRef = useRef<any>(null);
 
-  const [currentSection, setCurrentSection] = useState<number>(() => {
-    const saved = localStorage.getItem("iir_current_section");
-    const parsed = saved ? parseInt(saved, 10) : 1;
-    if (isEditMode) {
-      const ids = [1, 2, 3, 4, 7, 8];
-      return ids.includes(parsed) ? parsed : 1;
-    }
-    return parsed;
-  });
+  const [currentSection, setCurrentSection] = useState<number>(1);
   const [visitedSections, setVisitedSections] = useState<number[]>(() => {
     const saved = localStorage.getItem("iir_visited_sections");
     const parsed = saved ? JSON.parse(saved) : [1];
@@ -172,8 +165,8 @@ export default function IIRForm() {
 
       const sourceData = isEditMode ? editProfileData || draft : draft;
       const initializedData = initializeFormData(
-        // completeIIRForm,
-        sourceData ?? null,
+        completeIIRForm,
+        // sourceData ?? null,
         EMPTY_IIR_FORM,
         me,
       );

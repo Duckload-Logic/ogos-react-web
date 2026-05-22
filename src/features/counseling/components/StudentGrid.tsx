@@ -90,8 +90,7 @@ export default function StudentGrid({
                   className={cn(
                     "bg-glass-bg/50 relative flex h-28 w-28 items-center",
                     "justify-center overflow-hidden rounded-full border-[6px]",
-                    "border-white/40 shadow-xl transition-transform duration-500",
-                    "group-hover/avatar:scale-105 dark:border-black/20",
+                    "border-primary/20 shadow-xl transition-transform duration-500",
                   )}
                 >
                   {student.gender?.id === 1 || student?.gender?.id !== 2 ? (
@@ -106,9 +105,9 @@ export default function StudentGrid({
                   className={cn(
                     "absolute bottom-1 right-1 flex h-8 w-8 items-center",
                     "justify-center rounded-full border border-white/20",
-                    "bg-white/80 shadow-lg backdrop-blur-md transition-transform",
+                    "bg-card shadow-lg backdrop-blur-md transition-transform",
                     "duration-500 group-hover/avatar:translate-x-1",
-                    "group-hover/avatar:translate-y-1 dark:bg-black/40",
+                    "group-hover/avatar:translate-y-1",
                   )}
                 >
                   <div
