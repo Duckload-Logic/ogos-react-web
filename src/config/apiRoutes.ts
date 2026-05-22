@@ -210,6 +210,8 @@ export const API_ROUTES = Object.freeze({
       revokeSession: (userId: string, sessionId: string) =>
         `/users/${userId}/sessions/${sessionId}`,
       activity: (id: string) => `/users/${id}/activity`,
+      whitelist: "/users/whitelist",
+      removeWhitelist: "/users/whitelist/remove",
       updateRoles: "/users/update-roles",
     }),
     analytics: Object.freeze({
@@ -222,11 +224,16 @@ export const API_ROUTES = Object.freeze({
       audit: "/logs/audit",
       stats: "/logs/stats",
       activity: "/logs/activity",
+      traceTracks: (traceId: string) => `/logs/trace/${traceId}`,
+      detail: (id: string) => `/logs/${id}`,
     }),
-    academicSettings: Object.freeze({
-      get: "/students/settings/academic",
-      update: "/students/settings/academic",
-    }),
+  }),
+
+  /**
+   * Academic related endpoints
+   */
+  academic: Object.freeze({
+    settings: "/students/settings/academic",
   }),
   /**
    * Developer portal related endpoints
