@@ -200,6 +200,7 @@ export const API_ROUTES = Object.freeze({
       revoke: (id: string | number) => `/m2m-clients/${id}`,
       rotateSecret: (id: string | number) => `/m2m-clients/${id}/secret`,
       verify: (id: string | number) => `/m2m-clients/${id}/verify`,
+      reject: (id: string | number) => `/m2m-clients/${id}/reject`,
     }),
     users: Object.freeze({
       list: "/users",
@@ -246,7 +247,7 @@ export const API_ROUTES = Object.freeze({
    */
   notifications: Object.freeze({
     me: "/notifications/me",
-    stream: "/notifications/stream",
+    stream: "/notifications/me/stream",
     markAsRead: (id: string) => `/notifications/${id}/read`,
   }),
 });

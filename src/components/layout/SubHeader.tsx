@@ -1,6 +1,7 @@
 import React from "react";
 import Breadcrumbs from "./Breadcrumbs";
 import { cn } from "@/lib/utils";
+import { formatDate } from "@/utils/dateTime";
 
 interface SubHeaderProps {
   title: string;
@@ -69,12 +70,7 @@ export default function SubHeader({
 
           {showDate && (
             <p className="text-sm font-medium text-muted-foreground">
-              {today.toLocaleDateString("en-US", {
-                weekday: "long",
-                month: "long",
-                day: "numeric",
-                year: "numeric",
-              })}
+              {formatDate(today)}
             </p>
           )}
         </div>

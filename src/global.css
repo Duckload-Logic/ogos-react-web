@@ -420,7 +420,7 @@
 
 @layer components {
   .glass-card {
-    @apply border border-glass-border bg-glass-bg shadow-2xl backdrop-blur-[var(--glass-blur)];
+    @apply rounded-md border border-glass-border bg-glass-bg shadow-md backdrop-blur-[var(--glass-blur)];
   }
 
   .glass-button {

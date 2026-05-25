@@ -27,14 +27,14 @@ function Calendar({
           buttonVariants({ variant: "outline" }),
           "h-8 w-8 bg-transparent p-0 rounded-full transition-all duration-200",
           "hover:bg-accent hover:scale-105 active:scale-95",
-          "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2",
         ),
         nav_button_previous: "absolute left-1",
         nav_button_next: "absolute right-1",
         table: "border-collapse mx-auto",
         head_row: "flex",
         head_cell:
-          "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] uppercase tracking-wide",
+          "text-muted-foreground rounded-md w-9 font-normal text-[0.8rem] uppercase ",
         row: "flex w-full mt-2",
         cell: cn(
           "h-10 w-10 text-center text-sm p-0 relative",
@@ -43,29 +43,29 @@ function Calendar({
           "[&:has([aria-selected])]:bg-accent/30",
           "first:[&:has([aria-selected])]:rounded-l-full",
           "last:[&:has([aria-selected])]:rounded-r-full",
-          "focus-within:relative focus-within:z-20"
+          "focus-within:relative focus-within:z-20",
         ),
         day: cn(
           buttonVariants({ variant: "ghost" }),
           "h-10 w-10 p-0 font-normal rounded-full transition-all duration-200",
           "hover:scale-105 hover:bg-accent hover:text-accent-foreground",
           "active:scale-95",
-          "aria-selected:opacity-100 aria-selected:scale-105"
+          "aria-selected:opacity-100 aria-selected:scale-105",
         ),
         day_range_end: "day-range-end",
         day_selected: cn(
           "bg-primary text-primary-foreground hover:bg-primary",
           "hover:text-primary-foreground focus:bg-primary",
-          "focus:text-primary-foreground shadow-md shadow-primary/20"
+          "focus:text-primary-foreground shadow-md shadow-primary/20",
         ),
         day_today: cn(
           "bg-accent text-accent-foreground ring-1 ring-primary/30",
-          "font-semibold"
+          "font-semibold",
         ),
         day_outside: cn(
           "day-outside text-muted-foreground opacity-50",
           "aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
-          "aria-selected:opacity-30"
+          "aria-selected:opacity-30",
         ),
         day_disabled: "text-muted-foreground opacity-40 cursor-not-allowed",
         day_range_middle:
