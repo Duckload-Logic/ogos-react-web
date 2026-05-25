@@ -32,7 +32,10 @@ export default function ConsentDialog({
       open={open}
       onOpenChange={(isOpen) => !isOpen && !isSubmitting && onCancel()}
     >
-      <DialogContent className="sm:max-w-[600px]">
+      <DialogContent
+        hasCloseButton={false}
+        className="sm:max-w-[600px]"
+      >
         <DialogHeader>
           <DialogTitle className="text-2xl">Confirm Submission</DialogTitle>
           <DialogDescription className="pt-4 text-base">

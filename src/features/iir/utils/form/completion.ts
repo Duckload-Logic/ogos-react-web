@@ -60,6 +60,7 @@ function calculateCompletionFromSchema(
 export function calculateSectionCompletion(
   sectionIndex: number,
   formData: IIRForm | null,
+  isEditMode?: boolean,
 ): number {
   if (!formData) return 0;
 
@@ -82,13 +83,20 @@ export function calculateSectionCompletion(
     case 6:
     case 7:
     case 8:
-    case 9:
+    case 9: {
       // Family Background sub-steps
+      let allowed = FAMILY_SUBSTEP_FIELDS[sectionIndex - 5];
+      if (isEditMode && sectionIndex === 9) {
+        allowed = allowed.filter((field) =>
+          field.startsWith("family.relatedPersons.2.")
+        );
+      }
       return calculateCompletionFromSchema(
         familyValidationSchema,
         formData,
-        FAMILY_SUBSTEP_FIELDS[sectionIndex - 5],
+        allowed,
       );
+    }
 
     case 10: {
       // Health Information

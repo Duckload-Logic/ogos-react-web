@@ -129,7 +129,7 @@ export const EducationSection = forwardRef<
         {/* Nature of Schooling */}
         <div
           className={cn(
-            "border-glass-border/40 rounded-[24px] border bg-glass-bg p-5",
+            "border-glass-border/40 rounded-xl border bg-glass-bg p-5",
             "shadow-sm backdrop-blur-glass transition-all duration-300",
             "sm:p-8",
           )}
@@ -277,7 +277,7 @@ export const EducationSection = forwardRef<
                 key={idx}
                 className={cn(
                   "bg-glass-bg/60 border-glass-border/40 group overflow-hidden",
-                  "rounded-[24px] border shadow-sm backdrop-blur-glass",
+                  "rounded-xl border shadow-sm backdrop-blur-glass",
                   "transition-all duration-300 hover:shadow-md",
                 )}
               >

@@ -164,19 +164,12 @@ export default function IIRProfile() {
       : "Manage your personal guidance information and student record",
     badgeText: isAdmin ? "Admin Audit" : "Student Profile",
     badgeIcon,
-    isLoading,
+    isLoading: false,
     headerActions: headerActions || undefined,
   });
 
   if (isLoading || isMeLoading) {
-    return (
-      <div className="flex h-[400px] items-center justify-center">
-        <Spinner
-          size="lg"
-          message="Loading record..."
-        />
-      </div>
-    );
+    return <IIRProfileSkeleton />;
   }
 
   // Handle final state where no ID can be resolved (after loading)
@@ -320,5 +313,120 @@ export default function IIRProfile() {
         </ResponsiveModalContent>
       </ResponsiveModal>
     </>
+  );
+}
+
+function IIRProfileSkeleton() {
+  return (
+    <div className={cn("mt-4 flex w-full animate-pulse flex-col gap-8")}>
+      <div className="grid h-full grid-cols-1 gap-4 xl:grid-cols-4">
+        {/* Left Side: BioCard Skeleton */}
+        <div
+          className={cn(
+            "rounded-2xl border border-glass-border bg-glass-bg",
+            "flex flex-col items-center gap-6 p-6",
+          )}
+        >
+          <div
+            className={cn(
+              "h-24 w-24 rounded-full bg-neutral-200",
+              "dark:bg-neutral-800",
+            )}
+          />
+          <div className="flex w-full flex-col items-center gap-2">
+            <div
+              className={cn(
+                "h-6 w-3/4 rounded bg-neutral-200",
+                "dark:bg-neutral-800",
+              )}
+            />
+            <div
+              className={cn(
+                "h-4 w-1/2 rounded bg-neutral-200",
+                "dark:bg-neutral-800",
+              )}
+            />
+          </div>
+          <div
+            className={cn(
+              "w-full border-t border-glass-border pt-6",
+              "flex flex-col gap-4",
+            )}
+          >
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className="flex flex-col gap-1.5"
+              >
+                <div
+                  className={cn(
+                    "h-3 w-1/3 rounded bg-neutral-200",
+                    "dark:bg-neutral-800",
+                  )}
+                />
+                <div
+                  className={cn(
+                    "h-4 w-2/3 rounded bg-neutral-200",
+                    "dark:bg-neutral-800",
+                  )}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Right Side: Navigation & Content Skeletons */}
+        <div className="flex h-full flex-col gap-4 xl:col-span-3">
+          {/* Tabs Navigation Skeleton */}
+          <div className="flex gap-2 overflow-x-auto pb-2">
+            {Array.from({ length: 4 }).map((_, i) => (
+              <div
+                key={i}
+                className={cn(
+                  "h-10 w-28 rounded-xl bg-neutral-200",
+                  "shrink-0 dark:bg-neutral-800",
+                )}
+              />
+            ))}
+          </div>
+
+          {/* Content Card Skeleton */}
+          <div
+            className={cn(
+              "flex-1 rounded-2xl border border-glass-border",
+              "flex flex-col gap-6 bg-glass-bg p-6 sm:p-8",
+            )}
+          >
+            <div
+              className={cn(
+                "h-6 w-1/4 rounded bg-neutral-200",
+                "dark:bg-neutral-800",
+              )}
+            />
+            <div className="mt-4 grid grid-cols-1 gap-6 md:grid-cols-2">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                  key={i}
+                  className="flex flex-col gap-2"
+                >
+                  <div
+                    className={cn(
+                      "h-3 w-1/4 rounded bg-neutral-200",
+                      "dark:bg-neutral-800",
+                    )}
+                  />
+                  <div
+                    className={cn(
+                      "h-10 w-full rounded bg-neutral-200",
+                      "dark:bg-neutral-800",
+                    )}
+                  />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   );
 }

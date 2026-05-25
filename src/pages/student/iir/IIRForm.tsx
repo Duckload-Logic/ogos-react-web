@@ -25,6 +25,7 @@ import {
   AlertDialogAction,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import {
   AlertCircle,
   Save,
@@ -39,9 +40,6 @@ import {
   FamilySection,
   HealthSection,
   InterestsSection,
-  // ConsentDialog,
-  // FormErrorModal,
-  // SectionProgress,
 } from "@/features/iir/components/form";
 import {
   updateNestedField,
@@ -59,7 +57,6 @@ import { SectionProgress } from "@/features/iir/components/form/SectionProgress"
 import ConsentDialog from "@/features/iir/components/form/ConsentDialog";
 import { cn } from "@/lib/utils";
 import { PatchIIRSubmit } from "@/features/iir/services/service";
-import { completeIIRForm } from "@/features/iir/tests/test";
 
 const FORM_SECTIONS = [
   { title: "Basic Info", id: 1, key: "personal_basic", main: 1 },
@@ -82,7 +79,14 @@ export default function IIRForm() {
   const isEditMode = searchParams.get("edit") === "true" && !!editIirId;
   const activeSections = useMemo(() => {
     if (isEditMode) {
-      return FORM_SECTIONS.filter((s) => [1, 2, 3, 4, 7, 8].includes(s.id));
+      return FORM_SECTIONS.filter((s) =>
+        [1, 2, 3, 4, 7, 8, 9].includes(s.id)
+      ).map((s) => {
+        if (s.id === 9) {
+          return { ...s, title: "Guardian's Information" };
+        }
+        return s;
+      });
     }
     return FORM_SECTIONS;
   }, [isEditMode]);
@@ -112,7 +116,7 @@ export default function IIRForm() {
     const saved = localStorage.getItem("iir_visited_sections");
     const parsed = saved ? JSON.parse(saved) : [1];
     if (isEditMode) {
-      const ids = [1, 2, 3, 4, 7, 8];
+      const ids = [1, 2, 3, 4, 7, 8, 9];
       return parsed.filter((id: number) => ids.includes(id));
     }
     return parsed;
@@ -124,8 +128,6 @@ export default function IIRForm() {
   const [showConsentDialog, setShowConsentDialog] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
-  const [validationErrorList, setValidationErrorList] = useState<string[]>([]);
-  const [showValidationError, setShowValidationError] = useState(false);
   const [sectionsWithErrors, setSectionsWithErrors] = useState<number[]>([]);
   const [showDraftPrompt, setShowDraftPrompt] = useState(false);
   const [draftData, setDraftData] = useState<IIRFormType | null>(null);
@@ -156,19 +158,14 @@ export default function IIRForm() {
       )
         return;
 
-      // In edit mode, wait for the profile fetch to land before
-      // initializing — without this, hasInitialized flips true on the
-      // first render while editProfileData is still undefined, locking
-      // the form on empty permanently and preventing toDateOnly from
-      // ever running on the real server data.
       if (isEditMode && !editProfileData) return;
 
       const sourceData = isEditMode ? editProfileData || draft : draft;
       const initializedData = initializeFormData(
-        completeIIRForm,
-        // sourceData ?? null,
+        sourceData ?? null,
         EMPTY_IIR_FORM,
         me,
+        { preserveBasicInfoFromSource: isEditMode },
       );
       setLocalFormData(initializedData);
       setIsInitializing(false);
@@ -281,9 +278,7 @@ export default function IIRForm() {
 
     const validation = validateSection(sectionRefs[currentSection]);
     if (!validation.isValid) {
-      markAllTouched(); // Reveal inline errors in the current section
-      setValidationErrorList(Object.values(validation.errors));
-      setShowValidationError(true);
+      markAllTouched();
       return;
     }
 
@@ -347,14 +342,16 @@ export default function IIRForm() {
       sectionRefs,
       activeSections,
       (sectionIndex) =>
-        calculateSectionCompletion(sectionIndex, localFormData ?? null),
+        calculateSectionCompletion(
+          sectionIndex,
+          localFormData ?? null,
+          isEditMode,
+        ),
       currentSection,
     );
 
     if (validationResult.hasErrors) {
       setSectionsWithErrors(validationResult.sectionsWithErrors);
-      setValidationErrorList(validationResult.errorMessages);
-      setShowValidationError(true);
 
       const raw = validationResult.rawErrors || {};
       const total = Object.keys(raw).length;
@@ -384,7 +381,6 @@ export default function IIRForm() {
     // All validations passed, clear section errors and open legal consent dialog
     clearDraft();
     setSectionsWithErrors([]);
-    setShowValidationError(false);
     setShowConsentDialog(true);
   };
 
@@ -466,7 +462,7 @@ export default function IIRForm() {
         <AnimationStyles />
 
         {/* Main Content Container */}
-        <div className="relative z-10 mx-auto max-w-[1400px] px-4 py-10 sm:px-6 lg:px-8">
+        <div className="relative z-10 mx-auto max-w-[1400px] px-4 sm:px-6 lg:px-8">
           <div className="lg:flex lg:items-start lg:gap-10">
             {/* Sidebar Progress Tracker (Desktop) */}
             <aside className="hidden w-[300px] shrink-0 lg:sticky lg:top-24 lg:block">
@@ -478,12 +474,12 @@ export default function IIRForm() {
                 onNavigate={(id: number) => {
                   setCurrentSection(id);
                   setSectionsWithErrors([]);
-                  setShowValidationError(false);
                 }}
                 calculateCompletion={(sectionIndex: number) =>
                   calculateSectionCompletion(
                     sectionIndex,
                     localFormData ?? null,
+                    isEditMode,
                   )
                 }
                 lastSaved={lastSaved}
@@ -492,7 +488,7 @@ export default function IIRForm() {
 
             {/* Main Content Area */}
             <div className="flex-1">
-              <div className="flex flex-col gap-10">
+              <div className="flex flex-col gap-6">
                 {/* Mobile/Tablet Progress Tracker */}
                 <div className="lg:hidden">
                   <SectionProgress
@@ -503,12 +499,12 @@ export default function IIRForm() {
                     onNavigate={(id: number) => {
                       setCurrentSection(id);
                       setSectionsWithErrors([]);
-                      setShowValidationError(false);
                     }}
                     calculateCompletion={(sectionIndex: number) =>
                       calculateSectionCompletion(
                         sectionIndex,
                         localFormData ?? null,
+                        isEditMode,
                       )
                     }
                     lastSaved={lastSaved}
@@ -570,11 +566,11 @@ export default function IIRForm() {
                   </div>
                 )}
 
-                <div className="flex flex-col gap-6">
+                <div className="flex flex-col">
                   {/* Form Content Wrapper */}
                   <div className="">
                     {/* Floating Completion Pill */}
-                    <div className="animate-in fade-in slide-in-from-right-4 mb-3 delay-300 duration-700">
+                    <div className="animate-in fade-in slide-in-from-right-4 mb-4 delay-300 duration-700">
                       <div
                         className={cn(
                           "flex items-center gap-2.5 rounded-full border",
@@ -592,12 +588,13 @@ export default function IIRForm() {
                         <span
                           className={cn(
                             "text-[11px] uppercase",
-                            "text-neutral-900 dark:text-white",
+                            "text-neutral-700 dark:text-white",
                           )}
                         >
                           {calculateSectionCompletion(
                             currentSection,
                             localFormData ?? null,
+                            isEditMode,
                           )}
                           % Form Progress
                         </span>
@@ -668,12 +665,11 @@ export default function IIRForm() {
                   {/* Form Navigation Action Bar */}
                   <div
                     className={cn(
-                      "animate-in fade-in slide-in-from-bottom-4 mb-20 mt-4 flex",
-                      "flex-col items-center justify-between gap-4 rounded-[28px]",
-                      "border border-white/20 bg-white/40 p-5",
-                      "shadow-[0_12px_40px_rgba(31,38,135,0.08)] backdrop-blur-xl",
-                      "delay-500 duration-700 dark:border-white/10",
-                      "dark:bg-white/[0.04] md:flex-row",
+                      "animate-in fade-in slide-in-from-bottom-4 flex",
+                      "flex-col items-center justify-between gap-4 rounded-xl",
+                      "border border-glass-border bg-glass-bg p-5",
+                      "shadow-md",
+                      "delay-500 duration-700 md:flex-row",
                     )}
                   >
                     <Button
@@ -795,32 +791,39 @@ export default function IIRForm() {
         >
           <AlertDialogContent
             className={cn(
-              "max-w-sm rounded-3xl border-none bg-white/90 shadow-2xl",
-              "backdrop-blur-3xl dark:bg-neutral-900/90",
+              "max-w-sm rounded-3xl shadow-md",
+              "backdrop-blur-3xl",
             )}
           >
             <AlertDialogHeader>
-              <AlertDialogTitle className="text-2xl tracking-tight">
+              <AlertDialogTitle className="text-2xl">
                 Erase everything?
               </AlertDialogTitle>
-              <AlertDialogDescription className="font-medium leading-relaxed text-neutral-500 dark:text-neutral-400">
+              <AlertDialogDescription className="font-medium text-neutral-500 dark:text-neutral-400">
                 This will clear all your current answers. This action cannot be
                 undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
-            <AlertDialogFooter className="mt-4 flex-row gap-2">
-              <AlertDialogCancel asChild>
-                <Button
-                  variant="ghost"
-                  className="flex-1 rounded-2xl border border-neutral-200 font-bold dark:border-neutral-800"
-                >
-                  Cancel
-                </Button>
+            <AlertDialogFooter
+              className={cn(
+                "mt-4 flex flex-row items-center justify-center gap-2",
+                "sm:space-x-0",
+              )}
+            >
+              <AlertDialogCancel
+                className={cn(
+                  "mt-0 flex-1 rounded-xl border border-neutral-200",
+                  "bg-transparent font-bold text-foreground",
+                  "hover:bg-accent hover:text-accent-foreground",
+                  "dark:border-neutral-800",
+                )}
+              >
+                Cancel
               </AlertDialogCancel>
               <AlertDialogAction
                 onClick={confirmReset}
                 className={cn(
-                  "flex-1 rounded-2xl bg-destructive font-bold text-white",
+                  "mt-0 flex-1 rounded-xl bg-destructive font-bold text-white",
                   "shadow-lg shadow-destructive/20 hover:bg-destructive/90",
                 )}
               >
@@ -854,31 +857,28 @@ function SuccessPopup({
   onReturn: () => void;
   isEditMode?: boolean;
 }) {
-  if (!isOpen) return null;
-
   return (
-    <div
-      className={cn(
-        "animate-in fade-in fixed inset-0 z-[100] flex items-center",
-        "justify-center bg-neutral-950/40 p-4 backdrop-blur-sm",
-        "duration-500",
-      )}
-    >
-      <div
+    <Dialog open={isOpen}>
+      <DialogContent
+        hasCloseButton={false}
         className={cn(
-          "animate-in zoom-in-95 w-full max-w-md rounded-2xl border",
-          "border-card bg-card p-10 text-center",
-          "shadow-[0_32px_120px_rgba(0,0,0,0.15)] backdrop-blur-2xl",
-          "duration-500",
+          "max-w-md border-card bg-card p-10 text-center shadow-2xl",
+          "backdrop-blur-2xl",
         )}
       >
-        <div className="mb-8 flex justify-center">
+        <div className="flex justify-center">
           <div className="relative">
-            <div className="absolute inset-0 animate-pulse rounded-full bg-green-500/20 blur-2xl" />
+            <div
+              className={cn(
+                "absolute inset-0 rounded-full",
+                "bg-green-500/20 blur-2xl",
+              )}
+            />
             <div
               className={cn(
                 "relative flex h-20 w-20 items-center justify-center",
-                "rounded-full bg-green-500 shadow-xl shadow-green-500/30",
+                "animate-bounce rounded-full bg-green-500 shadow-xl",
+                "shadow-green-500/30",
               )}
             >
               <Check
@@ -888,37 +888,40 @@ function SuccessPopup({
             </div>
           </div>
         </div>
+
         <h3
           className={cn(
-            "mb-3 text-3xl font-[900]",
+            "text-3xl font-[900]",
             "text-neutral-900 dark:text-white",
           )}
         >
           All Done!
         </h3>
+
         <p
           className={cn(
-            "mb-10 px-4 font-medium",
+            "px-4 font-medium",
             "text-neutral-500 dark:text-neutral-400",
           )}
         >
           {isEditMode
             ? "Your Individual Inventory Record has been successfully " +
               "updated and saved."
-            : "Your Individual Inventory Re1cord has been successfully " +
+            : "Your Individual Inventory Record has been successfully " +
               "submitted and saved to our secure database."}
         </p>
+
         <Button
           onClick={onReturn}
           className={cn(
-            "h-14 w-full rounded-md bg-primary text-lg font-bold text-primary-foreground",
-            "shadow-xl transition-all",
+            "h-14 w-full rounded-md bg-primary text-lg font-bold",
+            "text-primary-foreground shadow-xl transition-all",
             "duration-300 hover:bg-primary/90 active:scale-95",
           )}
         >
           Complete
         </Button>
-      </div>
-    </div>
+      </DialogContent>
+    </Dialog>
   );
 }
