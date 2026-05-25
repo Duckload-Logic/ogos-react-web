@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useMemo } from "react";
 import { usePageMetadata } from "@/context";
 import { m2mService } from "@/features/dev-tools/m2m/services/api";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Plus,
   Trash2,
@@ -17,6 +18,7 @@ import {
   X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
 
 interface M2MClient {
   id: number;
@@ -49,36 +51,57 @@ const M2MManagement: React.FC = () => {
     fetchClients();
   }, []);
 
-  usePageMetadata({
-    title: "Client Manager",
-    description:
-      "Manage machine-to-machine authentication for your capstone system.",
-    badgeText: "Dev Portal",
-    badgeIcon: <Lock className="h-3.5 w-3.5" />,
-    headerActions: (
-      <div className="group relative">
-        <button
-          onClick={() => setShowCreateModal(true)}
-          disabled={clients.some((c) => c.isActive)}
-          className="btn-primary flex items-center gap-2 px-6 py-3 transition-all disabled:cursor-not-allowed disabled:opacity-50"
-        >
-          <Plus
-            size={20}
-            strokeWidth={3}
-          />
-          <span>Create New Client</span>
-        </button>
-        {clients.some((c) => c.isActive) && (
-          <div className="pointer-events-none absolute right-0 top-full z-50 mt-2 w-64 rounded-xl border border-border bg-card p-3 opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
-            <p className="text-[10px] font-bold leading-relaxed text-amber-500">
-              Restriction: You already have an active client. Revoke it to
-              create a new one.
-            </p>
+  usePageMetadata(
+    useMemo(
+      () => ({
+        title: "Client Manager",
+        description:
+          "Manage machine-to-machine authentication for your capstone system.",
+        badgeText: "Dev Portal",
+        badgeIcon: <Lock className="h-3.5 w-3.5" />,
+        headerActions: (
+          <div className="group relative">
+            <button
+              onClick={() => setShowCreateModal(true)}
+              disabled={clients.some((c) => c.isActive)}
+              className={cn(
+                "btn-primary flex items-center gap-2 px-6",
+                "py-3 transition-all disabled:cursor-not-allowed",
+                "disabled:opacity-50",
+              )}
+            >
+              <Plus
+                size={20}
+                strokeWidth={3}
+              />
+              <span>Create New Client</span>
+            </button>
+            {clients.some((c) => c.isActive) && (
+              <div
+                className={cn(
+                  "pointer-events-none absolute right-0 top-full",
+                  "z-50 mt-2 w-64 rounded-xl border border-border",
+                  "bg-card p-3 opacity-0 shadow-xl transition-opacity",
+                  "group-hover:opacity-100",
+                )}
+              >
+                <p
+                  className={cn(
+                    "text-[10px] font-bold leading-relaxed",
+                    "text-amber-500",
+                  )}
+                >
+                  Restriction: You already have an active client. Revoke it to
+                  create a new one.
+                </p>
+              </div>
+            )}
           </div>
-        )}
-      </div>
+        ),
+      }),
+      [clients],
     ),
-  });
+  );
 
   const fetchClients = async () => {
     try {
@@ -186,14 +209,32 @@ const M2MManagement: React.FC = () => {
       )}
 
       {loading ? (
-        <div className="flex h-96 flex-col items-center justify-center space-y-4">
-          <Loader2
-            className="animate-spin text-primary"
-            size={48}
-          />
-          <p className="animate-pulse text-xs font-bold uppercase text-muted-foreground">
-            Retrieving secured clients...
-          </p>
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-2 xl:grid-cols-3">
+          {[1, 2, 3].map((i) => (
+            <div
+              key={i}
+              className={cn(
+                "glass-card flex flex-col rounded-xl",
+                "border border-glass-border p-6 space-y-6",
+              )}
+            >
+              <div className="flex items-start justify-between">
+                <Skeleton className="h-14 w-14 rounded-lg bg-muted/60" />
+                <Skeleton className="h-8 w-8 rounded-lg bg-muted/60" />
+              </div>
+              <div className="space-y-3">
+                <Skeleton className="h-6 w-3/4 bg-muted/60" />
+                <Skeleton className="h-4 w-5/6 bg-muted/60" />
+              </div>
+              <div className="space-y-2 pt-2">
+                <Skeleton className="h-3 w-16 bg-muted/60" />
+                <Skeleton className="h-10 w-full rounded-lg bg-muted/60" />
+              </div>
+              <div className="pt-2">
+                <Skeleton className="h-8 w-32 rounded-lg bg-muted/60" />
+              </div>
+            </div>
+          ))}
         </div>
       ) : clients.length === 0 ? (
         <div className="glass-card group relative flex flex-col items-center justify-center space-y-6 overflow-hidden p-24 text-center">
@@ -266,7 +307,11 @@ const M2MManagement: React.FC = () => {
                     </label>
                     <div className="group/item flex items-center gap-3 rounded-lg border border-border bg-muted/50 p-3 pr-4 shadow-inner">
                       <code className="flex-1 truncate font-mono text-xs font-bold tracking-tight text-foreground">
-                        {client.clientId}
+                        {client.isVerified ? (
+                          client.clientId
+                        ) : (
+                          <span className="italic">••••••••••••</span>
+                        )}
                       </code>
                       <button
                         onClick={() =>

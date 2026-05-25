@@ -92,15 +92,26 @@ export default function NotificationModal({
     const nType = (notif.type || "").toLowerCase();
 
     if (nType.includes("appointment")) {
-      url = role === "admin" && notif.targetId 
-        ? `/admin/appointments/${notif.targetId}`
-        : `/${role}/appointments`;
+      url =
+        role === "admin" && notif.targetId
+          ? `/admin/appointments/${notif.targetId}`
+          : `/${role}/appointments`;
     } else if (nType.includes("slip")) {
-      url = role === "admin" && notif.targetId
-        ? `/admin/slips/${notif.targetId}`
-        : `/${role}/slips`;
+      url =
+        role === "admin" && notif.targetId
+          ? `/admin/slips/${notif.targetId}`
+          : `/${role}/slips`;
     } else if (nType.includes("user") && role === "admin" && notif.targetId) {
       url = `/admin/student-records/${notif.targetId}`;
+    } else if (
+      nType.includes("system") ||
+      (notif.title || "").toLowerCase().includes("m2m")
+    ) {
+      if (role === "developer") {
+        url = "/developer";
+      } else if (role === "superadmin") {
+        url = "/superadmin/m2m-management";
+      }
     }
 
     if (url) {
@@ -115,6 +126,7 @@ export default function NotificationModal({
       onOpenChange={setShowNotifications}
     >
       <ResponsiveModalContent
+        hasCloseButton={false}
         className={cn(
           "flex h-[85vh] w-full flex-col overflow-hidden border-border",
           "bg-card p-0 shadow-2xl outline-none sm:h-[75vh]",

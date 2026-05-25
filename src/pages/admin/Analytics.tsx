@@ -203,7 +203,7 @@ export default function AnalyticsPage() {
       "and social profiles",
     badgeText: "Real-time Metrics",
     badgeIcon: pageBadgeIcon,
-    isLoading: loading,
+    isLoading: false,
     headerActions,
   });
 

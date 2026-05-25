@@ -16,6 +16,13 @@ const ACTIVITY_ACTIONS = [
   "APPOINTMENT_UPDATED",
   "SLIP_CREATED",
   "SLIP_STATUS_UPDATED",
+  "NOTE_CREATED",
+  "NOTE_UPDATED",
+  "NOTE_DELETED",
+  "IIR_CREATED",
+  "IIR_UPDATED",
+  "IIR_DELETED",
+  "IIR_SUBMITTED",
 ];
 
 export default function UserActivity() {

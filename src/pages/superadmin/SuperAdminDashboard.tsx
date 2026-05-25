@@ -253,7 +253,7 @@ export default function SuperAdminDashboard() {
           </div>
           <Button
             size="sm"
-            variant="outline"
+            variant="ghost"
             className={cn(
               "border-amber-500/20 text-amber-600",
               "hover:bg-amber-500/20 hover:text-amber-700 sm:w-auto",
