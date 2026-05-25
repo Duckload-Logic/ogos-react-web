@@ -1,5 +1,5 @@
 import { asText, formatCurrency, getOptionLabel } from "../../utils";
-import { formatDate } from "@/features/schedules/utils/formatters";
+import { formatDate } from "@/utils/dateTime";
 import {
   BadgeInfo,
   Briefcase,
@@ -126,7 +126,7 @@ export default function FamilyView({
                     </p>
                     <p
                       className={cn(
-                        "mt-1 text-[10px] uppercase tracking-wide",
+                        "mt-1 text-[10px] uppercase",
                         "text-muted-foreground",
                       )}
                     >

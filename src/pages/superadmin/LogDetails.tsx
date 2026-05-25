@@ -108,17 +108,6 @@ export default function LogDetails() {
 
   return (
     <div className="mx-auto w-full max-w-[1700px] space-y-6">
-      <div className="flex items-center justify-between">
-        <Button
-          onClick={() => navigate(-1)}
-          variant="outline"
-          className="flex items-center gap-1.5 rounded-xl"
-        >
-          <ArrowLeft className="h-4 w-4" />
-          Back to Logs
-        </Button>
-      </div>
-
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Main Details Section */}
         <div className="space-y-6 lg:col-span-2">

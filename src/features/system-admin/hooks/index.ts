@@ -67,6 +67,21 @@ export function useVerifyM2MClient() {
   });
 }
 
+export function useRejectM2MClient() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (id: number) => superadminService.rejectM2MClient(id),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.superadmin.m2mClients(false),
+      });
+      queryClient.invalidateQueries({
+        queryKey: QUERY_KEYS.superadmin.m2mClients(true),
+      });
+    },
+  });
+}
+
 // User Management hooks
 export function useUsers(params?: ListUsersParams) {
   return useQuery({

@@ -82,7 +82,7 @@ export function SectionProgress({
     sections.find((s) => s.id === currentSection) || sections[0];
 
   return (
-    <div className="mb-6 select-none">
+    <div className="select-none">
       <div className="w-full">
         {/* === Mobile View === */}
         <div className="relative py-2 md:hidden">

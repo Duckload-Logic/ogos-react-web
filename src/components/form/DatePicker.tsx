@@ -43,6 +43,11 @@ export function DatePicker({
     return undefined;
   }, [value]);
 
+  const dateStringValue = React.useMemo(() => {
+    if (!dateValue) return "";
+    return format(dateValue, "yyyy-MM-dd");
+  }, [dateValue]);
+
   const [open, setOpen] = React.useState(false);
 
   const handleSelect = (date: Date | undefined) => {
@@ -56,22 +61,30 @@ export function DatePicker({
   };
 
   const id = React.useId();
+  const safeId = id.replace(/:/g, "-");
 
-  const inputClasses = `
-    w-full justify-start text-left flex items-center gap-2 rounded-xl border px-4 py-2.5 outline-none transition-all duration-200
-    text-sm font-medium tracking-tight text-foreground placeholder:text-muted-foreground/70
-    ${
-      disabled
-        ? "bg-muted/80 border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-60"
-        : dateValue
-          ? "bg-muted/20 border-primary/30 focus:bg-glass-bg dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm"
-          : required
-            ? "bg-muted/60 dark:bg-muted/20 border-border hover:border-destructive/40 focus:border-destructive/50 focus:ring-2 focus:ring-destructive/5"
-            : "bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
-    }
-    h-11
-    ${error ? "border-red-500 focus-visible:ring-red-500" : ""}
-  `;
+  const inputClasses = cn(
+    "w-full justify-start text-left flex items-center gap-2",
+    "rounded-xl border px-4 py-2.5 outline-none transition-all",
+    "duration-200 text-sm font-medium tracking-tight text-foreground",
+    "placeholder:text-muted-foreground/70 h-11",
+    disabled
+      ? "bg-muted/80 border-glass-border/20 text-muted-foreground " +
+        "cursor-not-allowed opacity-60"
+      : dateValue
+        ? "bg-muted/20 border-primary/30 focus:bg-glass-bg " +
+          "dark:focus:bg-glass-bg/50 focus:border-primary/50 " +
+          "focus:ring-2 focus:ring-primary/5 shadow-sm"
+        : required
+          ? "bg-muted/60 dark:bg-muted/20 border-border " +
+            "hover:border-destructive/40 focus:border-destructive/50 " +
+            "focus:ring-2 focus:ring-destructive/5"
+          : "bg-muted/60 dark:bg-muted/20 border-border " +
+            "hover:border-glass-border/60 focus:bg-glass-bg " +
+            "dark:focus:bg-glass-bg/40 focus:border-primary/50 " +
+            "focus:ring-2 focus:ring-primary/5",
+    error ? "border-red-500 focus-visible:ring-red-500" : "",
+  );
 
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
@@ -88,34 +101,85 @@ export function DatePicker({
           {required && <span className="text-red-500">*</span>}
         </div>
       )}
-      <Popover open={open} onOpenChange={handleOpenChange}>
-        <PopoverTrigger asChild>
-          <Button
-            id={id}
-            variant="ghost"
-            className={cn(inputClasses, !dateValue && "text-muted-foreground/70 font-normal")}
-            disabled={disabled}
+
+      {/* Mobile view native date picker */}
+      <div className="sm:hidden relative w-full">
+        <style>{`
+          #${safeId}-mobile::-webkit-calendar-picker-indicator {
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            padding: 0;
+            opacity: 0;
+            cursor: pointer;
+          }
+        `}</style>
+        <input
+          type="date"
+          id={`${safeId}-mobile`}
+          value={dateStringValue}
+          onChange={(e) => onChange(e.target.value)}
+          onBlur={onBlur}
+          disabled={disabled}
+          className={cn(
+            inputClasses,
+            "bg-background pr-10 text-left",
+            !value && "text-muted-foreground/70",
+          )}
+        />
+        <CalendarIcon
+          className={cn(
+            "absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4",
+            "text-muted-foreground pointer-events-none",
+          )}
+        />
+      </div>
+
+      {/* Desktop view Popover calendar */}
+      <div className="hidden sm:block w-full">
+        <Popover open={open} onOpenChange={handleOpenChange}>
+          <PopoverTrigger asChild>
+            <Button
+              id={`${safeId}-desktop`}
+              variant="ghost"
+              className={cn(
+                inputClasses,
+                !dateValue && "text-muted-foreground/70 font-normal",
+              )}
+              disabled={disabled}
+            >
+              <CalendarIcon className="h-4 w-4 shrink-0" />
+              <span className="flex-1 text-left truncate">
+                {dateValue ? format(dateValue, "PPP") : "Select a date"}
+              </span>
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent
+            className="w-[300px] p-0 bg-background rounded-xl"
+            align="start"
           >
-            <CalendarIcon className="h-4 w-4 shrink-0" />
-            <span className="flex-1 text-left truncate">
-              {dateValue ? format(dateValue, "PPP") : "Select a date"}
-            </span>
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[300px] p-0 bg-background rounded-xl" align="start">
-          <Calendar
-            mode="single"
-            selected={dateValue}
-            defaultMonth={dateValue}
-            onSelect={handleSelect}
-            initialFocus
-            captionLayout="dropdown"
-            fromYear={1900}
-            toYear={new Date().getFullYear()}
-          />
-        </PopoverContent>
-      </Popover>
-      {error && <span className="text-xs text-red-500 mt-1.5 ml-1 block">{error}</span>}
+            <Calendar
+              mode="single"
+              selected={dateValue}
+              defaultMonth={dateValue}
+              onSelect={handleSelect}
+              initialFocus
+              captionLayout="dropdown"
+              fromYear={1900}
+              toYear={new Date().getFullYear()}
+            />
+          </PopoverContent>
+        </Popover>
+      </div>
+
+      {error && (
+        <span className="text-xs text-red-500 mt-1.5 ml-1 block">
+          {error}
+        </span>
+      )}
     </div>
   );
 }

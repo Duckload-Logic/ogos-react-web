@@ -7,7 +7,7 @@ import {
   XCircle,
 } from "lucide-react";
 import { asText } from "../../utils";
-import { formatDate } from "@/features/schedules/utils/formatters";
+import { formatDate } from "@/utils/dateTime";
 import EmptyState from "./EmptyState";
 import InfoItem from "./InfoItem";
 import SectionTitle from "./SectionTitle";

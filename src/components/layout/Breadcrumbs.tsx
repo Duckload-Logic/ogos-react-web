@@ -3,6 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import { ChevronRight, Home } from "lucide-react";
 import BackNav from "./BackNav";
 import { cn } from "@/lib/utils";
+import { useIsMobile } from "@/hooks/useIsMobile";
 
 const PATH_LABELS: Record<string, string> = {
   home: "Dashboard",
@@ -31,6 +32,7 @@ interface BreadcrumbItem {
 
 export default function Breadcrumbs() {
   const location = useLocation();
+  const isMobile = useIsMobile();
   const pathnames = location.pathname.split("/").filter((x) => x);
 
   // Don't show breadcrumbs on main dashboard pages
@@ -71,8 +73,9 @@ export default function Breadcrumbs() {
       const prevValue = i > 0 ? pathnames[i - 1] : "";
       const isPrevId =
         prevValue &&
-        (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-          .test(prevValue) ||
+        (/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(
+          prevValue,
+        ) ||
           /^\d+$/.test(prevValue));
 
       if (isPrevId) {
@@ -86,7 +89,14 @@ export default function Breadcrumbs() {
     }
   }
 
-  const parentPath = items.length > 1 ? items[items.length - 2].to : "/";
+  const role = pathnames[0];
+  const rootPath = ["admin", "student", "superadmin", "developer"].includes(
+    role,
+  )
+    ? `/${role}`
+    : "/";
+
+  const parentPath = items.length > 1 ? items[items.length - 2].to : rootPath;
 
   return (
     <nav
@@ -121,44 +131,44 @@ export default function Breadcrumbs() {
             <span className="xs:inline hidden">Home</span>
           </Link>
         </li>
+        {!isMobile &&
+          items.map((item, index) => {
+            const last = index === items.length - 1;
 
-        {items.map((item, index) => {
-          const last = index === items.length - 1;
-
-          return (
-            <React.Fragment key={item.to}>
-              <li className="flex items-center text-muted-foreground/50">
-                <ChevronRight
-                  size={14}
-                  strokeWidth={3}
-                />
-              </li>
-              <li className="flex items-center">
-                {last ? (
-                  <span
-                    className={cn(
-                      "max-w-[150px] truncate font-semibold",
-                      "text-foreground sm:max-w-[250px]",
-                    )}
-                  >
-                    {item.label}
-                  </span>
-                ) : (
-                  <Link
-                    to={item.to}
-                    className={cn(
-                      "max-w-[100px] truncate text-muted-foreground",
-                      "transition-colors hover:text-primary",
-                      "sm:max-w-[150px]",
-                    )}
-                  >
-                    {item.label}
-                  </Link>
-                )}
-              </li>
-            </React.Fragment>
-          );
-        })}
+            return (
+              <React.Fragment key={item.to}>
+                <li className="flex items-center text-muted-foreground/50">
+                  <ChevronRight
+                    size={14}
+                    strokeWidth={3}
+                  />
+                </li>
+                <li className="flex items-center">
+                  {last ? (
+                    <span
+                      className={cn(
+                        "max-w-[150px] truncate font-semibold",
+                        "text-foreground sm:max-w-[250px]",
+                      )}
+                    >
+                      {item.label}
+                    </span>
+                  ) : (
+                    <Link
+                      to={item.to}
+                      className={cn(
+                        "max-w-[100px] truncate text-muted-foreground",
+                        "transition-colors hover:text-primary",
+                        "sm:max-w-[150px]",
+                      )}
+                    >
+                      {item.label}
+                    </Link>
+                  )}
+                </li>
+              </React.Fragment>
+            );
+          })}
       </ol>
     </nav>
   );

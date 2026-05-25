@@ -27,6 +27,7 @@ import {
 import { usePageMetadata } from "@/context";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   useAdminAnalytics,
   useUsers,
@@ -174,17 +175,63 @@ export default function AnalyticsOverview() {
 
   if (isLoading) {
     return (
-      <div className="flex h-[400px] w-full items-center justify-center">
-        <div className="flex flex-col items-center gap-4">
-          <div
-            className={
-              "h-12 w-12 animate-spin rounded-full border-4 " +
-              "border-primary border-t-transparent"
-            }
-          />
-          <p className="animate-pulse text-sm text-muted-foreground">
-            Aggregating system intelligence...
-          </p>
+      <div className="mx-auto w-full max-w-[1700px] space-y-6">
+        {/* Metrics Grid Skeleton */}
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+          {Array.from({ length: 5 }).map((_, i) => (
+            <Card key={i}>
+              <CardContent className="p-6 space-y-4">
+                <Skeleton className="h-10 w-10 rounded-2xl bg-muted/60" />
+                <div className="space-y-2">
+                  <Skeleton className="h-3 w-24 bg-muted/60" />
+                  <Skeleton className="h-8 w-16 bg-muted/60" />
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+
+        {/* Big Chart Skeleton */}
+        <Card className="min-h-[450px]">
+          <CardHeader className="pb-8">
+            <div className="flex items-center justify-between">
+              <Skeleton className="h-8 w-48 bg-muted/60" />
+              <Skeleton className="h-9 w-64 rounded-xl bg-muted/60" />
+            </div>
+          </CardHeader>
+          <CardContent className="flex items-center justify-center h-[320px]">
+            <Skeleton className="h-full w-full rounded-xl bg-muted/60" />
+          </CardContent>
+        </Card>
+
+        {/* Bottom Rows Skeleton */}
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <Card className="lg:col-span-2 min-h-[420px]">
+            <CardHeader className="space-y-2">
+              <Skeleton className="h-6 w-36 bg-muted/60" />
+              <Skeleton className="h-4 w-48 bg-muted/60" />
+            </CardHeader>
+            <CardContent className="h-80">
+              <Skeleton className="h-full w-full rounded-xl bg-muted/60" />
+            </CardContent>
+          </Card>
+
+          <Card className="min-h-[420px]">
+            <CardHeader>
+              <Skeleton className="h-6 w-40 bg-muted/60" />
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <Skeleton className="h-4 w-32 bg-muted/60" />
+              <div className="space-y-2">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <Skeleton
+                    key={i}
+                    className="h-12 w-full rounded-xl bg-muted/60"
+                  />
+                ))}
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     );

@@ -269,7 +269,7 @@ export const HealthSection = forwardRef<
               <div
                 key={idx}
                 className={cn(
-                  "bg-glass-bg/60 relative overflow-hidden rounded-[24px]",
+                  "bg-glass-bg/60 relative overflow-hidden rounded-xl",
                   "border p-5 backdrop-blur-glass transition-all",
                   "duration-300 sm:p-8",
                   item.yesValue === true
@@ -382,7 +382,7 @@ export const HealthSection = forwardRef<
               <div
                 key={idx}
                 className={cn(
-                  "bg-glass-bg/60 relative overflow-hidden rounded-[24px]",
+                  "bg-glass-bg/60 relative overflow-hidden rounded-xl",
                   "border p-5 backdrop-blur-glass transition-all",
                   "duration-300 sm:p-8",
                   type.consulted === true

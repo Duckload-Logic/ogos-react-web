@@ -42,6 +42,7 @@ export default function CORManagement() {
   const [dragActive, setDragActive] = useState(false);
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+  const [activeTab, setActiveTab] = useState<"upload" | "preview">("upload");
 
   usePageMetadata(
     useMemo(() => {
@@ -110,6 +111,8 @@ export default function CORManagement() {
     if (!selectedFile) return;
 
     setIsUploading(true);
+    // setShowConfirm(false);
+
     try {
       const validation = await validateCorFile(selectedFile);
 
@@ -119,11 +122,11 @@ export default function CORManagement() {
         return;
       }
 
+      setShowConfirm(false);
       await UploadCOR(selectedFile);
       await refresh();
       setSelectedFile(null);
       triggerToast("COR uploaded and validated successfully!");
-      setShowConfirm(false);
     } catch (error: any) {
       const errMsg = getErrorMessage(error);
       triggerToast(errMsg);
@@ -137,31 +140,100 @@ export default function CORManagement() {
   const isPdf = corUrl?.toLowerCase().endsWith(".pdf");
 
   return (
-    <div className="animate-in fade-in slide-in-from-bottom-4 mx-auto w-full max-w-[1400px] space-y-8 pb-12 duration-700">
+    <div
+      className={cn(
+        "animate-in fade-in slide-in-from-bottom-4 duration-700",
+        "w- mx-auto space-y-6 pb-12",
+        "px-4 sm:px-6 md:px-8",
+      )}
+    >
+      {/* Mobile Glassmorphic Tab Switcher */}
+      <div
+        className={cn(
+          "flex rounded-xl bg-muted/60 p-1 backdrop-blur-md",
+          "border border-border dark:bg-muted/20 lg:hidden",
+        )}
+      >
+        <button
+          onClick={() => setActiveTab("upload")}
+          className={cn(
+            "flex-1 rounded-lg py-2 text-sm font-semibold transition-all",
+            activeTab === "upload"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          Upload Document
+        </button>
+        <button
+          onClick={() => setActiveTab("preview")}
+          className={cn(
+            "flex-1 rounded-lg py-2 text-sm font-semibold transition-all",
+            activeTab === "preview"
+              ? "bg-background text-foreground shadow-sm"
+              : "text-muted-foreground hover:text-foreground",
+          )}
+        >
+          Document Preview
+        </button>
+      </div>
+
       <div className="grid grid-cols-1 gap-8 lg:grid-cols-3">
         {/* Left: Preview Section */}
-        <div className="space-y-6 lg:col-span-2">
-          <Card className="flex h-[750px] flex-col overflow-hidden rounded-[32px] border-white/20 bg-white/45 shadow-2xl backdrop-blur-xl dark:bg-white/[0.04]">
-            <CardHeader className="shrink-0 border-b border-border/10 bg-white/20 p-8 dark:bg-white/[0.02]">
-              <div className="flex items-center justify-between">
+        <div
+          className={cn(
+            "space-y-6 lg:col-span-2",
+            activeTab === "preview" ? "block" : "hidden lg:block",
+          )}
+        >
+          <Card
+            className={cn(
+              "flex h-[400px] flex-col overflow-hidden rounded-xl",
+              "border-border bg-card shadow-md backdrop-blur-md",
+              "dark:bg-card/45 sm:h-[750px]",
+            )}
+          >
+            <CardHeader
+              className={cn(
+                "shrink-0 border-b border-border/10 bg-muted/30 p-5",
+                "dark:bg-muted/10 sm:p-8",
+              )}
+            >
+              <div
+                className={cn(
+                  "flex flex-col gap-4",
+                  "sm:flex-row sm:items-center sm:justify-between",
+                )}
+              >
                 <div className="flex items-center gap-4">
-                  <div className="rounded-2xl bg-primary/10 p-3 text-primary">
-                    <Eye size={24} />
+                  <div className="rounded-2xl bg-primary/10 p-2 text-primary sm:p-3">
+                    <Eye className="h-5 w-5 sm:h-6 sm:w-6" />
                   </div>
                   <div>
-                    <div className="flex items-center gap-3">
-                      <CardTitle className="text-2xl font-bold">
+                    <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                      <CardTitle
+                        className={cn("text-xl font-bold sm:text-2xl")}
+                      >
                         Document Preview
                       </CardTitle>
                       {corUrl &&
                         (user?.isStudentCorValid ? (
-                          <Badge className="flex items-center gap-1 rounded-full bg-emerald-500 px-3 py-1 text-xs font-semibold text-white hover:bg-emerald-600">
+                          <Badge
+                            className={cn(
+                              "flex items-center gap-1 rounded-full",
+                              "bg-emerald-500 px-3 py-1 text-xs",
+                              "font-semibold text-white hover:bg-emerald-600",
+                            )}
+                          >
                             <CheckCircle2 size={12} /> Valid COR
                           </Badge>
                         ) : (
                           <Badge
                             variant="destructive"
-                            className="flex items-center gap-1 rounded-full px-3 py-1 text-xs font-semibold"
+                            className={cn(
+                              "flex items-center gap-1 rounded-full",
+                              "px-3 py-1 text-xs font-semibold",
+                            )}
                           >
                             <AlertCircle size={12} /> Outdated COR
                           </Badge>
@@ -175,11 +247,13 @@ export default function CORManagement() {
                 {corUrl && (
                   <Button
                     variant="outline"
-                    className="gap-2 rounded-xl"
+                    className="w-full justify-center gap-2 rounded-xl sm:w-auto"
                     asChild
                   >
                     <a
-                      href={`${import.meta.env.VITE_API_BASE_URL}${corUrl}`}
+                      href={
+                        `${import.meta.env.VITE_API_BASE_URL}` + `${corUrl}`
+                      }
                       target="_blank"
                       rel="noreferrer"
                     >
@@ -189,11 +263,16 @@ export default function CORManagement() {
                 )}
               </div>
             </CardHeader>
-            <CardContent className="relative flex-1 overflow-hidden bg-muted/30 p-0">
+            <CardContent
+              className={cn("relative flex-1 overflow-hidden bg-muted/30 p-0")}
+            >
               {corUrl ? (
                 isPdf ? (
                   <iframe
-                    src={`${import.meta.env.VITE_API_BASE_URL}${corUrl}#toolbar=0`}
+                    src={
+                      `${import.meta.env.VITE_API_BASE_URL}` +
+                      `${corUrl}#toolbar=0`
+                    }
                     className="h-full w-full border-none"
                     title="COR PDF Preview"
                   />
@@ -228,10 +307,20 @@ export default function CORManagement() {
         </div>
 
         {/* Right: Upload and Info Section */}
-        <div className="space-y-8">
+        <div
+          className={cn(
+            "space-y-8",
+            activeTab === "upload" ? "block" : "hidden lg:block",
+          )}
+        >
           {/* Upload Card */}
-          <Card className="overflow-hidden rounded-[32px] border-primary/20 bg-gradient-to-br from-primary/5 to-blue-500/5 shadow-xl">
-            <CardHeader className="p-8 pb-0">
+          <Card
+            className={cn(
+              "overflow-hidden rounded-xl border-primary/20",
+              "bg-gradient-to-br from-primary/5 to-blue-500/5 shadow-md",
+            )}
+          >
+            <CardHeader className="p-5 pb-0 sm:p-8">
               <CardTitle className="flex items-center gap-2 text-xl font-bold">
                 <Upload
                   size={20}
@@ -243,10 +332,12 @@ export default function CORManagement() {
                 Provide a scanned copy or clear photo of your latest COR.
               </CardDescription>
             </CardHeader>
-            <CardContent className="space-y-6 p-8">
+            <CardContent className="space-y-6 p-5 sm:p-8">
               <div
                 className={cn(
-                  "group relative cursor-pointer rounded-[24px] border-2 border-dashed p-10 text-center transition-all duration-300",
+                  "group relative cursor-pointer rounded-xl border-2",
+                  "border-dashed p-6 text-center sm:p-10",
+                  "transition-all duration-300",
                   dragActive
                     ? "scale-95 border-primary bg-primary/10"
                     : "border-border/30 hover:border-primary/50 hover:bg-primary/5",
@@ -298,8 +389,8 @@ export default function CORManagement() {
                       <div className="space-y-1">
                         <p className="font-bold">Click or drag file here</p>
                         <p className="text-xs text-muted-foreground">
-                          PDF, JPG, or PNG (Max 5MB). Filename should include
-                          "COR" or "Certificate of Registration".
+                          PDF (Max 5MB). Filename should include "COR" or
+                          "Certificate of Registration".
                         </p>
                       </div>
                     </motion.div>
@@ -330,7 +421,7 @@ export default function CORManagement() {
                     ) : (
                       <ShieldCheck className="mr-2 h-4 w-4" />
                     )}
-                    Confirm Upload
+                    Upload
                   </Button>
                 </div>
               )}
@@ -338,8 +429,13 @@ export default function CORManagement() {
           </Card>
 
           {/* Guidelines Card */}
-          <Card className="rounded-[32px] border-white/20 bg-white/45 shadow-xl backdrop-blur-xl dark:bg-white/[0.04]">
-            <CardHeader className="p-8">
+          <Card
+            className={cn(
+              "rounded-xl border-border bg-card",
+              "shadow-md backdrop-blur-md dark:bg-card/45",
+            )}
+          >
+            <CardHeader className="my-0 mb-0 space-y-0 p-0 sm:p-8">
               <CardTitle className="flex items-center gap-2 text-lg font-bold">
                 <AlertCircle
                   size={20}
@@ -348,13 +444,13 @@ export default function CORManagement() {
                 Upload Guidelines
               </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4 p-8 pt-0">
+            <CardContent className="space-y-0 p-5 pt-0 sm:p-8">
               <ul className="space-y-3 text-sm font-medium text-muted-foreground">
                 <li className="flex items-start gap-3">
                   <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                   <span>
-                    The file name must contain the words "COR" or "Certificate
-                    of Registration"
+                    The file name must contain the words "Registration
+                    Certificate", "COR" or "Certificate of Registration"
                   </span>
                 </li>
                 <li className="flex items-start gap-3">
@@ -380,8 +476,15 @@ export default function CORManagement() {
                 <li className="flex items-start gap-3">
                   <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-primary" />
                   <span>
-                    For PDF files, please ensure they are not password
-                    protected.
+                    The system will only accept the Registration Certificate
+                    generated in{" "}
+                    <a
+                      href="https://sis8.pup.edu.ph/student"
+                      className="offset-4 underline hover:no-underline"
+                      target="_blank"
+                    >
+                      PUP-SIS
+                    </a>
                   </span>
                 </li>
               </ul>
@@ -394,7 +497,7 @@ export default function CORManagement() {
         open={showConfirm}
         onOpenChange={setShowConfirm}
       >
-        <AlertDialogContent className="rounded-2xl backdrop-blur-xl dark:bg-slate-900/80">
+        <AlertDialogContent className="rounded-xl bg-card shadow-md">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-xl font-bold">
               Confirm COR Upload
@@ -418,7 +521,10 @@ export default function CORManagement() {
                 e.preventDefault();
                 handleUpload();
               }}
-              className="rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:bg-primary/95"
+              className={cn(
+                "rounded-xl bg-primary text-primary-foreground",
+                "shadow-lg shadow-primary/20 hover:bg-primary/95",
+              )}
             >
               {isUploading ? "Uploading..." : "Upload COR"}
             </AlertDialogAction>
@@ -432,9 +538,18 @@ export default function CORManagement() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-[100] flex flex-col items-center justify-center bg-background/30 backdrop-blur-md"
+            className={cn(
+              "fixed inset-0 z-[100] flex flex-col items-center",
+              "justify-center bg-slate-950/40 shadow-md",
+            )}
           >
-            <div className="flex flex-col items-center gap-4 rounded-3xl border border-white/25 bg-white/45 p-10 shadow-2xl backdrop-blur-2xl dark:border-white/10 dark:bg-white/[0.045]">
+            <div
+              className={cn(
+                "flex w-[calc(100%-2rem)] max-w-sm flex-col items-center",
+                "gap-4 rounded-xl border border-border bg-card p-6",
+                "shadow-2xl backdrop-blur-2xl sm:p-10",
+              )}
+            >
               <div className="relative">
                 <RefreshCw
                   size={48}

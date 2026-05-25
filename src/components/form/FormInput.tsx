@@ -131,21 +131,33 @@ const FormInput = forwardRef<
       }
     };
 
-    const inputClasses = `
-      w-full rounded-xl border px-4 py-2.5 outline-none transition-all duration-200
-      text-sm font-medium tracking-tight text-foreground placeholder:text-muted-foreground/70
-      ${
-        disabled
-          ? "bg-muted border-glass-border/20 text-muted-foreground cursor-not-allowed opacity-90"
-          : value !== undefined && value !== null && value !== ""
-            ? "bg-muted/20 border-primary/30 focus:bg-glass-bg dark:focus:bg-glass-bg/50 focus:border-primary/50 focus:ring-2 focus:ring-primary/5 shadow-sm"
-            : required
-              ? "bg-muted/60 dark:bg-muted/20 border-border hover:border-destructive/40 focus:border-destructive/50 focus:ring-2 focus:ring-destructive/5"
-              : "bg-muted/60 dark:bg-muted/20 border-border hover:border-glass-border/60 focus:bg-glass-bg dark:focus:bg-glass-bg/40 focus:border-primary/50 focus:ring-2 focus:ring-primary/5"
-      }
-      ${isTextarea ? "min-h-[100px] py-3 resize-none" : "h-11"}
-      ${isListening ? "border-primary ring-2 ring-primary/10" : ""}
-    `;
+    const inputClasses = cn(
+      "w-full rounded-xl border px-4 py-2.5 outline-none transition-all",
+      "duration-200 text-sm font-medium tracking-tight text-foreground",
+      "placeholder:text-muted-foreground/70",
+      disabled
+        ? "bg-muted border-glass-border/20 text-muted-foreground " +
+            "cursor-not-allowed opacity-90"
+        : value !== undefined && value !== null && value !== ""
+          ? "bg-muted/20 border-primary/30 focus:bg-glass-bg " +
+            "dark:focus:bg-glass-bg/50 focus:border-primary/50 " +
+            "focus:ring-2 focus:ring-primary/5 shadow-sm"
+          : required
+            ? "bg-muted/60 dark:bg-muted/20 border-border " +
+              "hover:border-destructive/40 focus:border-destructive/50 " +
+              "focus:ring-2 focus:ring-destructive/5"
+            : "bg-muted/60 dark:bg-muted/20 border-border " +
+              "hover:border-glass-border/60 focus:bg-glass-bg " +
+              "dark:focus:bg-glass-bg/40 focus:border-primary/50 " +
+              "focus:ring-2 focus:ring-primary/5",
+      isTextarea
+        ? cn(
+            "min-h-[100px] pt-3 pr-4 resize-none",
+            browserSupportsSpeechRecognition && !disabled ? "pb-12" : "pb-3",
+          )
+        : "h-11",
+      isListening ? "border-primary ring-2 ring-primary/10" : "",
+    );
 
     return (
       <div className={`space-y-2 ${className}`}>
@@ -200,23 +212,25 @@ const FormInput = forwardRef<
               />
             )}
 
-            <div className="bottom-4 right-2 z-10 block flex items-center gap-2">
-              {isTextarea && browserSupportsSpeechRecognition && !disabled && (
+            {isTextarea && browserSupportsSpeechRecognition && !disabled && (
+              <div className="absolute bottom-4 right-2 z-10">
                 <button
                   type="button"
                   onClick={handleMicToggle}
                   title={isListening ? "Stop Dictation" : "Start Dictation"}
-                  className={`flex h-10 w-10 items-center justify-center rounded-lg p-0 shadow-sm transition-all ${
+                  className={cn(
+                    "flex h-9 w-9 items-center justify-center rounded-lg p-0",
+                    "transition-all",
                     isListening
                       ? "animate-pulse bg-primary text-white ring-4 ring-primary/20"
-                      : "bg-transparent text-muted-foreground hover:bg-primary/10 " +
-                        "border border-border/50 hover:text-primary"
-                  }`}
+                      : "bg-glass-bg text-muted-foreground hover:bg-primary/10 " +
+                          "hover:text-primary",
+                  )}
                 >
                   {isListening ? <MicOff size={15} /> : <Mic size={15} />}
                 </button>
-              )}
-            </div>
+              </div>
+            )}
           </div>
         </div>
         {(error || internalError) && (

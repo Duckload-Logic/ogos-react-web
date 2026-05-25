@@ -112,8 +112,7 @@ const checkActivitiesAndRoles = (interests: any): FormErrors => {
 
   const activities = interests?.activities || [];
   const academicOthers = activities.find(
-    (a: any) =>
-      isAcademicActivity(a) && isOtherName(a.activityOption?.name),
+    (a: any) => isAcademicActivity(a) && isOtherName(a.activityOption?.name),
   );
   if (academicOthers) {
     const spec = (academicOthers.otherSpecification || "").trim();
@@ -124,8 +123,7 @@ const checkActivitiesAndRoles = (interests: any): FormErrors => {
   }
 
   const extraOthers = activities.find(
-    (a: any) =>
-      !isAcademicActivity(a) && isOtherName(a.activityOption?.name),
+    (a: any) => !isAcademicActivity(a) && isOtherName(a.activityOption?.name),
   );
   if (extraOthers) {
     const spec = (extraOthers.otherSpecification || "").trim();
@@ -135,9 +133,7 @@ const checkActivitiesAndRoles = (interests: any): FormErrors => {
     }
   }
 
-  const hasOrgsSelected = activities.some(
-    (a: any) => !isAcademicActivity(a),
-  );
+  const hasOrgsSelected = activities.some((a: any) => !isAcademicActivity(a));
 
   if (hasOrgsSelected) {
     const tempRole = (interests?._tempRole || "").trim();
@@ -217,9 +213,7 @@ export const InterestsSection = forwardRef<
                   (act: any) =>
                     act.activityOption.id !== a.activityOption.id &&
                     (act.activityOption.category === "extra_curricular" ||
-                      EXTRA_CURRICULAR_ORGS.includes(
-                        act.activityOption.name,
-                      )),
+                      EXTRA_CURRICULAR_ORGS.includes(act.activityOption.name)),
                 );
                 if (hasOtherAcademic && !hasOtherExtra) {
                   isAcademic = true;
@@ -370,7 +364,7 @@ export const InterestsSection = forwardRef<
         currentActivities.push({
           activityOption: { ...option, isAcademic },
           otherSpecification: "",
-          role: isAcademic ? "Member" : (interests?._tempRole || ""),
+          role: isAcademic ? "Member" : interests?._tempRole || "",
           roleSpecification:
             !isAcademic && (interests?._tempRole || "").includes("Other")
               ? interests?._tempRoleSpecification || ""
@@ -635,8 +629,8 @@ export const InterestsSection = forwardRef<
 
           <div
             className={cn(
-              "bg-glass-bg/60 border-glass-border/40 relative mb-8",
-              "overflow-hidden rounded-[24px] border p-5 backdrop-blur-glass",
+              "bg-glass-bg/60 relative mb-8 border-glass-border",
+              "overflow-hidden rounded-xl p-5 backdrop-blur-glass",
               "transition-all duration-300 sm:p-8",
             )}
           >
@@ -707,7 +701,7 @@ export const InterestsSection = forwardRef<
           <div className="grid grid-cols-1 gap-6 sm:gap-8 md:grid-cols-2">
             <div
               className={cn(
-                "bg-glass-bg/60 border-glass-border/40 rounded-[24px] border",
+                "bg-glass-bg/60 border-glass-border/40 rounded-xl border",
                 "p-5 shadow-sm backdrop-blur-glass transition-all duration-300",
                 "hover:border-primary/20 sm:p-6",
               )}
@@ -741,7 +735,7 @@ export const InterestsSection = forwardRef<
             </div>
             <div
               className={cn(
-                "bg-glass-bg/60 border-glass-border/40 rounded-[24px] border",
+                "bg-glass-bg/60 border-glass-border/40 rounded-xl border",
                 "p-5 shadow-sm backdrop-blur-glass transition-all duration-300",
                 "hover:border-primary/20 sm:p-6",
               )}
@@ -792,7 +786,7 @@ export const InterestsSection = forwardRef<
             <div
               className={cn(
                 "bg-glass-bg/60 border-glass-border/40 group relative",
-                "overflow-hidden rounded-[24px] border p-6 shadow-sm",
+                "overflow-hidden rounded-xl border p-6 shadow-sm",
                 "backdrop-blur-glass transition-all duration-300 sm:p-8",
                 "lg:col-span-1",
               )}
@@ -863,7 +857,7 @@ export const InterestsSection = forwardRef<
             <div
               className={cn(
                 "bg-glass-bg/60 border-glass-border/40 relative",
-                "overflow-hidden rounded-[24px] border p-6 shadow-sm",
+                "overflow-hidden rounded-xl border p-6 shadow-sm",
                 "backdrop-blur-glass transition-all duration-300 sm:p-8",
                 "lg:col-span-2",
               )}

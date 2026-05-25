@@ -18,14 +18,15 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Pagination } from "@/components/shared";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Pagination, Table, Column } from "@/components/shared";
 import { useDebounce } from "@/hooks/useDebounce";
 import { usePageMetadata } from "@/context";
 import type { SystemLog, SystemLogsParams, SystemLogsResponse } from "../types";
 import type { UseQueryResult } from "@tanstack/react-query";
 import { DatePicker, Dropdown } from "@/components/form";
 import { cn } from "@/lib/utils";
-import { formatDate, truncateText } from "@/utils";
+import { capitalizeWords, formatDate, truncateText } from "@/utils";
 import { useNavigate } from "react-router-dom";
 import { useTraceTracks } from "../hooks";
 import { id } from "zod/v4/locales";
@@ -43,49 +44,90 @@ interface LogsTableProps {
 
 const ACTION_BADGE_COLORS: Record<string, string> = {
   LOGIN_SUCCESS:
-    "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    "border-emerald-500/20 bg-emerald-500/10 " +
+    "text-emerald-700 dark:text-emerald-400",
   LOGIN_FAILED:
-    "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400",
+    "border-red-500/20 bg-red-500/10 " + "text-red-700 dark:text-red-400",
   ACCESS_DENIED:
-    "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400",
+    "border-red-500/20 bg-red-500/10 " + "text-red-700 dark:text-red-400",
   RATE_LIMIT_EXCEEDED:
-    "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+    "border-amber-500/20 bg-amber-500/10 " +
+    "text-amber-700 dark:text-amber-400",
   INVALID_TOKEN:
-    "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400",
+    "border-red-500/20 bg-red-500/10 " + "text-red-700 dark:text-red-400",
   API_KEY_INVALID:
-    "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400",
+    "border-red-500/20 bg-red-500/10 " + "text-red-700 dark:text-red-400",
   LOGOUT:
-    "border-slate-500/20 bg-slate-500/10 text-slate-700 dark:text-slate-400",
+    "border-slate-500/20 bg-slate-500/10 " +
+    "text-slate-700 dark:text-slate-400",
   TOKEN_REFRESHED:
-    "border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+    "border-blue-500/20 bg-blue-500/10 " + "text-blue-700 dark:text-blue-400",
   API_KEY_USED:
-    "border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+    "border-blue-500/20 bg-blue-500/10 " + "text-blue-700 dark:text-blue-400",
   API_KEY_CREATED:
-    "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    "border-emerald-500/20 bg-emerald-500/10 " +
+    "text-emerald-700 dark:text-emerald-400",
   API_KEY_REVOKED:
-    "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400",
+    "border-red-500/20 bg-red-500/10 " + "text-red-700 dark:text-red-400",
   SETTING_CHANGED:
-    "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-400",
+    "border-amber-500/20 bg-amber-500/10 " +
+    "text-amber-700 dark:text-amber-400",
   USER_CREATED:
-    "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    "border-emerald-500/20 bg-emerald-500/10 " +
+    "text-emerald-700 dark:text-emerald-400",
   USER_UPDATED:
-    "border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+    "border-blue-500/20 bg-blue-500/10 " + "text-blue-700 dark:text-blue-400",
   USER_DELETED:
-    "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-400",
+    "border-red-500/20 bg-red-500/10 " + "text-red-700 dark:text-red-400",
   ROLE_CHANGED:
-    "border-purple-500/20 bg-purple-500/10 text-purple-700 dark:text-purple-400",
+    "border-purple-500/20 bg-purple-500/10 " +
+    "text-purple-700 dark:text-purple-400",
   SLIP_CREATED:
-    "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    "border-emerald-500/20 bg-emerald-500/10 " +
+    "text-emerald-700 dark:text-emerald-400",
   SLIP_STATUS_UPDATED:
-    "border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+    "border-blue-500/20 bg-blue-500/10 " + "text-blue-700 dark:text-blue-400",
   APPOINTMENT_CREATED:
-    "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    "border-emerald-500/20 bg-emerald-500/10 " +
+    "text-emerald-700 dark:text-emerald-400",
   APPOINTMENT_UPDATED:
-    "border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+    "border-blue-500/20 bg-blue-500/10 " + "text-blue-700 dark:text-blue-400",
   STUDENT_RECORD_CREATED:
-    "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+    "border-emerald-500/20 bg-emerald-500/10 " +
+    "text-emerald-700 dark:text-emerald-400",
   STUDENT_RECORD_UPDATED:
-    "border-blue-500/20 bg-blue-500/10 text-blue-700 dark:text-blue-400",
+    "border-blue-500/20 bg-blue-500/10 " + "text-blue-700 dark:text-blue-400",
+  M2M_CLIENT_CREATED:
+    "border-emerald-500/20 bg-emerald-500/10 " +
+    "text-emerald-700 dark:text-emerald-400",
+  M2M_CLIENT_REVOKED:
+    "border-red-500/20 bg-red-500/10 " + "text-red-700 dark:text-red-400",
+  M2M_CLIENT_VERIFIED:
+    "border-emerald-500/20 bg-emerald-500/10 " +
+    "text-emerald-700 dark:text-emerald-400",
+  M2M_CLIENT_SECRET_ROTATED:
+    "border-amber-500/20 bg-amber-500/10 " +
+    "text-amber-700 dark:text-amber-400",
+  M2M_CLIENT_USED:
+    "border-blue-500/20 bg-blue-500/10 " + "text-blue-700 dark:text-blue-400",
+  M2M_CLIENT_INVALID:
+    "border-red-500/20 bg-red-500/10 " + "text-red-700 dark:text-red-400",
+  M2M_AUTH_SUCCESS:
+    "border-emerald-500/20 bg-emerald-500/10 " +
+    "text-emerald-700 dark:text-emerald-400",
+  M2M_AUTH_FAILED:
+    "border-red-500/20 bg-red-500/10 " + "text-red-700 dark:text-red-400",
+  M2M_TOKEN_REFRESHED:
+    "border-blue-500/20 bg-blue-500/10 " + "text-blue-700 dark:text-blue-400",
+  M2M_DATA_ACCESS:
+    "border-blue-500/20 bg-blue-500/10 " + "text-blue-700 dark:text-blue-400",
+  M2M_DATA_ACCESS_DENIED:
+    "border-red-500/20 bg-red-500/10 " + "text-red-700 dark:text-red-400",
+  EMAIL_SEND_SUCCESS:
+    "border-emerald-500/20 bg-emerald-500/10 " +
+    "text-emerald-700 dark:text-emerald-400",
+  EMAIL_SEND_FAILED:
+    "border-red-500/20 bg-red-500/10 " + "text-red-700 dark:text-red-400",
 };
 
 interface TraceTracksViewerProps {
@@ -137,7 +179,7 @@ export function TraceTracksViewer({
 
   return (
     <div
-      className={cn("relative mt-2 space-y-4 border-l pl-4", "border-border")}
+      className={cn("relative mt-4 space-y-4 border-l pl-4", "border-border")}
     >
       {tracks.map((track) => {
         const isCurrent = track.id === currentLogId;
@@ -148,22 +190,20 @@ export function TraceTracksViewer({
           >
             <div
               className={cn(
-                "absolute -left-[21px] top-1.5 h-3.5 w-3.5",
+                "absolute -left-[24.5px] h-3.5 w-3.5",
                 "rounded-full border-2",
                 isCurrent
                   ? "scale-110 border-primary bg-primary shadow-sm"
                   : "border-muted-foreground/40 bg-background",
               )}
             />
-            <div className="flex max-h-[45rem] flex-col space-y-4">
+            <div className="flex max-h-[20rem] flex-col space-y-4">
               <div className="flex flex-wrap items-center gap-2">
                 <span className="text-xs font-semibold text-foreground">
                   {track.action.replace(/_/g, " ")}
                 </span>
                 <Badge
-                  variant={
-                    track.level === "ERROR" ? "destructive" : "secondary"
-                  }
+                  variant={track.level === "ERROR" ? "destructive" : "info"}
                   className="rounded px-1.5 py-0 text-[10px]"
                 >
                   {track.level}
@@ -236,19 +276,8 @@ export default function LogsTable({
   const total = data?.meta?.total ?? 0;
   const hasActiveFilters = Boolean(actionFilter || startDate || endDate);
 
-  const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleString("en-US", {
-      month: "short",
-      day: "numeric",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit",
-      second: "2-digit",
-    });
-  };
-
   const formatAction = (action: string) =>
-    action.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase());
+    capitalizeWords(action.replace(/_/g, " "));
 
   const actionDropdownOptions = useMemo(() => {
     return [
@@ -334,6 +363,113 @@ export default function LogsTable({
     }),
     [title, description, refetch, isFetching, showFilters, hasActiveFilters],
   );
+
+  const columns = useMemo<Column<SystemLog>[]>(() => {
+    const cols: Column<SystemLog>[] = [
+      {
+        header: "Timestamp",
+        className: cn(
+          "px-5 py-4 text-xs font-semibold uppercase",
+          "tracking-[0.14em] text-muted-foreground",
+        ),
+        render: (log) => (
+          <span
+            className={cn(
+              "whitespace-nowrap font-medium",
+              "text-muted-foreground",
+            )}
+          >
+            {formatDate(log.createdAt)}
+          </span>
+        ),
+      },
+      {
+        header: "Action",
+        className: cn(
+          "px-5 py-4 text-xs font-semibold uppercase",
+          "tracking-[0.14em] text-muted-foreground",
+        ),
+        render: (log) => (
+          <span
+            className={cn(
+              "inline-flex rounded-full border px-2.5 py-1",
+              "text-xs font-semibold",
+              ACTION_BADGE_COLORS[log.action] ??
+                "border-white/20 bg-white/40 text-muted-foreground " +
+                  "dark:bg-white/[0.04]",
+            )}
+          >
+            {formatAction(log.action)}
+          </span>
+        ),
+      },
+      {
+        header: "Message",
+        className: cn(
+          "px-5 py-4 text-xs font-semibold uppercase",
+          "tracking-[0.14em] text-muted-foreground",
+        ),
+        render: (log) => (
+          <div
+            className={cn(
+              "line-clamp-2 max-w-[460px]",
+              "leading-relaxed text-foreground",
+            )}
+          >
+            {highlightText(
+              truncateText(log.message, 25),
+              debouncedSearch,
+            )}
+          </div>
+        ),
+      },
+      {
+        header: "Actor",
+        className: cn(
+          "px-5 py-4 text-xs font-semibold uppercase",
+          "tracking-[0.14em] text-muted-foreground",
+        ),
+        render: (log) => (
+          <span className="text-muted-foreground">
+            {log.userEmail
+              ? highlightText(log.userEmail, debouncedSearch)
+              : "—"}
+          </span>
+        ),
+      },
+      {
+        header: "Target",
+        className: cn(
+          "px-5 py-4 text-xs font-semibold uppercase",
+          "tracking-[0.14em] text-muted-foreground",
+        ),
+        render: (log) => (
+          <span className="text-muted-foreground">
+            {log.targetEmail
+              ? highlightText(log.targetEmail, debouncedSearch)
+              : "—"}
+          </span>
+        ),
+      },
+    ];
+
+    if (showIPAddress) {
+      cols.push({
+        header: "IP Address",
+        className: cn(
+          "px-5 py-4 text-xs font-semibold uppercase",
+          "tracking-[0.14em] text-muted-foreground",
+        ),
+        render: (log) => (
+          <span className="text-muted-foreground">
+            {log.ipAddress || "—"}
+          </span>
+        ),
+      });
+    }
+
+    return cols;
+  }, [showIPAddress, debouncedSearch]);
 
   usePageMetadata(pageMetaData);
 
@@ -459,118 +595,52 @@ export default function LogsTable({
           </CardHeader>
 
           <CardContent className="p-0">
-            {logs.length === 0 ? (
-              <div className="flex flex-col items-center justify-center px-6 py-14 text-center">
-                <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-white/30 bg-white/60 backdrop-blur-md dark:border-white/10 dark:bg-white/[0.05]">
-                  {icon}
-                </div>
-
-                <p className="text-lg font-semibold text-foreground">
-                  No log entries found
-                </p>
-                <p className="mt-2 max-w-md text-sm text-muted-foreground">
-                  Try adjusting your filters or clear them to load more results.
-                </p>
-
-                {(hasActiveFilters || searchTerm) && (
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={handleReset}
-                    className="mt-4 rounded-xl"
+            <Table
+              data={logs}
+              columns={columns}
+              isLoading={isLoading}
+              emptyState={
+                <div
+                  className={cn(
+                    "flex flex-col items-center justify-center",
+                    "px-6 py-14 text-center",
+                  )}
+                >
+                  <div
+                    className={cn(
+                      "mb-4 flex h-14 w-14 items-center justify-center",
+                      "rounded-2xl border border-white/30 bg-white/60",
+                      "backdrop-blur-md dark:border-white/10",
+                      "dark:bg-white/[0.05]",
+                    )}
                   >
-                    Clear filters
-                  </Button>
-                )}
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full min-w-[980px] text-sm">
-                  <thead className="sticky top-0 z-10">
-                    <tr className="border-b border-white/20 bg-white/55 text-left backdrop-blur-md dark:border-white/10 dark:bg-white/[0.03]">
-                      <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                        Timestamp
-                      </th>
-                      <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                        Action
-                      </th>
-                      <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                        Message
-                      </th>
-                      <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                        Actor
-                      </th>
-                      <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                        Target
-                      </th>
-                      {showIPAddress && (
-                        <th className="px-5 py-4 text-xs font-semibold uppercase tracking-[0.14em] text-muted-foreground">
-                          IP Address
-                        </th>
-                      )}
-                    </tr>
-                  </thead>
-
-                  <tbody>
-                    {logs.map((log: SystemLog) => (
-                      <tr
-                        key={log.id}
-                        className={cn(
-                          "border-b border-glass-border bg-glass-bg",
-                          "transition-colors duration-150 hover:bg-muted/50",
-                          "cursor-pointer",
-                        )}
-                        onClick={() =>
-                          navigate(
-                            `/superadmin/${title.replace(" ", "-").toLocaleLowerCase()}/${log.id}`,
-                          )
-                        }
-                      >
-                        <td className="whitespace-nowrap px-5 py-4 text-xs font-medium text-muted-foreground">
-                          {formatDate(log.createdAt)}
-                        </td>
-
-                        <td className="px-5 py-4">
-                          <span
-                            className={`inline-flex rounded-full border px-2.5 py-1 text-xs font-semibold ${
-                              ACTION_BADGE_COLORS[log.action] ??
-                              "border-white/20 bg-white/40 text-muted-foreground dark:bg-white/[0.04]"
-                            }`}
-                          >
-                            {formatAction(log.action)}
-                          </span>
-                        </td>
-
-                        <td className="max-w-[460px] px-5 py-4 text-sm leading-relaxed text-foreground">
-                          <div className="line-clamp-2">
-                            {highlightText(
-                              truncateText(log.message, 25),
-                              debouncedSearch,
-                            )}
-                          </div>
-                        </td>
-
-                        <td className="px-5 py-4 text-sm text-muted-foreground">
-                          {log.userEmail
-                            ? highlightText(log.userEmail, debouncedSearch)
-                            : "—"}
-                        </td>
-
-                        <td className="px-5 py-4 text-sm text-muted-foreground">
-                          {log.targetEmail
-                            ? highlightText(log.targetEmail, debouncedSearch)
-                            : "—"}
-                        </td>
-
-                        {showIPAddress && (
-                          <td className="px-5 py-4">{log.ipAddress || "—"}</td>
-                        )}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            )}
+                    {icon}
+                  </div>
+                  <p className="text-lg font-semibold text-foreground">
+                    No log entries found
+                  </p>
+                  <p className="mt-2 max-w-md text-sm text-muted-foreground">
+                    Try adjusting your filters or clear them to load more
+                    results.
+                  </p>
+                  {(hasActiveFilters || searchTerm) && (
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={handleReset}
+                      className="mt-4 rounded-xl"
+                    >
+                      Clear filters
+                    </Button>
+                  )}
+                </div>
+              }
+              onRowClick={(log) => {
+                const pathName = title.replace(" ", "-").toLowerCase();
+                navigate(`/superadmin/${pathName}/${log.id}`);
+              }}
+              containerClassName="px-3 py-3"
+            />
 
             {totalPages > 1 && (
               <Pagination

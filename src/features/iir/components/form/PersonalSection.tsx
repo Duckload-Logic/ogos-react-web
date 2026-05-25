@@ -1,18 +1,7 @@
-import {
-  forwardRef,
-  useImperativeHandle,
-  useState,
-  useCallback,
-} from "react";
+import { forwardRef, useImperativeHandle, useState, useCallback } from "react";
 import { Dropdown, FormInput, Checkbox, DatePicker } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
-import {
-  User,
-  MapPin,
-  Phone,
-  Briefcase,
-  Activity,
-} from "lucide-react";
+import { User, MapPin, Phone, Briefcase, Activity } from "lucide-react";
 import {
   useCourses,
   useGenders,
@@ -1343,24 +1332,19 @@ export const PersonalSection = forwardRef<
                   "student.personalInfo.mobileNumber",
                 )}
               />
-              {!isEditMode && (
-                <FormInput
-                  label="Telephone Number"
-                  inputMode="tel"
-                  value={studentInfo?.personalInfo?.telephoneNumber || ""}
-                  onChange={(val: any) =>
-                    handleInputChange(
-                      "student.personalInfo.telephoneNumber",
-                      val,
-                    )
-                  }
-                  onBlur={() =>
-                    handleFieldBlur("student.personalInfo.telephoneNumber")
-                  }
-                  error={getFieldError("student.personalInfo.telephoneNumber")}
-                  placeholder="e.g. 8-XXX-XXXX"
-                />
-              )}
+              <FormInput
+                label="Telephone Number"
+                inputMode="tel"
+                value={studentInfo?.personalInfo?.telephoneNumber || ""}
+                onChange={(val: any) =>
+                  handleInputChange("student.personalInfo.telephoneNumber", val)
+                }
+                onBlur={() =>
+                  handleFieldBlur("student.personalInfo.telephoneNumber")
+                }
+                error={getFieldError("student.personalInfo.telephoneNumber")}
+                placeholder="e.g. 8-XXX-XXXX"
+              />
             </div>
           </SectionContainer>
 
@@ -1471,7 +1455,7 @@ export const PersonalSection = forwardRef<
                 </div>
               </div>
 
-              <div className="border-t border-border/50 pt-8">
+              <div className="border-t border-glass-border pt-8">
                 <div className="mb-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
                   <h4 className="flex items-center gap-2 text-sm font-bold text-foreground/80">
                     <span className="h-1.5 w-1.5 rounded-full bg-primary" />
