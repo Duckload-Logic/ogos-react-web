@@ -39,17 +39,13 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { format } from "date-fns";
-import {
-  getDateRange,
-  getFilterLabel,
-  type TimeFilter,
-} from "@/features/slips/utils/dateFilters";
+import { getDateRange, getFilterLabel, type TimeFilter } from "@/utils";
 import { usePageMetadata } from "@/context";
 
 export default function ReviewSlips() {
   const navigate = useNavigate();
 
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>("today");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("month");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [ticketCode, setTicketCode] = useState("");
@@ -64,6 +60,7 @@ export default function ReviewSlips() {
 
   const { data: slipStats, isLoading: isStatsLoading } = useGetSlipStats({
     params: {
+      orderBy: "date_needed",
       startDate: dateRange.startDate,
       endDate: dateRange.endDate,
     },
@@ -133,11 +130,16 @@ export default function ReviewSlips() {
   const confirmClaim = async () => {
     if (!pendingSlip?.ticket?.ticketCode) return;
 
+    const slipId = pendingSlip.id;
+
     try {
       await claimTicketMutation.mutateAsync(pendingSlip.ticket.ticketCode);
       triggerToast("✓ Ticket verified successfully!");
       setTicketCode("");
       setPendingSlip(null);
+      if (slipId) {
+        navigate(`/admin/slips/${slipId}`);
+      }
     } catch (error: any) {
       triggerToast(error.message || "Failed to verify ticket");
     }
@@ -152,7 +154,7 @@ export default function ReviewSlips() {
   const headerActions = useMemo(
     () => (
       <div className="flex flex-col gap-2.5 sm:flex-row sm:flex-wrap sm:items-center">
-        {(["today", "month"] as TimeFilter[]).map((filter) => (
+        {(["today", "week", "month"] as TimeFilter[]).map((filter) => (
           <Button
             key={filter}
             variant={timeFilter === filter ? "default" : "outline"}
@@ -344,7 +346,7 @@ export default function ReviewSlips() {
           )}
 
           <AlertDialogFooter className="gap-3 sm:gap-0">
-            <AlertDialogCancel className="border-glass-border/40 hover:bg-glass-bg/10 rounded-xl font-bold transition-all">
+            <AlertDialogCancel className="rounded-xl font-bold transition-all">
               Cancel
             </AlertDialogCancel>
             <AlertDialogAction
@@ -368,7 +370,7 @@ export default function ReviewSlips() {
         open={showAlreadyVerified}
         onOpenChange={setShowAlreadyVerified}
       >
-        <AlertDialogContent className="border-glass-border/40 max-w-sm bg-background/80 shadow-2xl backdrop-blur-2xl">
+        <AlertDialogContent className="max-w-sm backdrop-blur-2xl">
           <AlertDialogHeader>
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-blue-500/10 text-blue-500">
               <ShieldCheck className="h-8 w-8" />
@@ -394,7 +396,7 @@ export default function ReviewSlips() {
         open={showNotFound}
         onOpenChange={setShowNotFound}
       >
-        <AlertDialogContent className="border-glass-border/40 max-w-sm bg-background/80 shadow-2xl backdrop-blur-2xl">
+        <AlertDialogContent className="max-w-sm backdrop-blur-2xl">
           <AlertDialogHeader>
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-red-500/10 text-red-500">
               <XCircle className="h-8 w-8" />

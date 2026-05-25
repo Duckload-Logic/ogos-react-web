@@ -27,9 +27,8 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { STATUS_COLORS } from "@/config/constants";
-import { format12HourTime } from "@/features/appointments/utils";
-import { formatDate } from "@/features/schedules/utils/formatters";
+import { STATUS_COLORS, getStatusColorKey } from "@/config/constants";
+import { format12HourTime, formatDate } from "@/utils/dateTime";
 import { usePageMetadata } from "@/context";
 import ActionConfirmModal from "@/features/appointments/components/ConfirmModal";
 import RescheduleModal from "@/features/appointments/components/RescheduleModal";
@@ -251,7 +250,7 @@ export default function AppointmentDetails() {
         <div
           className={cn(
             "animate-in zoom-in-95 flex flex-col items-center",
-            "justify-between gap-4 rounded-[28px] border border-primary/20",
+            "justify-between gap-4 rounded-xl border border-primary/20",
             "bg-primary/10 p-6 shadow-md backdrop-blur-xl duration-500",
             "sm:flex-row",
           )}
@@ -293,7 +292,7 @@ export default function AppointmentDetails() {
         <Card
           className={cn(
             "group relative overflow-hidden",
-            "border-border bg-card shadow-sm lg:col-span-1",
+            "border-border bg-glass-bg shadow-md lg:col-span-1",
           )}
         >
           <CardContent
@@ -362,7 +361,7 @@ export default function AppointmentDetails() {
         </Card>
 
         {/* General Information Card */}
-        <Card className="border-border bg-card shadow-sm lg:col-span-2">
+        <Card className="border-border bg-glass-bg shadow-md lg:col-span-2">
           <CardHeader
             className={cn(
               "flex flex-row items-center justify-between",
@@ -437,7 +436,7 @@ export default function AppointmentDetails() {
       <div className="grid grid-cols-1 gap-6 pb-12 lg:grid-cols-12">
         {/* Left: Session Details (Col-span 8) */}
         <div className="space-y-6 lg:col-span-8">
-          <Card className="h-full overflow-hidden border-border bg-card shadow-sm">
+          <Card className="h-full overflow-hidden border-border bg-glass-bg shadow-md">
             <CardHeader
               className={cn(
                 "flex flex-row items-center justify-between",
@@ -452,8 +451,8 @@ export default function AppointmentDetails() {
                   <CardTitle className="text-lg font-bold tracking-tight">
                     Session Context
                   </CardTitle>
-                  <p className="text-[10px] font-mono text-muted-foreground">
-                    ID: {appointment.id}
+                  <p className="font-mono text-[10px] text-muted-foreground">
+                    ID: {appointment.id?.substring(0, 8)}
                   </p>
                 </div>
               </div>
@@ -463,8 +462,8 @@ export default function AppointmentDetails() {
                   <Badge
                     className={cn(
                       "rounded-full border px-3 py-1 text-[10px] font-bold",
-                      "tracking-wide shadow-sm",
-                      STATUS_COLORS[appointment.status.colorKey || "info"],
+                      "shadow-sm",
+                      STATUS_COLORS[getStatusColorKey(appointment.status.name)],
                     )}
                   >
                     {appointment.status.name}
@@ -474,7 +473,7 @@ export default function AppointmentDetails() {
                   variant="secondary"
                   className={cn(
                     "rounded-full border border-primary/20 bg-primary/10 px-3",
-                    "py-1 text-[10px] font-bold tracking-wide text-primary",
+                    "py-1 text-[10px] font-bold text-primary",
                   )}
                 >
                   {appointment.appointmentCategory.name}
@@ -514,7 +513,7 @@ export default function AppointmentDetails() {
                 >
                   <div className="flex items-center gap-2 text-muted-foreground/70">
                     <CalendarDays className="h-4 w-4 text-primary/60" />
-                    <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground/60">
                       Scheduled Date
                     </span>
                   </div>
@@ -530,7 +529,7 @@ export default function AppointmentDetails() {
                 >
                   <div className="flex items-center gap-2 text-muted-foreground/70">
                     <Clock className="h-4 w-4 text-primary/60" />
-                    <span className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground/60">
+                    <span className="text-[10px] font-bold uppercase text-muted-foreground/60">
                       Time Slot
                     </span>
                   </div>
@@ -546,7 +545,7 @@ export default function AppointmentDetails() {
                     <div className="rounded-lg border border-orange-500/20 bg-orange-500/10 p-1.5">
                       <ShieldUser className="h-4 w-4 text-orange-500" />
                     </div>
-                    <h3 className="text-xs font-bold uppercase tracking-wide text-orange-500">
+                    <h3 className="text-xs font-bold uppercase text-orange-500">
                       Counselor Remarks
                     </h3>
                   </div>
@@ -568,7 +567,7 @@ export default function AppointmentDetails() {
 
         {/* Right: Actions & Timeline (Col-span 4) */}
         <div className="space-y-6 lg:col-span-4">
-          <Card className="overflow-hidden border-border bg-card shadow-sm">
+          <Card className="overflow-hidden border-border bg-glass-bg shadow-md">
             <CardHeader className="border-b bg-muted/5 p-5">
               <CardTitle className="flex items-center gap-2.5 text-base font-bold tracking-tight">
                 <ShieldUser className="h-4 w-4 text-primary" />
@@ -591,9 +590,7 @@ export default function AppointmentDetails() {
                     >
                       <div className="flex items-center gap-3">
                         {actionIcon(action)}
-                        <span className="text-xs font-bold tracking-wide">
-                          {action}
-                        </span>
+                        <span className="text-xs font-bold">{action}</span>
                       </div>
                       <ArrowLeft
                         className={cn(
@@ -614,7 +611,7 @@ export default function AppointmentDetails() {
                   <div className="mx-auto w-fit rounded-full border border-primary/20 bg-primary/10 p-3">
                     <CheckCircle className="h-6 w-6 text-primary/60" />
                   </div>
-                  <p className="text-xs font-bold italic tracking-wide text-muted-foreground/60">
+                  <p className="text-xs font-bold italic text-muted-foreground/60">
                     All set! No pending tasks.
                   </p>
                 </div>
@@ -622,12 +619,12 @@ export default function AppointmentDetails() {
             </CardContent>
           </Card>
 
-          <Card className="overflow-hidden border-border bg-card shadow-sm">
+          <Card className="overflow-hidden border-border bg-glass-bg shadow-md">
             <CardHeader className="border-b bg-muted/5 p-5">
               <CardTitle
                 className={cn(
                   "flex items-center gap-2 text-[10px] font-bold",
-                  "text-muted-foreground uppercase tracking-wider",
+                  "uppercase tracking-wider text-muted-foreground",
                 )}
               >
                 <Clock3 className="h-3.5 w-3.5" />
@@ -645,7 +642,7 @@ export default function AppointmentDetails() {
                   />
                   <div
                     className={cn(
-                      "bg-border absolute left-1/2 top-3.5 h-10 w-0.5",
+                      "absolute left-1/2 top-3.5 h-10 w-0.5 bg-border",
                       "-translate-x-1/2 group-last:hidden",
                     )}
                   />

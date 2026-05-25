@@ -23,13 +23,12 @@ import {
   ShieldUser,
   ExternalLink,
 } from "lucide-react";
-import { STATUS_COLORS } from "@/config/constants";
+import { STATUS_COLORS, getStatusColorKey } from "@/config/constants";
 import ActionConfirmModal from "./ConfirmModal";
 import RescheduleModal from "./RescheduleModal";
-import { format12HourTime } from "../utils";
-import { formatDate } from "@/features/schedules/utils/formatters";
 import { cn } from "@/lib/utils";
 import { CORPreviewDialog } from "@/components/shared/CORPreviewDialog";
+import { format12HourTime, formatDate } from "@/utils";
 
 interface ViewModalProps {
   appointment: Appointment | null;
@@ -201,7 +200,7 @@ export default function ViewModal({
             <div className="flex justify-start">
               <span
                 className={`inline-flex items-center gap-1 rounded-full border px-3 py-1 text-sm font-medium transition-all duration-200 hover:scale-105 ${
-                  STATUS_COLORS[appointment.status?.colorKey || "info"]
+                  STATUS_COLORS[getStatusColorKey(appointment.status?.name)]
                 }`}
               >
                 {appointment.status?.name}
