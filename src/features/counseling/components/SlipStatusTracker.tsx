@@ -51,7 +51,7 @@ export function SlipStatusTracker({
 
   return (
     <Card
-      className={cn("overflow-hidden shadow-lg backdrop-blur-md", className)}
+      className={cn("overflow-hidden shadow-md backdrop-blur-md", className)}
     >
       <CardHeader className="pb-4">
         <CardTitle className="text-lg font-bold">Excuse Slip Tracker</CardTitle>

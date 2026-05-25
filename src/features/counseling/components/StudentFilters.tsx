@@ -43,7 +43,7 @@ export default function StudentFilters({
     <div
       className={cn(
         "hover:bg-glass-bg/30 rounded-3xl border border-glass-border",
-        "bg-glass-bg p-6 shadow-sm backdrop-blur-glass transition-all",
+        "bg-glass-bg p-6 shadow-md backdrop-blur-glass transition-all",
         "duration-500",
       )}
     >
