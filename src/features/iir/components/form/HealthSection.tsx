@@ -35,9 +35,16 @@ export const HealthSection = forwardRef<
     onChange: (path: string, value: any) => void;
     onFieldBlur?: (fieldPath: string) => void;
     shouldShowError?: (fieldPath: string) => boolean;
+    isEditMode?: boolean;
   }
 >(function HealthSection(
-  { health, onChange, onFieldBlur, shouldShowError },
+  {
+    health,
+    onChange,
+    onFieldBlur,
+    shouldShowError,
+    isEditMode = false,
+  },
   ref,
 ) {
   const [errors, setErrors] = useState<FormErrors>({});
@@ -206,14 +213,18 @@ export const HealthSection = forwardRef<
       yesValue: health?.healthRecord?.generalHealthHasProblem,
       detailsValue: health?.healthRecord?.generalHealthDetails || "",
     },
-    {
-      label: "Mental / Emotional Health",
-      icon: Brain,
-      yesKey: "health.healthRecord.mentalEmotionalHasProblem",
-      detailsKey: "health.healthRecord.mentalEmotionalDetails",
-      yesValue: health?.healthRecord?.mentalEmotionalHasProblem,
-      detailsValue: health?.healthRecord?.mentalEmotionalDetails || "",
-    },
+    ...(isEditMode
+      ? [
+          {
+            label: "Mental / Emotional Health",
+            icon: Brain,
+            yesKey: "health.healthRecord.mentalEmotionalHasProblem",
+            detailsKey: "health.healthRecord.mentalEmotionalDetails",
+            yesValue: health?.healthRecord?.mentalEmotionalHasProblem,
+            detailsValue: health?.healthRecord?.mentalEmotionalDetails || "",
+          },
+        ]
+      : []),
   ];
 
   // Array of psychological consultation types

@@ -29,6 +29,7 @@ export default function FamilyView({
 }: {
   data: FamilySection | undefined;
 }) {
+  console.log(data?.background?.employedSiblings);
   return (
     <div className="animate-in fade-in space-y-8 duration-500">
       <section>
@@ -91,15 +92,15 @@ export default function FamilyView({
               </p>
             </CardBlock>
           )}
-          <CardBlock title="Employed Siblings' Supports">
-            {data?.background?.siblingSupportTypes?.length !== 0 && (
+          {data?.background?.employedSiblings !== 0 && (
+            <CardBlock title="Employed Siblings' Supports">
               <TagList
                 values={data!.background!.siblingSupportTypes.map(
                   (item: SibilingSupportType) => getOptionLabel(item.name),
                 )}
               />
-            )}
-          </CardBlock>
+            </CardBlock>
+          )}
         </div>
       </section>
 

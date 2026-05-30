@@ -68,13 +68,33 @@ export function calculateSectionCompletion(
     case 1:
     case 2:
     case 3:
-    case 4:
+    case 4: {
       // Personal Information sub-steps
+      let allowed = PERSONAL_SUBSTEP_FIELDS[sectionIndex];
+      if (isEditMode) {
+        if (sectionIndex === 2) {
+          allowed = allowed.filter(
+            (field) =>
+              ![
+                "student.personalInfo.placeOfBirth",
+                "student.personalInfo.highSchoolGWA",
+                "student.personalInfo.heightM",
+                "student.personalInfo.weightKg",
+                "student.personalInfo.complexion",
+              ].includes(field),
+          );
+        } else if (sectionIndex === 3) {
+          allowed = allowed.filter(
+            (field) => field !== "student.personalInfo.telephoneNumber",
+          );
+        }
+      }
       return calculateCompletionFromSchema(
         personalInformationValidationSchema,
         formData,
-        PERSONAL_SUBSTEP_FIELDS[sectionIndex],
+        allowed,
       );
+    }
 
     case 5:
       // Education

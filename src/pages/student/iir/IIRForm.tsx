@@ -58,6 +58,7 @@ import ConsentDialog from "@/features/iir/components/form/ConsentDialog";
 import { cn } from "@/lib/utils";
 import { PatchIIRSubmit } from "@/features/iir/services/service";
 
+
 const FORM_SECTIONS = [
   { title: "Basic Info", id: 1, key: "personal_basic", main: 1 },
   { title: "Personal Profile", id: 2, key: "personal_profile", main: 1 },
@@ -648,6 +649,7 @@ export default function IIRForm() {
                           onChange={handleInputChange}
                           onFieldBlur={markFieldTouched}
                           shouldShowError={shouldShowError}
+                          isEditMode={isEditMode}
                         />
                       )}
                       {currentSection === 11 && localFormData?.interests && (

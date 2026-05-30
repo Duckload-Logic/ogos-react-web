@@ -58,24 +58,93 @@ export const educationValidationSchema: FieldValidationSchema = {
   ],
 };
 
+const isSchoolFilled = (rootData: any, i: number): boolean => {
+  const school = rootData?.education?.schools?.[i];
+  if (!school) return false;
+  return !!(
+    school.schoolName?.trim() ||
+    school.schoolAddress?.trim() ||
+    school.schoolType?.trim() ||
+    school.yearStarted?.toString().trim() ||
+    school.yearCompleted?.toString().trim() ||
+    school.awards?.trim()
+  );
+};
+
+const isFieldRequiredForSchool = (rootData: any, i: number): boolean => {
+  if (i === 1 || i === 2) return true;
+  return isSchoolFilled(rootData, i);
+};
+
 // Add schools dynamically
 for (let i = 0; i < 5; i++) {
   educationValidationSchema[`education.schools.${i}.schoolName`] = [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        if (isFieldRequiredForSchool(rootData, i)) {
+          return value && String(value).trim().length >= 2;
+        }
+        return true;
+      },
+      message: "School name is required",
+    },
     commonRules.minLength(2),
     commonRules.noSpecialChars("School name"),
   ];
   educationValidationSchema[`education.schools.${i}.schoolAddress`] = [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        if (isFieldRequiredForSchool(rootData, i)) {
+          return value && String(value).trim().length >= 2;
+        }
+        return true;
+      },
+      message: "School address is required",
+    },
     commonRules.minLength(2),
     commonRules.noSpecialChars("School address"),
   ];
   educationValidationSchema[`education.schools.${i}.awards`] = [
     commonRules.noSpecialChars("Awards"),
   ];
-  educationValidationSchema[`education.schools.${i}.schoolType`] = [];
+  educationValidationSchema[`education.schools.${i}.schoolType`] = [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        if (isFieldRequiredForSchool(rootData, i)) {
+          return !!value;
+        }
+        return true;
+      },
+      message: "School type is required",
+    },
+  ];
   educationValidationSchema[`education.schools.${i}.yearStarted`] = [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        if (isFieldRequiredForSchool(rootData, i)) {
+          return !!value;
+        }
+        return true;
+      },
+      message: "Year started is required",
+    },
     validYearRule(),
   ];
   educationValidationSchema[`education.schools.${i}.yearCompleted`] = [
+    {
+      type: "required",
+      validate: (value: any, rootData: any) => {
+        if (isFieldRequiredForSchool(rootData, i)) {
+          return !!value;
+        }
+        return true;
+      },
+      message: "Year completed is required",
+    },
     validYearRule(),
     yearCompletedRule(`education.schools.${i}.yearStarted`),
   ];
