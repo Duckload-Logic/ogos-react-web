@@ -310,7 +310,6 @@ export default function UserManagement() {
                 <MoreVertical size={16} />
               </Button>
             </DropdownMenuTrigger>
-
             <DropdownMenuContent
               align="end"
               className="w-48 rounded-xl bg-card backdrop-blur-2xl"
@@ -343,10 +342,7 @@ export default function UserManagement() {
         className: "px-6 py-4 font-medium text-foreground",
         render: (entry: WhitelistEntry) => (
           <div className="flex items-center gap-2">
-            <Mail
-              size={14}
-              className="text-muted-foreground"
-            />
+            <Mail size={14} className="text-muted-foreground" />
             {entry.email}
           </div>
         ),
@@ -398,7 +394,6 @@ export default function UserManagement() {
                 <MoreVertical size={16} />
               </Button>
             </DropdownMenuTrigger>
-
             <DropdownMenuContent
               align="end"
               className="w-48 rounded-xl bg-card backdrop-blur-2xl"

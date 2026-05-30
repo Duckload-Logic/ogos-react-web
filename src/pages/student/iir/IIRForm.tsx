@@ -57,7 +57,6 @@ import { SectionProgress } from "@/features/iir/components/form/SectionProgress"
 import ConsentDialog from "@/features/iir/components/form/ConsentDialog";
 import { cn } from "@/lib/utils";
 import { PatchIIRSubmit } from "@/features/iir/services/service";
-import { completeIIRForm } from "@/features/iir/tests/test";
 import { Skeleton } from "@/components/ui/skeleton";
 
 function FormSectionSkeleton() {
@@ -208,7 +207,7 @@ export default function IIRForm() {
       const sourceData = isEditMode ? editProfileData || draft : draft;
       const initializedData = initializeFormData(
         sourceData ?? null,
-        // completeIIRForm,
+
         EMPTY_IIR_FORM,
         me,
         { preserveBasicInfoFromSource: isEditMode },
@@ -1176,7 +1175,12 @@ export default function IIRForm() {
               <AlertDialogTitle className="text-2xl">
                 Reset this section?
               </AlertDialogTitle>
-              <AlertDialogDescription className="font-medium text-neutral-500 dark:text-neutral-400">
+              <AlertDialogDescription
+                className={cn(
+                  "font-medium text-neutral-500",
+                  "dark:text-neutral-400",
+                )}
+              >
                 This will clear all answers in the current section. This action
                 cannot be undone.
               </AlertDialogDescription>

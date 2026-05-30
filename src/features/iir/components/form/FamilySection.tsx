@@ -226,6 +226,7 @@ const ParentInformationCard = memo(
                 `family.relatedPersons.${idx}.educationalAttainment`,
               )}
             />
+
             <div className="relative">
               <FormInput
                 name={`family.relatedPersons.${idx}.occupation`}
@@ -311,6 +312,7 @@ const ParentInformationCard = memo(
               disabled={isNA}
               error={getFieldError(`family.relatedPersons.${idx}.employerName`)}
             />
+
             <div className="md:col-span-2">
               <FormInput
                 name={`family.relatedPersons.${idx}.employerAddress`}

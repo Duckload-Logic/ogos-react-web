@@ -45,7 +45,7 @@ import { usePageMetadata } from "@/context";
 export default function ReviewSlips() {
   const navigate = useNavigate();
 
-  const [timeFilter, setTimeFilter] = useState<TimeFilter>("today");
+  const [timeFilter, setTimeFilter] = useState<TimeFilter>("month");
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [ticketCode, setTicketCode] = useState("");
