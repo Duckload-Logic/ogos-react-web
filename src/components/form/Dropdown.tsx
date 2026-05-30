@@ -135,37 +135,6 @@ export default function Dropdown({
                     strokeWidth={2}
                   />
                 )}
-                {enabled && isFilled && (
-                  <div
-                    role="button"
-                    tabIndex={0}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      e.preventDefault();
-                      onChange("");
-                      if (onBlur) onBlur();
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" || e.key === " ") {
-                        e.stopPropagation();
-                        e.preventDefault();
-                        onChange("");
-                        if (onBlur) onBlur();
-                      }
-                    }}
-                    className={cn(
-                      "animate-in zoom-in flex h-5 w-5 items-center",
-                      "justify-center rounded-full hover:bg-muted/50",
-                      "text-muted-foreground/60 hover:text-muted-foreground",
-                      "duration-300 cursor-pointer",
-                    )}
-                  >
-                    <X
-                      size={12}
-                      strokeWidth={3}
-                    />
-                  </div>
-                )}
                 <ChevronDown
                   className={cn(
                     "size-4 opacity-40 transition-transform duration-300",
@@ -233,7 +202,7 @@ export default function Dropdown({
       </div>
 
       {error && (
-        <p className="mt-1 text-xs font-semibold text-red-600">{error}</p>
+        <p className="mt-1 text-xs font-normal text-red-500">{error}</p>
       )}
     </div>
   );

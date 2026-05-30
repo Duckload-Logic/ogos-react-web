@@ -298,8 +298,6 @@ export const validateObject = (
     }
   });
 
-  console.log(errors);
-
   return errors;
 };
 

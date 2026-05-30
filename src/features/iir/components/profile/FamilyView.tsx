@@ -29,7 +29,6 @@ export default function FamilyView({
 }: {
   data: FamilySection | undefined;
 }) {
-  console.log(data?.background?.employedSiblings);
   return (
     <div className="animate-in fade-in space-y-8 duration-500">
       <section>

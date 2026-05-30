@@ -27,7 +27,7 @@ export function SectionContainer({
           "border-glass-border bg-glass-bg p-5 hover:bg-glass-bg",
           "dark:hover:bg-glass-bg/50 relative overflow-hidden",
           "rounded-xl shadow-md backdrop-blur-glass",
-          "transition-all duration-500 sm:p-8 sm:shadow-md",
+          "transition-all duration-500 sm:p-8",
         )}
       >
         {/* Subtle Gradient Accent */}

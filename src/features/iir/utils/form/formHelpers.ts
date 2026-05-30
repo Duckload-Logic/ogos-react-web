@@ -27,7 +27,6 @@ function toDateOnly(dateStr: string | null | undefined): string {
   return dateStr.split("T")[0];
 }
 
-
 /**
  * Updates a nested field in the form data immutably
  * @param formData - Current form data
@@ -46,7 +45,9 @@ export function updateNestedField(
     const key = path[index];
     const isLast = index === path.length - 1;
     const currentValue = current ?? (Number.isInteger(Number(key)) ? [] : {});
-    const copy = Array.isArray(currentValue) ? [...currentValue] : { ...currentValue };
+    const copy = Array.isArray(currentValue)
+      ? [...currentValue]
+      : { ...currentValue };
 
     copy[key] = isLast ? value : updateAtPath(copy[key], index + 1);
     return copy;
@@ -174,9 +175,7 @@ export function initializeFormData(
       personalInfo: {
         ...emptyData.student?.personalInfo,
         ...baseData.student?.personalInfo,
-        dateOfBirth: toDateOnly(
-          baseData.student?.personalInfo?.dateOfBirth,
-        ),
+        dateOfBirth: toDateOnly(baseData.student?.personalInfo?.dateOfBirth),
       },
       addresses: Array.isArray(baseData.student?.addresses)
         ? baseData.student.addresses
@@ -193,17 +192,16 @@ export function initializeFormData(
           "Vocational",
           "College",
         ];
-        const existing =
-          (baseData.education?.schools || []).find(
-            (s: any) => s.educationalLevel?.id === id,
-          ) || {
-            schoolName: "",
-            schoolAddress: "",
-            schoolType: "",
-            yearStarted: "",
-            yearCompleted: "",
-            awards: "",
-          };
+        const existing = (baseData.education?.schools || []).find(
+          (s: any) => s.educationalLevel?.id === id,
+        ) || {
+          schoolName: "",
+          schoolAddress: "",
+          schoolType: "",
+          yearStarted: "",
+          yearCompleted: "",
+          awards: "",
+        };
         return {
           ...existing,
           educationalLevel: { id, name: levelNames[idx] },
@@ -226,25 +224,28 @@ export function initializeFormData(
             const template = emptyData.family.relatedPersons[idx];
             let existing: any = {};
             if (idx === 0) {
-              existing = (baseData.family?.relatedPersons || []).find(
-                (p: any) =>
-                  p.isParent &&
-                  (p.relationship?.id === 1 ||
-                    p.relationship?.relationshipName === "Father" ||
-                    p.relationship?.name === "Father"),
-              ) || {};
+              existing =
+                (baseData.family?.relatedPersons || []).find(
+                  (p: any) =>
+                    p.isParent &&
+                    (p.relationship?.id === 1 ||
+                      p.relationship?.relationshipName === "Father" ||
+                      p.relationship?.name === "Father"),
+                ) || {};
             } else if (idx === 1) {
-              existing = (baseData.family?.relatedPersons || []).find(
-                (p: any) =>
-                  p.isParent &&
-                  (p.relationship?.id === 2 ||
-                    p.relationship?.relationshipName === "Mother" ||
-                    p.relationship?.name === "Mother"),
-              ) || {};
+              existing =
+                (baseData.family?.relatedPersons || []).find(
+                  (p: any) =>
+                    p.isParent &&
+                    (p.relationship?.id === 2 ||
+                      p.relationship?.relationshipName === "Mother" ||
+                      p.relationship?.name === "Mother"),
+                ) || {};
             } else {
-              existing = (baseData.family?.relatedPersons || []).find(
-                (p: any) => p.isGuardian,
-              ) || {};
+              existing =
+                (baseData.family?.relatedPersons || []).find(
+                  (p: any) => p.isGuardian,
+                ) || {};
             }
 
             return {
@@ -288,4 +289,3 @@ export function initializeFormData(
     },
   };
 }
-

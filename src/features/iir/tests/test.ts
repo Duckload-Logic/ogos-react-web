@@ -39,7 +39,7 @@ export const completeIIRForm: IIRForm = {
         middleName: "Dela",
         lastName: "Cruz",
         contactNumber: "09987654321",
-        relationship: { id: 1 }, // E.g., Mother
+        relationship: { id: 1 }, // Father
         address: {
           region: { code: "1300000000" },
           province: { code: "" },
@@ -147,7 +147,7 @@ export const completeIIRForm: IIRForm = {
         occupation: "Engineer",
         employerName: "Tech Corp",
         employerAddress: "Makati City",
-        relationship: { id: 2 }, // Father
+        relationship: { id: 1 }, // Father
         isParent: true,
         isGuardian: false,
         isLiving: true,
@@ -161,7 +161,7 @@ export const completeIIRForm: IIRForm = {
         occupation: "Housewife",
         employerName: null,
         employerAddress: null,
-        relationship: { id: 1 }, // Mother
+        relationship: { id: 2 }, // Mother
         isParent: true,
         isGuardian: false,
         isLiving: true,

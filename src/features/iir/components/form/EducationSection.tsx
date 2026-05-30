@@ -87,10 +87,7 @@ export const EducationSection = forwardRef<
     });
   };
 
-  const handleClearSection = (
-    idx: number,
-    e: React.MouseEvent,
-  ) => {
+  const handleClearSection = (idx: number, e: React.MouseEvent) => {
     e.stopPropagation();
     const fields = [
       "schoolName",
@@ -113,17 +110,95 @@ export const EducationSection = forwardRef<
   const handleInputChange = (fieldPath: string, value: any) => {
     onChange(fieldPath, value);
 
+    // Simulate next state because onChange is asynchronous
+    const updatedEducation = { ...education };
+    const pathParts = fieldPath.split(".");
+    if (pathParts[0] === "education") {
+      let current = updatedEducation;
+      for (let i = 1; i < pathParts.length - 1; i++) {
+        const part = pathParts[i];
+        const nextPart = pathParts[i + 1];
+        const isNextArray = !isNaN(Number(nextPart));
+        if (isNextArray) {
+          if (!Array.isArray(current[part])) {
+            current[part] = [];
+          }
+        } else {
+          if (typeof current[part] !== "object" || current[part] === null) {
+            current[part] = {};
+          }
+        }
+        current[part] = isNextArray
+          ? [...current[part]]
+          : { ...current[part] };
+        current = current[part];
+      }
+      const lastPart = pathParts[pathParts.length - 1];
+      const isLastArray = !isNaN(Number(lastPart));
+      if (isLastArray) {
+        current[Number(lastPart)] = value;
+      } else {
+        current[lastPart] = value;
+      }
+    }
+
     // Instant validation
     const fieldRules = educationValidationSchema[fieldPath];
+    let newErrors = { ...errors };
+
     if (fieldRules) {
-      const error = validateField(value, fieldRules, { education });
-      setErrors((prev: FormErrors) => {
-        const updated = { ...prev };
-        if (error) updated[fieldPath] = error;
-        else delete updated[fieldPath];
-        return updated;
+      const error = validateField(value, fieldRules, {
+        education: updatedEducation,
       });
+      if (error) {
+        newErrors[fieldPath] = error;
+      } else {
+        delete newErrors[fieldPath];
+      }
     }
+
+    // Re-validate all years to handle cross-field / cross-level changes
+    const isYearField =
+      fieldPath.endsWith(".yearStarted") ||
+      fieldPath.endsWith(".yearCompleted");
+
+    if (isYearField) {
+      for (let i = 0; i < 5; i++) {
+        const startPath = `education.schools.${i}.yearStarted`;
+        const compPath = `education.schools.${i}.yearCompleted`;
+
+        const startVal = updatedEducation?.schools?.[i]?.yearStarted;
+        const compVal = updatedEducation?.schools?.[i]?.yearCompleted;
+
+        const startRules = educationValidationSchema[startPath];
+        const compRules = educationValidationSchema[compPath];
+
+        if (startRules) {
+          const err = validateField(startVal, startRules, {
+            education: updatedEducation,
+          });
+          if (err) {
+            newErrors[startPath] = err;
+            if (onFieldBlur) onFieldBlur(startPath);
+          } else {
+            delete newErrors[startPath];
+          }
+        }
+        if (compRules) {
+          const err = validateField(compVal, compRules, {
+            education: updatedEducation,
+          });
+          if (err) {
+            newErrors[compPath] = err;
+            if (onFieldBlur) onFieldBlur(compPath);
+          } else {
+            delete newErrors[compPath];
+          }
+        }
+      }
+    }
+
+    setErrors(newErrors);
 
     if (onFieldBlur) {
       onFieldBlur(fieldPath);
@@ -188,11 +263,6 @@ export const EducationSection = forwardRef<
           <label
             className={`mb-6 flex items-center gap-2 text-sm font-bold transition-colors duration-300 ${getFieldError("education.natureOfSchooling") ? "text-destructive" : "text-foreground/80"}`}
           >
-            {getFieldError("education.natureOfSchooling") ? (
-              <AlertCircle className="h-4 w-4" />
-            ) : (
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            )}
             Nature of Schooling
             <span className="text-primary">*</span>
           </label>
@@ -305,6 +375,7 @@ export const EducationSection = forwardRef<
                   "schooling was interrupted...",
                 )}
                 error={getFieldError("education.interruptedDetails")}
+                maxChars={100}
               />
             </div>
           )}
@@ -351,7 +422,7 @@ export const EducationSection = forwardRef<
                   className={cn(
                     "bg-glass-bg/40 border-glass-border/20 flex flex-wrap",
                     "items-center justify-between gap-3 px-5 py-4 sm:px-8",
-                    "sm:py-5 cursor-pointer select-none",
+                    "cursor-pointer select-none sm:py-5",
                     isExpanded && "border-b",
                   )}
                 >
@@ -373,9 +444,7 @@ export const EducationSection = forwardRef<
                             "text-muted-foreground",
                           )}
                         >
-                          {idx === 1 || idx === 2
-                            ? "(Required)"
-                            : "(Optional)"}
+                          {idx === 1 || idx === 2 ? "(Required)" : "(Optional)"}
                         </span>
                       </h3>
                       <div className="mt-0.5 flex items-center gap-2">
@@ -401,7 +470,7 @@ export const EducationSection = forwardRef<
                         className={cn(
                           "mr-2 rounded-lg px-2.5 py-1 text-xs font-bold",
                           "bg-destructive/10 text-destructive",
-                          "hover:bg-destructive/20 transition-all",
+                          "transition-all hover:bg-destructive/20",
                           "duration-200",
                         )}
                       >

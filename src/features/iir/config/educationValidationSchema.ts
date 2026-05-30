@@ -40,6 +40,53 @@ export const yearCompletedRule = (startedKey: string): ValidationRule => ({
   message: "Year completed cannot be before year started",
 });
 
+export const schoolSequenceRule = (index: number): ValidationRule => ({
+  type: "schoolSequence",
+  validate: (value: any, rootData: any) => {
+    if (!value) return true;
+    const currentStart = Number(value);
+    if (isNaN(currentStart)) return true;
+
+    const schools = rootData?.education?.schools || [];
+    for (let prevIdx = index - 1; prevIdx >= 0; prevIdx--) {
+      const prevSchool = schools[prevIdx];
+      if (prevSchool && prevSchool.yearCompleted) {
+        const prevCompleted = Number(prevSchool.yearCompleted);
+        if (!isNaN(prevCompleted)) {
+          return currentStart >= prevCompleted;
+        }
+      }
+    }
+    return true;
+  },
+  message: "Year started cannot overlap with previous school level",
+});
+
+export const schoolSequenceCompletedRule = (
+  index: number,
+): ValidationRule => ({
+  type: "schoolSequenceCompleted",
+  validate: (value: any, rootData: any) => {
+    if (!value) return true;
+    const currentCompleted = Number(value);
+    if (isNaN(currentCompleted)) return true;
+
+    const schools = rootData?.education?.schools || [];
+    for (let nextIdx = index + 1; nextIdx < 5; nextIdx++) {
+      const nextSchool = schools[nextIdx];
+      if (nextSchool && nextSchool.yearStarted) {
+        const nextStart = Number(nextSchool.yearStarted);
+        if (!isNaN(nextStart)) {
+          return currentCompleted <= nextStart;
+        }
+      }
+    }
+    return true;
+  },
+  message: "Year completed cannot overlap with next school level",
+});
+
+
 export const educationValidationSchema: FieldValidationSchema = {
   "education.natureOfSchooling": [commonRules.required("Nature of schooling")],
   "education.interruptedDetails": [
@@ -133,6 +180,7 @@ for (let i = 0; i < 5; i++) {
       message: "Year started is required",
     },
     validYearRule(),
+    schoolSequenceRule(i),
   ];
   educationValidationSchema[`education.schools.${i}.yearCompleted`] = [
     {
@@ -147,5 +195,6 @@ for (let i = 0; i < 5; i++) {
     },
     validYearRule(),
     yearCompletedRule(`education.schools.${i}.yearStarted`),
+    schoolSequenceCompletedRule(i),
   ];
 }
