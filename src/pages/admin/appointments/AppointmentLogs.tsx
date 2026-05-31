@@ -3,15 +3,14 @@ import { useNavigate } from "react-router-dom";
 import { useDebounce } from "@/hooks/useDebounce";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Calendar } from "lucide-react";
-import { useAppointments, useAppointmentsStats } from "@/features/appointments/hooks";
+import {
+  useAppointments,
+  useAppointmentsStats,
+} from "@/features/appointments/hooks";
 import type { Appointment } from "@/features/appointments/types";
 import { AppointmentList } from "@/features/appointments/components";
-import { STATUS_COLORS } from "@/config/constants";
-import {
-  getMonthsList,
-  getYearsList,
-  getMonthRange,
-} from "@/features/appointments/utils/dateFilters";
+import { getStatusColorKey } from "@/config/constants";
+import { getMonthsList, getYearsList, getMonthRange } from "@/utils";
 import { Dropdown } from "@/components/form";
 import { usePageMetadata } from "@/context";
 
@@ -101,26 +100,14 @@ export default function AppointmentLogs() {
       },
       ...appointmentStats.map((stat) => ({
         ...stat,
-        colorKey: (stat.name.toLowerCase() === "pending"
-          ? "pending"
-          : stat.name.toLowerCase() === "scheduled"
-            ? "scheduled"
-            : stat.name.toLowerCase() === "completed"
-              ? "completed"
-              : stat.name.toLowerCase() === "cancelled"
-                ? "cancelled"
-                : stat.name.toLowerCase() === "rejected"
-                  ? "rejected"
-                  : stat.name.toLowerCase() === "rescheduled"
-                    ? "rescheduled"
-                    : "stale") as keyof typeof STATUS_COLORS,
+        colorKey: getStatusColorKey(stat.name),
       })),
     ];
   }, [appointmentStats]);
 
   // Extract appointments and total pages from response
   const appointments = data?.appointments || [];
-  const totalPages = data?.totalPages || 1;
+  const totalPages = data?.meta?.totalPages || 1;
 
   // Handle actions
   const handleViewAppointment = (apt: Appointment) => {

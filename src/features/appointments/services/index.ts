@@ -16,7 +16,7 @@ import type {
 } from "../types";
 import { QueryParam } from "../types/reqParams";
 import { DailyStatusCount } from "../types/calendar";
-import { toISODateString } from "../utils";
+import { toISODateString } from "@/utils";
 
 // Re-export types for legacy imports
 export type { Appointment, CreateAppointmentRequest, AvailableTimeSlotView };

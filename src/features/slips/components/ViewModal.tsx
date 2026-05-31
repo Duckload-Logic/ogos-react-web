@@ -29,7 +29,7 @@ import {
 } from "lucide-react";
 import type { Slip } from "../types";
 import { AttachmentsGrid } from "./AttachmentsGrid";
-import { STATUS_COLORS } from "@/config/constants";
+import { STATUS_COLORS, getStatusColorKey } from "@/config/constants";
 import { useGetSlipAttachments } from "../hooks";
 import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
@@ -97,14 +97,14 @@ export function ViewModal({
     onClose();
   };
 
-  const getStatusColor = (colorKey?: string) => {
-    if (!colorKey) return "bg-gray-100 text-gray-800";
-    const key = colorKey as keyof typeof STATUS_COLORS;
+  const getStatusColor = (statusName?: string) => {
+    const key = getStatusColorKey(statusName);
     return STATUS_COLORS[key] || "bg-gray-100 text-gray-800";
   };
 
-  const getStatusIcon = (colorKey?: string) => {
-    switch (colorKey) {
+  const getStatusIcon = (statusName?: string) => {
+    const key = getStatusColorKey(statusName);
+    switch (key) {
       case "success":
         return <CheckCircle2 className="h-4 w-4" />;
       case "danger":
@@ -166,9 +166,13 @@ export function ViewModal({
                         Status
                       </p>
                       <div
-                        className={`inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-medium ${getStatusColor(slip.status?.colorKey)} mt-1`}
+                        className={cn(
+                          "inline-flex items-center gap-2 rounded-full",
+                          "px-3 py-1 text-sm font-medium mt-1",
+                          getStatusColor(slip.status?.name),
+                        )}
                       >
-                        {getStatusIcon(slip.status?.colorKey)}
+                        {getStatusIcon(slip.status?.name)}
                         {slip.status?.name}
                       </div>
                     </div>

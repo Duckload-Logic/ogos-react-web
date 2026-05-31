@@ -1,7 +1,7 @@
 import { Home } from "lucide-react";
 import { StudentSection, StudentAddress } from "../../types";
 import { asText, renderAddress } from "../../utils";
-import { formatDate } from "@/features/schedules/utils/formatters";
+import { formatDate } from "@/utils/dateTime";
 import EmptyState from "./EmptyState";
 import SectionTitle from "./SectionTitle";
 import CardBlock from "./CardBlock";
@@ -52,7 +52,7 @@ export default function PersonalView({
         <SectionTitle title="Student Identity & Personal Details" />
         <div
           className={cn(
-            "mt-6 grid grid-cols-1 gap-x-10 gap-y-6",
+            "mt-6 grid grid-cols-2 gap-x-10 gap-y-6",
             "md:grid-cols-2 lg:grid-cols-3",
           )}
         >
@@ -64,6 +64,42 @@ export default function PersonalView({
             />
           ))}
         </div>
+      </section>
+
+      <section>
+        <SectionTitle title="Employment Details" />
+        {personalInfo?.isEmployed ? (
+          <div
+            className={cn(
+              "mt-6 grid grid-cols-2 gap-x-10 gap-y-6",
+              "md:grid-cols-2 lg:grid-cols-3",
+            )}
+          >
+            <InfoItem
+              label="Currently Employed"
+              value="Yes"
+            />
+            <InfoItem
+              label="Employer Name"
+              value={asText(personalInfo?.employerName)}
+            />
+            <InfoItem
+              label="Employer Address"
+              value={asText(personalInfo?.employerAddress)}
+            />
+            <InfoItem
+              label="Employer Contact"
+              value={asText(personalInfo?.employerContactNumber)}
+            />
+          </div>
+        ) : (
+          <div className="mt-6">
+            <InfoItem
+              label="Currently Employed"
+              value="No"
+            />
+          </div>
+        )}
       </section>
 
       <section>

@@ -1,5 +1,5 @@
 import { asText, formatCurrency, getOptionLabel } from "../../utils";
-import { formatDate } from "@/features/schedules/utils/formatters";
+import { formatDate } from "@/utils/dateTime";
 import {
   BadgeInfo,
   Briefcase,
@@ -91,15 +91,15 @@ export default function FamilyView({
               </p>
             </CardBlock>
           )}
-          <CardBlock title="Employed Siblings' Supports">
-            {data?.background?.siblingSupportTypes?.length !== 0 && (
+          {data?.background?.employedSiblings !== 0 && (
+            <CardBlock title="Employed Siblings' Supports">
               <TagList
                 values={data!.background!.siblingSupportTypes.map(
                   (item: SibilingSupportType) => getOptionLabel(item.name),
                 )}
               />
-            )}
-          </CardBlock>
+            </CardBlock>
+          )}
         </div>
       </section>
 
@@ -126,7 +126,7 @@ export default function FamilyView({
                     </p>
                     <p
                       className={cn(
-                        "mt-1 text-[10px] uppercase tracking-wide",
+                        "mt-1 text-[10px] uppercase",
                         "text-muted-foreground",
                       )}
                     >

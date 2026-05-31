@@ -6,11 +6,7 @@ import { Calendar } from "lucide-react";
 import { useSlipLogs, useGetSlipStats } from "@/features/slips/hooks";
 import type { Slip, SlipStatus } from "@/features/slips/types";
 import { SlipList } from "@/features/slips/components";
-import {
-  getMonthsList,
-  getYearsList,
-  getMonthRange,
-} from "@/features/slips/utils/dateFilters";
+import { getMonthsList, getYearsList, getMonthRange } from "@/utils";
 import { Dropdown } from "@/components/form";
 import { usePageMetadata } from "@/context";
 
@@ -90,7 +86,6 @@ export default function SlipLogs() {
       {
         id: 0,
         name: "All Status",
-        colorKey: "stale",
         count: totalCount,
       },
       ...slipStats,

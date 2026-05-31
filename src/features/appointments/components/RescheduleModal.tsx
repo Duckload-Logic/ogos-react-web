@@ -9,11 +9,10 @@ import {
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 
-
 import { useAvailableSlots } from "@/features/appointments/hooks";
 import { Dropdown, FormInput } from "@/components/form";
 import { AvailableTimeSlotView } from "../types";
-import { format12HourTime, toISODateString } from "../utils";
+import { format12HourTime, toISODateString } from "@/utils/dateTime";
 
 interface RescheduleModalProps {
   isOpen: boolean;

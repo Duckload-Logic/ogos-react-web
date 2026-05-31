@@ -113,6 +113,24 @@ export const PatchVerifyM2MClient = async (
 };
 
 /**
+ * Reject M2M client
+ */
+export const PatchRejectM2MClient = async (
+  id: number,
+  config?: AxiosConfigWithMeta,
+): Promise<void> => {
+  try {
+    await apiClient.patch(
+      API_ROUTES.superadmin.m2mClients.reject(id),
+      {},
+      config,
+    );
+  } catch (error) {
+    throw error;
+  }
+};
+
+/**
  * List all users with filtering and pagination
  */
 export const GetUsers = async (
@@ -458,6 +476,7 @@ export const superadminService = {
   revokeM2MClient: DeleteM2MClient,
   rotateM2MSecret: PostM2MSecret,
   verifyM2MClient: PatchVerifyM2MClient,
+  rejectM2MClient: PatchRejectM2MClient,
   listUsers: GetUsers,
   getUserDistribution: GetUserDistribution,
   toggleUserStatus: PostToggleUserStatus,

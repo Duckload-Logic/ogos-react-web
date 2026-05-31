@@ -14,6 +14,7 @@ import {
   Check,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import SearchInput from "@/components/form/SearchInput";
 
 interface Endpoint {
   path: string;
@@ -217,22 +218,13 @@ const Documentation: React.FC = () => {
   const endpoints = getEndpoints();
 
   return (
-    <div className="mx-auto max-w-5xl space-y-12 pb-20">
-      <div className="top-20 z-30 bg-background/80 py-4 backdrop-blur-md">
-        <div className="relative">
-          <Search
-            className="absolute left-4 top-3.5 text-muted-foreground"
-            size={20}
-          />
-          <input
-            type="text"
-            placeholder="Search endpoints, paths, or keywords..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-white/5 py-3.5 pl-12 pr-4 text-lg shadow-2xl transition-all focus:border-primary/50 focus:outline-none"
-          />
-        </div>
-      </div>
+    <div className="mx-auto max-w-5xl space-y-12">
+      <SearchInput
+        hasHeader={false}
+        placeholder="Search endpoints, paths, or keywords..."
+        searchTerm={search}
+        onSearchChange={setSearch}
+      />
 
       <div className="space-y-6">
         {endpoints.map((endpoint) => {
@@ -242,7 +234,7 @@ const Documentation: React.FC = () => {
           return (
             <div
               key={id}
-              className="glass-card group overflow-hidden border-white/5 transition-all hover:border-white/10"
+              className="group overflow-hidden rounded-xl border-glass-border bg-glass-bg shadow-md transition-all hover:border-white/10"
             >
               <button
                 onClick={() => toggleEndpoint(id)}

@@ -39,6 +39,7 @@ export default function Toast({
               "flex animate-toast-slide-in-right items-center gap-3",
               "rounded-xl border-glass-border bg-card px-5 py-3 text-sm",
               "cursor-default shadow-xl transition-opacity duration-300",
+              "max-w-[20rem]",
             )}
           >
             <div className="flex-shrink-0 origin-top animate-ring">{icon}</div>
