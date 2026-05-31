@@ -55,14 +55,14 @@ export default function HealthView({
       )}
     >
       <section>
-        <SectionTitle title="Health Remarks" />
+        <SectionTitle title="Physical Remarks" />
         <div className="mt-6 grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4">
           {physicalStats.map((stat) => (
             <div
               key={stat.label}
               className={cn(
                 "rounded-xl border border-glass-border bg-glass-bg p-4",
-                "h-fit shadow-sm transition-shadow hover:shadow-lg",
+                "shadow-sm transition-shadow hover:shadow-lg",
               )}
             >
               <div className="mb-3 flex min-h-[62px] items-center gap-3">

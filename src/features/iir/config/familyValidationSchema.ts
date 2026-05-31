@@ -129,81 +129,29 @@ const RELATIONS = [
   { prefix: "family.relatedPersons.2", label: "Guardian" },
 ];
 
-const isParentSectionEmpty = (person: any): boolean => {
-  if (!person) return true;
-  const isEduEmpty =
-    !person.educationalAttainment ||
-    person.educationalAttainment.id === undefined ||
-    person.educationalAttainment.id === null ||
-    Number(person.educationalAttainment.id) === 0;
-  return (
-    !person.firstName?.trim() &&
-    !person.lastName?.trim() &&
-    !person.middleName?.trim() &&
-    !person.dateOfBirth?.trim() &&
-    isEduEmpty &&
-    (!person.occupation || person.occupation.trim() === "") &&
-    !person.employerName?.trim() &&
-    !person.employerAddress?.trim()
-  );
-};
-
-const hasParentData = (rootData: any, idx: number) => {
-  if (!rootData) return false;
-  let person = rootData?.family?.relatedPersons?.[idx];
-  if (!person && rootData?.relatedPersons) {
-    person = rootData.relatedPersons[idx];
-  }
-  if (!person) return false;
-  return !isParentSectionEmpty(person);
-};
-
 RELATIONS.forEach(({ prefix, label }, idx) => {
   familyValidationSchema[`${prefix}.firstName`] = [
-    {
-      type: "required",
-      validate: (value: any, rootData: any) => {
-        if ((idx === 0 || idx === 1) && !hasParentData(rootData, idx)) {
-          return true;
-        }
-        return !!value && String(value).trim().length > 0;
-      },
-      message: `${label} first name is required`,
-    },
+    commonRules.required(`${label} first name`),
     commonRules.minLength(2),
     commonRules.nameFormat(),
     commonRules.noSpecialChars(`${label} first name`),
   ];
-
   familyValidationSchema[`${prefix}.lastName`] = [
-    {
-      type: "required",
-      validate: (value: any, rootData: any) => {
-        if ((idx === 0 || idx === 1) && !hasParentData(rootData, idx)) {
-          return true;
-        }
-        return !!value && String(value).trim().length > 0;
-      },
-      message: `${label} last name is required`,
-    },
+    commonRules.required(`${label} last name`),
     commonRules.minLength(2),
     commonRules.nameFormat(),
     commonRules.noSpecialChars(`${label} last name`),
   ];
-
   familyValidationSchema[`${prefix}.middleName`] = [
     commonRules.nameFormat(),
     commonRules.noSpecialChars(`${label} middle name`),
   ];
-
   familyValidationSchema[`${prefix}.dateOfBirth`] = [
     {
       type: "required",
       validate: (value: any, rootData: any) => {
-        if ((idx === 0 || idx === 1) && !hasParentData(rootData, idx)) {
-          return true;
-        }
         const person = rootData?.family?.relatedPersons?.[idx];
+        // For Father (idx 0) and Guardian (idx 2), it's always required. For Mother, depends on isLiving.
         if (idx === 0 || idx === 2 || person?.isLiving !== false) {
           return !!value && String(value).trim().length > 0;
         }
@@ -213,14 +161,10 @@ RELATIONS.forEach(({ prefix, label }, idx) => {
     },
     commonRules.validDate(),
   ];
-
   familyValidationSchema[`${prefix}.educationalAttainment`] = [
     {
       type: "required",
       validate: (value: any, rootData: any) => {
-        if ((idx === 0 || idx === 1) && !hasParentData(rootData, idx)) {
-          return true;
-        }
         const person = rootData?.family?.relatedPersons?.[idx];
         const id = value?.id || value;
         if (idx === 0 || idx === 2 || person?.isLiving !== false) {
@@ -231,14 +175,10 @@ RELATIONS.forEach(({ prefix, label }, idx) => {
       message: `${label} educational attainment is required`,
     },
   ];
-
   familyValidationSchema[`${prefix}.occupation`] = [
     {
       type: "required",
       validate: (value: any, rootData: any) => {
-        if ((idx === 0 || idx === 1) && !hasParentData(rootData, idx)) {
-          return true;
-        }
         const person = rootData?.family?.relatedPersons?.[idx];
         if (idx === 0 || idx === 2 || person?.isLiving !== false) {
           return !!value && String(value).trim().length > 0;
@@ -249,37 +189,22 @@ RELATIONS.forEach(({ prefix, label }, idx) => {
     },
     commonRules.noSpecialChars(`${label} occupation`),
   ];
-
   familyValidationSchema[`${prefix}.employerName`] = [
     commonRules.noSpecialChars(`${label} employer name`),
   ];
-
   familyValidationSchema[`${prefix}.employerAddress`] = [
     commonRules.noSpecialChars(`${label} employer address`),
   ];
-
   if (idx !== 2) {
     familyValidationSchema[`${prefix}.isLiving`] = [
-      {
-        type: "required",
-        validate: (value: any, rootData: any) => {
-          if (!hasParentData(rootData, idx)) {
-            return true;
-          }
-          return value !== undefined && value !== null && value !== "";
-        },
-        message: `${label} status (Living/Deceased) is required`,
-      },
+      commonRules.required(`${label} status (Living/Deceased)`),
     ];
   }
 
   familyValidationSchema[`${prefix}.relationship`] = [
     {
       type: "required",
-      validate: (value: any, rootData: any) => {
-        if ((idx === 0 || idx === 1) && !hasParentData(rootData, idx)) {
-          return true;
-        }
+      validate: (value: any) => {
         const id = value?.id || value;
         return !!id && Number(id) > 0;
       },

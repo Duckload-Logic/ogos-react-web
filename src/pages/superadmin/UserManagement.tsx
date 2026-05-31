@@ -214,222 +214,218 @@ export default function UserManagement() {
     },
   ];
 
-  const userColumns = useMemo<Column<UserAccount>[]>(
-    () => [
-      {
-        header: "User",
-        className: "px-6 py-4",
-        render: (user: UserAccount) => (
-          <div className="flex items-center gap-3 text-left">
+  const userColumns = useMemo<Column<UserAccount>[]>(() => [
+    {
+      header: "User",
+      className: "px-6 py-4",
+      render: (user: UserAccount) => (
+        <div className="flex items-center gap-3 text-left">
+          <div
+            className={cn(
+              "flex h-10 w-10 items-center justify-center",
+              "rounded-xl bg-primary/20 text-xs font-bold",
+              "uppercase text-primary",
+            )}
+          >
+            {user.firstName[0]}
+            {user.lastName[0]}
+          </div>
+          <div className="space-y-0.5">
+            <div className="font-semibold text-foreground">
+              {user.firstName} {user.lastName}{" "}
+              {user.suffixName && <span> {user.suffixName}</span>}
+            </div>
             <div
               className={cn(
-                "flex h-10 w-10 items-center justify-center",
-                "rounded-xl bg-primary/20 text-xs font-bold",
-                "uppercase text-primary",
+                "flex items-center gap-1.5 text-xs text-muted-foreground",
               )}
             >
-              {user.firstName[0]}
-              {user.lastName[0]}
-            </div>
-            <div className="space-y-0.5">
-              <div className="font-semibold text-foreground">
-                {user.firstName} {user.lastName}{" "}
-                {user.suffixName && <span> {user.suffixName}</span>}
-              </div>
-              <div
-                className={cn(
-                  "flex items-center gap-1.5 text-xs text-muted-foreground",
-                )}
-              >
-                <Mail size={12} />
-                {user.email}
-              </div>
+              <Mail size={12} />
+              {user.email}
             </div>
           </div>
-        ),
-      },
-      {
-        header: "Role",
-        className: "px-6 py-4",
-        render: (user: UserAccount) => (
-          <div className="flex flex-wrap gap-1">
-            {user.roles.map((role: any) => (
-              <Badge
-                key={role.id}
-                variant="outline"
-                className={cn(
-                  "rounded-full px-3 font-medium transition-all",
-                  getRoleBadgeColor(role.name),
-                )}
-              >
-                {role.name}
-              </Badge>
-            ))}
-          </div>
-        ),
-      },
-      {
-        header: "Status",
-        className: "px-6 py-4",
-        render: (user: UserAccount) => (
-          <div className="flex items-center gap-1.5 font-bold tracking-tight">
-            <div
+        </div>
+      ),
+    },
+    {
+      header: "Role",
+      className: "px-6 py-4",
+      render: (user: UserAccount) => (
+        <div className="flex flex-wrap gap-1">
+          {user.roles.map((role: any) => (
+            <Badge
+              key={role.id}
+              variant="outline"
               className={cn(
-                "h-2 w-2 rounded-full",
-                user.isActive ? "bg-emerald-500" : "bg-primary",
+                "rounded-full px-3 font-medium transition-all",
+                getRoleBadgeColor(role.name),
               )}
-            />
-            <span>{user.isActive ? "Active" : "Blocked"}</span>
-          </div>
-        ),
-      },
-      {
-        header: "Joined Date",
-        className: "px-6 py-4 text-muted-foreground",
-        render: (user: UserAccount) => (
-          <div className="flex items-center gap-1.5">
-            <Calendar size={14} />
-            {formatDate(user.createdAt)}
-          </div>
-        ),
-      },
-      {
-        header: "Actions",
-        className: "px-6 py-4 text-left",
-        render: (user: UserAccount) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "h-5 w-5 rounded-full hover:bg-muted",
-                  "ml-auto hover:text-muted-foreground",
-                )}
-              >
-                <MoreVertical size={16} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-48 rounded-xl bg-card backdrop-blur-2xl"
             >
-              {menuActions(user).map((item: any) => (
-                <DropdownMenuItem
-                  key={item.id}
-                  className={cn(
-                    "cursor-pointer gap-2 text-foreground",
-                    "focus:bg-muted focus:text-primary",
-                  )}
-                  onClick={item.onAction}
-                >
-                  <item.icon size={14} />
-                  {item.label}
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ),
-      },
-    ],
-    [navigate, userToManageRoles, userToToggle],
-  );
+              {role.name}
+            </Badge>
+          ))}
+        </div>
+      ),
+    },
+    {
+      header: "Status",
+      className: "px-6 py-4",
+      render: (user: UserAccount) => (
+        <div className="flex items-center gap-1.5 font-bold tracking-tight">
+          <div
+            className={cn(
+              "h-2 w-2 rounded-full",
+              user.isActive ? "bg-emerald-500" : "bg-primary",
+            )}
+          />
+          <span>{user.isActive ? "Active" : "Blocked"}</span>
+        </div>
+      ),
+    },
+    {
+      header: "Joined Date",
+      className: "px-6 py-4 text-muted-foreground",
+      render: (user: UserAccount) => (
+        <div className="flex items-center gap-1.5">
+          <Calendar size={14} />
+          {formatDate(user.createdAt)}
+        </div>
+      ),
+    },
+    {
+      header: "Actions",
+      className: "px-6 py-4 text-right",
+      render: (user: UserAccount) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "h-5 w-5 rounded-full hover:bg-muted",
+                "hover:text-muted-foreground",
+              )}
+            >
+              <MoreVertical size={16} />
+            </Button>
+          </DropdownMenuTrigger>
 
-  const whitelistColumns = useMemo<Column<WhitelistEntry>[]>(
-    () => [
-      {
-        header: "Email Address",
-        className: "px-6 py-4 font-medium text-foreground",
-        render: (entry: WhitelistEntry) => (
-          <div className="flex items-center gap-2">
-            <Mail size={14} className="text-muted-foreground" />
-            {entry.email}
-          </div>
-        ),
-      },
-      {
-        header: "Pre-approved Roles",
-        className: "px-6 py-4",
-        render: (entry: WhitelistEntry) => (
-          <div className="flex flex-wrap gap-1">
-            {entry.roles.map((role: any) => (
-              <Badge
-                key={role.id}
-                variant="outline"
-                className={cn(
-                  "rounded-full px-3 font-medium transition-all",
-                  getRoleBadgeColor(role.name),
-                )}
-              >
-                {role.name}
-              </Badge>
-            ))}
-          </div>
-        ),
-      },
-      {
-        header: "Date Whitelisted",
-        className: "px-6 py-4 text-muted-foreground",
-        render: (entry: WhitelistEntry) => (
-          <div className="flex items-center gap-1.5">
-            <Calendar size={14} />
-            {formatDate(entry.createdAt)}
-          </div>
-        ),
-      },
-      {
-        header: "Actions",
-        className: "px-6 py-4 text-right",
-        render: (entry: WhitelistEntry) => (
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className={cn(
-                  "h-5 w-5 rounded-full hover:bg-muted",
-                  "hover:text-muted-foreground",
-                )}
-              >
-                <MoreVertical size={16} />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent
-              align="end"
-              className="w-48 rounded-xl bg-card backdrop-blur-2xl"
-            >
+          <DropdownMenuContent
+            align="end"
+            className="w-48 rounded-xl bg-card backdrop-blur-2xl"
+          >
+            {menuActions(user).map((item: any) => (
               <DropdownMenuItem
+                key={item.id}
                 className={cn(
                   "cursor-pointer gap-2 text-foreground",
                   "focus:bg-muted focus:text-primary",
                 )}
-                onClick={() => {
-                  setEditingWhitelistEntry(entry);
-                  setIsWhitelistOpen(true);
-                }}
+                onClick={item.onAction}
               >
-                <Shield size={14} />
-                Edit Roles
+                <item.icon size={14} />
+                {item.label}
               </DropdownMenuItem>
-              <DropdownMenuSeparator className="bg-white/10" />
-              <DropdownMenuItem
-                className={cn(
-                  "cursor-pointer gap-2 text-red-500",
-                  "hover:text-red-500 focus:bg-red-500/10",
-                  "focus:text-red-500",
-                )}
-                onClick={() => setUserToRemoveWhitelist(entry.email)}
-              >
-                <UserMinus size={14} />
-                Remove Whitelist
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        ),
-      },
-    ],
-    [userToRemoveWhitelist, editingWhitelistEntry, isWhitelistOpen],
-  );
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ], [navigate, userToManageRoles, userToToggle]);
+
+  const whitelistColumns = useMemo<Column<WhitelistEntry>[]>(() => [
+    {
+      header: "Email Address",
+      className: "px-6 py-4 font-medium text-foreground",
+      render: (entry: WhitelistEntry) => (
+        <div className="flex items-center gap-2">
+          <Mail size={14} className="text-muted-foreground" />
+          {entry.email}
+        </div>
+      ),
+    },
+    {
+      header: "Pre-approved Roles",
+      className: "px-6 py-4",
+      render: (entry: WhitelistEntry) => (
+        <div className="flex flex-wrap gap-1">
+          {entry.roles.map((role: any) => (
+            <Badge
+              key={role.id}
+              variant="outline"
+              className={cn(
+                "rounded-full px-3 font-medium transition-all",
+                getRoleBadgeColor(role.name),
+              )}
+            >
+              {role.name}
+            </Badge>
+          ))}
+        </div>
+      ),
+    },
+    {
+      header: "Date Whitelisted",
+      className: "px-6 py-4 text-muted-foreground",
+      render: (entry: WhitelistEntry) => (
+        <div className="flex items-center gap-1.5">
+          <Calendar size={14} />
+          {formatDate(entry.createdAt)}
+        </div>
+      ),
+    },
+    {
+      header: "Actions",
+      className: "px-6 py-4 text-right",
+      render: (entry: WhitelistEntry) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className={cn(
+                "h-5 w-5 rounded-full hover:bg-muted",
+                "hover:text-muted-foreground",
+              )}
+            >
+              <MoreVertical size={16} />
+            </Button>
+          </DropdownMenuTrigger>
+
+          <DropdownMenuContent
+            align="end"
+            className="w-48 rounded-xl bg-card backdrop-blur-2xl"
+          >
+            <DropdownMenuItem
+              className={cn(
+                "cursor-pointer gap-2 text-foreground",
+                "focus:bg-muted focus:text-primary",
+              )}
+              onClick={() => {
+                setEditingWhitelistEntry(entry);
+                setIsWhitelistOpen(true);
+              }}
+            >
+              <Shield size={14} />
+              Edit Roles
+            </DropdownMenuItem>
+            <DropdownMenuSeparator className="bg-white/10" />
+            <DropdownMenuItem
+              className={cn(
+                "cursor-pointer gap-2 text-red-500",
+                "hover:text-red-500 focus:bg-red-500/10",
+                "focus:text-red-500",
+              )}
+              onClick={() => setUserToRemoveWhitelist(entry.email)}
+            >
+              <UserMinus size={14} />
+              Remove Whitelist
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      ),
+    },
+  ], [userToRemoveWhitelist, editingWhitelistEntry, isWhitelistOpen]);
 
   return (
     <div className="mx-auto w-full max-w-[1700px] space-y-6">
