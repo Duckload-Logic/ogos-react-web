@@ -1,4 +1,4 @@
-import { Check, Lock, ChevronDown, X } from "lucide-react";
+import { Check, Lock, ChevronDown } from "lucide-react";
 import { useState } from "react";
 import { cn } from "@/lib/utils";
 import {
@@ -54,7 +54,8 @@ export default function Dropdown({
   const selectedOption = options.find(
     (opt) => String(opt[identifier]) === String(value),
   );
-  const isFilled = selectedOption !== undefined && value !== "";
+  const isFilled = selectedOption !== undefined;
+
   const getLabel = (option: any) => {
     if (!option) return `Select ${label}`;
     if (labelKey) return option[labelKey] || "";
@@ -75,12 +76,7 @@ export default function Dropdown({
       (opt) => String(opt[identifier]) === optionValue,
     );
     if (selected) {
-      const selectedVal = selected[get];
-      if (String(value) === String(selectedVal)) {
-        onChange("");
-      } else {
-        onChange(selectedVal);
-      }
+      onChange(selected[get]);
       setOpen(false);
       if (onBlur) onBlur();
     }
@@ -122,9 +118,7 @@ export default function Dropdown({
                     "font-normal italic text-muted-foreground/50",
                 )}
               >
-                {selectedOption && value !== ""
-                  ? getLabel(selectedOption)
-                  : `Select ${label}`}
+                {selectedOption ? getLabel(selectedOption) : `Select ${label}`}
               </span>
 
               <div className="ml-2 flex flex-shrink-0 items-center gap-2">
@@ -134,6 +128,19 @@ export default function Dropdown({
                     className="text-muted-foreground/60"
                     strokeWidth={2}
                   />
+                )}
+                {enabled && isFilled && !error && formStyle && (
+                  <div
+                    className={cn(
+                      "animate-in zoom-in flex h-5 w-5 items-center justify-center",
+                      "rounded-full bg-primary/10 text-primary duration-300",
+                    )}
+                  >
+                    <Check
+                      size={12}
+                      strokeWidth={3}
+                    />
+                  </div>
                 )}
                 <ChevronDown
                   className={cn(
@@ -202,7 +209,7 @@ export default function Dropdown({
       </div>
 
       {error && (
-        <p className="mt-1 text-xs font-normal text-red-500">{error}</p>
+        <p className="mt-1 text-xs font-semibold text-red-600">{error}</p>
       )}
     </div>
   );

@@ -770,6 +770,8 @@ export const InterestsSection = forwardRef<
           </div>
         </section>
 
+        <div className="h-px bg-gradient-to-r from-transparent via-white/20 to-transparent" />
+
         {/* B. Extra-Curricular Section */}
         <section>
           <div className="mb-6 flex items-center gap-3">
@@ -783,7 +785,7 @@ export const InterestsSection = forwardRef<
             {/* Hobbies Card */}
             <div
               className={cn(
-                "bg-glass-bg/60 border-glass-border/40 group relative h-fit",
+                "bg-glass-bg/60 border-glass-border/40 group relative",
                 "overflow-hidden rounded-xl border p-6 shadow-sm",
                 "backdrop-blur-glass transition-all duration-300 sm:p-8",
                 "lg:col-span-1",
@@ -854,7 +856,7 @@ export const InterestsSection = forwardRef<
             {/* Organizations Card */}
             <div
               className={cn(
-                "bg-glass-bg/60 border-glass-border/40 relative h-fit",
+                "bg-glass-bg/60 border-glass-border/40 relative",
                 "overflow-hidden rounded-xl border p-6 shadow-sm",
                 "backdrop-blur-glass transition-all duration-300 sm:p-8",
                 "lg:col-span-2",
@@ -891,26 +893,31 @@ export const InterestsSection = forwardRef<
               </div>
 
               {isActivityChecked("Others", false, true) && (
-                <FormInput
-                  label="Please specify details"
-                  type="textbox"
-                  maxChars={50}
-                  value={getOtherSpecification(false)}
-                  onChange={(val: string) =>
-                    updateOtherSpecification(false, val)
-                  }
-                  placeholder="e.g. Community Volunteers"
-                  error={getFieldError("interests.extraOthersSpecification")}
-                  required={isActivityChecked("Others", false, true)}
-                />
+                <div
+                  className={cn(
+                    "animate-in fade-in slide-in-from-top-4 mt-8 border-t",
+                    "border-white/10 pt-8 duration-300",
+                  )}
+                >
+                  <FormInput
+                    label="Please specify details"
+                    value={getOtherSpecification(false)}
+                    onChange={(val: string) =>
+                      updateOtherSpecification(false, val)
+                    }
+                    placeholder="e.g. Community Volunteers"
+                    error={getFieldError("interests.extraOthersSpecification")}
+                    required={isActivityChecked("Others", false, true)}
+                  />
+                </div>
               )}
 
               {/* Roles Section Sub-Card */}
               {hasOrgsSelected && (
                 <div
                   className={cn(
-                    "relative mt-2 overflow-hidden rounded-xl border",
-                    "border-primary/10 bg-primary/5 p-5",
+                    "relative mt-8 overflow-hidden rounded-[20px] border",
+                    "border-primary/10 bg-primary/5 p-5 sm:mt-10 sm:p-8",
                   )}
                 >
                   <div className="absolute right-0 top-0 p-3 opacity-10">

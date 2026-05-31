@@ -37,7 +37,6 @@ const FormInput = forwardRef<
     prefix?: string;
     noSpecialCharacters?: boolean;
     list?: string;
-    maxChars?: number;
   }
 >(
   (
@@ -62,7 +61,6 @@ const FormInput = forwardRef<
       prefix,
       noSpecialCharacters = true,
       list,
-      maxChars,
     },
     ref,
   ) => {
@@ -75,8 +73,6 @@ const FormInput = forwardRef<
     } = useSpeechToText();
 
     const previousTranscriptRef = useRef("");
-    const isTextboxType = isTextarea || type === "textbox";
-    const charCount = typeof value === "string" ? value.length : 0;
 
     useEffect(() => {
       if (transcript && transcript !== previousTranscriptRef.current) {
@@ -99,7 +95,7 @@ const FormInput = forwardRef<
         }
         previousTranscriptRef.current = transcript;
       }
-    }, [transcript, onChange, value, name, isTextboxType, maxChars]);
+    }, [transcript, onChange, value, name]);
 
     const handleMicToggle = (e: React.MouseEvent) => {
       e.preventDefault();
@@ -124,10 +120,7 @@ const FormInput = forwardRef<
     const handleChange = (
       e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
     ) => {
-      let newValue = e.target.value;
-      if (isTextboxType && maxChars && newValue.length > maxChars) {
-        newValue = newValue.slice(0, maxChars);
-      }
+      const newValue = e.target.value;
       validateContent(newValue);
 
       // Try string first, then event (RHF)
@@ -142,21 +135,22 @@ const FormInput = forwardRef<
       "w-full rounded-xl border px-4 py-2.5 outline-none transition-all",
       "duration-200 text-sm font-medium tracking-tight text-foreground",
       "placeholder:text-muted-foreground/70",
-      "bg-card border-foreground/30",
       disabled
-        ? "bg-border/50 border-0 text-muted-foreground " +
+        ? "bg-muted border-glass-border/20 text-muted-foreground " +
             "cursor-not-allowed opacity-90"
         : value !== undefined && value !== null && value !== ""
           ? "bg-muted/20 border-primary/30 focus:bg-glass-bg " +
             "dark:focus:bg-glass-bg/50 focus:border-primary/50 " +
             "focus:ring-2 focus:ring-primary/5 shadow-sm"
           : required
-            ? "hover:border-destructive/40 focus:border-destructive/50 " +
+            ? "bg-muted/60 dark:bg-muted/20 border-border " +
+              "hover:border-destructive/40 focus:border-destructive/50 " +
               "focus:ring-2 focus:ring-destructive/5"
-            : "hover:border-glass-border/60 focus:bg-glass-bg " +
+            : "bg-muted/60 dark:bg-muted/20 border-border " +
+              "hover:border-glass-border/60 focus:bg-glass-bg " +
               "dark:focus:bg-glass-bg/40 focus:border-primary/50 " +
               "focus:ring-2 focus:ring-primary/5",
-      isTextboxType
+      isTextarea
         ? cn(
             "min-h-[100px] pt-3 pr-4 resize-none",
             browserSupportsSpeechRecognition && !disabled ? "pb-12" : "pb-3",
@@ -167,47 +161,26 @@ const FormInput = forwardRef<
 
     return (
       <div className={`space-y-2 ${className}`}>
-        <div
-          className={cn(
-            "flex max-h-10 items-start justify-between gap-1",
-            "text-sm font-medium text-card-foreground",
-          )}
-        >
-          <div className="flex items-center gap-1">
-            {info && <CustomTooltip content={info} />}
-            <span>{label}</span>
-            {required && <span className="text-red-500">*</span>}
-          </div>
-          {isTextboxType && maxChars && (
-            <span className="text-xs font-semibold text-muted-foreground">
-              {charCount}/{maxChars}
-            </span>
-          )}
+        <div className="flex max-h-10 items-start gap-1 text-sm font-medium text-card-foreground">
+          {info && <CustomTooltip content={info} />}
+          <span>{label}</span>
+          {required && <span className="text-red-500">*</span>}
         </div>
-        <div className={cn("flex", prefix ? "gap-0" : "gap-2")}>
+        <div className="flex gap-2">
           {prefix && (
             <div
               className={cn(
-                "relative flex h-11 w-fit items-center rounded-l-xl rounded-r-none",
-                "bg-muted-foreground/20 px-4 text-muted-foreground",
-                "border-glass-border/30 border border-r-0",
+                "flex w-fit items-center rounded-md rounded-r-none",
+                "bg-muted-foreground/50 px-3 py-2 text-muted-foreground",
               )}
             >
               <span className="text-nowrap text-sm font-medium text-card-foreground">
                 {prefix}
               </span>
-              {/* Protruding puzzle piece tab */}
-              <div
-                className={cn(
-                  "absolute right-[-6px] top-1/2 -translate-y-1/2",
-                  "z-10 h-3 w-3 rounded-full bg-muted-foreground/20",
-                  "border-glass-border/30 border border-l-0",
-                )}
-              />
             </div>
           )}
           <div className="relative w-full">
-            {isTextboxType ? (
+            {isTextarea ? (
               <textarea
                 id={id}
                 name={name}
@@ -217,21 +190,8 @@ const FormInput = forwardRef<
                 onBlur={onBlur}
                 placeholder={placeholder}
                 disabled={disabled}
-                className={cn(inputClasses, prefix && "rounded-l-none")}
-                style={
-                  prefix
-                    ? {
-                        WebkitMaskImage:
-                          "radial-gradient(circle 6px at 0px 50%, " +
-                          "transparent 6px, black 6.5px)",
-                        maskImage:
-                          "radial-gradient(circle 6px at 0px 50%, " +
-                          "transparent 6px, black 6.5px)",
-                      }
-                    : undefined
-                }
+                className={inputClasses}
                 rows={5}
-                maxLength={maxChars}
               />
             ) : (
               <input
@@ -245,26 +205,14 @@ const FormInput = forwardRef<
                 placeholder={placeholder}
                 inputMode={inputMode}
                 disabled={disabled}
-                className={cn(inputClasses, prefix && "rounded-l-none")}
-                style={
-                  prefix
-                    ? {
-                        WebkitMaskImage:
-                          "radial-gradient(circle 6px at 0px 50%, " +
-                          "transparent 6px, black 6.5px)",
-                        maskImage:
-                          "radial-gradient(circle 6px at 0px 50%, " +
-                          "transparent 6px, black 6.5px)",
-                      }
-                    : undefined
-                }
+                className={inputClasses}
                 min={min}
                 max={max}
                 list={list}
               />
             )}
 
-            {isTextboxType && browserSupportsSpeechRecognition && !disabled && (
+            {isTextarea && browserSupportsSpeechRecognition && !disabled && (
               <div className="absolute bottom-4 right-2 z-10">
                 <button
                   type="button"
