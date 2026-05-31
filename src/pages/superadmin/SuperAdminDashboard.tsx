@@ -331,7 +331,7 @@ export default function SuperAdminDashboard() {
                     </p>
                     <span
                       className={cn(
-                        "inline-flex origin-right scale-[0.9] items-center gap-1.5",
+                        "inline-flex items-center gap-1.5",
                         "rounded-full px-2 py-0.5 text-[10px] font-medium",
                         service.isHealthy
                           ? "bg-emerald-500/10 text-emerald-500"

@@ -57,6 +57,35 @@ import { SectionProgress } from "@/features/iir/components/form/SectionProgress"
 import ConsentDialog from "@/features/iir/components/form/ConsentDialog";
 import { cn } from "@/lib/utils";
 import { PatchIIRSubmit } from "@/features/iir/services/service";
+import { Skeleton } from "@/components/ui/skeleton";
+
+function FormSectionSkeleton() {
+  return (
+    <div
+      className={cn(
+        "space-y-6 rounded-3xl border border-glass-border",
+        "bg-glass-bg p-6 shadow-md",
+      )}
+    >
+      <div className="space-y-2">
+        <Skeleton className="h-7 w-48 rounded-lg" />
+        <Skeleton className="h-4 w-72 rounded-lg" />
+      </div>
+      <hr className="border-glass-border" />
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+        {Array.from({ length: 6 }).map((_, i) => (
+          <div
+            key={i}
+            className="space-y-2"
+          >
+            <Skeleton className="h-4 w-24 rounded-md" />
+            <Skeleton className="h-11 w-full rounded-xl" />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 const FORM_SECTIONS = [
   { title: "Basic Info", id: 1, key: "personal_basic", main: 1 },
@@ -80,7 +109,7 @@ export default function IIRForm() {
   const activeSections = useMemo(() => {
     if (isEditMode) {
       return FORM_SECTIONS.filter((s) =>
-        [1, 2, 3, 4, 7, 8, 9].includes(s.id)
+        [1, 2, 3, 4, 7, 8, 9].includes(s.id),
       ).map((s) => {
         if (s.id === 9) {
           return { ...s, title: "Guardian's Information" };
@@ -101,8 +130,13 @@ export default function IIRForm() {
   const { submitFormAsync, isSubmitting } = useIIRFormSave();
 
   // Touched state management
-  const { markFieldTouched, markAllTouched, shouldShowError, resetTouched } =
-    useTouchedState();
+  const {
+    markFieldTouched,
+    markAllTouched,
+    shouldShowError,
+    resetTouched,
+    clearFieldTouched,
+  } = useTouchedState();
 
   const hasInitialized = useRef(false);
   const personalSectionRef = useRef<any>(null);
@@ -125,6 +159,7 @@ export default function IIRForm() {
   const [localFormData, setLocalFormData] = useState<IIRFormType | null>(null);
   const [isInitializing, setIsInitializing] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isTransitioningStep, setIsTransitioningStep] = useState(false);
   const [showConsentDialog, setShowConsentDialog] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -139,6 +174,15 @@ export default function IIRForm() {
   const [totalErrors, setTotalErrors] = useState(0);
 
   const [lastChangeTimestamp, setLastChangeTimestamp] = useState(0);
+
+  const scrollToTop = () => {
+    const container = document.querySelector("main")?.parentElement;
+    if (container) {
+      container.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   const handleInputChange = useCallback((fieldPath: string, value: any) => {
     const path = fieldPath.split(".");
@@ -163,6 +207,7 @@ export default function IIRForm() {
       const sourceData = isEditMode ? editProfileData || draft : draft;
       const initializedData = initializeFormData(
         sourceData ?? null,
+
         EMPTY_IIR_FORM,
         me,
         { preserveBasicInfoFromSource: isEditMode },
@@ -202,6 +247,7 @@ export default function IIRForm() {
       return prev;
     });
     localStorage.setItem("iir_current_section", currentSection.toString());
+    scrollToTop();
   }, [currentSection]);
 
   useEffect(() => {
@@ -246,8 +292,7 @@ export default function IIRForm() {
     }
   };
 
-  const isLoading =
-    isLoadingDraft || isLoadingEditProfile || isSubmitting || isSaving;
+  const isLoading = isLoadingDraft || isLoadingEditProfile || isSubmitting;
 
   if (draftError) {
     return (
@@ -282,18 +327,21 @@ export default function IIRForm() {
       return;
     }
 
+    if (currentIndex < activeSections.length - 1) {
+      setCurrentSection(activeSections[currentIndex + 1].id);
+    }
+
     setIsSaving(true);
+    setIsTransitioningStep(true);
     try {
       if (localFormData) {
         await saveDraft(localFormData);
-      }
-      if (currentIndex < activeSections.length - 1) {
-        setCurrentSection(activeSections[currentIndex + 1].id);
       }
     } catch (err: any) {
       console.error("Error saving section:", err);
     } finally {
       setIsSaving(false);
+      setIsTransitioningStep(false);
     }
   };
 
@@ -429,15 +477,336 @@ export default function IIRForm() {
   };
 
   const confirmReset = () => {
-    const resetData = createResetFormData(EMPTY_IIR_FORM, me);
-    setLocalFormData(resetData);
-    setCurrentSection(1);
-    setVisitedSections([1]);
-    localStorage.removeItem("iir_current_section");
-    localStorage.removeItem("iir_visited_sections");
-    resetTouched(); // Clear touched state on reset
+    if (!localFormData) return;
+
+    setLocalFormData((prev) => {
+      if (!prev) return prev;
+      const updated = { ...prev };
+      const fieldsToClearTouched: string[] = [];
+
+      switch (currentSection) {
+        case 1:
+          updated.student = {
+            ...updated.student,
+            personalInfo: {
+              ...updated.student.personalInfo,
+              studentNumber: "",
+              course: { id: 0 },
+              yearLevel: 1,
+              section: "",
+            },
+          };
+          fieldsToClearTouched.push(
+            "student.personalInfo.studentNumber",
+            "student.personalInfo.course",
+            "student.personalInfo.yearLevel",
+            "student.personalInfo.section",
+          );
+          break;
+        case 2:
+          updated.student = {
+            ...updated.student,
+            personalInfo: {
+              ...updated.student.personalInfo,
+              suffix: "",
+              gender: { id: 0 },
+              civilStatus: { id: 0 },
+              religion: { id: 0 },
+              dateOfBirth: "",
+              placeOfBirth: "",
+              highSchoolGWA: "",
+              heightM: "",
+              weightKg: "",
+              complexion: "",
+            },
+          };
+          fieldsToClearTouched.push(
+            "student.personalInfo.suffix",
+            "student.personalInfo.gender",
+            "student.personalInfo.civilStatus",
+            "student.personalInfo.religion",
+            "student.personalInfo.dateOfBirth",
+            "student.personalInfo.placeOfBirth",
+            "student.personalInfo.highSchoolGWA",
+            "student.personalInfo.heightM",
+            "student.personalInfo.weightKg",
+            "student.personalInfo.complexion",
+          );
+          break;
+        case 3:
+          updated.student = {
+            ...updated.student,
+            personalInfo: {
+              ...updated.student.personalInfo,
+              mobileNumber: "",
+              telephoneNumber: null,
+              emergencyContact: {
+                firstName: "",
+                middleName: null,
+                lastName: "",
+                contactNumber: "",
+                relationship: { id: 0 },
+                address: {
+                  region: { id: 0, code: "" },
+                  province: null,
+                  city: { id: 0, code: "" },
+                  barangay: { id: 0, code: "" },
+                  streetDetail: "",
+                },
+              },
+            },
+            addresses: [],
+          };
+          fieldsToClearTouched.push(
+            "student.personalInfo.mobileNumber",
+            "student.personalInfo.telephoneNumber",
+            "student.personalInfo.emergencyContact.firstName",
+            "student.personalInfo.emergencyContact.lastName",
+            "student.personalInfo.emergencyContact.middleName",
+            "student.personalInfo.emergencyContact.contactNumber",
+            "student.personalInfo.emergencyContact.relationship",
+            "student.personalInfo.emergencyContact.address.region",
+            "student.personalInfo.emergencyContact.address.province",
+            "student.personalInfo.emergencyContact.address.city",
+            "student.personalInfo.emergencyContact.address.barangay",
+            "student.addresses.0.address.region",
+            "student.addresses.0.address.province",
+            "student.addresses.0.address.city",
+            "student.addresses.0.address.barangay",
+            "student.addresses.1.address.region",
+            "student.addresses.1.address.province",
+            "student.addresses.1.address.city",
+            "student.addresses.1.address.barangay",
+          );
+          break;
+        case 4:
+          updated.student = {
+            ...updated.student,
+            personalInfo: {
+              ...updated.student.personalInfo,
+              isEmployed: false,
+              employerName: null,
+              employerAddress: null,
+              employerContactNumber: null,
+            },
+          };
+          fieldsToClearTouched.push(
+            "student.personalInfo.isEmployed",
+            "student.personalInfo.employerName",
+            "student.personalInfo.employerAddress",
+            "student.personalInfo.employerContactNumber",
+          );
+          break;
+        case 5:
+          updated.education = {
+            natureOfSchooling: "",
+            interruptedDetails: null,
+            schools: [],
+          };
+          fieldsToClearTouched.push(
+            "education.natureOfSchooling",
+            "education.interruptedDetails",
+            "education.schools",
+          );
+          break;
+        case 6:
+          updated.family = {
+            ...updated.family,
+            background: {
+              ...updated.family.background,
+              parentalStatus: "",
+              parentalStatusDetails: null,
+              haveQuietPlaceToStudy: false,
+              isSharingRoom: false,
+              roomSharingDetails: null,
+              natureOfResidence: {},
+            } as any,
+          };
+          fieldsToClearTouched.push(
+            "family.background.parentalStatus",
+            "family.background.parentalStatusDetails",
+            "family.background.haveQuietPlaceToStudy",
+            "family.background.isSharingRoom",
+            "family.background.roomSharingDetails",
+            "family.background.natureOfResidence",
+          );
+          break;
+        case 7:
+          if (updated.family?.relatedPersons) {
+            const related = [...updated.family.relatedPersons];
+            related[0] = {
+              firstName: "",
+              middleName: null,
+              lastName: "",
+              dateOfBirth: "",
+              educationalAttainment: { id: 0 },
+              occupation: null,
+              employerName: null,
+              employerAddress: null,
+              relationship: { id: 1 },
+              isParent: true,
+              isGuardian: false,
+              isLiving: true,
+            };
+            updated.family = {
+              ...updated.family,
+              relatedPersons: related,
+            };
+          }
+          fieldsToClearTouched.push(
+            "family.relatedPersons.0.isLiving",
+            "family.relatedPersons.0.firstName",
+            "family.relatedPersons.0.middleName",
+            "family.relatedPersons.0.lastName",
+            "family.relatedPersons.0.dateOfBirth",
+            "family.relatedPersons.0.educationalAttainment",
+            "family.relatedPersons.0.occupation",
+            "family.relatedPersons.0.employerName",
+            "family.relatedPersons.0.employerAddress",
+          );
+          break;
+        case 8:
+          if (updated.family?.relatedPersons) {
+            const related = [...updated.family.relatedPersons];
+            related[1] = {
+              firstName: "",
+              middleName: null,
+              lastName: "",
+              dateOfBirth: "",
+              educationalAttainment: { id: 0 },
+              occupation: null,
+              employerName: null,
+              employerAddress: null,
+              relationship: { id: 2 },
+              isParent: true,
+              isGuardian: false,
+              isLiving: true,
+            };
+            updated.family = {
+              ...updated.family,
+              relatedPersons: related,
+            };
+          }
+          fieldsToClearTouched.push(
+            "family.relatedPersons.1.isLiving",
+            "family.relatedPersons.1.firstName",
+            "family.relatedPersons.1.middleName",
+            "family.relatedPersons.1.lastName",
+            "family.relatedPersons.1.dateOfBirth",
+            "family.relatedPersons.1.educationalAttainment",
+            "family.relatedPersons.1.occupation",
+            "family.relatedPersons.1.employerName",
+            "family.relatedPersons.1.employerAddress",
+          );
+          break;
+        case 9:
+          if (updated.family?.relatedPersons) {
+            const related = [...updated.family.relatedPersons];
+            related[2] = {
+              firstName: "",
+              middleName: null,
+              lastName: "",
+              dateOfBirth: "",
+              educationalAttainment: { id: 0 },
+              occupation: null,
+              employerName: null,
+              employerAddress: null,
+              relationship: { id: 3 },
+              isParent: false,
+              isGuardian: true,
+              isLiving: true,
+            };
+            updated.family = {
+              ...updated.family,
+              relatedPersons: related,
+              background: {
+                ...updated.family.background,
+                brothers: 0,
+                sisters: 0,
+                employedSiblings: 0,
+                ordinalPosition: 1,
+              } as any,
+              finance: {
+                monthlyFamilyIncomeRange: { id: 0 },
+                weeklyAllowance: "",
+                financialSupportTypes: [],
+              } as any,
+            };
+          }
+          fieldsToClearTouched.push(
+            "family.relatedPersons.2.relationship",
+            "family.relatedPersons.2.isLiving",
+            "family.relatedPersons.2.firstName",
+            "family.relatedPersons.2.middleName",
+            "family.relatedPersons.2.lastName",
+            "family.relatedPersons.2.dateOfBirth",
+            "family.relatedPersons.2.occupation",
+            "family.relatedPersons.2.educationalAttainment",
+            "family.background.brothers",
+            "family.background.sisters",
+            "family.background.employedSiblings",
+            "family.background.ordinalPosition",
+            "family.finance.monthlyFamilyIncomeRange",
+            "family.finance.weeklyAllowance",
+            "family.finance.financialSupportTypes",
+          );
+          break;
+        case 10:
+          updated.health = {
+            healthRecord: {
+              visionHasProblem: false,
+              visionDetails: null,
+              hearingHasProblem: false,
+              hearingDetails: null,
+              speechHasProblem: false,
+              speechDetails: null,
+              generalHealthHasProblem: false,
+              generalHealthDetails: null,
+              mentalEmotionalHasProblem: false,
+              mentalEmotionalDetails: null,
+            } as any,
+            consultations: [],
+          };
+          fieldsToClearTouched.push(
+            "health.healthRecord.visionHasProblem",
+            "health.healthRecord.visionDetails",
+            "health.healthRecord.hearingHasProblem",
+            "health.healthRecord.hearingDetails",
+            "health.healthRecord.speechHasProblem",
+            "health.healthRecord.speechDetails",
+            "health.healthRecord.generalHealthHasProblem",
+            "health.healthRecord.generalHealthDetails",
+            "health.healthRecord.mentalEmotionalHasProblem",
+            "health.healthRecord.mentalEmotionalDetails",
+            "health.consultations",
+          );
+          break;
+        case 11:
+          updated.interests = {
+            activities: [],
+            subjectPreferences: [],
+            hobbies: [],
+          };
+          fieldsToClearTouched.push(
+            "interests.activities",
+            "interests.subjectPreferences",
+            "interests.hobbies",
+          );
+          break;
+        default:
+          break;
+      }
+
+      fieldsToClearTouched.forEach((path) => {
+        clearFieldTouched(path);
+      });
+
+      return updated;
+    });
+
     setShowResetConfirm(false);
-    triggerToast("Form has been reset.");
+    triggerToast("Section has been reset.");
+    scrollToTop();
   };
 
   const badgeIcon = useMemo(() => <User className="h-4 w-4" />, []);
@@ -521,7 +890,7 @@ export default function IIRForm() {
                         "dark:bg-primary/10 sm:flex-row",
                       )}
                     >
-                      <div className="flex items-center gap-3">
+                      <div className="mb-4 flex items-center gap-3">
                         <div
                           className={cn(
                             "flex h-10 w-10 items-center justify-center rounded-2xl",
@@ -573,10 +942,9 @@ export default function IIRForm() {
                     <div className="animate-in fade-in slide-in-from-right-4 mb-4 delay-300 duration-700">
                       <div
                         className={cn(
-                          "flex items-center gap-2.5 rounded-full border",
-                          "border-white/20 bg-white/60 px-4 py-2",
-                          "shadow-[0_4px_12px_rgba(0,0,0,0.03)] backdrop-blur-md",
-                          "dark:border-white/10 dark:bg-white/[0.04]",
+                          "flex items-center gap-2.5 rounded-xl border",
+                          "bg-glass border-glass-border px-4 py-2",
+                          "shadow-md backdrop-blur-md",
                         )}
                       >
                         <div
@@ -608,56 +976,64 @@ export default function IIRForm() {
                         "fill-mode-both duration-700 ease-out",
                       )}
                     >
-                      {[1, 2, 3, 4].includes(currentSection) &&
-                        localFormData?.student && (
-                          <PersonalSection
-                            ref={personalSectionRef}
-                            studentInfo={localFormData.student}
-                            onChange={handleInputChange}
-                            onFieldBlur={markFieldTouched}
-                            shouldShowError={shouldShowError}
-                            subStep={currentSection}
-                            isEditMode={isEditMode}
-                          />
-                        )}
-                      {currentSection === 5 && localFormData?.education && (
-                        <EducationSection
-                          ref={educationSectionRef}
-                          education={localFormData.education}
-                          onChange={handleInputChange}
-                          onFieldBlur={markFieldTouched}
-                          shouldShowError={shouldShowError}
-                        />
-                      )}
-                      {[6, 7, 8, 9].includes(currentSection) &&
-                        localFormData?.family && (
-                          <FamilySection
-                            ref={familySectionRef}
-                            family={localFormData.family}
-                            onChange={handleInputChange}
-                            onFieldBlur={markFieldTouched}
-                            shouldShowError={shouldShowError}
-                            subStep={currentSection - 5}
-                            isEditMode={isEditMode}
-                          />
-                        )}
-                      {currentSection === 10 && localFormData?.health && (
-                        <HealthSection
-                          ref={healthSectionRef}
-                          health={localFormData.health}
-                          onChange={handleInputChange}
-                          onFieldBlur={markFieldTouched}
-                          shouldShowError={shouldShowError}
-                        />
-                      )}
-                      {currentSection === 11 && localFormData?.interests && (
-                        <InterestsSection
-                          ref={interestsSectionRef}
-                          interests={localFormData.interests}
-                          onChange={handleInputChange}
-                          onFieldBlur={markFieldTouched}
-                          shouldShowError={shouldShowError}
-                        />
+                      {isTransitioningStep ? (
+                        <FormSectionSkeleton />
+                      ) : (
+                        <>
+                          {[1, 2, 3, 4].includes(currentSection) &&
+                            localFormData?.student && (
+                              <PersonalSection
+                                ref={personalSectionRef}
+                                studentInfo={localFormData.student}
+                                onChange={handleInputChange}
+                                onFieldBlur={markFieldTouched}
+                                shouldShowError={shouldShowError}
+                                subStep={currentSection}
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                          {currentSection === 5 && localFormData?.education && (
+                            <EducationSection
+                              ref={educationSectionRef}
+                              education={localFormData.education}
+                              onChange={handleInputChange}
+                              onFieldBlur={markFieldTouched}
+                              shouldShowError={shouldShowError}
+                            />
+                          )}
+                          {[6, 7, 8, 9].includes(currentSection) &&
+                            localFormData?.family && (
+                              <FamilySection
+                                ref={familySectionRef}
+                                family={localFormData.family}
+                                onChange={handleInputChange}
+                                onFieldBlur={markFieldTouched}
+                                shouldShowError={shouldShowError}
+                                subStep={currentSection - 5}
+                                isEditMode={isEditMode}
+                              />
+                            )}
+                          {currentSection === 10 && localFormData?.health && (
+                            <HealthSection
+                              ref={healthSectionRef}
+                              health={localFormData.health}
+                              onChange={handleInputChange}
+                              onFieldBlur={markFieldTouched}
+                              shouldShowError={shouldShowError}
+                              isEditMode={isEditMode}
+                            />
+                          )}
+                          {currentSection === 11 &&
+                            localFormData?.interests && (
+                              <InterestsSection
+                                ref={interestsSectionRef}
+                                interests={localFormData.interests}
+                                onChange={handleInputChange}
+                                onFieldBlur={markFieldTouched}
+                                shouldShowError={shouldShowError}
+                              />
+                            )}
+                        </>
                       )}
                     </div>
                   </div>
@@ -681,7 +1057,7 @@ export default function IIRForm() {
                         "sm:px-6",
                       )}
                     >
-                      Reset
+                      Reset Section
                     </Button>
 
                     <div className="flex gap-3">
@@ -797,11 +1173,16 @@ export default function IIRForm() {
           >
             <AlertDialogHeader>
               <AlertDialogTitle className="text-2xl">
-                Erase everything?
+                Reset this section?
               </AlertDialogTitle>
-              <AlertDialogDescription className="font-medium text-neutral-500 dark:text-neutral-400">
-                This will clear all your current answers. This action cannot be
-                undone.
+              <AlertDialogDescription
+                className={cn(
+                  "font-medium text-neutral-500",
+                  "dark:text-neutral-400",
+                )}
+              >
+                This will clear all answers in the current section. This action
+                cannot be undone.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter
