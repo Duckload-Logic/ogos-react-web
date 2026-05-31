@@ -1,5 +1,11 @@
 import { forwardRef, useImperativeHandle, useState } from "react";
-import { GraduationCap, School, CheckCircle2, AlertCircle } from "lucide-react";
+import {
+  GraduationCap,
+  School,
+  CheckCircle2,
+  AlertCircle,
+  ChevronDown,
+} from "lucide-react";
 import { FormInput, Dropdown } from "@/components/form";
 import { SectionContainer } from "./SectionContainer";
 import {
@@ -31,6 +37,12 @@ export const EducationSection = forwardRef<
   ref,
 ) {
   const [errors, setErrors] = useState<FormErrors>({});
+  const [expandedSections, setExpandedSections] = useState<
+    Record<number, boolean>
+  >({
+    1: true, // Junior High School (Required)
+    2: true, // Senior High School (Required)
+  });
 
   const validate = (
     step?: number,
@@ -40,6 +52,23 @@ export const EducationSection = forwardRef<
       educationValidationSchema,
     );
     setErrors(sectionErrors);
+
+    const errorIndices: Record<number, boolean> = {};
+    Object.keys(sectionErrors).forEach((key) => {
+      const match = key.match(/^education\.schools\.(\d+)\./);
+      if (match) {
+        const idx = parseInt(match[1], 10);
+        errorIndices[idx] = true;
+      }
+    });
+
+    if (Object.keys(errorIndices).length > 0) {
+      setExpandedSections((prev) => ({
+        ...prev,
+        ...errorIndices,
+      }));
+    }
+
     return {
       isValid: Object.keys(sectionErrors).length === 0,
       errors: sectionErrors,
@@ -58,20 +87,118 @@ export const EducationSection = forwardRef<
     });
   };
 
+  const handleClearSection = (idx: number, e: React.MouseEvent) => {
+    e.stopPropagation();
+    const fields = [
+      "schoolName",
+      "schoolAddress",
+      "schoolType",
+      "yearStarted",
+      "yearCompleted",
+      "awards",
+    ];
+    fields.forEach((field) => {
+      onChange(`education.schools.${idx}.${field}`, "");
+      setErrors((prev: FormErrors) => {
+        const updated = { ...prev };
+        delete updated[`education.schools.${idx}.${field}`];
+        return updated;
+      });
+    });
+  };
+
   const handleInputChange = (fieldPath: string, value: any) => {
     onChange(fieldPath, value);
 
+    // Simulate next state because onChange is asynchronous
+    const updatedEducation = { ...education };
+    const pathParts = fieldPath.split(".");
+    if (pathParts[0] === "education") {
+      let current = updatedEducation;
+      for (let i = 1; i < pathParts.length - 1; i++) {
+        const part = pathParts[i];
+        const nextPart = pathParts[i + 1];
+        const isNextArray = !isNaN(Number(nextPart));
+        if (isNextArray) {
+          if (!Array.isArray(current[part])) {
+            current[part] = [];
+          }
+        } else {
+          if (typeof current[part] !== "object" || current[part] === null) {
+            current[part] = {};
+          }
+        }
+        current[part] = isNextArray
+          ? [...current[part]]
+          : { ...current[part] };
+        current = current[part];
+      }
+      const lastPart = pathParts[pathParts.length - 1];
+      const isLastArray = !isNaN(Number(lastPart));
+      if (isLastArray) {
+        current[Number(lastPart)] = value;
+      } else {
+        current[lastPart] = value;
+      }
+    }
+
     // Instant validation
     const fieldRules = educationValidationSchema[fieldPath];
+    let newErrors = { ...errors };
+
     if (fieldRules) {
-      const error = validateField(value, fieldRules, { education });
-      setErrors((prev: FormErrors) => {
-        const updated = { ...prev };
-        if (error) updated[fieldPath] = error;
-        else delete updated[fieldPath];
-        return updated;
+      const error = validateField(value, fieldRules, {
+        education: updatedEducation,
       });
+      if (error) {
+        newErrors[fieldPath] = error;
+      } else {
+        delete newErrors[fieldPath];
+      }
     }
+
+    // Re-validate all years to handle cross-field / cross-level changes
+    const isYearField =
+      fieldPath.endsWith(".yearStarted") ||
+      fieldPath.endsWith(".yearCompleted");
+
+    if (isYearField) {
+      for (let i = 0; i < 5; i++) {
+        const startPath = `education.schools.${i}.yearStarted`;
+        const compPath = `education.schools.${i}.yearCompleted`;
+
+        const startVal = updatedEducation?.schools?.[i]?.yearStarted;
+        const compVal = updatedEducation?.schools?.[i]?.yearCompleted;
+
+        const startRules = educationValidationSchema[startPath];
+        const compRules = educationValidationSchema[compPath];
+
+        if (startRules) {
+          const err = validateField(startVal, startRules, {
+            education: updatedEducation,
+          });
+          if (err) {
+            newErrors[startPath] = err;
+            if (onFieldBlur) onFieldBlur(startPath);
+          } else {
+            delete newErrors[startPath];
+          }
+        }
+        if (compRules) {
+          const err = validateField(compVal, compRules, {
+            education: updatedEducation,
+          });
+          if (err) {
+            newErrors[compPath] = err;
+            if (onFieldBlur) onFieldBlur(compPath);
+          } else {
+            delete newErrors[compPath];
+          }
+        }
+      }
+    }
+
+    setErrors(newErrors);
 
     if (onFieldBlur) {
       onFieldBlur(fieldPath);
@@ -116,7 +243,6 @@ export const EducationSection = forwardRef<
   const schoolTypes = [
     { id: "Public", name: "Public" },
     { id: "Private", name: "Private" },
-    { id: "Others", name: "Others" },
   ];
 
   return (
@@ -137,11 +263,6 @@ export const EducationSection = forwardRef<
           <label
             className={`mb-6 flex items-center gap-2 text-sm font-bold transition-colors duration-300 ${getFieldError("education.natureOfSchooling") ? "text-destructive" : "text-foreground/80"}`}
           >
-            {getFieldError("education.natureOfSchooling") ? (
-              <AlertCircle className="h-4 w-4" />
-            ) : (
-              <span className="h-1.5 w-1.5 rounded-full bg-primary" />
-            )}
             Nature of Schooling
             <span className="text-primary">*</span>
           </label>
@@ -254,6 +375,7 @@ export const EducationSection = forwardRef<
                   "schooling was interrupted...",
                 )}
                 error={getFieldError("education.interruptedDetails")}
+                maxChars={100}
               />
             </div>
           )}
@@ -262,15 +384,24 @@ export const EducationSection = forwardRef<
         {/* School Levels */}
         <div className="space-y-8">
           {[
-            { name: "Pre-elementary" },
             { name: "Elementary" },
-            { name: "High School" },
+            { name: "Junior High School" },
+            { name: "Senior High School" },
             { name: "Vocational" },
-            // { name: "College" },
+            { name: "College" },
           ].map((level: any, idx: number) => {
             const school = education?.schools?.[idx] || {};
             const status = getCompletionStatus(idx);
             const StatusIcon = status.icon;
+            const isExpanded = !!expandedSections[idx];
+            const hasData = [
+              "schoolName",
+              "schoolAddress",
+              "schoolType",
+              "yearStarted",
+              "yearCompleted",
+              "awards",
+            ].some((field) => !!school[field]?.toString().trim());
 
             return (
               <div
@@ -282,10 +413,17 @@ export const EducationSection = forwardRef<
                 )}
               >
                 <div
+                  onClick={() =>
+                    setExpandedSections((prev) => ({
+                      ...prev,
+                      [idx]: !prev[idx],
+                    }))
+                  }
                   className={cn(
                     "bg-glass-bg/40 border-glass-border/20 flex flex-wrap",
-                    "items-center justify-between gap-3 border-b px-5 py-4 sm:px-8",
-                    "sm:py-5",
+                    "items-center justify-between gap-3 px-5 py-4 sm:px-8",
+                    "cursor-pointer select-none sm:py-5",
+                    isExpanded && "border-b",
                   )}
                 >
                   <div className="flex items-center gap-3">
@@ -299,7 +437,15 @@ export const EducationSection = forwardRef<
                     </div>
                     <div>
                       <h3 className="text-base font-bold text-foreground">
-                        {level.name}
+                        {level.name}{" "}
+                        <span
+                          className={cn(
+                            "text-xs font-normal",
+                            "text-muted-foreground",
+                          )}
+                        >
+                          {idx === 1 || idx === 2 ? "(Required)" : "(Optional)"}
+                        </span>
                       </h3>
                       <div className="mt-0.5 flex items-center gap-2">
                         <span
@@ -316,144 +462,168 @@ export const EducationSection = forwardRef<
                       </div>
                     </div>
                   </div>
-                  {StatusIcon && (
-                    <StatusIcon
+                  <div className="flex items-center gap-3">
+                    {hasData && (
+                      <button
+                        type="button"
+                        onClick={(e) => handleClearSection(idx, e)}
+                        className={cn(
+                          "mr-2 rounded-lg px-2.5 py-1 text-xs font-bold",
+                          "bg-destructive/10 text-destructive",
+                          "transition-all hover:bg-destructive/20",
+                          "duration-200",
+                        )}
+                      >
+                        Clear
+                      </button>
+                    )}
+                    {StatusIcon && (
+                      <StatusIcon
+                        className={cn(
+                          "h-5 w-5",
+                          status.color.replace("bg-", "text-"),
+                        )}
+                      />
+                    )}
+                    <ChevronDown
                       className={cn(
-                        "h-5 w-5",
-                        status.color.replace("bg-", "text-"),
+                        "h-5 w-5 text-muted-foreground transition-transform duration-300",
+                        isExpanded && "rotate-180",
                       )}
                     />
-                  )}
-                </div>
-
-                <div className="p-5 sm:p-8">
-                  <div className="grid grid-cols-1 gap-5 sm:gap-8 md:grid-cols-2">
-                    <div className="md:col-span-2">
-                      <FormInput
-                        name={`education.schools.${idx}.schoolName`}
-                        label="School Name"
-                        required={isFieldRequired(
-                          educationValidationSchema,
-                          `education.schools.${idx}.schoolName`,
-                        )}
-                        value={school.schoolName || ""}
-                        onChange={(val) =>
-                          handleInputChange(
-                            `education.schools.${idx}.schoolName`,
-                            val,
-                          )
-                        }
-                        noSpecialCharacters={true}
-                        placeholder="e.g. Philippine Science High School"
-                        error={getFieldError(
-                          `education.schools.${idx}.schoolName`,
-                        )}
-                      />
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <FormInput
-                        name={`education.schools.${idx}.schoolAddress`}
-                        label="School Address"
-                        required={isFieldRequired(
-                          educationValidationSchema,
-                          `education.schools.${idx}.schoolAddress`,
-                        )}
-                        value={school.schoolAddress || ""}
-                        onChange={(val) =>
-                          handleInputChange(
-                            `education.schools.${idx}.schoolAddress`,
-                            val,
-                          )
-                        }
-                        noSpecialCharacters={true}
-                        placeholder="Street, City, Province"
-                        error={getFieldError(
-                          `education.schools.${idx}.schoolAddress`,
-                        )}
-                      />
-                    </div>
-
-                    <Dropdown
-                      formStyle
-                      label="School Type"
-                      options={schoolTypes}
-                      value={school.schoolType || ""}
-                      onChange={(val: any) =>
-                        handleInputChange(
-                          `education.schools.${idx}.schoolType`,
-                          val,
-                        )
-                      }
-                      error={getFieldError(
-                        `education.schools.${idx}.schoolType`,
-                      )}
-                      required={isFieldRequired(
-                        educationValidationSchema,
-                        `education.schools.${idx}.schoolType`,
-                      )}
-                    />
-
-                    <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
-                      <FormInput
-                        name={`education.schools.${idx}.yearStarted`}
-                        label="Year Started"
-                        inputMode="numeric"
-                        required={isFieldRequired(
-                          educationValidationSchema,
-                          `education.schools.${idx}.yearStarted`,
-                        )}
-                        value={school.yearStarted || ""}
-                        onChange={(val) =>
-                          handleInputChange(
-                            `education.schools.${idx}.yearStarted`,
-                            val.replace(/[^0-9]/g, ""),
-                          )
-                        }
-                        placeholder="YYYY"
-                        error={getFieldError(
-                          `education.schools.${idx}.yearStarted`,
-                        )}
-                      />
-                      <FormInput
-                        name={`education.schools.${idx}.yearCompleted`}
-                        label="Year Graduated"
-                        inputMode="numeric"
-                        required={isFieldRequired(
-                          educationValidationSchema,
-                          `education.schools.${idx}.yearCompleted`,
-                        )}
-                        value={school.yearCompleted || ""}
-                        onChange={(val) =>
-                          handleInputChange(
-                            `education.schools.${idx}.yearCompleted`,
-                            val.replace(/[^0-9]/g, ""),
-                          )
-                        }
-                        placeholder="YYYY"
-                        error={getFieldError(
-                          `education.schools.${idx}.yearCompleted`,
-                        )}
-                      />
-                    </div>
-
-                    <div className="md:col-span-2">
-                      <FormInput
-                        name={`education.schools.${idx}.awards`}
-                        label="Awards/Honors"
-                        value={school.awards || ""}
-                        onChange={(val) =>
-                          handleInputChange(
-                            `education.schools.${idx}.awards`,
-                            val,
-                          )
-                        }
-                        noSpecialCharacters={true}
-                        placeholder="e.g. With Honors, Academic Excellence..."
-                      />
-                    </div>
                   </div>
                 </div>
+
+                {isExpanded && (
+                  <div className="p-5 sm:p-8">
+                    <div className="grid grid-cols-1 gap-5 sm:gap-8 md:grid-cols-2">
+                      <div className="md:col-span-2">
+                        <FormInput
+                          name={`education.schools.${idx}.schoolName`}
+                          label="School Name"
+                          required={isFieldRequired(
+                            educationValidationSchema,
+                            `education.schools.${idx}.schoolName`,
+                          )}
+                          value={school.schoolName || ""}
+                          onChange={(val) =>
+                            handleInputChange(
+                              `education.schools.${idx}.schoolName`,
+                              val,
+                            )
+                          }
+                          noSpecialCharacters={true}
+                          placeholder="e.g. Philippine Science High School"
+                          error={getFieldError(
+                            `education.schools.${idx}.schoolName`,
+                          )}
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <FormInput
+                          name={`education.schools.${idx}.schoolAddress`}
+                          label="School Address"
+                          required={isFieldRequired(
+                            educationValidationSchema,
+                            `education.schools.${idx}.schoolAddress`,
+                          )}
+                          value={school.schoolAddress || ""}
+                          onChange={(val) =>
+                            handleInputChange(
+                              `education.schools.${idx}.schoolAddress`,
+                              val,
+                            )
+                          }
+                          noSpecialCharacters={true}
+                          placeholder="Street, City, Province"
+                          error={getFieldError(
+                            `education.schools.${idx}.schoolAddress`,
+                          )}
+                        />
+                      </div>
+
+                      <Dropdown
+                        formStyle
+                        label="School Type"
+                        options={schoolTypes}
+                        value={school.schoolType || ""}
+                        onChange={(val: any) =>
+                          handleInputChange(
+                            `education.schools.${idx}.schoolType`,
+                            val,
+                          )
+                        }
+                        error={getFieldError(
+                          `education.schools.${idx}.schoolType`,
+                        )}
+                        required={isFieldRequired(
+                          educationValidationSchema,
+                          `education.schools.${idx}.schoolType`,
+                        )}
+                      />
+
+                      <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+                        <FormInput
+                          name={`education.schools.${idx}.yearStarted`}
+                          label="Year Started"
+                          inputMode="numeric"
+                          required={isFieldRequired(
+                            educationValidationSchema,
+                            `education.schools.${idx}.yearStarted`,
+                          )}
+                          value={school.yearStarted || ""}
+                          onChange={(val) =>
+                            handleInputChange(
+                              `education.schools.${idx}.yearStarted`,
+                              val.replace(/[^0-9]/g, ""),
+                            )
+                          }
+                          placeholder="YYYY"
+                          error={getFieldError(
+                            `education.schools.${idx}.yearStarted`,
+                          )}
+                        />
+                        <FormInput
+                          name={`education.schools.${idx}.yearCompleted`}
+                          label="Year Graduated"
+                          inputMode="numeric"
+                          required={isFieldRequired(
+                            educationValidationSchema,
+                            `education.schools.${idx}.yearCompleted`,
+                          )}
+                          value={school.yearCompleted || ""}
+                          onChange={(val) =>
+                            handleInputChange(
+                              `education.schools.${idx}.yearCompleted`,
+                              val.replace(/[^0-9]/g, ""),
+                            )
+                          }
+                          placeholder="YYYY"
+                          error={getFieldError(
+                            `education.schools.${idx}.yearCompleted`,
+                          )}
+                        />
+                      </div>
+
+                      <div className="md:col-span-2">
+                        <FormInput
+                          name={`education.schools.${idx}.awards`}
+                          label="Awards/Honors"
+                          value={school.awards || ""}
+                          onChange={(val) =>
+                            handleInputChange(
+                              `education.schools.${idx}.awards`,
+                              val,
+                            )
+                          }
+                          noSpecialCharacters={true}
+                          placeholder="e.g. With Honors, Academic Excellence..."
+                        />
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}

@@ -50,6 +50,17 @@ export function DatePicker({
 
   const [open, setOpen] = React.useState(false);
 
+  // Close the popover on mobile viewport resize
+  React.useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640 && open) {
+        setOpen(false);
+      }
+    };
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, [open]);
+
   const handleSelect = (date: Date | undefined) => {
     if (date) {
       // Format back to YYYY-MM-DD for form state compatibility
@@ -70,20 +81,29 @@ export function DatePicker({
     "placeholder:text-muted-foreground/70 h-11",
     disabled
       ? "bg-muted/80 border-glass-border/20 text-muted-foreground " +
-        "cursor-not-allowed opacity-60"
+          "cursor-not-allowed opacity-60"
       : dateValue
         ? "bg-muted/20 border-primary/30 focus:bg-glass-bg " +
           "dark:focus:bg-glass-bg/50 focus:border-primary/50 " +
-          "focus:ring-2 focus:ring-primary/5 shadow-sm"
+          "focus:ring-2 focus:ring-primary/5 shadow-sm " +
+          "focus-within:bg-glass-bg focus-within:border-primary/50 " +
+          "focus-within:ring-2 focus-within:ring-primary/5"
         : required
           ? "bg-muted/60 dark:bg-muted/20 border-border " +
             "hover:border-destructive/40 focus:border-destructive/50 " +
-            "focus:ring-2 focus:ring-destructive/5"
+            "focus:ring-2 focus:ring-destructive/5 " +
+            "focus-within:border-destructive/50 " +
+            "focus-within:ring-2 focus-within:ring-destructive/5"
           : "bg-muted/60 dark:bg-muted/20 border-border " +
             "hover:border-glass-border/60 focus:bg-glass-bg " +
             "dark:focus:bg-glass-bg/40 focus:border-primary/50 " +
-            "focus:ring-2 focus:ring-primary/5",
-    error ? "border-red-500 focus-visible:ring-red-500" : "",
+            "focus:ring-2 focus:ring-primary/5 " +
+            "focus-within:bg-glass-bg focus-within:border-primary/50 " +
+            "focus-within:ring-2 focus-within:ring-primary/5",
+    error
+      ? "border-red-500 focus-visible:ring-red-500 " +
+          "focus-within:border-red-500 focus-within:ring-red-500"
+      : "",
   );
 
   const handleOpenChange = (isOpen: boolean) => {
@@ -94,17 +114,23 @@ export function DatePicker({
   };
 
   return (
-    <div className="space-y-2 w-full">
+    <div className="w-full space-y-2">
       {label && (
-        <div className="flex max-h-10 items-start gap-1 text-sm font-medium text-card-foreground">
+        <div
+          className={cn(
+            "flex max-h-10 items-start gap-1 text-sm font-medium",
+            "text-card-foreground",
+          )}
+        >
           <span>{label}</span>
           {required && <span className="text-red-500">*</span>}
         </div>
       )}
 
-      {/* Mobile view native date picker */}
-      <div className="sm:hidden relative w-full">
-        <style>{`
+      {/* Mobile view native date picker overlay */}
+      <div className="relative h-11 w-full sm:hidden">
+        <style>
+          {`
           #${safeId}-mobile::-webkit-calendar-picker-indicator {
             position: absolute;
             left: 0;
@@ -116,7 +142,25 @@ export function DatePicker({
             opacity: 0;
             cursor: pointer;
           }
-        `}</style>
+          #${safeId}-mobile::-webkit-inner-spin-button {
+            display: none;
+          }
+        `}
+        </style>
+        {/* Styled background container mimicking the input */}
+        <div
+          className={cn(
+            inputClasses,
+            "pointer-events-none relative flex items-center gap-2",
+            !dateValue && "font-normal text-muted-foreground/70",
+          )}
+        >
+          <CalendarIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+          <span className="flex-1 truncate text-left">
+            {dateValue ? format(dateValue, "PPP") : "Select a date"}
+          </span>
+        </div>
+        {/* Invisible native input on top to capture clicks */}
         <input
           type="date"
           id={`${safeId}-mobile`}
@@ -125,40 +169,36 @@ export function DatePicker({
           onBlur={onBlur}
           disabled={disabled}
           className={cn(
-            inputClasses,
-            "bg-background pr-10 text-left",
-            !value && "text-muted-foreground/70",
-          )}
-        />
-        <CalendarIcon
-          className={cn(
-            "absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4",
-            "text-muted-foreground pointer-events-none",
+            "absolute inset-0 h-full w-full cursor-pointer opacity-0",
+            "disabled:cursor-not-allowed",
           )}
         />
       </div>
 
       {/* Desktop view Popover calendar */}
-      <div className="hidden sm:block w-full">
-        <Popover open={open} onOpenChange={handleOpenChange}>
+      <div className="hidden w-full sm:block">
+        <Popover
+          open={open}
+          onOpenChange={handleOpenChange}
+        >
           <PopoverTrigger asChild>
             <Button
               id={`${safeId}-desktop`}
               variant="ghost"
               className={cn(
                 inputClasses,
-                !dateValue && "text-muted-foreground/70 font-normal",
+                !dateValue && "font-normal text-muted-foreground/70",
               )}
               disabled={disabled}
             >
               <CalendarIcon className="h-4 w-4 shrink-0" />
-              <span className="flex-1 text-left truncate">
+              <span className="flex-1 truncate text-left">
                 {dateValue ? format(dateValue, "PPP") : "Select a date"}
               </span>
             </Button>
           </PopoverTrigger>
           <PopoverContent
-            className="w-[300px] p-0 bg-background rounded-xl"
+            className="w-[300px] rounded-xl bg-background p-0"
             align="start"
           >
             <Calendar
@@ -176,9 +216,7 @@ export function DatePicker({
       </div>
 
       {error && (
-        <span className="text-xs text-red-500 mt-1.5 ml-1 block">
-          {error}
-        </span>
+        <span className="ml-1 mt-1.5 block text-xs text-red-500">{error}</span>
       )}
     </div>
   );

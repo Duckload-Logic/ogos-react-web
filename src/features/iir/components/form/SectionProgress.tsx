@@ -121,7 +121,7 @@ export function SectionProgress({
                 "dark:bg-neutral-900",
               )}
             >
-              {sections.map((section) => {
+              {sections.map((section, idx) => {
                 const active = currentSection === section.id;
                 const isCompleted = isSectionFinished(section.id);
                 const navigable = isNavigable(section.id);
@@ -143,8 +143,7 @@ export function SectionProgress({
                     )}
                   >
                     <span className="text-sm">
-                      {section.id}.{" "}
-                      {section.title.split(". ")[1] || section.title}
+                      {idx + 1}. {section.title.split(". ")[1] || section.title}
                     </span>
                     {finished ? (
                       <Check className="h-4 w-4 text-green-500" />
